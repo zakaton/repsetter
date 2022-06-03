@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .style-links a {
+    @apply text-blue-600 no-underline;
+  }
+  .style-links a:hover {
+    @apply text-blue-500;
+  }
+}
