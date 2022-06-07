@@ -23,6 +23,7 @@ class MyDocument extends Document {
             name="description"
             content="Repsetter - online coaching"
           />
+          <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
         </Head>
         <body>
           <Main />
