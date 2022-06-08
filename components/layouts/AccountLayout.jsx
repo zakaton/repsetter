@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import Head from 'next/head';
-import { BellIcon, UserCircleIcon } from '@heroicons/react/outline';
+import { BellIcon, UserCircleIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/outline';
 import MyLink from '../MyLink';
 import { useUser } from '../../context/user-context';
 
@@ -10,6 +10,22 @@ const navigation = [
     name: 'General',
     href: '/account',
     icon: UserCircleIcon,
+  },
+  {
+    name: 'Users',
+    href: '/users',
+    icon: UserGroupIcon,
+    isAdmin: true,
+  },
+  {
+    name: 'Coaches',
+    href: '/coaches',
+    icon: UsersIcon,
+  },
+  {
+    name: 'Clients',
+    href: '/clients',
+    icon: UserGroupIcon,
   },
   {
     name: 'Notifications',
@@ -48,8 +64,8 @@ export default function AccountLayout({ children }) {
         <Head>
           <title>Account - Repsetter</title>
         </Head>
-        <div className="lg:grid lg:grid-cols-12 lg:gap-x-5">
-          <aside className="px-2 sm:px-6 lg:col-span-2 lg:py-0 lg:px-0">
+        <div className="lg:grid lg:grid-cols-7 lg:gap-x-5">
+          <aside className="px-2 sm:px-6 lg:col-span-1 lg:py-0 lg:px-0">
             <nav className="space-y-1">
               {navigation.map((item) => {
                 const current = router.route === item.href;
@@ -83,7 +99,7 @@ export default function AccountLayout({ children }) {
             </nav>
           </aside>
 
-          <div className="space-y-6 sm:px-6 lg:col-span-9 lg:px-0">
+          <div className="space-y-6 sm:px-6 lg:col-span-6 lg:px-0">
             <div className="shadow sm:rounded-md">{children}</div>
           </div>
         </div>

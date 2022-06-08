@@ -16,7 +16,7 @@ export default function Layout({ children }) {
       <Header />
       {!online && <OfflineBanner />}
       <DeleteAccountNotification />
-      <main className="relative mx-auto max-w-7xl py-4 px-4 sm:px-6 lg:px-8">
+      <main className="relative mx-auto py-4 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
       <Footer />

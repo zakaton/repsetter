@@ -40,10 +40,24 @@ export default function AccountGeneral() {
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                   {user.can_coach ? (
-                    'yes'
+                    <>
+                    Yes.{' '}
+                    <MyLink
+                      href={stripeLinks.dashboard}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <button
+                        type="button"
+                        className="inline-flex items-center rounded-md border border-transparent bg-indigo-100 px-2 py-1 text-sm font-medium leading-4 text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      >
+                        Go to Stripe Dashboard
+                      </button>
+                    </MyLink>
+                  </>
                   ) : (
                     <>
-                      no.{' '}
+                      No.{' '}
                       <MyLink
                         href={stripeLinks.onboarding}
                         target="_blank"
@@ -66,25 +80,6 @@ export default function AccountGeneral() {
         )}
       </div>
       <div className="flex items-end justify-end gap-2 bg-gray-50 px-4 py-3 text-right text-xs sm:px-6 sm:text-sm">
-        <MyLink
-          href={
-            user.has_completed_onboarding
-              ? stripeLinks.dashboard
-              : stripeLinks.onboarding
-          }
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button
-            type="button"
-            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            {user.has_completed_onboarding
-              ? 'Go to Stripe Dashboard'
-              : 'Setup Stripe Account'}
-          </button>
-        </MyLink>
-
         <button
           type="button"
           onClick={() => setShowDeleteAccount(true)}
