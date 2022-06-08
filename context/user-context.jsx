@@ -54,6 +54,7 @@ export function UserContextProvider(props) {
   useEffect(() => {
     const session = supabase.auth.session();
     setSession(session);
+    console.log(session)
     
     updateUserProfile();
 
