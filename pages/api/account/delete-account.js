@@ -6,9 +6,11 @@ import {
   getUserByAccessToken,
 } from '../../../utils/supabase';
 import { emailAdmin } from '../../../utils/send-email';
+import Stripe from 'stripe';
 
 export default async function handler(req, res) {
   const supabase = getSupabaseService();
+  const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
   const sendError = (error) =>
     res.status(200).json({
