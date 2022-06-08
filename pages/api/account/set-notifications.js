@@ -7,10 +7,10 @@ import {
 
 export const notificationTypes = [
   {
-    value: 'email_pledge_receipt',
-    title: 'Pledge Receipt',
+    value: 'email_subscription_receipt',
+    title: 'Subscription',
     description:
-      "Receive a receipt when you're charged for a pledge you've made to a campaign that succeeds.",
+      "Receive a receipt when you're charged for a coaching subscription",
   },
 ];
 
