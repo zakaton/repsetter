@@ -39,7 +39,7 @@ export default function AccountGeneral() {
                   Can create campaigns?
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                  {user.can_create_campaigns ? (
+                  {user.can_coach ? (
                     'yes'
                   ) : (
                     <>
