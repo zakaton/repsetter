@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import MyLink from '../components/MyLink';
