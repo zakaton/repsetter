@@ -2,7 +2,7 @@ import mail from '@sendgrid/mail';
 
 mail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const adminEmail = 'zack@ukaton.com';
+const adminEmail = 'contact@repsetter.com';
 const notificationsEmail = 'notifications@repsetter.com';
 
 export default async function sendEmail(...messages) {
