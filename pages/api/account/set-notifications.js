@@ -8,7 +8,7 @@ import {
 export const notificationTypes = [
   {
     value: 'email_subscription_receipt',
-    title: 'Subscription',
+    title: 'Subscription Charge',
     description:
       "Receive a receipt when you're charged for a coaching subscription",
   },
