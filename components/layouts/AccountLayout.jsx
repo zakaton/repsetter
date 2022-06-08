@@ -60,7 +60,7 @@ export default function AccountLayout({ children }) {
                       href={item.href}
                       className={classNames(
                         current
-                          ? 'bg-gray-50 text-yellow-700 hover:bg-white hover:text-yellow-700'
+                          ? 'bg-gray-50 text-blue-700 hover:bg-white hover:text-blue-700'
                           : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900',
                         'group flex items-center rounded-md px-3 py-2 text-sm font-medium'
                       )}
@@ -69,7 +69,7 @@ export default function AccountLayout({ children }) {
                       <item.icon
                         className={classNames(
                           current
-                            ? 'text-yellow-500 group-hover:text-yellow-500'
+                            ? 'text-blue-500 group-hover:text-blue-500'
                             : 'text-gray-400 group-hover:text-gray-500',
                           '-ml-1 mr-3 h-6 w-6 flex-shrink-0'
                         )}
