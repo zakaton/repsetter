@@ -26,6 +26,7 @@ const navigation = [
     name: 'My Clients',
     href: '/account/my-clients',
     icon: UserGroupIcon,
+    canCoach: true,
   },
   {
     name: 'Subscriptions',
@@ -85,7 +86,7 @@ export default function AccountLayout({ children }) {
               {navigation.map((item) => {
                 const current = router.route === item.href;
                 return (
-                  (!item.isAdmin || isAdmin) && (
+                  (!item.isAdmin || isAdmin) && (!item.canCoach || user.can_coach) && (
                     <MyLink
                       key={item.href}
                       href={item.href}
