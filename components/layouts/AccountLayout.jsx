@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import Head from 'next/head';
-import { BellIcon, UserCircleIcon, UserGroupIcon, CurrencyDollarIcon, ClipboardListIcon, HeartIcon, HandIcon } from '@heroicons/react/outline';
+import { BellIcon, UserCircleIcon, UserGroupIcon, CurrencyDollarIcon, ClipboardListIcon, HeartIcon, FireIcon } from '@heroicons/react/outline';
 import MyLink from '../MyLink';
 import { useUser } from '../../context/user-context';
 
@@ -35,7 +35,7 @@ const navigation = [
   {
     name: 'Workouts',
     href: '/account/workouts',
-    icon: HandIcon,
+    icon: FireIcon,
   },
   {
     name: 'Diet',
