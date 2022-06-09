@@ -49,7 +49,7 @@ export default function Header() {
                     src="/images/icon.svg"
                     alt="Repsetter"
                   />
-                  <span className="hidden px-2 text-xl font-semibold xs:block">
+                  <span className="hidden px-2 text-xl font-medium xs:block">
                     Repsetter
                   </span>
                 </MyLink>

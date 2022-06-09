@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 import { useState } from 'react';
 import { useUser } from '../../context/user-context';
-import DeleteAccountModal from '../../components/account/DeleteAccountModal';
+import DeleteAccountModal from '../../components/account/modal/DeleteAccountModal';
 import MyLink from '../../components/MyLink';
 import { getAccountLayout } from '../../components/layouts/AccountLayout';
 
@@ -80,6 +80,18 @@ export default function AccountGeneral() {
         )}
       </div>
       <div className="flex items-end justify-end gap-2 bg-gray-50 px-4 py-3 text-right text-xs sm:px-6 sm:text-sm">
+      <MyLink
+          href={stripeLinks.customerPortal}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <button
+            type="button"
+            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            Customer Portal
+          </button>
+        </MyLink>
         <button
           type="button"
           onClick={() => setShowDeleteAccount(true)}

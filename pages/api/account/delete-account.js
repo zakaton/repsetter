@@ -27,9 +27,9 @@ export default async function handler(req, res) {
   }
 
   let userToDelete;
-  if (req.method === 'POST') {
+  if (req.query.userId) {
     if (isUserAdmin(user)) {
-      const { userId } = req.body;
+      const { userId } = req.query;
       if (userId) {
         const { data: foundUser, error } = await supabase
           .from('profile')

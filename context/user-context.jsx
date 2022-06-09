@@ -27,6 +27,7 @@ export function UserContextProvider(props) {
       setStripeLinks({
         onboarding: `/api/account/stripe-onboarding?access_token=${session.access_token}`,
         dashboard: `/api/account/stripe-dashboard?access_token=${session.access_token}`,
+        customerPortal: `/api/account/stripe-customer-portal?access_token=${session.access_token}`,
       });
     }
   }, [session]);

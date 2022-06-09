@@ -1,12 +1,48 @@
 /* eslint-disable react/destructuring-assignment */
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { ExclamationIcon, XIcon } from '@heroicons/react/outline';
-import { useUser } from '../../context/user-context';
+import { XIcon, ExclamationIcon } from '@heroicons/react/outline';
 
-export default function DeleteAccountModal({ open, setOpen }) {
-  const { deleteAccount } = useUser();
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
+const colorPalletes = {
+  red: {
+    'bg-100': 'bg-red-100',
+    'text-600':'text-red-600',
+    'bg-600':'bg-red-600',
+    'focus:ring-500':'focus:ring-red-500',
+    'hover:bg-700':'hover:bg-red-700'
+  },
+  indigo: {
+    'bg-100': 'bg-indigo-100',
+    'text-600':'text-indigo-600',
+    'bg-600':'bg-indigo-600',
+    'focus:ring-500':'focus:ring-indigo-500',
+    'hover:bg-700':'hover:bg-indigo-700'
+  },
+  blue: {
+    'bg-100': 'bg-blue-100',
+    'text-600':'text-blue-600',
+    'bg-600':'bg-blue-600',
+    'focus:ring-500':'focus:ring-blue-500',
+    'hover:bg-700':'hover:bg-blue-700'
+  }
+}
+
+export default function Modal({
+  children,
+  title,
+  message,
+  open,
+  setOpen,
+  Icon = ExclamationIcon,
+  color,
+  Button
+}) {
+  const colorPallete = colorPalletes[color] || colorPalletes.blue
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-40" onClose={setOpen}>
@@ -52,9 +88,9 @@ export default function DeleteAccountModal({ open, setOpen }) {
                   </button>
                 </div>
                 <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <ExclamationIcon
-                      className="h-6 w-6 text-red-600"
+                  <div className={classNames("mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10", colorPallete['bg-100'])}>
+                    <Icon
+                      className={classNames("h-6 w-6", colorPallete['text-600'])}
                       aria-hidden="true"
                     />
                   </div>
@@ -63,31 +99,17 @@ export default function DeleteAccountModal({ open, setOpen }) {
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900"
                     >
-                      Delete account
+                      {title}
                     </Dialog.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to delete your account? All of
-                        your data will be permanently removed from our servers
-                        forever, and any pending campaigns and pledges will be
-                        canceled. This action cannot be undone.
+                        {message}
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setIsDeletingAccount(true);
-                      await deleteAccount();
-                    }}
-                    className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-                  >
-                    {isDeletingAccount
-                      ? 'Deleting Account...'
-                      : 'Delete Account'}
-                  </button>
+                  {Button}
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"

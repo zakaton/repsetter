@@ -18,7 +18,7 @@ export default function Notifications() {
   return (
     <>
       <Head>
-        <title>Notifications - Pennyseed</title>
+        <title>Notifications - Repsetter</title>
       </Head>
       <Notification
         open={showUpdateNotificationsNotification}

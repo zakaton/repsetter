@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useUser } from '../../context/user-context';
-import Notification from '../Notification';
+import { useUser } from '../../../context/user-context';
+import Notification from '../../Notification';
 
-export default function DeleteAccountStatusNotification() {
+export default function DeleteAccountNotification() {
   const { didDeleteAccount } = useUser();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState();

@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import Head from 'next/head';
-import { BellIcon, UserCircleIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/outline';
+import { BellIcon, UserCircleIcon, UserGroupIcon, CurrencyDollarIcon, ClipboardListIcon, HeartIcon, HandIcon } from '@heroicons/react/outline';
 import MyLink from '../MyLink';
 import { useUser } from '../../context/user-context';
 
@@ -12,20 +12,35 @@ const navigation = [
     icon: UserCircleIcon,
   },
   {
-    name: 'Users',
-    href: '/users',
+    name: 'All Users',
+    href: '/account/all-users',
     icon: UserGroupIcon,
     isAdmin: true,
   },
   {
-    name: 'Coaches',
-    href: '/coaches',
-    icon: UsersIcon,
+    name: 'My Coaches',
+    href: '/account/my-coaches',
+    icon: ClipboardListIcon,
   },
   {
-    name: 'Clients',
-    href: '/clients',
+    name: 'My Clients',
+    href: '/account/my-clients',
     icon: UserGroupIcon,
+  },
+  {
+    name: 'Subscriptions',
+    href: '/account/subscriptions',
+    icon: CurrencyDollarIcon,
+  },
+  {
+    name: 'Workouts',
+    href: '/account/workouts',
+    icon: HandIcon,
+  },
+  {
+    name: 'Diet',
+    href: '/account/diet',
+    icon: HeartIcon,
   },
   {
     name: 'Notifications',
