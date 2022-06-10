@@ -4,7 +4,7 @@ export default function Privacy() {
   return (
     <>
       <Head>
-        <title>Privacy Policy - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>Privacy Policy - Repsetter</title>
       </Head>
       <div className="prose mx-auto max-w-prose text-lg">
         <h1>

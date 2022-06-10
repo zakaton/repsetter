@@ -22,7 +22,7 @@ export default function FAQ() {
   return (
     <>
       <Head>
-        <title>FAQ - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>FAQ - Repsetter</title>
       </Head>
       <div className="style-links mx-auto max-w-3xl divide-y-2 divide-gray-200">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">

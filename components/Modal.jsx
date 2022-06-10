@@ -1,35 +1,35 @@
 /* eslint-disable react/destructuring-assignment */
-import { Fragment, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { XIcon, ExclamationIcon } from '@heroicons/react/outline';
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { XIcon, ExclamationIcon } from "@heroicons/react/outline";
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 const colorPalletes = {
   red: {
-    'bg-100': 'bg-red-100',
-    'text-600':'text-red-600',
-    'bg-600':'bg-red-600',
-    'focus:ring-500':'focus:ring-red-500',
-    'hover:bg-700':'hover:bg-red-700'
+    "bg-100": "bg-red-100",
+    "text-600": "text-red-600",
+    "bg-600": "bg-red-600",
+    "focus:ring-500": "focus:ring-red-500",
+    "hover:bg-700": "hover:bg-red-700",
   },
   indigo: {
-    'bg-100': 'bg-indigo-100',
-    'text-600':'text-indigo-600',
-    'bg-600':'bg-indigo-600',
-    'focus:ring-500':'focus:ring-indigo-500',
-    'hover:bg-700':'hover:bg-indigo-700'
+    "bg-100": "bg-indigo-100",
+    "text-600": "text-indigo-600",
+    "bg-600": "bg-indigo-600",
+    "focus:ring-500": "focus:ring-indigo-500",
+    "hover:bg-700": "hover:bg-indigo-700",
   },
   blue: {
-    'bg-100': 'bg-blue-100',
-    'text-600':'text-blue-600',
-    'bg-600':'bg-blue-600',
-    'focus:ring-500':'focus:ring-blue-500',
-    'hover:bg-700':'hover:bg-blue-700'
-  }
-}
+    "bg-100": "bg-blue-100",
+    "text-600": "text-blue-600",
+    "bg-600": "bg-blue-600",
+    "focus:ring-500": "focus:ring-blue-500",
+    "hover:bg-700": "hover:bg-blue-700",
+  },
+};
 
 export default function Modal({
   children,
@@ -39,9 +39,9 @@ export default function Modal({
   setOpen,
   Icon = ExclamationIcon,
   color,
-  Button
+  Button,
 }) {
-  const colorPallete = colorPalletes[color] || colorPalletes.blue
+  const colorPallete = colorPalletes[color] || colorPalletes.blue;
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -88,9 +88,17 @@ export default function Modal({
                   </button>
                 </div>
                 <div className="sm:flex sm:items-start">
-                  <div className={classNames("mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10", colorPallete['bg-100'])}>
+                  <div
+                    className={classNames(
+                      "mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10",
+                      colorPallete["bg-100"]
+                    )}
+                  >
                     <Icon
-                      className={classNames("h-6 w-6", colorPallete['text-600'])}
+                      className={classNames(
+                        "h-6 w-6",
+                        colorPallete["text-600"]
+                      )}
                       aria-hidden="true"
                     />
                   </div>
@@ -102,12 +110,11 @@ export default function Modal({
                       {title}
                     </Dialog.Title>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        {message}
-                      </p>
+                      <p className="text-sm text-gray-500">{message}</p>
                     </div>
                   </div>
                 </div>
+                {children}
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   {Button}
                   <button

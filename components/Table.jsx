@@ -6,7 +6,6 @@ import { useUser } from "../context/user-context";
 import Notification from "./Notification";
 import Filters from "./Filters";
 import Pagination from "./Pagination";
-import MyLink from "./MyLink";
 
 const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();
@@ -24,7 +23,6 @@ export default function Table({
   DeleteResultModal,
   resultMap,
   deleteTitle,
-  getResultUrl,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -214,16 +212,14 @@ export default function Table({
   return (
     <>
       <Head>
-        <title>
-          {title} - {process.env.NEXT_PUBLIC_URL_TITLE}
-        </title>
+        <title>{title} - Repsetter</title>
       </Head>
       {CreateResultModal && (
         <CreateResultModal
           open={showCreateResultModal}
           setOpen={setShowCreateResultModal}
           setCreateResultStatus={setCreateResultStatus}
-          setShowDeleteResultNotification={setShowCreateResultNotification}
+          setShowCreateResultNotification={setShowCreateResultNotification}
         />
       )}
       <Notification
@@ -283,12 +279,20 @@ export default function Table({
         {results?.length > 0 &&
           // eslint-disable-next-line no-shadow
           results.map((result) => {
-            const resultContent = resultMap(result).map(({ title, value }) => (
-              <div key={title} className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">{title}</dt>
-                <dd className="mt-1 text-sm text-gray-900">{value}</dd>
-              </div>
-            ));
+            const resultContent = resultMap(result).map(
+              ({ title, value, jsx }, index) => (
+                <div key={index} className="sm:col-span-1">
+                  {jsx || (
+                    <>
+                      <dt className="text-sm font-medium text-gray-500">
+                        {title}
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900">{value}</dd>
+                    </>
+                  )}
+                </div>
+              )
+            );
             return (
               <div
                 key={result.id}
@@ -296,18 +300,6 @@ export default function Table({
               >
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {resultContent}
-                  {getResultUrl && (
-                    <div className="sm:col-span-1">
-                      <MyLink href={getResultUrl(result)}>
-                        <button
-                          type="button"
-                          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                        >
-                          View <span className="sr-only"> {resultName}</span>
-                        </button>
-                      </MyLink>
-                    </div>
-                  )}
                   {DeleteResultModal && (
                     <div className="sm:col-span-1">
                       <button

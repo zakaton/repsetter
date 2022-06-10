@@ -86,7 +86,7 @@ export default function AccountLayout({ children }) {
     user && (
       <>
         <Head>
-          <title>Account - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+          <title>Account - Repsetter</title>
         </Head>
         <div className="lg:grid lg:grid-cols-7 lg:gap-x-5">
           <aside className="px-2 sm:px-6 lg:col-span-1 lg:py-0 lg:px-0">

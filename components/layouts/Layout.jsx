@@ -11,7 +11,7 @@ export default function Layout({ children }) {
   return (
     <>
       <Head>
-        <title>{process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>Repsetter</title>
       </Head>
       <Header />
       {!online && <OfflineBanner />}

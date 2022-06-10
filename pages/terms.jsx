@@ -4,7 +4,7 @@ export default function Terms() {
   return (
     <>
       <Head>
-        <title>Terms of Use - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>Terms of Use - Repsetter</title>
       </Head>
       <div className="prose mx-auto max-w-prose text-lg">
         <h1>

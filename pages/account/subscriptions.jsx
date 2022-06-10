@@ -44,24 +44,50 @@ export default function Subscriptions() {
         orderTypes={orderTypes}
         tableName="subscription"
         DeleteResultModal={DeleteSubscriptionModal}
-        resultMap={(result) => [
-          {
-            title: "coach",
-            value: result.coach,
-          },
-          {
-            title: "client",
-            value: result.client,
-          },
-          {
-            title: "price",
-            value: result.price,
-          },
-          {
-            title: "created at",
-            value: new Date(result.created_at).toLocaleString(),
-          },
-        ]}
+        resultMap={(result) =>
+          [
+            {
+              title: "coach",
+              value: result.coach,
+            },
+            {
+              title: "client",
+              value: result.client,
+            },
+            {
+              title: "price",
+              value: result.price,
+            },
+            {
+              title: "redeemed?",
+              value: result.redeemed,
+            },
+            !result.redeemed && {
+              title: "url",
+              value: `pennyseed.me/${result.id}`,
+            },
+            !result.redeemed && {
+              title: "Share",
+              value: `FILL`,
+            },
+            !result.redeemed && {
+              title: "QR",
+              value: `FILL`,
+            },
+            result.redeemed && {
+              title: "Cancel",
+              value: `FILL`,
+            },
+            result.redeemed && {
+              title: "Last Billing Cycle",
+              value: `FILL`,
+            },
+            {
+              title: "created at",
+              value: new Date(result.created_at).toLocaleString(),
+            },
+          ].filter(Boolean)
+        }
       ></Table>
     </>
   );

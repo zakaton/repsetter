@@ -18,7 +18,7 @@ export default function Notifications() {
   return (
     <>
       <Head>
-        <title>Notifications - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>Notifications - Repsetter</title>
       </Head>
       <Notification
         open={showUpdateNotificationsNotification}

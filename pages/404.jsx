@@ -4,7 +4,7 @@ export default function Error404() {
   return (
     <>
       <Head>
-        <title>404 - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>404 - Repsetter</title>
       </Head>
       <div className="min-h-full bg-white px-4 py-16 sm:px-6 sm:py-24 md:grid md:place-items-center lg:px-8">
         <div className="mx-auto max-w-max">

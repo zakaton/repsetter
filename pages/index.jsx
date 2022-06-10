@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>{process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>Repsetter</title>
       </Head>
       <h1>Repsetter</h1>
     </>

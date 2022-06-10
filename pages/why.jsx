@@ -6,7 +6,7 @@ export default function Why() {
   return (
     <>
       <Head>
-        <title>Why - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
+        <title>Why - Repsetter</title>
       </Head>
       Why?
     </>
