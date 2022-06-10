@@ -1,57 +1,65 @@
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import Head from 'next/head';
-import { BellIcon, UserCircleIcon, UserGroupIcon, CurrencyDollarIcon, ClipboardListIcon, HeartIcon, FireIcon } from '@heroicons/react/outline';
-import MyLink from '../MyLink';
-import { useUser } from '../../context/user-context';
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import Head from "next/head";
+import {
+  BellIcon,
+  UserCircleIcon,
+  UserGroupIcon,
+  CurrencyDollarIcon,
+  ClipboardListIcon,
+  HeartIcon,
+  FireIcon,
+} from "@heroicons/react/outline";
+import MyLink from "../MyLink";
+import { useUser } from "../../context/user-context";
 
 const navigation = [
   {
-    name: 'General',
-    href: '/account',
+    name: "General",
+    href: "/account",
     icon: UserCircleIcon,
   },
   {
-    name: 'All Users',
-    href: '/account/all-users',
+    name: "All Users",
+    href: "/account/all-users",
     icon: UserGroupIcon,
     isAdmin: true,
   },
   {
-    name: 'My Coaches',
-    href: '/account/my-coaches',
+    name: "My Coaches",
+    href: "/account/my-coaches",
     icon: ClipboardListIcon,
   },
   {
-    name: 'My Clients',
-    href: '/account/my-clients',
+    name: "My Clients",
+    href: "/account/my-clients",
     icon: UserGroupIcon,
     canCoach: true,
   },
   {
-    name: 'Subscriptions',
-    href: '/account/subscriptions',
+    name: "Subscriptions",
+    href: "/account/subscriptions",
     icon: CurrencyDollarIcon,
   },
   {
-    name: 'Workouts',
-    href: '/account/workouts',
+    name: "Workouts",
+    href: "/account/workouts",
     icon: FireIcon,
   },
   {
-    name: 'Diet',
-    href: '/account/diet',
+    name: "Diet",
+    href: "/account/diet",
     icon: HeartIcon,
   },
   {
-    name: 'Notifications',
-    href: '/account/notifications',
+    name: "Notifications",
+    href: "/account/notifications",
     icon: BellIcon,
   },
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function AccountLayout({ children }) {
@@ -62,10 +70,10 @@ export default function AccountLayout({ children }) {
     if (!isLoading && !user) {
       router.replace(
         {
-          pathname: '/sign-in',
+          pathname: "/sign-in",
           query: { ...router.query, ...{ redirect_pathname: router.pathname } },
         },
-        '/sign-in',
+        "/sign-in",
         {
           shallow: true,
         }
@@ -78,7 +86,7 @@ export default function AccountLayout({ children }) {
     user && (
       <>
         <Head>
-          <title>Account - Repsetter</title>
+          <title>Account - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
         </Head>
         <div className="lg:grid lg:grid-cols-7 lg:gap-x-5">
           <aside className="px-2 sm:px-6 lg:col-span-1 lg:py-0 lg:px-0">
@@ -86,24 +94,25 @@ export default function AccountLayout({ children }) {
               {navigation.map((item) => {
                 const current = router.route === item.href;
                 return (
-                  (!item.isAdmin || isAdmin) && (!item.canCoach || user.can_coach) && (
+                  (!item.isAdmin || isAdmin) &&
+                  (!item.canCoach || user.can_coach) && (
                     <MyLink
                       key={item.href}
                       href={item.href}
                       className={classNames(
                         current
-                          ? 'bg-gray-50 text-blue-700 hover:bg-white hover:text-blue-700'
-                          : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900',
-                        'group flex items-center rounded-md px-3 py-2 text-sm font-medium'
+                          ? "bg-gray-50 text-blue-700 hover:bg-white hover:text-blue-700"
+                          : "text-gray-900 hover:bg-gray-50 hover:text-gray-900",
+                        "group flex items-center rounded-md px-3 py-2 text-sm font-medium"
                       )}
-                      {...(current ? { 'aria-current': 'page' } : {})}
+                      {...(current ? { "aria-current": "page" } : {})}
                     >
                       <item.icon
                         className={classNames(
                           current
-                            ? 'text-blue-500 group-hover:text-blue-500'
-                            : 'text-gray-400 group-hover:text-gray-500',
-                          '-ml-1 mr-3 h-6 w-6 flex-shrink-0'
+                            ? "text-blue-500 group-hover:text-blue-500"
+                            : "text-gray-400 group-hover:text-gray-500",
+                          "-ml-1 mr-3 h-6 w-6 flex-shrink-0"
                         )}
                         aria-hidden="true"
                       />

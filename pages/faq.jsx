@@ -1,33 +1,28 @@
-import { Disclosure } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/outline';
-import Head from 'next/head';
+import { Disclosure } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/outline";
+import Head from "next/head";
 
 const faqs = [
   {
-    question: 'Question?',
+    question: "Question?",
     answer: () => (
       <>
-        <p>
-          Answer
-        </p>
-        <p>
-         more info
-        </p>
+        <p>Answer</p>
+        <p>more info</p>
       </>
     ),
   },
-  
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function FAQ() {
   return (
     <>
       <Head>
-        <title>FAQ - Repsetter</title>
+        <title>FAQ - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
       </Head>
       <div className="style-links mx-auto max-w-3xl divide-y-2 divide-gray-200">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -46,8 +41,8 @@ export default function FAQ() {
                       <span className="ml-6 flex h-7 items-center">
                         <ChevronDownIcon
                           className={classNames(
-                            open ? '-rotate-180' : 'rotate-0',
-                            'h-6 w-6 transform'
+                            open ? "-rotate-180" : "rotate-0",
+                            "h-6 w-6 transform"
                           )}
                           aria-hidden="true"
                         />

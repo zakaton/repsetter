@@ -214,7 +214,9 @@ export default function Table({
   return (
     <>
       <Head>
-        <title>{title} - Repsetter</title>
+        <title>
+          {title} - {process.env.NEXT_PUBLIC_URL_TITLE}
+        </title>
       </Head>
       {CreateResultModal && (
         <CreateResultModal

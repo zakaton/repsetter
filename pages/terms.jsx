@@ -1,10 +1,10 @@
-import Head from 'next/head';
+import Head from "next/head";
 
 export default function Terms() {
   return (
     <>
       <Head>
-        <title>Terms of Use - Repsetter</title>
+        <title>Terms of Use - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
       </Head>
       <div className="prose mx-auto max-w-prose text-lg">
         <h1>

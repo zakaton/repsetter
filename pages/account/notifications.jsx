@@ -1,9 +1,9 @@
-import Head from 'next/head';
-import { useState } from 'react';
-import { getAccountLayout } from '../../components/layouts/AccountLayout';
-import { useUser } from '../../context/user-context';
-import Notification from '../../components/Notification';
-import { notificationTypes } from '../api/account/set-notifications';
+import Head from "next/head";
+import { useState } from "react";
+import { getAccountLayout } from "../../components/layouts/AccountLayout";
+import { useUser } from "../../context/user-context";
+import Notification from "../../components/Notification";
+import { notificationTypes } from "../api/account/set-notifications";
 
 export default function Notifications() {
   const { user, fetchWithAccessToken } = useUser();
@@ -18,7 +18,7 @@ export default function Notifications() {
   return (
     <>
       <Head>
-        <title>Notifications - Repsetter</title>
+        <title>Notifications - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
       </Head>
       <Notification
         open={showUpdateNotificationsNotification}
@@ -100,7 +100,7 @@ export default function Notifications() {
           <button
             type="button"
             onClick={(e) => {
-              const form = e.target.closest('form');
+              const form = e.target.closest("form");
               form
                 .querySelectorAll("input[type='checkbox']")
                 .forEach((input) => {
@@ -117,7 +117,7 @@ export default function Notifications() {
             type="submit"
             className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
           >
-            {isUpdatingNotifications ? 'Saving...' : 'Save'}
+            {isUpdatingNotifications ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

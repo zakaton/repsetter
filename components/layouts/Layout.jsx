@@ -1,17 +1,17 @@
-import Head from 'next/head';
-import Header from '../Header';
-import Footer from '../Footer';
+import Head from "next/head";
+import Header from "../Header";
+import Footer from "../Footer";
 
-import { useOnline } from '../../context/online-context';
-import OfflineBanner from '../OfflineBanner';
-import DeleteAccountNotification from '../account/notification/DeleteAccountNotification';
+import { useOnline } from "../../context/online-context";
+import OfflineBanner from "../OfflineBanner";
+import DeleteAccountNotification from "../account/notification/DeleteAccountNotification";
 
 export default function Layout({ children }) {
   const { online } = useOnline();
   return (
     <>
       <Head>
-        <title>Repsetter</title>
+        <title>{process.env.NEXT_PUBLIC_URL_TITLE}</title>
       </Head>
       <Header />
       {!online && <OfflineBanner />}

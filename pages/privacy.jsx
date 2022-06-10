@@ -1,10 +1,10 @@
-import Head from 'next/head';
+import Head from "next/head";
 
 export default function Privacy() {
   return (
     <>
       <Head>
-        <title>Privacy Policy - Repsetter</title>
+        <title>Privacy Policy - {process.env.NEXT_PUBLIC_URL_TITLE}</title>
       </Head>
       <div className="prose mx-auto max-w-prose text-lg">
         <h1>
@@ -16,7 +16,7 @@ export default function Privacy() {
       <div className="prose prose-lg prose-blue mx-auto mt-6 text-gray-500">
         <h3>User Data</h3>
         <p>
-          We store the following data on{' '}
+          We store the following data on{" "}
           <a href="https://supabase.com/" target="_blank" rel="noreferrer">
             Supabase&apos;s database
           </a>
@@ -25,8 +25,8 @@ export default function Privacy() {
         <ul>
           <li>
             Your email address so you can sign in, receive pledge receipts, as
-            well as optionally receive coaching subscription updates (which is disabled by
-            default, you&apos;d need to opt-in to receive emails)
+            well as optionally receive coaching subscription updates (which is
+            disabled by default, you&apos;d need to opt-in to receive emails)
           </li>
           <li>
             Stripe customer information, so you can make payments to coaches
