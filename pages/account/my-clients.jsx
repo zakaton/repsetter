@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import DeleteUserModal from "../../components/account/modal/DeleteUserModal";
 import Table from "../../components/Table";
+import CreateSubscriptionModal from "../../components/account/modal/CreateSubscriptionModal";
 
 const filterTypes = [
   {
@@ -51,6 +52,7 @@ export default function AllUsers() {
         tableName="profile"
         resultName="client"
         title="My Clients"
+        CreateResultModal={CreateSubscriptionModal}
         DeleteResultModal={DeleteUserModal}
         resultMap={(result) => [
           {
