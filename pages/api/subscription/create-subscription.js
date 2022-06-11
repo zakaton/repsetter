@@ -53,7 +53,7 @@ export default async function handler(req, res) {
   ) {
     return sendError({
       message:
-        "You've exceeded the number of unredeemed subscriptions. You must wait for any existing ones to be redeemed or cancel one to create a new one.",
+        "You've exceeded the number of unredeemed subscriptions. You must wait for any existing ones to be redeemed or delete one to create a new one.",
     });
   }
 
@@ -92,8 +92,9 @@ export default async function handler(req, res) {
     .insert([
       {
         coach: profile.id,
+        coach_email: profile.email,
         price: subscriptionPrice,
-        price_id: priceObject?.id,
+        price_id: priceObject?.id || process.env.DEFAULT_SUBSCRIPTION_PRICE_ID,
       },
     ]);
 

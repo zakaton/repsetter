@@ -2,6 +2,8 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import DeleteSubscriptionModal from "../../components/account/modal/DeleteSubscriptionModal";
 import Table from "../../components/Table";
 import { formatDollars } from "../../utils/subscription-utils";
+import MyLink from "../../components/MyLink";
+import { useUser } from "../../context/user-context";
 
 const filterTypes = [
   {
@@ -38,27 +40,43 @@ const orderTypes = [
 ];
 
 export default function Subscriptions() {
+  const { stripeLinks } = useUser();
   return (
     <>
       <Table
+        HeaderButton={
+          <MyLink
+            href={stripeLinks.customerPortal}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+            >
+              Customer Portal
+            </button>
+          </MyLink>
+        }
         selectString="*, coach(*), client(*)"
         filterTypes={filterTypes}
         orderTypes={orderTypes}
+        title="Subscriptions"
         tableName="subscription"
         DeleteResultModal={DeleteSubscriptionModal}
         resultMap={(result) =>
           [
             {
               title: "coach",
-              value: result.coach?.email,
+              value: result.coach_email,
             },
             result.client && {
               title: "client",
-              value: result.client?.email,
+              value: result.client_email,
             },
             {
               title: "price",
-              value: formatDollars(result.price, false),
+              value: `${formatDollars(result.price, false)}/month`,
             },
             {
               title: "redeemed?",
@@ -71,6 +89,16 @@ export default function Subscriptions() {
             {
               title: "created at",
               value: new Date(result.created_at).toLocaleString(),
+            },
+            {
+              jsx: (
+                <MyLink
+                  href={`/subscription/${result.id}`}
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  View<span className="sr-only"> subscription</span>
+                </MyLink>
+              ),
             },
           ].filter(Boolean)
         }

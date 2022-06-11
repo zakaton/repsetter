@@ -14,7 +14,7 @@ export default function SubscriptionPage() {
     <>
       <Head>
         {coachEmail ? (
-          <title>Subscribe to {coachEmail}&apos;s coaching - Repsetter</title>
+          <title>{coachEmail}&apos;s Coaching Subscription - Repsetter</title>
         ) : (
           <title>Coaching Subscription - Repsetter</title>
         )}

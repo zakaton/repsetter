@@ -9,6 +9,7 @@ import {
   ClipboardListIcon,
   HeartIcon,
   FireIcon,
+  ScaleIcon,
 } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 import { useUser } from "../../context/user-context";
@@ -50,6 +51,11 @@ const navigation = [
     name: "Diet",
     href: "/account/diet",
     icon: HeartIcon,
+  },
+  {
+    name: "Weight",
+    href: "/account/weight",
+    icon: ScaleIcon,
   },
   {
     name: "Notifications",

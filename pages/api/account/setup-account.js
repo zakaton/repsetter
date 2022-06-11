@@ -1,12 +1,12 @@
-import Stripe from 'stripe';
-import enforceApiRouteSecret from '../../../utils/enforce-api-route-secret';
-import { getSupabaseService } from '../../../utils/supabase';
+import Stripe from "stripe";
+import enforceApiRouteSecret from "../../../utils/enforce-api-route-secret";
+import { getSupabaseService } from "../../../utils/supabase";
 
 // eslint-disable-next-line consistent-return
 export default async function handler(req, res) {
   const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
   const supabase = getSupabaseService();
-  console.log('received request', req.query);
+  console.log("received request", req.query);
   if (!enforceApiRouteSecret(req, res)) {
     return;
   }
@@ -16,17 +16,17 @@ export default async function handler(req, res) {
   });
   const account = await stripe.accounts.create({
     email: req.body.record.email,
-    type: 'express',
+    type: "express",
   });
 
   await supabase
-    .from('profile')
+    .from("profile")
     .update({
       stripe_customer: customer.id,
       stripe_account: account.id,
-      notifications: ['email_subscription_receipt'],
+      notifications: ["email_subscription_receipt"],
     })
-    .eq('id', req.body.record.id);
+    .eq("id", req.body.record.id);
 
   res.status(200).send({
     message: `stripe customer ${customer.id} created and account ${account.id} created for id ${req.body.record.id}`,

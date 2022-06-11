@@ -29,7 +29,7 @@ export default function CreateSubscriptionModal(props) {
         type: "failed",
         title: "You've exceeded the number of unredeemed subscriptions",
         message:
-          "You must wait for any existing ones to be redeemed or cancel one to create a new one.",
+          "You must wait for any existing ones to be redeemed or delete one to create a new one.",
       });
       setShowCreateSubscriptionNotification(true);
       setOpen(false);

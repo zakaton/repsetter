@@ -8,16 +8,17 @@ import DeleteSubscriptionModal from "../account/modal/DeleteSubscriptionModal";
 import Notification from "../Notification";
 import QRCodeModal from "../QRCodeModal";
 import { ClipboardListIcon } from "@heroicons/react/outline";
+import MyLink from "../MyLink";
 
 export default function Subscription({ subscriptionId, setCoachEmail }) {
   const [isGettingSubscription, setIsGettingSubscription] = useState(true);
   const [subscription, setSubscription] = useState(null);
-  const { user, isAdmin } = useUser();
+  const { user, isAdmin, isLoading, session } = useUser();
 
   const [isMySubscription, setIsMySubscription] = useState(null);
   useEffect(() => {
     if (user && subscription) {
-      setIsMySubscription(user.id === subscription.coach?.id);
+      setIsMySubscription(user.id === subscription.coach);
     }
   }, [user, subscription]);
 
@@ -25,12 +26,12 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
     // eslint-disable-next-line no-shadow
     const { data: subscription } = await supabase
       .from("subscription")
-      .select("*, coach(*)")
+      .select("*")
       .eq("id", subscriptionId)
       .maybeSingle();
     console.log("setting subscription", subscription);
     if (subscription) {
-      setCoachEmail(subscription.coach.email);
+      setCoachEmail(subscription.coach_email);
     }
     setSubscription(subscription);
     setIsGettingSubscription(false);
@@ -43,7 +44,6 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
 
   // eslint-disable-next-line consistent-return
   useEffect(() => {
-    console.log("before", subscription);
     if (subscription) {
       console.log("subscribing to subscription updates", subscription);
       const supabaseSubscription = supabase
@@ -63,6 +63,21 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
       };
     }
   }, [subscription]);
+
+  const [existingSubscription, setExistingSubscription] = useState(null);
+  const checkForExistingSubscription = async () => {
+    const { data: existingSubscription } = await supabase
+      .from("subscription")
+      .select("*")
+      .match({ client: user.id, coach: subscription.coach })
+      .maybeSingle();
+    setExistingSubscription(existingSubscription);
+  };
+  useEffect(() => {
+    if (subscription && user) {
+      checkForExistingSubscription();
+    }
+  }, [subscription, user]);
 
   const [selectedSubscription, setSelectedSubscription] = useState(null);
   useEffect(() => {
@@ -115,7 +130,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
         />
       )}
 
-      <div className="style-links mx-auto max-w-prose bg-white text-lg shadow sm:rounded-lg">
+      <div className="mx-auto max-w-prose bg-white text-lg shadow sm:rounded-lg">
         <div className="py-3 px-5 pb-5 sm:py-4 sm:pb-5">
           {isGettingSubscription && (
             <div className="style-links prose prose-lg mx-auto text-center text-xl text-gray-500">
@@ -136,11 +151,26 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                 <div className="mx-auto max-w-prose text-lg">
                   <div className="prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500">
                     <p>
-                      You have been invited by {subscription.coach.email} to be
+                      You have been invited by {subscription.coach_email} to be
                       coached for{" "}
                       <span>{formatDollars(subscription.price, false)}</span>{" "}
                       per month.
                     </p>
+                    {!isLoading && !user && (
+                      <p>
+                        <MyLink
+                          href={`/sign-in?redirect_pathname=${window.location.pathname}`}
+                          as="/sign-in"
+                          className="inline-flex items-center rounded-md border border-transparent bg-blue-100 px-2 py-2 font-medium leading-4 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        >
+                          Sign in
+                        </MyLink>{" "}
+                        to redeem this subscription.
+                      </p>
+                    )}
+                    {existingSubscription && (
+                      <p>You are already a client of this coach.</p>
+                    )}
                   </div>
                 </div>
               </>
@@ -176,6 +206,15 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
               >
                 Share
               </button>
+            )}
+            {user && !isMySubscription && !existingSubscription && (
+              <MyLink
+                href={`/api/subscription/redeem-subscription?subscriptionId=${subscription.id}&access_token=${session.access_token}`}
+                target="_blank"
+                className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Subscribe
+              </MyLink>
             )}
             {(isMySubscription || isAdmin) && (
               <button

@@ -1,10 +1,10 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
-import { useState } from 'react';
-import { useUser } from '../../context/user-context';
-import DeleteAccountModal from '../../components/account/modal/DeleteAccountModal';
-import MyLink from '../../components/MyLink';
-import { getAccountLayout } from '../../components/layouts/AccountLayout';
+import { useState } from "react";
+import { useUser } from "../../context/user-context";
+import DeleteAccountModal from "../../components/account/modal/DeleteAccountModal";
+import MyLink from "../../components/MyLink";
+import { getAccountLayout } from "../../components/layouts/AccountLayout";
 
 export default function AccountGeneral() {
   const { user, isLoading, stripeLinks } = useUser();
@@ -41,23 +41,23 @@ export default function AccountGeneral() {
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                   {user.can_coach ? (
                     <>
-                    Yes.{' '}
-                    <MyLink
-                      href={stripeLinks.dashboard}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <button
-                        type="button"
-                        className="inline-flex items-center rounded-md border border-transparent bg-indigo-100 px-2 py-1 text-sm font-medium leading-4 text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      Yes.{" "}
+                      <MyLink
+                        href={stripeLinks.dashboard}
+                        target="_blank"
+                        rel="noreferrer"
                       >
-                        Go to Stripe Dashboard
-                      </button>
-                    </MyLink>
-                  </>
+                        <button
+                          type="button"
+                          className="inline-flex items-center rounded-md border border-transparent bg-indigo-100 px-2 py-1 text-sm font-medium leading-4 text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                          Go to Stripe Dashboard
+                        </button>
+                      </MyLink>
+                    </>
                   ) : (
                     <>
-                      No.{' '}
+                      No.{" "}
                       <MyLink
                         href={stripeLinks.onboarding}
                         target="_blank"
@@ -69,7 +69,7 @@ export default function AccountGeneral() {
                         >
                           Setup your Stripe account
                         </button>
-                      </MyLink>{' '}
+                      </MyLink>{" "}
                       in order to coach.
                     </>
                   )}
@@ -80,7 +80,7 @@ export default function AccountGeneral() {
         )}
       </div>
       <div className="flex items-end justify-end gap-2 bg-gray-50 px-4 py-3 text-right text-xs sm:px-6 sm:text-sm">
-      <MyLink
+        <MyLink
           href={stripeLinks.customerPortal}
           target="_blank"
           rel="noreferrer"

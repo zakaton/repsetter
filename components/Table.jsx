@@ -24,6 +24,7 @@ export default function Table({
   DeleteResultModal,
   resultMap,
   deleteTitle,
+  HeaderButton,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -264,6 +265,7 @@ export default function Table({
                 Add
               </button>
             )}
+            {HeaderButton}
           </div>
         </div>
 
