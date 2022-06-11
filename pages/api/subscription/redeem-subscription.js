@@ -65,9 +65,8 @@ export default async function handler(req, res) {
         transfer_data: {
           destination: subscription.coach.stripe_account,
         },
+        metadata: { subscription: subscription.id },
       },
-
-      metadata: { subscription: subscription.id },
 
       success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscription/${subscription.id}`,
