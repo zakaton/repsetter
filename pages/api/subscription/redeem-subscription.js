@@ -58,7 +58,6 @@ export default async function handler(req, res) {
       ],
 
       customer: profile.stripe_customer,
-      payment_intent_data: { setup_future_usage: "on_session" },
 
       success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscription/${subscription.id}`,
