@@ -53,7 +53,6 @@ export default async function handler(req, res) {
       line_items: [
         {
           price: subscription.price_id,
-          // For metered billing, do not pass quantity
           quantity: 1,
         },
       ],
@@ -61,9 +60,6 @@ export default async function handler(req, res) {
       customer: profile.stripe_customer,
       payment_intent_data: { setup_future_usage: "on_session" },
 
-      // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
-      // the actual Session ID is returned in the query parameter when your customer
-      // is redirected to the success page.
       success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscription/${subscription.id}`,
     });

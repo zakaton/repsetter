@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       unit_amount: subscriptionPrice * 100,
       currency: "usd",
       recurring: { interval: "month" },
-      product: process.env.SUBSCRIPTION_PRODUCT_ID,
+      product: profile.product_id,
     });
   }
 
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         coach: profile.id,
         coach_email: profile.email,
         price: subscriptionPrice,
-        price_id: priceObject?.id || process.env.DEFAULT_SUBSCRIPTION_PRICE_ID,
+        price_id: priceObject?.id || profile.default_price_id,
       },
     ]);
 
