@@ -82,6 +82,11 @@ export default async function handler(req, res) {
       currency: "usd",
       recurring: { interval: "month" },
       product: profile.product_id,
+      metadata: {
+        coach_id: profile.id,
+        coach_email: profile.email,
+        coach_stripe_account: profile.stripe_account,
+      },
     });
   }
 

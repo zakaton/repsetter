@@ -26,19 +26,19 @@ export default async function handler(req, res) {
 
   const { data: subscription } = await supabase
     .from("subscription")
-    .select("*")
+    .select("*, coach(*)")
     .match({ id: subscriptionId })
     .single();
 
   if (subscription) {
-    if (subscription.coach === user.id) {
+    if (subscription.coach.id === user.id) {
       return sendError({ message: "you can't subscribe to yourself" });
     }
 
     const { data: existingSubscription } = await supabase
       .from("subscription")
       .select("*")
-      .match({ client: user.id, coach: subscription.coach })
+      .match({ client: user.id, coach: subscription.coach.id })
       .maybeSingle();
     if (existingSubscription) {
       return sendError({ message: "You're already subscribed to this coach" });
@@ -48,16 +48,17 @@ export default async function handler(req, res) {
 
     const profile = await getUserProfile(user, supabase);
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+    console.log(subscription.price_id);
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
+      customer: profile.stripe_customer,
+
       line_items: [
         {
           price: subscription.price_id,
           quantity: 1,
         },
       ],
-
-      customer: profile.stripe_customer,
 
       success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscription/${subscription.id}`,
