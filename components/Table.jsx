@@ -11,6 +11,7 @@ const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();
 
 export default function Table({
+  selectString = "*",
   filterTypes,
   orderTypes,
   numberOfResultsPerPage = 4,
@@ -48,7 +49,7 @@ export default function Table({
     // eslint-disable-next-line no-shadow
     const { count: numberOfResults } = await supabase
       .from(tableName)
-      .select("*", { count: "exact", head: true })
+      .select(selectString, { count: "exact", head: true })
       .match(filters);
     setPageIndex(0);
     setNumberOfResults(numberOfResults);
@@ -73,7 +74,7 @@ export default function Table({
       // eslint-disable-next-line no-shadow
       const { data: results } = await supabase
         .from(tableName)
-        .select("*")
+        .select(selectString)
         .match(filters)
         .order(...order)
         .limit(numberOfResultsPerPage)

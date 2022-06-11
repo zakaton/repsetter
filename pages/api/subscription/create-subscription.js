@@ -6,7 +6,10 @@ import {
   getUserByAccessToken,
 } from "../../../utils/supabase";
 
-import { maxNumberOfUnredeemedSubscriptionsPerCoach } from "../../../utils/subscription-utils";
+import {
+  maxNumberOfUnredeemedSubscriptionsPerCoach,
+  updateNumberOfSubscriptions,
+} from "../../../utils/subscription-utils";
 
 export default async function handler(req, res) {
   const sendError = (error) =>
@@ -35,8 +38,17 @@ export default async function handler(req, res) {
     });
   }
 
+  const { count: number_of_unredeemed_subscriptions } = await supabase
+    .from("subscription")
+    .select("*", { count: "exact", head: true })
+    .match({ coach: profile.id, redeemed: false });
+  console.log(
+    "number_of_unredeemed_subscriptions",
+    number_of_unredeemed_subscriptions
+  );
+
   if (
-    profile.number_of_unredeemed_subscriptions >
+    number_of_unredeemed_subscriptions >=
     maxNumberOfUnredeemedSubscriptionsPerCoach
   ) {
     return sendError({
@@ -71,8 +83,6 @@ export default async function handler(req, res) {
       recurring: { interval: "month" },
       product: process.env.SUBSCRIPTION_PRODUCT_ID,
     });
-  } else {
-    // free
   }
 
   console.log("priceObject", priceObject);
@@ -80,7 +90,11 @@ export default async function handler(req, res) {
   const { data: subscriptions, error: insertSubscriptionError } = await supabase
     .from("subscription")
     .insert([
-      { coach: profile.id, price: subscriptionPrice, price_id: priceObject.id },
+      {
+        coach: profile.id,
+        price: subscriptionPrice,
+        price_id: priceObject?.id,
+      },
     ]);
 
   if (insertSubscriptionError) {
@@ -98,10 +112,13 @@ export default async function handler(req, res) {
     });
   }
 
+  await updateNumberOfSubscriptions(profile, supabase);
+
   res.status(200).json({
     status: {
       type: "succeeded",
       title: "Successfully Created Subscription",
     },
+    subscription: subscription.id,
   });
 }

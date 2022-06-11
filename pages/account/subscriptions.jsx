@@ -1,6 +1,7 @@
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import DeleteSubscriptionModal from "../../components/account/modal/DeleteSubscriptionModal";
 import Table from "../../components/Table";
+import { formatDollars } from "../../utils/subscription-utils";
 
 const filterTypes = [
   {
@@ -40,6 +41,7 @@ export default function Subscriptions() {
   return (
     <>
       <Table
+        selectString="*, coach(*), client(*)"
         filterTypes={filterTypes}
         orderTypes={orderTypes}
         tableName="subscription"
@@ -48,35 +50,19 @@ export default function Subscriptions() {
           [
             {
               title: "coach",
-              value: result.coach,
+              value: result.coach?.email,
             },
-            {
+            result.client && {
               title: "client",
-              value: result.client,
+              value: result.client?.email,
             },
             {
               title: "price",
-              value: result.price,
+              value: formatDollars(result.price, false),
             },
             {
               title: "redeemed?",
-              value: result.redeemed,
-            },
-            !result.redeemed && {
-              title: "url",
-              value: `pennyseed.me/${result.id}`,
-            },
-            !result.redeemed && {
-              title: "Share",
-              value: `FILL`,
-            },
-            !result.redeemed && {
-              title: "QR",
-              value: `FILL`,
-            },
-            result.redeemed && {
-              title: "Cancel",
-              value: `FILL`,
+              value: result.redeemed ? "yes" : "no",
             },
             result.redeemed && {
               title: "Last Billing Cycle",

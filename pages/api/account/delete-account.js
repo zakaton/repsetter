@@ -5,7 +5,6 @@ import {
   isUserAdmin,
   getUserByAccessToken,
 } from "../../../utils/supabase";
-import { emailAdmin } from "../../../utils/send-email";
 import Stripe from "stripe";
 
 export default async function handler(req, res) {
@@ -83,14 +82,6 @@ export default async function handler(req, res) {
     userToDelete.id
   );
   console.log("delete user result", deleteUserError);
-
-  await emailAdmin({
-    subject: "Deleted User",
-    dynamicTemplateData: {
-      heading: `Goodbye ${userToDelete.email}!`,
-      body: `A user with email ${userToDelete.email} has deleted their account.`,
-    },
-  });
 
   res.status(200).json({
     status: {

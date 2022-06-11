@@ -1,0 +1,194 @@
+/* eslint-disable no-param-reassign */
+import { useEffect, useState } from "react";
+import { QrcodeIcon } from "@heroicons/react/outline";
+import { supabase } from "../../utils/supabase";
+import { formatDollars } from "../../utils/subscription-utils";
+import { useUser } from "../../context/user-context";
+import DeleteSubscriptionModal from "../account/modal/DeleteSubscriptionModal";
+import Notification from "../Notification";
+import QRCodeModal from "../QRCodeModal";
+import { ClipboardListIcon } from "@heroicons/react/outline";
+
+export default function Subscription({ subscriptionId, setCoachEmail }) {
+  const [isGettingSubscription, setIsGettingSubscription] = useState(true);
+  const [subscription, setSubscription] = useState(null);
+  const { user, isAdmin } = useUser();
+
+  const [isMySubscription, setIsMySubscription] = useState(null);
+  useEffect(() => {
+    if (user && subscription) {
+      setIsMySubscription(user.id === subscription.coach?.id);
+    }
+  }, [user, subscription]);
+
+  const getSubscription = async () => {
+    // eslint-disable-next-line no-shadow
+    const { data: subscription } = await supabase
+      .from("subscription")
+      .select("*, coach(*)")
+      .eq("id", subscriptionId)
+      .maybeSingle();
+    console.log("setting subscription", subscription);
+    if (subscription) {
+      setCoachEmail(subscription.coach.email);
+    }
+    setSubscription(subscription);
+    setIsGettingSubscription(false);
+  };
+  useEffect(() => {
+    if (subscriptionId) {
+      getSubscription();
+    }
+  }, [subscriptionId]);
+
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    console.log("before", subscription);
+    if (subscription) {
+      console.log("subscribing to subscription updates", subscription);
+      const supabaseSubscription = supabase
+        .from(`subscription:id=eq.${subscription.id}`)
+        .on("UPDATE", (payload) => {
+          console.log("updated subscription");
+          setSubscription({ ...subscription, ...payload.new });
+        })
+        .on("DELETE", (payload) => {
+          console.log("deleted subscription", payload);
+          setSubscription(null);
+        })
+        .subscribe();
+      return () => {
+        console.log("unsubscribing to subscription updates");
+        supabase.removeSubscription(supabaseSubscription);
+      };
+    }
+  }, [subscription]);
+
+  const [selectedSubscription, setSelectedSubscription] = useState(null);
+  useEffect(() => {
+    if (subscription) {
+      setSelectedSubscription(subscription);
+    }
+  }, [subscription]);
+
+  const [showDeleteSubscriptionModal, setShowDeleteSubscriptionModal] =
+    useState(false);
+  const [deleteSubscriptionStatus, setDeleteSubscriptionStatus] = useState();
+  const [
+    showDeleteSubscriptionNotification,
+    setShowDeleteSubscriptionNotification,
+  ] = useState(false);
+
+  const removeNotifications = () => {
+    setShowDeleteSubscriptionNotification(false);
+  };
+  useEffect(() => {
+    if (showDeleteSubscriptionModal) {
+      removeNotifications();
+    }
+  }, [showDeleteSubscriptionModal]);
+
+  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
+
+  return (
+    <>
+      <DeleteSubscriptionModal
+        open={showDeleteSubscriptionModal}
+        setOpen={setShowDeleteSubscriptionModal}
+        selectedResult={selectedSubscription}
+        setDeleteResultStatus={setDeleteSubscriptionStatus}
+        setShowDeleteResultNotification={setShowDeleteSubscriptionNotification}
+      />
+      <Notification
+        open={showDeleteSubscriptionNotification}
+        setOpen={setShowDeleteSubscriptionNotification}
+        status={deleteSubscriptionStatus}
+      />
+
+      {subscription && (
+        <QRCodeModal
+          open={showQRCodeModal}
+          setOpen={setShowQRCodeModal}
+          Icon={ClipboardListIcon}
+          title="Subscription QR Code"
+          text={`https://repsetter.me/${subscription.id}`}
+        />
+      )}
+
+      <div className="style-links mx-auto max-w-prose bg-white text-lg shadow sm:rounded-lg">
+        <div className="py-3 px-5 pb-5 sm:py-4 sm:pb-5">
+          {isGettingSubscription && (
+            <div className="style-links prose prose-lg mx-auto text-center text-xl text-gray-500">
+              <p>Loading subscription...</p>
+            </div>
+          )}
+
+          {!isGettingSubscription &&
+            (subscription ? (
+              <>
+                <div className="mx-auto max-w-prose text-lg">
+                  <h1>
+                    <span className="mt-2 block text-center text-2xl font-bold leading-8 tracking-tight text-gray-900 sm:text-3xl">
+                      Coaching Invitation
+                    </span>
+                  </h1>
+                </div>
+                <div className="mx-auto max-w-prose text-lg">
+                  <div className="prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500">
+                    <p>
+                      You have been invited by {subscription.coach.email} to be
+                      coached for{" "}
+                      <span>{formatDollars(subscription.price, false)}</span>{" "}
+                      per month.
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="style-links prose prose-lg mx-auto text-center text-xl text-gray-500">
+                <p>Subscription not found or is no longer available.</p>
+              </div>
+            ))}
+        </div>
+        {subscription && (
+          <div className="mt-1 flex items-end justify-end gap-2 bg-gray-50 px-4 py-3 text-right text-xs sm:px-6 sm:text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setShowQRCodeModal(true);
+              }}
+              className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-1 px-1 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <span className="sr-only">QR Code</span>
+              <QrcodeIcon className="h-7 w-7" aria-hidden="true" />
+            </button>
+            {navigator.canShare && (
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.share({
+                    title: `Repsetter Coaching Invitation`,
+                    text: `Follow this link to start getting coached on Repsetter!`,
+                    url: `https://repsetter.me/${subscription.id}`,
+                  });
+                }}
+                className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Share
+              </button>
+            )}
+            {(isMySubscription || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => setShowDeleteSubscriptionModal(true)}
+                className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

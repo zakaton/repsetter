@@ -1,30 +1,30 @@
 /* eslint-disable consistent-return */
-import { getSupabaseService } from '../../../utils/supabase';
+import { getSupabaseService } from "../../../utils/supabase";
 
-import sendEmail from '../../../utils/send-email';
+import sendEmail from "../../../utils/send-email";
 
-const magicLinkEmail = 'magic-link@repsetter.com';
+const magicLinkEmail = "magic-link@repsetter.com";
 const recoveryEmailLimit = 1000 * 60; // ms
 
 export default async function handler(req, res) {
-  const allowedDomains = process.env.MAGIC_LINK_REDIRECT_URLS.split(',');
+  const allowedDomains = process.env.MAGIC_LINK_REDIRECT_URLS.split(",");
 
   const sendError = (error) =>
     res.status(200).json({
       status: {
-        type: 'failed',
-        title: 'Failed to send Magic Link',
+        type: "failed",
+        title: "Failed to send Magic Link",
         ...error,
       },
     });
-  if (req.method !== 'POST') {
+  if (req.method !== "POST") {
     return sendError({ message: 'must send a "POST" message' });
   }
 
   console.log(JSON.stringify(req.body));
   const { email, redirectTo } = req.body;
   if (!email) {
-    return sendError({ message: 'no email defined' });
+    return sendError({ message: "no email defined" });
   }
   if (
     redirectTo &&
@@ -40,9 +40,9 @@ export default async function handler(req, res) {
 
   const supabase = getSupabaseService();
   const { data: profile, error: getProfileError } = await supabase
-    .from('profile')
-    .select('*')
-    .eq('email', email)
+    .from("profile")
+    .select("*")
+    .eq("email", email)
     .maybeSingle();
 
   if (getProfileError) {
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     return sendError({ message: getProfileError.message });
   }
 
-  console.log('profile', profile);
+  console.log("profile", profile);
 
   if (profile) {
     const { data: user, error: getUserError } =
@@ -59,22 +59,22 @@ export default async function handler(req, res) {
       console.error(getUserError);
       return sendError({ message: getUserError.message });
     }
-    console.log('user', user);
+    console.log("user", user);
     const currentDate = new Date();
     const lastTime = new Date(user.recovery_sent_at);
     const timeSinceLastRecovery = currentDate.getTime() - lastTime.getTime();
-    console.log('timeSinceLastRecovery', timeSinceLastRecovery);
+    console.log("timeSinceLastRecovery", timeSinceLastRecovery);
     if (timeSinceLastRecovery < recoveryEmailLimit) {
       return sendError({
-        title: 'Magic Link already sent',
+        title: "Magic Link already sent",
         message:
-          'A link was already emailed to this address less than a minute ago.',
+          "A link was already emailed to this address less than a minute ago. Check your spam folder if you can't find it.",
       });
     }
   }
 
   const { data, generateLinkError } = await supabase.auth.api.generateLink(
-    'magiclink',
+    "magiclink",
     email,
     {
       redirectTo,
@@ -87,23 +87,23 @@ export default async function handler(req, res) {
 
   await sendEmail({
     to: email,
-    subject: 'Sign in to Repsetter',
+    subject: "Sign in to Repsetter",
     from: {
       email: magicLinkEmail,
     },
     templateId: process.env.SENDGRID_MAGIC_LINK_TEMPLATE_ID,
     dynamicTemplateData: {
-      heading: 'Your Repsetter Magic Link',
-      body: 'Follow this link to sign in to Repsetter:',
-      optional_link: 'Sign In',
+      heading: "Your Repsetter Magic Link",
+      body: "Follow this link to sign in to Repsetter:",
+      optional_link: "Sign In",
       optional_link_url: data.action_link,
     },
   });
 
   res.status(200).json({
     status: {
-      type: 'succeeded',
-      title: 'Successfully sent Magic Link',
+      type: "succeeded",
+      title: "Successfully sent Magic Link",
     },
   });
 }

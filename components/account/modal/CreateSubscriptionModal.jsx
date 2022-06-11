@@ -4,6 +4,7 @@ import { useUser } from "../../../context/user-context";
 import Modal from "../../Modal";
 import { UserAddIcon } from "@heroicons/react/outline";
 import MyLink from "../../MyLink";
+import { useRouter } from "next/router";
 
 import { maxNumberOfUnredeemedSubscriptionsPerCoach } from "../../../utils/subscription-utils";
 
@@ -15,11 +16,13 @@ export default function CreateSubscriptionModal(props) {
     setShowCreateResultNotification: setShowCreateSubscriptionNotification,
   } = props;
 
+  const router = useRouter();
+
   const { fetchWithAccessToken, user } = useUser();
   useEffect(() => {
     if (
       open &&
-      user.number_of_unredeemed_subscriptions >
+      user.number_of_unredeemed_subscriptions >=
         maxNumberOfUnredeemedSubscriptionsPerCoach
     ) {
       setCreateSubscriptionStatus({
@@ -30,6 +33,20 @@ export default function CreateSubscriptionModal(props) {
       });
       setShowCreateSubscriptionNotification(true);
       setOpen(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      setDidCreateSubscription(false);
+      setSubscriptionPrice(0);
+      setIsSubscriptionPriceEmptyString(true);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (open && didCreateSubscription) {
+      setShowCreateSubscriptionNotification(false);
     }
   }, [open]);
 
@@ -68,7 +85,6 @@ export default function CreateSubscriptionModal(props) {
           e.preventDefault();
           setIsCreatingSubscription(true);
           const form = e.target;
-          console.log(form);
           const formData = new FormData(form);
           const data = new URLSearchParams();
           formData.forEach((value, key) => {
@@ -85,8 +101,7 @@ export default function CreateSubscriptionModal(props) {
           setShowCreateSubscriptionNotification(true);
           setOpen(false);
           if (status.type === "succeeded") {
-            // FILL
-            console.log("subscription", subscription);
+            router.push(`/subscription/${subscription}`);
           } else {
             console.error(status);
           }
