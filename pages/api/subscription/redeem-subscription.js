@@ -67,6 +67,8 @@ export default async function handler(req, res) {
         },
       },
 
+      metadata: { subscription: subscription.id },
+
       success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscription/${subscription.id}`,
     });

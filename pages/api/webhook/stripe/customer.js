@@ -29,20 +29,16 @@ export default async function handler(req, res) {
     }
 
     switch (event.type) {
-      case "customer.subscription.created":
+      case "customer.subscription.deleted":
       case "customer.subscription.deleted":
         {
-          const payment_method = event.data.object;
-          const customerId =
-            event.type === "payment_method.attached"
-              ? payment_method.customer
-              : event.data.previous_attributes.customer;
-          const { data: profile } = await supabase
-            .from("profile")
+          const { metadata } = event.data.object;
+          const { data: subscription } = await supabase
+            .from("subscription")
             .select("*")
-            .eq("stripe_customer", customerId)
+            .eq("id", metadata.subscription)
             .single();
-          if (profile) {
+          if (subscription) {
             // FILL
           }
         }
