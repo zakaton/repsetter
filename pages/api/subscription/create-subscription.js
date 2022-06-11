@@ -75,20 +75,19 @@ export default async function handler(req, res) {
 
   subscriptionPrice = Math.floor(Number(subscriptionPrice));
   let priceObject;
-  if (subscriptionPrice > 0) {
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-    priceObject = await stripe.prices.create({
-      unit_amount: subscriptionPrice * 100,
-      currency: "usd",
-      recurring: { interval: "month" },
-      product: profile.product_id,
-      metadata: {
-        coach_id: profile.id,
-        coach_email: profile.email,
-        coach_stripe_account: profile.stripe_account,
-      },
-    });
-  }
+
+  const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+  priceObject = await stripe.prices.create({
+    unit_amount: subscriptionPrice * 100,
+    currency: "usd",
+    recurring: { interval: "month" },
+    product: profile.product_id,
+    metadata: {
+      coach_id: profile.id,
+      coach_email: profile.email,
+      coach_stripe_account: profile.stripe_account,
+    },
+  });
 
   console.log("priceObject", priceObject);
 

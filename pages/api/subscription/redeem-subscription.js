@@ -3,6 +3,7 @@
 import Stripe from "stripe";
 import { getSupabaseService, getUserProfile } from "../../../utils/supabase";
 import absoluteUrl from "next-absolute-url";
+import { repsetterFeePercentage } from "../../../utils/subscription-utils";
 
 export default async function handler(req, res) {
   const sendError = (error) =>
@@ -59,6 +60,12 @@ export default async function handler(req, res) {
           quantity: 1,
         },
       ],
+      subscription_data: {
+        application_fee_percent: repsetterFeePercentage,
+        transfer_data: {
+          destination: subscription.coach.stripe_account,
+        },
+      },
 
       success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscription/${subscription.id}`,
