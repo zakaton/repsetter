@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     console.log("event", event);
 
     switch (event.type) {
-      case "customer.subscription.deleted":
+      case "customer.subscription.created":
       case "customer.subscription.deleted":
         {
           const { metadata } = event.data.object;
@@ -43,17 +43,24 @@ export default async function handler(req, res) {
           console.log("subscription", subscription);
           if (subscription) {
             const coaches = subscription.client.coaches || [];
-            if (
-              !coaches.includes(subscription.coach.id) &&
-              subscription.coach.can_coach
-            ) {
-              coaches.push(subscription.coach.id);
+            if (event.type === "customer.subscription.created") {
+              if (
+                !coaches.includes(subscription.coach.id) &&
+                subscription.coach.can_coach
+              ) {
+                coaches.push(subscription.coach.id);
+              }
+            } else {
+              if (coaches.includes(subscription.coach.id)) {
+                coaches.splice(coaches.indexOf(subscription.coach.id), 1);
+              }
             }
             console.log("coaches", coaches);
-            await supabase
+            const updateClientResponse = await supabase
               .from("profile")
               .update({ coaches })
               .eq("id", subscription.client.id);
+            console.log("updateClientResponse", updateClientResponse);
           }
         }
         break;
