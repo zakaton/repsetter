@@ -31,9 +31,11 @@ export default async function handler(req, res) {
 
     switch (event.type) {
       case "customer.subscription.created":
+      case "customer.subscription.update":
       case "customer.subscription.deleted":
         {
-          const { metadata } = event.data.object;
+          const { object } = event.data;
+          const { metadata } = object;
           console.log("metadata", metadata);
           const { data: subscription } = await supabase
             .from("subscription")
@@ -42,7 +44,7 @@ export default async function handler(req, res) {
             .single();
           console.log("subscription", subscription);
 
-          const { data: client } = await _supabase
+          const { data: client } = await supabase
             .from("profile")
             .select("*")
             .eq("id", metadata.client)
@@ -50,16 +52,27 @@ export default async function handler(req, res) {
           console.log("client", client);
           if (subscription && client) {
             const coaches = client.coaches || [];
-            if (event.type === "customer.subscription.created") {
-              if (
-                !coaches.includes(subscription.coach.id) &&
-                subscription.coach.can_coach
-              ) {
-                coaches.push(subscription.coach.id);
-              }
-            } else {
+            if (event.type === "customer.subscription.deleted") {
               if (coaches.includes(subscription.coach.id)) {
                 coaches.splice(coaches.indexOf(subscription.coach.id), 1);
+              }
+              await supabase
+                .from("subscription")
+                .update({ client: client.id, redeemed: true, is_active: true })
+                .eq("id", subscription.id);
+            } else {
+              if (object.status === "active") {
+                if (
+                  !coaches.includes(subscription.coach.id) &&
+                  subscription.coach.can_coach
+                ) {
+                  coaches.push(subscription.coach.id);
+                }
+
+                await supabase
+                  .from("subscription")
+                  .update({ is_active: false })
+                  .eq("id", subscription.id);
               }
             }
             console.log("coaches", coaches);
