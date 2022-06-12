@@ -27,17 +27,20 @@ export default async function handler(req, res) {
       res.status(400).send(`Webhook Error: ${err.message}`);
       return;
     }
+    console.log("event", event);
 
     switch (event.type) {
       case "customer.subscription.deleted":
       case "customer.subscription.deleted":
         {
           const { metadata } = event.data.object;
+          console.log("metadata", metadata);
           const { data: subscription } = await supabase
             .from("subscription, client(*), coach(*)")
             .select("*")
             .eq("id", metadata.subscription)
             .single();
+          console.log("subscription", subscription);
           if (subscription) {
             const coaches = subscription.client.coaches || [];
             if (
@@ -46,10 +49,11 @@ export default async function handler(req, res) {
             ) {
               coaches.push(subscription.coach.id);
             }
+            console.log("coaches", coaches);
             await supabase
               .from("profile")
               .update({ coaches })
-              .eq("id", profile.id);
+              .eq("id", subscription.client.id);
           }
         }
         break;
