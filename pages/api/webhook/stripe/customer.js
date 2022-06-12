@@ -36,8 +36,8 @@ export default async function handler(req, res) {
           const { metadata } = event.data.object;
           console.log("metadata", metadata);
           const { data: subscription } = await supabase
-            .from("subscription, client(*), coach(*)")
-            .select("*")
+            .from("subscription")
+            .select("*, client(*), coach(*)")
             .eq("id", metadata.subscription)
             .single();
           console.log("subscription", subscription);
