@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     switch (event.type) {
       case "customer.subscription.created":
-      case "customer.subscription.update":
+      case "customer.subscription.updated":
       case "customer.subscription.deleted":
         {
           const { object } = event.data;
