@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
                 if (
                   subscription.coach.notifications?.includes(
-                    "email_subscription_created"
+                    "email_subscription_created_coach"
                   )
                 ) {
                   await sendEmail({
@@ -88,8 +88,69 @@ export default async function handler(req, res) {
                     },
                   });
                 }
+
+                if (
+                  client.notifications?.includes(
+                    "email_subscription_created_client"
+                  )
+                ) {
+                  await sendEmail({
+                    to: client.email,
+                    subject: "You got a new Coach!",
+                    dynamicTemplateData: {
+                      heading: `${subscription.coach.email} is now a Coach!`,
+                      body: `You've has agreed to pay ${formatDollars(
+                        subscription.price,
+                        false
+                      )}/month to ${
+                        subscription.coach.email
+                      } for their coaching services.`,
+                    },
+                  });
+                }
               }
             }
+
+            if (event.type === "customer.subscription.updated") {
+              if (object.cancel_at_period_end !== subscription.is_cancelled) {
+                await supabase
+                  .from("subscription")
+                  .update({
+                    is_cancelled: oject.cancel_at_period_end,
+                  })
+                  .eq("id", subscription.id);
+
+                if (
+                  subscription.coach.notifications?.includes(
+                    "email_subscription_cancelled_coach"
+                  )
+                ) {
+                  await sendEmail({
+                    to: subscription.coach.email,
+                    subject: "A Client has cancelled their Subscription",
+                    dynamicTemplateData: {
+                      heading: `${client.email} has cancelled their Subscription`,
+                      body: `You will still be able to coach ${client.email} until the end of the billing cycle`,
+                    },
+                  });
+                }
+                if (
+                  client.notifications?.includes(
+                    "email_subscription_cancelled_client"
+                  )
+                ) {
+                  await sendEmail({
+                    to: client.email,
+                    subject: "You've cancelled your Subscription",
+                    dynamicTemplateData: {
+                      heading: `You've cancelled your Subscription to ${subscription.coach.email}`,
+                      body: `You will still have access to ${subscription.coach.email}'s coaching until the end of the billing cycle`,
+                    },
+                  });
+                }
+              }
+            }
+
             console.log("coaches", coaches);
             const updateClientResponse = await supabase
               .from("profile")
@@ -108,7 +169,7 @@ export default async function handler(req, res) {
 
               if (
                 subscription.coach.notifications?.includes(
-                  "email_subscription_ended"
+                  "email_subscription_ended_coach"
                 )
               ) {
                 await sendEmail({
@@ -117,6 +178,21 @@ export default async function handler(req, res) {
                   dynamicTemplateData: {
                     heading: `${client.email}'s subscription has ended`,
                     body: `${client.email} has not renewed their subscription and so you will no longer be coaching them.`,
+                  },
+                });
+              }
+
+              if (
+                client.notifications?.includes(
+                  "email_subscription_ended_client"
+                )
+              ) {
+                await sendEmail({
+                  to: subscription.coach.email,
+                  subject: "Your subscription has ended",
+                  dynamicTemplateData: {
+                    heading: `Your subscription to ${subscription.coach.email}'s coaching has ended`,
+                    body: `You've not not renewed your subscription and so you will no longer be coached by ${subscription.coach.email}`,
                   },
                 });
               }

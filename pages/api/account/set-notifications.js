@@ -7,13 +7,34 @@ import {
 
 export const notificationTypes = [
   {
-    value: "email_subscription_created",
+    value: "email_subscription_created_client",
+    title: "New Coach",
+    description: "Be notified when you get a new coach",
+  },
+  {
+    value: "email_subscription_cancelled_client",
+    title: "Cancelled Subscription",
+    description: "Be notified when your subscription is cancelled",
+  },
+  {
+    value: "email_subscription_ended_client",
+    title: "Subscription Ends",
+    description: "Be notified when your subscription ends",
+  },
+
+  {
+    value: "email_subscription_created_coach",
     title: "New Client",
     description: "Be notified when you get a new client",
   },
   {
-    value: "email_subscription_ended",
-    title: "",
+    value: "email_subscription_cancelled_coach",
+    title: "Client Cancelled",
+    description: "Be notified when a client has cancelled their subscription",
+  },
+  {
+    value: "email_subscription_ended_coach",
+    title: "Client's Subscription Ends",
     description: "Be notified when a client's subscription ends",
   },
 ];
