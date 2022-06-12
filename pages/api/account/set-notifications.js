@@ -12,11 +12,6 @@ export const notificationTypes = [
     description: "Be notified when you get a new client",
   },
   {
-    value: "email_subscription_canceled",
-    title: "",
-    description: "Be notified when a client cancels their subscription",
-  },
-  {
     value: "email_subscription_ended",
     title: "",
     description: "Be notified when a client's subscription ends",

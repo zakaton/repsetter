@@ -3,6 +3,7 @@ import { buffer } from "micro";
 import Stripe from "stripe";
 import { getSupabaseService } from "../../../../utils/supabase";
 import sendEmail from "../../../../utils/send-email";
+import { formatDollars } from "../../../../utils/subscription-utils";
 
 const webhookSecret = process.env.STRIPE_CUSTOMER_WEBHOOK_SECRET;
 
@@ -69,7 +70,24 @@ export default async function handler(req, res) {
                     is_active: true,
                   })
                   .eq("id", subscription.id);
-                // FILL - emails
+
+                if (
+                  subscription.coach.notifications?.includes(
+                    "email_subscription_created"
+                  )
+                ) {
+                  await sendEmail({
+                    to: subscription.coach.email,
+                    subject: "You got a new Client!",
+                    dynamicTemplateData: {
+                      heading: `${client.email} is now a Client!`,
+                      body: `${client.email} has agreed to pay ${formatDollars(
+                        subscription.price,
+                        false
+                      )}/month for your coaching services.`,
+                    },
+                  });
+                }
               }
             }
             console.log("coaches", coaches);
@@ -87,7 +105,21 @@ export default async function handler(req, res) {
                 .from("subscription")
                 .update({ is_active: false })
                 .eq("id", subscription.id);
-              // FILL - emails
+
+              if (
+                subscription.coach.notifications?.includes(
+                  "email_subscription_ended"
+                )
+              ) {
+                await sendEmail({
+                  to: subscription.coach.email,
+                  subject: "A Client's subscription has ended",
+                  dynamicTemplateData: {
+                    heading: `${client.email}'s subscription has ended`,
+                    body: `${client.email} has not renewed their subscription and so you will no longer be coaching them.`,
+                  },
+                });
+              }
             }
           }
         }
