@@ -34,12 +34,22 @@ export default async function handler(req, res) {
         {
           const { metadata } = event.data.object;
           const { data: subscription } = await supabase
-            .from("subscription")
+            .from("subscription, client(*), coach(*)")
             .select("*")
             .eq("id", metadata.subscription)
             .single();
           if (subscription) {
-            // FILL
+            const coaches = subscription.client.coaches || [];
+            if (
+              !coaches.includes(subscription.coach.id) &&
+              subscription.coach.can_coach
+            ) {
+              coaches.push(subscription.coach.id);
+            }
+            await supabase
+              .from("profile")
+              .update({ coaches })
+              .eq("id", profile.id);
           }
         }
         break;
