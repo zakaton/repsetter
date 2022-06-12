@@ -2,6 +2,7 @@
 import { buffer } from "micro";
 import Stripe from "stripe";
 import { getSupabaseService } from "../../../../utils/supabase";
+import sendEmail from "../../../../utils/send-email";
 
 const webhookSecret = process.env.STRIPE_CUSTOMER_WEBHOOK_SECRET;
 
@@ -52,22 +53,14 @@ export default async function handler(req, res) {
           console.log("client", client);
           if (subscription && client) {
             const coaches = client.coaches || [];
-            if (event.type === "customer.subscription.deleted") {
-              if (coaches.includes(subscription.coach.id)) {
-                coaches.splice(coaches.indexOf(subscription.coach.id), 1);
+            if (object.status === "active") {
+              if (
+                !coaches.includes(subscription.coach.id) &&
+                subscription.coach.can_coach
+              ) {
+                coaches.push(subscription.coach.id);
               }
-              await supabase
-                .from("subscription")
-                .update({ is_active: false })
-                .eq("id", subscription.id);
-            } else {
-              if (object.status === "active") {
-                if (
-                  !coaches.includes(subscription.coach.id) &&
-                  subscription.coach.can_coach
-                ) {
-                  coaches.push(subscription.coach.id);
-                }
+              if (!subscription.is_active) {
                 await supabase
                   .from("subscription")
                   .update({
@@ -76,6 +69,7 @@ export default async function handler(req, res) {
                     is_active: true,
                   })
                   .eq("id", subscription.id);
+                // FILL - emails
               }
             }
             console.log("coaches", coaches);
@@ -84,6 +78,17 @@ export default async function handler(req, res) {
               .update({ coaches })
               .eq("id", client.id);
             console.log("updateClientResponse", updateClientResponse);
+          } else {
+            if (coaches.includes(subscription.coach.id)) {
+              coaches.splice(coaches.indexOf(subscription.coach.id), 1);
+            }
+            if (subscription.is_active) {
+              await supabase
+                .from("subscription")
+                .update({ is_active: false })
+                .eq("id", subscription.id);
+              // FILL - emails
+            }
           }
         }
         break;
