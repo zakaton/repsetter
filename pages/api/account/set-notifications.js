@@ -3,14 +3,23 @@ import {
   getSupabaseService,
   getUserProfile,
   getUserByAccessToken,
-} from '../../../utils/supabase';
+} from "../../../utils/supabase";
 
 export const notificationTypes = [
   {
-    value: 'email_subscription_receipt',
-    title: 'Subscription Charge',
-    description:
-      "Receive a receipt when you're charged for a coaching subscription",
+    value: "email_subscription_created",
+    title: "New Client",
+    description: "Be notified when you get a new client",
+  },
+  {
+    value: "email_subscription_canceled",
+    title: "",
+    description: "Be notified when a client cancels their subscription",
+  },
+  {
+    value: "email_subscription_ended",
+    title: "",
+    description: "Be notified when a client's subscription ends",
   },
 ];
 
@@ -18,8 +27,8 @@ export default async function handler(req, res) {
   const sendError = (error) =>
     res.status(200).json({
       status: {
-        type: 'failed',
-        title: 'Failed to Update Notifications',
+        type: "failed",
+        title: "Failed to Update Notifications",
         ...error,
       },
     });
@@ -27,23 +36,23 @@ export default async function handler(req, res) {
   const supabase = getSupabaseService();
   const { user } = await getUserByAccessToken(supabase, req);
   if (!user) {
-    return sendError({ message: 'You are not signed in' });
+    return sendError({ message: "You are not signed in" });
   }
 
   const profile = await getUserProfile(user, supabase);
   if (!profile) {
-    return sendError({ message: 'profile not found' });
+    return sendError({ message: "profile not found" });
   }
 
   const notifications = notificationTypes
-    .filter((notificationType) => req.body[notificationType.value] === 'on')
+    .filter((notificationType) => req.body[notificationType.value] === "on")
     .map(({ value }) => value);
-  await supabase.from('profile').update({ notifications }).eq('id', profile.id);
+  await supabase.from("profile").update({ notifications }).eq("id", profile.id);
 
   res.status(200).json({
     status: {
-      type: 'succeeded',
-      title: 'Successfully Updated Notifications',
+      type: "succeeded",
+      title: "Successfully Updated Notifications",
     },
   });
 }
