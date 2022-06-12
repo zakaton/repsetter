@@ -41,8 +41,15 @@ export default async function handler(req, res) {
             .eq("id", metadata.subscription)
             .single();
           console.log("subscription", subscription);
-          if (subscription) {
-            const coaches = subscription.client.coaches || [];
+
+          const { data: client } = await _supabase
+            .from("profile")
+            .select("*")
+            .eq("id", metadata.client)
+            .single();
+          console.log("client", client);
+          if (subscription && client) {
+            const coaches = client.coaches || [];
             if (event.type === "customer.subscription.created") {
               if (
                 !coaches.includes(subscription.coach.id) &&
@@ -59,7 +66,7 @@ export default async function handler(req, res) {
             const updateClientResponse = await supabase
               .from("profile")
               .update({ coaches })
-              .eq("id", subscription.client.id);
+              .eq("id", client.id);
             console.log("updateClientResponse", updateClientResponse);
           }
         }
