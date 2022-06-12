@@ -58,7 +58,7 @@ export default async function handler(req, res) {
               }
               await supabase
                 .from("subscription")
-                .update({ client: client.id, redeemed: true, is_active: true })
+                .update({ is_active: false })
                 .eq("id", subscription.id);
             } else {
               if (object.status === "active") {
@@ -68,10 +68,13 @@ export default async function handler(req, res) {
                 ) {
                   coaches.push(subscription.coach.id);
                 }
-
                 await supabase
                   .from("subscription")
-                  .update({ is_active: false })
+                  .update({
+                    client: client.id,
+                    redeemed: true,
+                    is_active: true,
+                  })
                   .eq("id", subscription.id);
               }
             }
