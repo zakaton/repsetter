@@ -65,6 +65,8 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
   }, [subscription]);
 
   const [existingSubscription, setExistingSubscription] = useState(null);
+  const [isGettingExistingSubscription, setIsGettingExistingSubscription] =
+    useState(true);
   const checkForExistingSubscription = async () => {
     const { data: existingSubscription } = await supabase
       .from("subscription")
@@ -72,6 +74,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
       .match({ client: user.id, coach: subscription.coach })
       .maybeSingle();
     setExistingSubscription(existingSubscription);
+    setIsGettingExistingSubscription(false);
   };
   useEffect(() => {
     if (subscription && user) {
@@ -169,7 +172,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                       </p>
                     )}
                     {existingSubscription && (
-                      <p>You are already a client of this coach.</p>
+                      <p>You are already subscribed to this coach.</p>
                     )}
                   </div>
                 </div>
@@ -192,7 +195,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
               <span className="sr-only">QR Code</span>
               <QrcodeIcon className="h-7 w-7" aria-hidden="true" />
             </button>
-            {navigator.canShare && (
+            {!subscription.redeemed && navigator.canShare && (
               <button
                 type="button"
                 onClick={() => {
@@ -207,15 +210,19 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                 Share
               </button>
             )}
-            {user && !isMySubscription && !existingSubscription && (
-              <MyLink
-                href={`/api/subscription/redeem-subscription?subscriptionId=${subscription.id}&access_token=${session.access_token}`}
-                target="_blank"
-                className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Subscribe
-              </MyLink>
-            )}
+            {user &&
+              !isGettingSubscription &&
+              !isMySubscription &&
+              !isGettingExistingSubscription &&
+              !existingSubscription && (
+                <MyLink
+                  href={`/api/subscription/redeem-subscription?subscriptionId=${subscription.id}&access_token=${session.access_token}`}
+                  target="_blank"
+                  className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  Subscribe
+                </MyLink>
+              )}
             {(isMySubscription || isAdmin) && (
               <button
                 type="button"

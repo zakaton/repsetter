@@ -6,24 +6,27 @@ import absoluteUrl from "next-absolute-url";
 import { repsetterFeePercentage } from "../../../utils/subscription-utils";
 
 export default async function handler(req, res) {
-  const sendError = (error) =>
-    res.status(200).json({
+  if (!req.query.subscriptionId) {
+    return sendError({ message: "No subscription was specified" });
+  }
+  const { subscriptionId } = req.query;
+
+  const sendError = (error) => {
+    return res.redirect(`/subscription/${subscriptionId}`);
+    return res.status(200).json({
       status: {
         type: "failed",
         title: "Failed to Redeem Coaching Subscription",
         ...error,
       },
     });
+  };
 
   const supabase = getSupabaseService();
   const { user } = await supabase.auth.api.getUser(req.query.access_token);
   if (!user) {
     return sendError({ message: "You're not signed in" });
   }
-  if (!req.query.subscriptionId) {
-    return sendError({ message: "No subscription was specified" });
-  }
-  const { subscriptionId } = req.query;
 
   const { data: subscription } = await supabase
     .from("subscription")
