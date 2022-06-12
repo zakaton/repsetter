@@ -116,7 +116,7 @@ export default async function handler(req, res) {
                 await supabase
                   .from("subscription")
                   .update({
-                    is_cancelled: oject.cancel_at_period_end,
+                    is_cancelled: object.cancel_at_period_end,
                   })
                   .eq("id", subscription.id);
 
@@ -203,7 +203,6 @@ export default async function handler(req, res) {
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
-
     res.json({ received: true });
   } else {
     res.setHeader("Allow", "POST");

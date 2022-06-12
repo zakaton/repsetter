@@ -60,7 +60,7 @@ export default function CreateSubscriptionModal(props) {
   return (
     <Modal
       {...props}
-      title="Create Client Subscription"
+      title="Create Coaching Subscription"
       message="Set a monthly price your client will pay for your coaching services (set 0 if you want to coach them for free)"
       Icon={UserAddIcon}
       Button={
