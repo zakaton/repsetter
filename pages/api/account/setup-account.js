@@ -24,7 +24,6 @@ export default async function handler(req, res) {
     .update({
       stripe_customer: customer.id,
       stripe_account: account.id,
-      notifications: ["email_subscription_receipt"],
     })
     .eq("id", req.body.record.id);
 
