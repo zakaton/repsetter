@@ -31,8 +31,8 @@ export default async function handler(req, res) {
   const { subscriptionId } = req.query;
 
   const { data: subscription } = await supabase
-    .from("subscription, client(*)")
-    .select("*")
+    .from("subscription")
+    .select("*, client(*)")
     .match({ id: subscriptionId })
     .single();
 
