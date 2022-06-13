@@ -134,33 +134,36 @@ export default async function handler(req, res) {
                   })
                   .eq("id", subscription.id);
 
-                if (
-                  subscription.coach.notifications?.includes(
-                    "email_subscription_cancelled_coach"
-                  )
-                ) {
-                  await sendEmail({
-                    to: subscription.coach.email,
-                    subject: "A Client has cancelled their Subscription",
-                    dynamicTemplateData: {
-                      heading: `${client.email} has cancelled their Subscription`,
-                      body: `You will still be able to coach ${client.email} until the end of the billing cycle`,
-                    },
-                  });
-                }
-                if (
-                  client.notifications?.includes(
-                    "email_subscription_cancelled_client"
-                  )
-                ) {
-                  await sendEmail({
-                    to: client.email,
-                    subject: "Your Subscription has been cancelled",
-                    dynamicTemplateData: {
-                      heading: `Your Subscription to ${subscription.coach.email} has been cancelled`,
-                      body: `You will still have access to ${subscription.coach.email}'s coaching until the end of the billing cycle`,
-                    },
-                  });
+                if (object.cancel_at_period_end) {
+                  if (
+                    subscription.coach.notifications?.includes(
+                      "email_subscription_cancelled_coach"
+                    )
+                  ) {
+                    await sendEmail({
+                      to: subscription.coach.email,
+                      subject: "A Client has cancelled their Subscription",
+                      dynamicTemplateData: {
+                        heading: `${client.email} has cancelled their Subscription`,
+                        body: `You will still be able to coach ${client.email} until the end of the billing cycle`,
+                      },
+                    });
+                  }
+
+                  if (
+                    client.notifications?.includes(
+                      "email_subscription_cancelled_client"
+                    )
+                  ) {
+                    await sendEmail({
+                      to: client.email,
+                      subject: "Your Subscription has been cancelled",
+                      dynamicTemplateData: {
+                        heading: `Your Subscription to ${subscription.coach.email} has been cancelled`,
+                        body: `You will still have access to ${subscription.coach.email}'s coaching until the end of the billing cycle`,
+                      },
+                    });
+                  }
                 }
               }
             }

@@ -1,9 +1,9 @@
-import mail from '@sendgrid/mail';
+import mail from "@sendgrid/mail";
 
 mail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const adminEmail = 'contact@repsetter.com';
-const notificationsEmail = 'notifications@repsetter.com';
+const adminEmail = "contact@repsetter.com";
+const notificationsEmail = "updates@repsetter.com";
 
 export default async function sendEmail(...messages) {
   console.log(
@@ -17,7 +17,7 @@ export default async function sendEmail(...messages) {
       templateId: process.env.SENDGRID_TEMPLATE_ID,
       from: {
         email: notificationsEmail,
-        name: 'Repsetter',
+        name: "Repsetter",
       },
       replyTo: adminEmail,
     }))
@@ -34,7 +34,7 @@ export default async function sendEmail(...messages) {
         },
         from: {
           email: notificationsEmail,
-          name: 'Repsetter',
+          name: "Repsetter",
           ...message?.from,
         },
         replyTo: adminEmail,
