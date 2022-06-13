@@ -66,7 +66,9 @@ export default async function handler(req, res) {
                   .from("subscription")
                   .update({
                     client: client.id,
+                    client_email: client.email,
                     redeemed: true,
+                    redeemed_at: new Date(),
                     is_active: true,
                   })
                   .eq("id", subscription.id);

@@ -58,7 +58,7 @@ export default function Notifications() {
               Notifications
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              Get notified on campaign updates.
+              Choose which updates to be notified on.
             </p>
           </div>
 
@@ -67,32 +67,40 @@ export default function Notifications() {
               By Email
             </legend>
             <div className="mt-4 space-y-4">
-              {notificationTypes.map((notificationType) => (
-                <div key={notificationType.value} className="flex items-start">
-                  <div className="flex h-5 items-center">
-                    <input
-                      id={notificationType.value}
-                      name={notificationType.value}
-                      type="checkbox"
-                      defaultChecked={user?.notifications?.includes(
-                        notificationType.value
-                      )}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
+              {notificationTypes
+                .filter(
+                  (notificationType) =>
+                    !notificationType.isCoach || user.can_coach
+                )
+                .map((notificationType) => (
+                  <div
+                    key={notificationType.value}
+                    className="flex items-start"
+                  >
+                    <div className="flex h-5 items-center">
+                      <input
+                        id={notificationType.value}
+                        name={notificationType.value}
+                        type="checkbox"
+                        defaultChecked={user?.notifications?.includes(
+                          notificationType.value
+                        )}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor={notificationType.value}
+                        className="font-medium text-gray-700"
+                      >
+                        {notificationType.title}
+                      </label>
+                      <p className="text-gray-500">
+                        {notificationType.description}
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor={notificationType.value}
-                      className="font-medium text-gray-700"
-                    >
-                      {notificationType.title}
-                    </label>
-                    <p className="text-gray-500">
-                      {notificationType.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </fieldset>
         </div>

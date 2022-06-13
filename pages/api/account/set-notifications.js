@@ -26,16 +26,19 @@ export const notificationTypes = [
     value: "email_subscription_created_coach",
     title: "New Client",
     description: "Be notified when you get a new client",
+    isCoach: true,
   },
   {
     value: "email_subscription_cancelled_coach",
     title: "Client Cancelled",
     description: "Be notified when a client has cancelled their subscription",
+    isCoach: true,
   },
   {
     value: "email_subscription_ended_coach",
     title: "Client's Subscription Ends",
     description: "Be notified when a client's subscription ends",
+    isCoach: true,
   },
 ];
 

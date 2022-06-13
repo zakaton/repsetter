@@ -71,9 +71,9 @@ export default function Subscriptions() {
               title: "coach",
               value: result.coach_email,
             },
-            result.client && {
-              title: "client",
-              value: result.client_email,
+            {
+              title: "created at",
+              value: new Date(result.created_at).toLocaleString(),
             },
             {
               title: "price",
@@ -83,15 +83,23 @@ export default function Subscriptions() {
               title: "redeemed?",
               value: result.redeemed ? "yes" : "no",
             },
+            result.client && {
+              title: "client",
+              value: result.client_email,
+            },
             result.redeemed && {
-              title: "Last Billing Cycle",
-              value: `FILL`,
+              title: "redeemed at",
+              value: new Date(result.redeemed_at).toLocaleString(),
             },
-            {
-              title: "created at",
-              value: new Date(result.created_at).toLocaleString(),
+            result.redeemed && {
+              title: "active?",
+              value: result.is_active ? "yes" : "no",
             },
-            {
+            result.redeemed && {
+              title: "cancelled?",
+              value: result.is_cancelled ? "yes" : "no",
+            },
+            !result.redeemed && {
               jsx: (
                 <MyLink
                   href={`/subscription/${result.id}`}

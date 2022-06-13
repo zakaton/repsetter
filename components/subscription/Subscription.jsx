@@ -187,6 +187,13 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                           : "You are already subscribed to this coach."}
                       </p>
                     )}
+                    {isMySubscription && subscription.redeemed && (
+                      <p>
+                        This subscription has been redeemed by{" "}
+                        {subscription.client_email} at{" "}
+                        {new Date(subscription.redeemed_at).toLocaleString()}
+                      </p>
+                    )}
                   </div>
                 </div>
               </>
