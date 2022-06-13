@@ -108,6 +108,13 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
 
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
 
+  const canSubscribe =
+    user &&
+    !isGettingSubscription &&
+    !isMySubscription &&
+    !isGettingExistingSubscription &&
+    !existingSubscription;
+
   return (
     <>
       <DeleteSubscriptionModal
@@ -153,12 +160,14 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                 </div>
                 <div className="mx-auto max-w-prose text-lg">
                   <div className="prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500">
-                    <p>
-                      You have been invited by {subscription.coach_email} to be
-                      coached for{" "}
-                      <span>{formatDollars(subscription.price, false)}</span>{" "}
-                      per month.
-                    </p>
+                    {
+                      <p>
+                        You have been invited by {subscription.coach_email} to
+                        be coached for{" "}
+                        <span>{formatDollars(subscription.price, false)}</span>{" "}
+                        per month.
+                      </p>
+                    }
                     {!isLoading && !user && (
                       <p>
                         <MyLink
@@ -172,7 +181,11 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                       </p>
                     )}
                     {existingSubscription && (
-                      <p>You are already subscribed to this coach.</p>
+                      <p>
+                        {existingSubscription.id === subscription.id
+                          ? "You've already redeemed this subscription."
+                          : "You are already subscribed to this coach."}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -183,46 +196,46 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
               </div>
             ))}
         </div>
-        {subscription && (
+        {subscription && !subscription.redeemed && (
           <div className="mt-1 flex items-end justify-end gap-2 bg-gray-50 px-4 py-3 text-right text-xs sm:px-6 sm:text-sm">
-            <button
-              type="button"
-              onClick={() => {
-                setShowQRCodeModal(true);
-              }}
-              className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-1 px-1 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              <span className="sr-only">QR Code</span>
-              <QrcodeIcon className="h-7 w-7" aria-hidden="true" />
-            </button>
-            {!subscription.redeemed && navigator.canShare && (
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.share({
-                    title: `Repsetter Coaching Invitation`,
-                    text: `Follow this link to start getting coached on Repsetter!`,
-                    url: `https://repsetter.me/${subscription.id}`,
-                  });
-                }}
-                className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Share
-              </button>
-            )}
-            {user &&
-              !isGettingSubscription &&
-              !isMySubscription &&
-              !isGettingExistingSubscription &&
-              !existingSubscription && (
-                <MyLink
-                  href={`/api/subscription/redeem-subscription?subscriptionId=${subscription.id}&access_token=${session.access_token}`}
-                  target="_blank"
-                  className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            {!subscription.redeemed && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowQRCodeModal(true);
+                  }}
+                  className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-1 px-1 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                  Subscribe
-                </MyLink>
-              )}
+                  <span className="sr-only">QR Code</span>
+                  <QrcodeIcon className="h-7 w-7" aria-hidden="true" />
+                </button>
+                {navigator.canShare && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.share({
+                        title: `Repsetter Coaching Invitation`,
+                        text: `Follow this link to start getting coached on Repsetter!`,
+                        url: `https://repsetter.me/${subscription.id}`,
+                      });
+                    }}
+                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    Share
+                  </button>
+                )}
+              </>
+            )}
+            {canSubscribe && (
+              <MyLink
+                href={`/api/subscription/redeem-subscription?subscriptionId=${subscription.id}&access_token=${session.access_token}`}
+                target="_blank"
+                className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Subscribe
+              </MyLink>
+            )}
             {(isMySubscription || isAdmin) && (
               <button
                 type="button"

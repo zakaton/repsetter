@@ -41,6 +41,7 @@ const orderTypes = [
 
 export default function Subscriptions() {
   const { stripeLinks } = useUser();
+
   return (
     <>
       <Table
