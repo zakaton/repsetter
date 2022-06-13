@@ -1,10 +1,10 @@
-import { Fragment, useEffect, useState } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { ChevronDownIcon, AdjustmentsIcon } from '@heroicons/react/solid';
-import { useRouter } from 'next/router';
+import { Fragment, useEffect, useState } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { ChevronDownIcon, AdjustmentsIcon } from "@heroicons/react/solid";
+import { useRouter } from "next/router";
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Filters({
@@ -25,18 +25,18 @@ export default function Filters({
   }, [filters]);
 
   const checkQuery = () => {
-    const { 'sort-by': sortBy } = router.query;
+    const { "sort-by": sortBy } = router.query;
 
-    console.log('query', router.query);
+    console.log("query", router.query);
     const newFilters = {};
     filterTypes.forEach((filterType) => {
-      console.log('checking', filterType.query);
+      console.log("checking", filterType.query);
       if (filterType.query in router.query) {
         newFilters[filterType.column] =
-          router.query[filterType.query] === 'true';
+          router.query[filterType.query] === "true";
       }
     });
-    console.log('newFilters', newFilters);
+    console.log("newFilters", newFilters);
     if (Object.keys(newFilters).length > 0) {
       setFilters(newFilters);
     }
@@ -74,8 +74,8 @@ export default function Filters({
                   className="mr-2 h-5 w-5 flex-none text-gray-400 group-hover:text-gray-500"
                   aria-hidden="true"
                 />
-                {numberOfActiveFilters || ''} Filter
-                {numberOfActiveFilters === 1 ? '' : 's'}
+                {numberOfActiveFilters || ""} Filter
+                {numberOfActiveFilters === 1 ? "" : "s"}
               </Disclosure.Button>
             </div>
             <div className="pl-6">
@@ -115,7 +115,7 @@ export default function Filters({
                               id={id}
                               name={fieldsetId}
                               type="radio"
-                              className="h-4 w-4 border-gray-300 text-yellow-600 focus:ring-yellow-500"
+                              className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                               checked={checked}
                               onChange={() => {
                                 const newFilters = { ...filters };
@@ -148,7 +148,7 @@ export default function Filters({
           <div className="mx-auto flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
             <Menu as="div" className="relative inline-block">
               <div className="flex">
-                <Menu.Button className="inline-flex group justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                   Sort
                   <ChevronDownIcon
                     className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
@@ -180,10 +180,10 @@ export default function Filters({
                               type="button"
                               className={classNames(
                                 isSelected
-                                  ? 'font-medium text-gray-900'
-                                  : 'text-gray-500',
-                                active ? 'bg-gray-100' : '',
-                                'block w-full px-4 py-2 text-left text-sm'
+                                  ? "font-medium text-gray-900"
+                                  : "text-gray-500",
+                                active ? "bg-gray-100" : "",
+                                "block w-full px-4 py-2 text-left text-sm"
                               )}
                             >
                               {orderType.label}

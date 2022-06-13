@@ -1,23 +1,15 @@
-import { useRouter } from "next/router";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import DeleteUserModal from "../../components/account/modal/DeleteUserModal";
+import DeleteSubscriptionModal from "../../components/account/modal/DeleteSubscriptionModal";
 import Table from "../../components/Table";
+import { useUser } from "../../context/user-context";
+import { formatDollars } from "../../utils/subscription-utils";
+import MyLink from "../../components/MyLink";
 
 const filterTypes = [
   {
-    name: "Has Completed Onboarding?",
-    query: "has-completed-onboarding",
-    column: "has_completed_onboarding",
-    radios: [
-      { value: true, label: "yes", defaultChecked: false },
-      { value: false, label: "no", defaultChecked: false },
-      { value: null, label: "either", defaultChecked: true },
-    ],
-  },
-  {
-    name: "Can Coach?",
-    query: "can-coach",
-    column: "can_coach",
+    name: "Redeemed?",
+    query: "redeemed",
+    column: "redeemed",
     radios: [
       { value: true, label: "yes", defaultChecked: false },
       { value: false, label: "no", defaultChecked: false },
@@ -28,41 +20,65 @@ const filterTypes = [
 
 const orderTypes = [
   {
-    label: "Date Joined",
-    query: "date-joined",
-    value: ["created_at", { ascending: false }],
+    label: "Date Redeemed",
+    query: "date-redeemed",
+    value: ["redeemed_at", { ascending: false }],
     current: false,
   },
   {
-    label: "Email",
-    query: "email",
-    value: ["email", { ascending: true }],
+    label: "Coach Email",
+    query: "coach-email",
+    value: ["coach", { ascending: true }],
+    current: false,
+  },
+  {
+    label: "Price",
+    query: "price",
+    value: ["price", { ascending: false }],
     current: false,
   },
 ];
 
-export default function AllUsers() {
-  const router = useRouter();
-
+export default function MyCoaches() {
+  const { user } = useUser();
   return (
     <>
       <Table
         filterTypes={filterTypes}
         orderTypes={orderTypes}
-        tableName="profile"
+        tableName="subscription"
+        baseFilter={{ client: user.id }}
         resultName="coach"
         resultNamePlural="coaches"
         title="My Coaches"
-        DeleteResultModal={DeleteUserModal}
-        resultMap={(result) => [
-          {
-            title: "email",
-            value: result.email,
-          },
-        ]}
+        DeleteResultModal={DeleteSubscriptionModal}
+        resultMap={(result) =>
+          [
+            {
+              title: "coach",
+              value: result.coach_email,
+            },
+            {
+              title: "price",
+              value: `${formatDollars(result.price, false)}/month`,
+            },
+            result.redeemed && {
+              title: "redeemed at",
+              value: new Date(result.redeemed_at).toLocaleString(),
+            },
+            result.redeemed && {
+              title: "active?",
+              value: result.is_active ? "yes" : "no",
+            },
+            result.redeemed && {
+              title: "cancelled?",
+              value: result.is_cancelled ? "yes" : "no",
+            },
+          ].filter(Boolean)
+        }
       ></Table>
     </>
   );
 }
 
-AllUsers.getLayout = getAccountLayout;
+MyCoaches.getLayout = getAccountLayout;

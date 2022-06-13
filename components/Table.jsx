@@ -25,6 +25,7 @@ export default function Table({
   resultMap,
   deleteTitle,
   HeaderButton,
+  baseFilter = {},
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -51,7 +52,7 @@ export default function Table({
     const { count: numberOfResults } = await supabase
       .from(tableName)
       .select(selectString, { count: "exact", head: true })
-      .match(filters);
+      .match({ ...baseFilter, ...filters });
     setPageIndex(0);
     setNumberOfResults(numberOfResults);
     setIsGettingNumberOfResults(false);
@@ -76,7 +77,7 @@ export default function Table({
       const { data: results } = await supabase
         .from(tableName)
         .select(selectString)
-        .match(filters)
+        .match({ ...baseFilter, ...filters })
         .order(...order)
         .limit(numberOfResultsPerPage)
         .range(
@@ -324,7 +325,7 @@ export default function Table({
           })}
 
         {isGettingResults && (
-          <div className="mt-5 border-t border-gray-200">
+          <div className="border-t border-gray-200">
             <div className="divide-y divide-gray-200">
               <div className="py-4 text-center sm:py-5">
                 <div className="text-sm font-medium text-gray-500">
@@ -336,7 +337,7 @@ export default function Table({
         )}
 
         {results?.length === 0 && !isGettingResults && (
-          <div className="mt-5 border-t border-gray-200">
+          <div className="border-t border-gray-200">
             <div className="divide-y divide-gray-200">
               <div className="py-4 text-center sm:py-5">
                 <div className="text-sm font-medium text-gray-500">

@@ -38,11 +38,6 @@ const navigation = [
     canCoach: true,
   },
   {
-    name: "Subscriptions",
-    href: "/account/subscriptions",
-    icon: CurrencyDollarIcon,
-  },
-  {
     name: "Workouts",
     href: "/account/workouts",
     icon: FireIcon,
