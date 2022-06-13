@@ -52,6 +52,18 @@ export default async function handler(req, res) {
             .eq("id", metadata.client)
             .single();
           console.log("client", client);
+
+          if (subscription && event.type === "customer.subscription.created") {
+            if (!subscription.stripe_id) {
+              await supabase
+                .from("subscription")
+                .update({
+                  stripe_id: object.id,
+                })
+                .eq("id", subscription.id);
+            }
+          }
+
           if (subscription && client) {
             const coaches = client.coaches || [];
             if (object.status === "active") {
@@ -143,9 +155,9 @@ export default async function handler(req, res) {
                 ) {
                   await sendEmail({
                     to: client.email,
-                    subject: "You've cancelled your Subscription",
+                    subject: "Your Subscription has been cancelled",
                     dynamicTemplateData: {
-                      heading: `You've cancelled your Subscription to ${subscription.coach.email}`,
+                      heading: `Your Subscription to ${subscription.coach.email} has been cancelled`,
                       body: `You will still have access to ${subscription.coach.email}'s coaching until the end of the billing cycle`,
                     },
                   });

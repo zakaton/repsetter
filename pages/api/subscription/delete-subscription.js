@@ -6,6 +6,7 @@ import {
   isUserAdmin,
   getUserByAccessToken,
 } from "../../../utils/supabase";
+import Stripe from "stripe";
 
 import { updateNumberOfSubscriptions } from "../../../utils/subscription-utils";
 
@@ -38,14 +39,25 @@ export default async function handler(req, res) {
   if (subscription && (subscription.coach === user.id || isUserAdmin(user))) {
     const profile = await getUserProfile(user, supabase);
 
-    if (subscription.redeemed) {
-      // FILL
+    if (subscription.redeemed && subscription.client) {
+      const { client } = subscription;
       if (client.coaches?.includes(subscription.coach)) {
         const coaches = client.coaches || [];
         coaches.splice(coaches.indexOf(subscription.coach), 1);
+
+        console.log("updated coaches", coaches);
+        const updateClientResponse = await supabase
+          .from("profile")
+          .update({ coaches })
+          .eq("id", client.id);
+        console.log("updateClientResponse", updateClientResponse);
       }
-      // remove self from client's coaches
-      // cancel stripe subscription
+
+      const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+      const cancelledStripeSubscription = await stripe.subscriptions.del(
+        subscription.stripe_id
+      );
+      console.log("cancelledStripeSubscription", cancelledStripeSubscription);
     }
 
     const deleteSubscriptionResult = await supabase
