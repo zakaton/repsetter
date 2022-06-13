@@ -159,46 +159,6 @@ export default async function handler(req, res) {
               .update({ coaches })
               .eq("id", client.id);
             console.log("updateClientResponse", updateClientResponse);
-          } else {
-            if (coaches.includes(subscription.coach.id)) {
-              coaches.splice(coaches.indexOf(subscription.coach.id), 1);
-            }
-            if (subscription.is_active) {
-              await supabase
-                .from("subscription")
-                .update({ is_active: false })
-                .eq("id", subscription.id);
-
-              if (
-                subscription.coach.notifications?.includes(
-                  "email_subscription_ended_coach"
-                )
-              ) {
-                await sendEmail({
-                  to: subscription.coach.email,
-                  subject: "A Client's subscription has ended",
-                  dynamicTemplateData: {
-                    heading: `${client.email}'s subscription has ended`,
-                    body: `${client.email} has not renewed their subscription and so you will no longer be coaching them.`,
-                  },
-                });
-              }
-
-              if (
-                client.notifications?.includes(
-                  "email_subscription_ended_client"
-                )
-              ) {
-                await sendEmail({
-                  to: subscription.coach.email,
-                  subject: "Your subscription has ended",
-                  dynamicTemplateData: {
-                    heading: `Your subscription to ${subscription.coach.email}'s coaching has ended`,
-                    body: `You've not not renewed your subscription and so you will no longer be coached by ${subscription.coach.email}`,
-                  },
-                });
-              }
-            }
           }
         }
         break;

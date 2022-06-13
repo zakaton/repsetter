@@ -37,13 +37,19 @@ export default async function handler(req, res) {
 
   if (subscription && (subscription.coach === user.id || isUserAdmin(user))) {
     const profile = await getUserProfile(user, supabase);
-    await updateNumberOfSubscriptions(profile, supabase);
+
+    if (subscription.redeemed) {
+      // FILL
+      // remove self from client's coaches
+      // cancel stripe subscription
 
     const deleteSubscriptionResult = await supabase
       .from("subscription")
       .delete()
       .eq("id", subscriptionId);
     console.log("delete subscription result", deleteSubscriptionResult);
+
+    await updateNumberOfSubscriptions(profile, supabase);
 
     res.status(200).json({
       status: { type: "succeeded", title: "Successfully deleted subscription" },
