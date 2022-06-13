@@ -1,5 +1,4 @@
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import DeleteSubscriptionModal from "../../components/account/modal/DeleteSubscriptionModal";
 import Table from "../../components/Table";
 import { useUser } from "../../context/user-context";
 import { formatDollars } from "../../utils/subscription-utils";
@@ -40,10 +39,24 @@ const orderTypes = [
 ];
 
 export default function MyCoaches() {
-  const { user } = useUser();
+  const { user, stripeLinks } = useUser();
   return (
     <>
       <Table
+        HeaderButton={
+          <MyLink
+            href={stripeLinks.customerPortal}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+            >
+              Manage Subscriptions
+            </button>
+          </MyLink>
+        }
         filterTypes={filterTypes}
         orderTypes={orderTypes}
         tableName="subscription"
@@ -51,7 +64,6 @@ export default function MyCoaches() {
         resultName="coach"
         resultNamePlural="coaches"
         title="My Coaches"
-        DeleteResultModal={DeleteSubscriptionModal}
         resultMap={(result) =>
           [
             {
