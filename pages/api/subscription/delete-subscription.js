@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   const { subscriptionId } = req.query;
 
   const { data: subscription } = await supabase
-    .from("subscription")
+    .from("subscription, client(*)")
     .select("*")
     .match({ id: subscriptionId })
     .single();
@@ -40,8 +40,13 @@ export default async function handler(req, res) {
 
     if (subscription.redeemed) {
       // FILL
+      if (client.coaches?.includes(subscription.coach)) {
+        const coaches = client.coaches || [];
+        coaches.splice(coaches.indexOf(subscription.coach), 1);
+      }
       // remove self from client's coaches
       // cancel stripe subscription
+    }
 
     const deleteSubscriptionResult = await supabase
       .from("subscription")
