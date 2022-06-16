@@ -36,13 +36,13 @@ const coachingFeatures = [
     icon: FireIcon,
   },
   {
-    name: "Diet",
+    name: "Design Meal Plans",
     description:
       "Set meal plans for clients, monitoring their nutritional intake and how well it correlates with performance in the gym.",
     icon: HeartIcon,
   },
   {
-    name: "Weight",
+    name: "Share Weight and Progress Pics",
     description:
       "Track weight fluctuations as you build muscle mass or burn body fat, sharing progress pictures along the way for comparison.",
     icon: ScaleIcon,
