@@ -1,23 +1,22 @@
-import { Fragment } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { MenuIcon, XIcon, UserCircleIcon } from '@heroicons/react/outline';
-import { useRouter } from 'next/router';
+import { Fragment } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
+import { useRouter } from "next/router";
 
-import { useUser } from '../context/user-context';
-import MyLink from './MyLink';
+import { useUser } from "../context/user-context";
+import MyLink from "./MyLink";
 
 const navigation = [
-  { name: 'What?', href: '/' },
-  { name: 'Why?', href: '/why' },
-  { name: 'FAQ', href: '/faq' },
+  { name: "About", href: "/" },
+  { name: "FAQ", href: "/faq" },
 ];
 const accountNavigation = [
-  { name: 'Account', href: '/account' },
-  { name: 'Sign Out', href: '/sign-out' },
+  { name: "Account", href: "/account" },
+  { name: "Sign Out", href: "/sign-out" },
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Header() {
@@ -60,9 +59,9 @@ export default function Header() {
                       key={name}
                       className={classNames(
                         router.pathname === href
-                          ? 'border-blue-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                        'text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium'
+                          ? "border-blue-500 text-gray-900"
+                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                        "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
                       )}
                     >
                       {name}
@@ -101,17 +100,17 @@ export default function Header() {
                                   <MyLink
                                     href={href}
                                     onClick={(e) => {
-                                      if (name === 'Sign Out') {
+                                      if (name === "Sign Out") {
                                         e.preventDefault();
                                         signOut();
                                       }
                                     }}
                                     className={classNames(
                                       router.pathname === href
-                                        ? 'font-medium text-blue-700'
-                                        : 'text-gray-700',
-                                      active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm'
+                                        ? "font-medium text-blue-700"
+                                        : "text-gray-700",
+                                      active ? "bg-gray-100" : "",
+                                      "block px-4 py-2 text-sm"
                                     )}
                                   >
                                     {name}
@@ -145,9 +144,9 @@ export default function Header() {
                   href={href}
                   className={classNames(
                     router.pathname === href
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-transparent  text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700',
-                    'block border-l-4 py-2 pl-3 pr-4 text-base font-medium'
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-transparent  text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700",
+                    "block border-l-4 py-2 pl-3 pr-4 text-base font-medium"
                   )}
                 >
                   {name}

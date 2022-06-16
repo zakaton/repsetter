@@ -29,6 +29,10 @@ export default function Privacy() {
             disabled by default, you&apos;d need to opt-in to receive emails)
           </li>
           <li>
+            Your workout information, so you can view and edit your workouts, as
+            well as allow coaches to view and plan your workout routines.
+          </li>
+          <li>
             Stripe customer information, so you can make payments to coaches
           </li>
           <li>
@@ -39,7 +43,7 @@ export default function Privacy() {
 
         <p>
           We only use this information to make this site work, and we don&apos;t
-          share it with any third parties
+          share it with any third parties.
         </p>
 
         <h3>Deleting your Account</h3>

@@ -18,8 +18,12 @@ export default function Terms() {
         <p>By signing in you agree to the following:</p>
         <ul>
           <li>
-            we can delete your account at any time, canceling (and refunding if
+            We can delete your account at any time, canceling (and refunding if
             applicable) any coaching subscriptions.
+          </li>
+          <li>
+            Subscriptions are nonrefundable. It sucks if you subscribed to a bad
+            coach, but all you can do is cancel your subscription.
           </li>
         </ul>
       </div>

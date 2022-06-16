@@ -4,11 +4,30 @@ import Head from "next/head";
 
 const faqs = [
   {
-    question: "Question?",
+    question: "Are are any fees to get started?",
     answer: () => (
       <>
-        <p>Answer</p>
-        <p>more info</p>
+        <p>
+          Nope. You can sign up for free and just use this as standalone workout
+          app if you aren&apos;t a coach or don&apos;t wanna coach others.
+        </p>
+        <p>You&apos;re only charged when you subscribe to any coaches.</p>
+      </>
+    ),
+  },
+  {
+    question: "Can I cancel my coaching subscription anytime?",
+    answer: () => (
+      <>
+        <p>You&apos;re free to cancel anytime.</p>
+      </>
+    ),
+  },
+  {
+    question: "What percent does Repsetter take from coaching subscriptions?",
+    answer: () => (
+      <>
+        <p>We take 5% from coaching subscriptions.</p>
       </>
     ),
   },
@@ -24,7 +43,7 @@ export default function FAQ() {
       <Head>
         <title>FAQ - Repsetter</title>
       </Head>
-      <div className="style-links mx-auto max-w-3xl divide-y-2 divide-gray-200">
+      <div className="style-links mx-auto mt-2 max-w-3xl divide-y-2 divide-gray-200">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">
           Frequently Asked Questions
         </h2>
