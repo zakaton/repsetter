@@ -44,7 +44,7 @@ const coachingFeatures = [
   {
     name: "Share Weight and Progress Pics",
     description:
-      "Track weight fluctuations as you build muscle mass or burn body fat, sharing progress pictures along the way for comparison.",
+      "Track weight fluctuations as you build muscle or burn fat, sharing progress pictures along the way for comparison.",
     icon: ScaleIcon,
   },
 ];

@@ -5,11 +5,11 @@ import {
   BellIcon,
   UserCircleIcon,
   UserGroupIcon,
-  CurrencyDollarIcon,
   ClipboardListIcon,
   HeartIcon,
   FireIcon,
   ScaleIcon,
+  CameraIcon,
 } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 import { useUser } from "../../context/user-context";
@@ -51,6 +51,11 @@ const navigation = [
     name: "Weight",
     href: "/account/weight",
     icon: ScaleIcon,
+  },
+  {
+    name: "Pictures",
+    href: "/account/pictures",
+    icon: CameraIcon,
   },
   {
     name: "Notifications",
