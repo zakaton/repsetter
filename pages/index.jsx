@@ -12,7 +12,7 @@ const clientFeatures = [
   {
     name: "Custom Subscription Pricing",
     description:
-      "Set your own prices for each client, charging more for more hands-on coaching.",
+      "Set your own prices for each client, charging more for your more demanding clients.",
     icon: CurrencyDollarIcon,
   },
   {
