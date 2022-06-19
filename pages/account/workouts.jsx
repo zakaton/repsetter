@@ -78,27 +78,27 @@ export default function Workouts() {
         <title>Workouts - Repsetter</title>
       </Head>
       <div className="space-y-6 px-4 pb-6 pt-6 sm:px-6 sm:pt-6">
-        <div>
-          <h3 className="inline text-lg font-medium leading-6 text-gray-900">
-            Workouts
-          </h3>
-          <div className="ml-3 inline-block">
-            <select
-              id="clientEmail"
-              className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-              defaultValue="Me"
-            >
-              <option>Me</option>
-              <option>United States</option>
-              <option>Mexico</option>
-            </select>
+        <div className="lg:grid lg:grid-cols-12 lg:grid-rows-2 lg:gap-x-10">
+          <div className="lg:col-start-1 lg:col-end-8 lg:row-start-1">
+            <h3 className="inline text-lg font-medium leading-6 text-gray-900">
+              Workouts
+            </h3>
+            <div className="ml-3 inline-block">
+              <select
+                id="clientEmail"
+                className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                defaultValue="Me"
+              >
+                <option>Me</option>
+                <option>United States</option>
+                <option>Mexico</option>
+              </select>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              View and Edit workouts for [YOU or CLIENT_EMAIL]
+            </p>
           </div>
-          <p className="mt-2 text-sm text-gray-500">
-            View and Edit workouts for [YOU or CLIENT_EMAIL]
-          </p>
-        </div>
-        <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
-          <div className="mt-10 text-center lg:col-start-8 lg:col-end-13 lg:row-start-1 lg:mt-9 xl:col-start-9">
+          <div className="mt-8 text-center lg:col-start-8 lg:col-end-13 lg:row-span-2 lg:row-start-1 lg:mt-0 xl:col-start-9">
             <div className="flex items-center text-gray-900">
               <button
                 type="button"
@@ -190,7 +190,7 @@ export default function Workouts() {
               Add Workout
             </button>
           </div>
-          <div className="mt-4 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 xl:col-span-8">
+          <div className="mt-8 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0">
             Hello
           </div>
         </div>
