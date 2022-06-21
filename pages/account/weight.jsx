@@ -1,14 +1,15 @@
 import AccountCalendarLayout from "../../components/layouts/AccountCalendarLayout";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import Head from "next/head";
 
 export default function Weight() {
   return (
     <>
-      <Head>
-        <title>Weight - Repsetter</title>
-      </Head>
-      <AccountCalendarLayout>Hello!</AccountCalendarLayout>
+      <AccountCalendarLayout
+        tableName="weight"
+        subtitle="View and log Bodyweight"
+      >
+        Hello!
+      </AccountCalendarLayout>
     </>
   );
 }
