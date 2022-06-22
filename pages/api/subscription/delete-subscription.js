@@ -8,7 +8,7 @@ import {
 } from "../../../utils/supabase";
 import Stripe from "stripe";
 
-import { updateNumberOfSubscriptions } from "../../../utils/subscription-utils";
+import { updateNumberOfUnredeemedSubscriptions } from "../../../utils/subscription-utils";
 
 export default async function handler(req, res) {
   const sendError = (error) =>
@@ -32,18 +32,23 @@ export default async function handler(req, res) {
 
   const { data: subscription } = await supabase
     .from("subscription")
-    .select("*, client(*)")
+    .select("*, client(*), coach(*)")
     .match({ id: subscriptionId })
     .single();
 
-  if (subscription && (subscription.coach === user.id || isUserAdmin(user))) {
+  if (
+    subscription &&
+    (subscription.coach.id === user.id ||
+      subscription.client.id === user.id ||
+      isUserAdmin(user))
+  ) {
     const profile = await getUserProfile(user, supabase);
 
     if (subscription.redeemed && subscription.client) {
       const { client } = subscription;
-      if (client.coaches?.includes(subscription.coach)) {
+      if (client.coaches?.includes(subscription.coach.id)) {
         const coaches = client.coaches || [];
-        coaches.splice(coaches.indexOf(subscription.coach), 1);
+        coaches.splice(coaches.indexOf(subscription.coach.id), 1);
 
         console.log("updated coaches", coaches);
         const updateClientResponse = await supabase
@@ -66,7 +71,7 @@ export default async function handler(req, res) {
       .eq("id", subscriptionId);
     console.log("delete subscription result", deleteSubscriptionResult);
 
-    await updateNumberOfSubscriptions(profile, supabase);
+    await updateNumberOfUnredeemedSubscriptions(subscription.coach, supabase);
 
     res.status(200).json({
       status: { type: "succeeded", title: "Successfully deleted subscription" },

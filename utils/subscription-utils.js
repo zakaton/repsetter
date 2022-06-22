@@ -25,7 +25,10 @@ export function formatDollars(dollars, useDecimals = true) {
   });
 }
 
-export async function updateNumberOfSubscriptions(coachProfile, supabase) {
+export async function updateNumberOfUnredeemedSubscriptions(
+  coachProfile,
+  supabase
+) {
   const { count: new_number_of_unredeemed_subscriptions } = await supabase
     .from("subscription")
     .select("*", { count: "exact", head: true })

@@ -8,7 +8,7 @@ import {
 
 import {
   maxNumberOfUnredeemedSubscriptionsPerCoach,
-  updateNumberOfSubscriptions,
+  updateNumberOfUnredeemedSubscriptions,
 } from "../../../utils/subscription-utils";
 
 export default async function handler(req, res) {
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
     });
   }
 
-  await updateNumberOfSubscriptions(profile, supabase);
+  await updateNumberOfUnredeemedSubscriptions(profile, supabase);
 
   res.status(200).json({
     status: {

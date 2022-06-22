@@ -59,6 +59,14 @@ export default async function handler(req, res) {
   }
 
   // FILL - delete subcriptions
+  // delete coaching subscriptions
+  //// cancel stripe subs
+  //// update clients' coaches
+  //// delete stripe subs
+  // delete own subscriptions
+  //// cancel stripe subs
+  //// delete supabase subs
+
   // FILL - delete workouts
   // FILL - delete diet
   // FILL - delete weight

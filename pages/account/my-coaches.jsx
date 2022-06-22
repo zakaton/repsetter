@@ -1,4 +1,5 @@
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
+import DeleteSubscriptionModal from "../../components/account/modal/DeleteSubscriptionModal";
 import Table from "../../components/Table";
 import { useUser } from "../../context/user-context";
 import { formatDollars } from "../../utils/subscription-utils";
@@ -64,6 +65,7 @@ export default function MyCoaches() {
         resultName="coach"
         resultNamePlural="coaches"
         title="My Coaches"
+        DeleteResultModal={DeleteSubscriptionModal}
         resultMap={(result) =>
           [
             {
