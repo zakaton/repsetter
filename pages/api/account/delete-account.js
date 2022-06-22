@@ -97,7 +97,7 @@ export default async function handler(req, res) {
   const { data: clientSubscriptions } = await supabase
     .from("subscription")
     .select("*")
-    .match({ coach: profile.id });
+    .match({ client: profile.id });
   await Promise.all(
     clientSubscriptions.map(async (clientSubscription) => {
       if (clientSubscription.stripe_id) {
