@@ -112,14 +112,37 @@ export function ClientContextProvider(props) {
     });
   }, [router.isReady, selectedClient, selectedDate, router.pathname]);
 
+  const [amITheClient, setAmITheClient] = useState(false);
+  useEffect(() => {
+    setAmITheClient(!selectedClient);
+  }, [selectedClient]);
+
+  const [isSelectedDateToday, setIsSelectedDateToday] = useState(false);
+  useEffect(() => {
+    if (!selectedDate) {
+      return;
+    }
+
+    const currentDate = new Date();
+    const isSelectedDateToday =
+      selectedDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
+      selectedDate.getUTCMonth() === currentDate.getUTCMonth() &&
+      selectedDate.getUTCDate() === currentDate.getUTCDate();
+    setIsSelectedDateToday(isSelectedDateToday);
+  }, [selectedDate]);
+
   const value = {
     getClients,
     isGettingClients,
     clients,
+
     selectedClient,
     setSelectedClient,
+    amITheClient,
+
     selectedDate,
     setSelectedDate,
+    isSelectedDateToday,
   };
 
   return <ClientContext.Provider value={value} {...props} />;

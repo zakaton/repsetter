@@ -53,30 +53,43 @@ export default async function handler(req, res) {
     const profile = await getUserProfile(user, supabase);
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
     console.log(subscription.price_id);
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer: profile.stripe_customer,
-
-      line_items: [
-        {
-          price: subscription.price_id,
-          quantity: 1,
-        },
-      ],
-      subscription_data: {
-        application_fee_percent: repsetterFeePercentage,
+    if (subscription.price === 0) {
+      const stripeSubscription = await stripe.subscriptions.create({
+        customer: profile.stripe_customer,
+        items: [{ price: subscription.price_id }],
+        metadata: { subscription: subscription.id, client: profile.id },
         transfer_data: {
           destination: subscription.coach.stripe_account,
+          amount_percent: repsetterFeePercentage,
         },
-        metadata: { subscription: subscription.id, client: profile.id },
-      },
+      });
+      res.redirect(`/subscription/${subscriptionId}`);
+    } else {
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer: profile.stripe_customer,
 
-      success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/subscription/${subscription.id}`,
-    });
+        line_items: [
+          {
+            price: subscription.price_id,
+            quantity: 1,
+          },
+        ],
+        subscription_data: {
+          application_fee_percent: repsetterFeePercentage,
+          transfer_data: {
+            destination: subscription.coach.stripe_account,
+          },
+          metadata: { subscription: subscription.id, client: profile.id },
+        },
 
-    console.log("checkout session", session);
-    res.redirect(session.url);
+        success_url: `${origin}/subscription/${subscription.id}?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/subscription/${subscription.id}`,
+      });
+
+      console.log("checkout session", session);
+      res.redirect(session.url);
+    }
   } else {
     return sendError({ message: "subscription not found" });
   }

@@ -58,6 +58,12 @@ export default async function handler(req, res) {
     return sendError({ message: "no user found" });
   }
 
+  // FILL - delete subcriptions
+  // FILL - delete workouts
+  // FILL - delete diet
+  // FILL - delete weight
+  // FILL - delete pictures
+
   // delete stripe customer/account
   const profile = await getUserProfile(userToDelete, supabase);
   try {
@@ -71,7 +77,6 @@ export default async function handler(req, res) {
     console.error("error deleting stripe account", error);
   }
 
-  // delete profile
   const deleteProfileResult = await supabase
     .from("profile")
     .delete()

@@ -2,7 +2,6 @@
 /* eslint-disable consistent-return */
 import {
   getSupabaseService,
-  getUserProfile,
   isUserAdmin,
   getUserByAccessToken,
 } from "../../../utils/supabase";

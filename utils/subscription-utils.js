@@ -44,3 +44,9 @@ export async function updateNumberOfSubscriptions(coachProfile, supabase) {
     .eq("id", coachProfile.id);
   console.log(updateProfileResult);
 }
+
+export async function deleteClientSubscriptions(client, supabase) {}
+export async function deleteCoachingSubscriptions(coach, supabase) {}
+export async function deleteSubscription(subscriptionId, supabase) {
+  // FILL
+}
