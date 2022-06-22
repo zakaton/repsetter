@@ -17,7 +17,7 @@ const nextConfig = withPWA({
     defaultLocale: "en",
   },
   compiler:
-    false && process.env.NODE_ENV === "production"
+    process.env.NODE_ENV === "production"
       ? {
           removeConsole: {
             exclude: ["error"],
