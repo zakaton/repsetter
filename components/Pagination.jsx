@@ -1,9 +1,9 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Pagination({
@@ -19,7 +19,8 @@ export default function Pagination({
 }) {
   const router = useRouter();
   useEffect(() => {
-    if ('page' in router.query) {
+    console.log(router.query);
+    if ("page" in router.query) {
       let newPageIndex = router.query.page;
       if (!Number.isNaN(newPageIndex)) {
         newPageIndex = Number(newPageIndex);
@@ -119,13 +120,13 @@ export default function Pagination({
         key="first"
         type="button"
         onClick={() => setPageIndex(0)}
-        {...(pageIndex === 0 ? { 'aria-current': 'page' } : {})}
+        {...(pageIndex === 0 ? { "aria-current": "page" } : {})}
         className={classNames(
-          'rounded-l-md',
+          "rounded-l-md",
           pageIndex === 0
-            ? 'z-10 border-blue-500 bg-blue-50 text-blue-600'
-            : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50',
-          'relative z-10 inline-flex items-center border px-4 py-2 text-sm font-medium'
+            ? "z-10 border-blue-500 bg-blue-50 text-blue-600"
+            : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50",
+          "relative z-10 inline-flex items-center border px-4 py-2 text-sm font-medium"
         )}
       >
         1
@@ -158,12 +159,12 @@ export default function Pagination({
           key={pageButtonIndex}
           type="button"
           onClick={() => setPageIndex(pageButtonPageIndex)}
-          {...(isActive ? { 'aria-current': 'page' } : {})}
+          {...(isActive ? { "aria-current": "page" } : {})}
           className={classNames(
             isActive
-              ? 'z-10 border-blue-500 bg-blue-50 text-blue-600'
-              : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50',
-            'relative z-10 inline-flex items-center border px-4 py-2 text-sm font-medium'
+              ? "z-10 border-blue-500 bg-blue-50 text-blue-600"
+              : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50",
+            "relative z-10 inline-flex items-center border px-4 py-2 text-sm font-medium"
           )}
         >
           {pageButtonPageIndex + 1}
@@ -191,13 +192,13 @@ export default function Pagination({
         key="last"
         type="button"
         onClick={() => setPageIndex(lastPageButtonIndex)}
-        {...(pageIndex === 0 ? { 'aria-current': 'page' } : {})}
+        {...(pageIndex === 0 ? { "aria-current": "page" } : {})}
         className={classNames(
-          'rounded-r-md',
+          "rounded-r-md",
           pageIndex === lastPageButtonIndex
-            ? 'z-10 border-blue-500 bg-blue-50 text-blue-600'
-            : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50',
-          'relative z-10 inline-flex items-center border px-4 py-2 text-sm font-medium'
+            ? "z-10 border-blue-500 bg-blue-50 text-blue-600"
+            : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50",
+          "relative z-10 inline-flex items-center border px-4 py-2 text-sm font-medium"
         )}
       >
         {numberOfPages}
@@ -214,39 +215,39 @@ export default function Pagination({
         <div
           className={classNames(
             numberOfResults > numberOfResultsPerPage
-              ? 'hidden sm:block'
-              : 'block'
+              ? "hidden sm:block"
+              : "block"
           )}
         >
           <p className="text-sm text-gray-700">
-            Showing{' '}
+            Showing{" "}
             <span className="font-medium">
               {pageIndex * numberOfResultsPerPage + 1}
-            </span>{' '}
-            to{' '}
+            </span>{" "}
+            to{" "}
             <span className="font-medium">
               {Math.min(
                 numberOfResults,
                 (pageIndex + 1) * numberOfResultsPerPage
               )}
-            </span>{' '}
+            </span>{" "}
             of <span className="font-medium">{numberOfResults}</span> {name}
-            {numberOfResults === 1 ? '' : 's'}
+            {numberOfResults === 1 ? "" : "s"}
           </p>
         </div>
         {numberOfResults > numberOfResultsPerPage && (
           <div
             className={classNames(
-              isSimple ? 'sm:justify-end' : 'sm:hidden',
-              'flex flex-1 justify-between'
+              isSimple ? "sm:justify-end" : "sm:hidden",
+              "flex flex-1 justify-between"
             )}
           >
             <button
               type="button"
               onClick={showPrevious}
               className={classNames(
-                pageIndex > 0 ? 'visible' : 'invisible',
-                'relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
+                pageIndex > 0 ? "visible" : "invisible",
+                "relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               )}
             >
               Previous
@@ -255,8 +256,8 @@ export default function Pagination({
               type="button"
               onClick={showNext}
               className={classNames(
-                hasNextPage ? 'visible' : 'hidden',
-                'relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
+                hasNextPage ? "visible" : "hidden",
+                "relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               )}
             >
               Next

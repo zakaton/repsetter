@@ -1,15 +1,20 @@
 import { useEffect, useState, createContext, useContext } from "react";
 import { useUser } from "./user-context";
 import { supabase } from "../utils/supabase";
+import { useRouter } from "next/router";
 
 export const ClientContext = createContext();
+
+const pathnamesForQuery = ["workouts", "pictures", "diet", "weight"].map(
+  (pathname) => "/account/" + pathname
+);
 
 export function ClientContextProvider(props) {
   const { user, isLoading } = useUser();
 
   const [clients, setClients] = useState();
   const [selectedClient, setSelectedClient] = useState();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState();
 
   const [isGettingClients, setIsGettingClients] = useState(false);
   const getClients = async (refresh) => {
@@ -54,6 +59,59 @@ export function ClientContextProvider(props) {
     }
   }, [clients]);
 
+  const router = useRouter();
+
+  useEffect(() => {
+    if (clients && "client" in router.query) {
+      const selectedClientEmail = router.query.client;
+      const selectedClient = clients.find(
+        (client) => client.client_email === selectedClientEmail
+      );
+      if (selectedClient) {
+        setSelectedClient(selectedClient);
+      }
+    }
+  }, [clients]);
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+    console.log("CHECK QUERY", router.query);
+    if ("date" in router.query) {
+      const selectedDateString = router.query.date;
+      const selectedDate = new Date(selectedDateString);
+      console.log(selectedDate);
+      setSelectedDate(selectedDate);
+    } else {
+      setSelectedDate(new Date());
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
+    if (!pathnamesForQuery.includes(router.pathname)) {
+      return;
+    }
+
+    const query = {};
+    if (selectedClient) {
+      console.log("selected client!", selectedClient);
+      query["client"] = selectedClient.client_email;
+    }
+    if (selectedDate) {
+      query["date"] = selectedDate.toDateString();
+    }
+
+    console.log("final client query", query);
+    router.replace({ query: { ...router.query, ...query } }, undefined, {
+      shallow: true,
+    });
+  }, [router.isReady, selectedClient, selectedDate, router.pathname]);
+
   const value = {
     getClients,
     isGettingClients,
@@ -63,17 +121,6 @@ export function ClientContextProvider(props) {
     selectedDate,
     setSelectedDate,
   };
-
-  // FILL - get client and date from query params
-  useEffect(() => {
-    if (!isLoading && user) {
-      setSelectedClient(user);
-    }
-  }, [isLoading, user]);
-
-  useEffect(() => {
-    setSelectedDate(new Date());
-  }, []);
 
   return <ClientContext.Provider value={value} {...props} />;
 }

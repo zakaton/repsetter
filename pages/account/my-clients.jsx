@@ -57,6 +57,7 @@ export default function MyClients() {
         baseFilter={{ coach: user.id }}
         resultName="client"
         title="My Clients"
+        createTitle="Add Client"
         CreateResultModal={CreateSubscriptionModal}
         DeleteResultModal={DeleteSubscriptionModal}
         resultMap={(result) =>

@@ -144,36 +144,41 @@ export default function AccountCalendarLayout({
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
-            <div className="ml-3 inline-block w-44">
-              <select
-                id="clientEmail"
-                className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                value={selectedClient?.client_email || user.email}
-                onInput={(e) => {
-                  const option = e.target.selectedOptions[0];
-                  setSelectedClient(
-                    e.target.value === user.email
-                      ? null
-                      : clients.find(
-                          (client) => client.client_email === e.target.value
-                        )
-                  );
-                }}
-              >
-                <option value={user.email}>Me</option>
-                {clients?.map((client) => (
-                  <option key={client.client_email} value={client.client_email}>
-                    {client.client_email}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {clients?.length > 0 && (
+              <div className="w-50 ml-3 inline-block">
+                <select
+                  id="clientEmail"
+                  className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                  value={selectedClient?.client_email || user.email}
+                  onInput={(e) => {
+                    const option = e.target.selectedOptions[0];
+                    setSelectedClient(
+                      e.target.value === user.email
+                        ? null
+                        : clients.find(
+                            (client) => client.client_email === e.target.value
+                          )
+                    );
+                  }}
+                >
+                  <option value={user.email}>Me</option>
+                  {clients?.map((client) => (
+                    <option
+                      key={client.client_email}
+                      value={client.client_email}
+                    >
+                      {client.client_email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <p className="mt-2 text-sm text-gray-500">
               {subtitle ||
-                `View and Edit ${
-                  selectedClient?.email === user.email
-                    ? "your"
-                    : `${selectedClient?.email}'s`
+                `View and edit ${
+                  selectedClient?.client_email
+                    ? selectedClient?.client_email + "'s"
+                    : "your"
                 } ${resultNamePlural}`}
             </p>
           </div>
@@ -311,7 +316,7 @@ export default function AccountCalendarLayout({
               type="button"
               className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Add Workout
+              Button
             </button>
           </div>
           <div className="mt-8 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0">

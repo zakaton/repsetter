@@ -20,6 +20,7 @@ export default function Table({
   resultNamePlural,
   title,
   subtitle,
+  createTitle = "Add",
   CreateResultModal,
   DeleteResultModal,
   resultMap,
@@ -263,7 +264,7 @@ export default function Table({
                   setShowCreateResultModal(true);
                 }}
               >
-                Add
+                {createTitle}
               </button>
             )}
             {HeaderButton}
