@@ -58,14 +58,64 @@ export default async function handler(req, res) {
     return sendError({ message: "no user found" });
   }
 
-  // FILL - delete subcriptions
-  // delete coaching subscriptions
-  //// cancel stripe subs
-  //// update clients' coaches
-  //// delete stripe subs
-  // delete own subscriptions
-  //// cancel stripe subs
-  //// delete supabase subs
+  const profile = await getUserProfile(userToDelete, supabase);
+
+  const { data: coachingSubscriptions } = await supabase
+    .from("subscription")
+    .select("*, client(*)")
+    .match({ coach: profile.id });
+  await Promise.all(
+    coachingSubscriptions.map(async (coachingSubscription) => {
+      const { client } = coachingSubscription;
+      const coaches = client.coaches || [];
+      if (coaches.includes(profile.id)) {
+        coaches.splice(coaches.indexOf(profile.id), 1);
+        console.log("updated coaches", coaches, "for client", client);
+        const updateClientResponse = await supabase
+          .from("profile")
+          .update({ coaches })
+          .eq("id", client.id);
+        console.log("updateClientResponse", updateClientResponse);
+      }
+      if (coachingSubscription.stripe_id) {
+        const cancelledStripeSubscription = await stripe.subscriptions.del(
+          coachingSubscription.stripe_id
+        );
+        console.log("cancelledStripeSubscription", cancelledStripeSubscription);
+      }
+    })
+  );
+  const deleteCoachingSubscriptionsResult = await supabase
+    .from("subscription")
+    .delete()
+    .eq("coach", profile.id);
+  console.log(
+    "deleteCoachingSubscriptionsResult",
+    deleteCoachingSubscriptionsResult
+  );
+
+  const { data: clientSubscriptions } = await supabase
+    .from("subscription")
+    .select("*")
+    .match({ coach: profile.id });
+  await Promise.all(
+    clientSubscriptions.map(async (clientSubscription) => {
+      if (clientSubscription.stripe_id) {
+        const cancelledStripeSubscription = await stripe.subscriptions.del(
+          clientSubscription.stripe_id
+        );
+        console.log("cancelledStripeSubscription", cancelledStripeSubscription);
+      }
+    })
+  );
+  const deleteClientSubscriptionsResult = await supabase
+    .from("subscription")
+    .delete()
+    .eq("client", profile.id);
+  console.log(
+    "deleteClientSubscriptionsResult",
+    deleteClientSubscriptionsResult
+  );
 
   // FILL - delete workouts
   // FILL - delete diet
@@ -73,7 +123,6 @@ export default async function handler(req, res) {
   // FILL - delete pictures
 
   // delete stripe customer/account
-  const profile = await getUserProfile(userToDelete, supabase);
   try {
     await stripe.customers.del(profile.stripe_customer);
   } catch (error) {
