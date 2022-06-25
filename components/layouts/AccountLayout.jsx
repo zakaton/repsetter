@@ -7,11 +7,11 @@ import {
   UserGroupIcon,
   ClipboardListIcon,
   HeartIcon,
-  FireIcon,
   ScaleIcon,
   CameraIcon,
   ClipboardCheckIcon,
   ClipboardIcon,
+  ChartBarIcon,
 } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 import { useUser } from "../../context/user-context";
@@ -52,7 +52,7 @@ const navigation = [
   {
     name: "Progress",
     href: "/account/progress",
-    icon: FireIcon,
+    icon: ChartBarIcon,
   },
   {
     name: "Diet",
