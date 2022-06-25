@@ -87,6 +87,7 @@ export default function Exercises() {
                 muted
                 loop
                 className="h-28"
+                playsInline
               ></video>
             ),
           },
