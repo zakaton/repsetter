@@ -86,7 +86,7 @@ export default function Exercises() {
                 autoPlay
                 muted
                 loop
-                className="h-28"
+                className="hide-controls h-28"
                 playsInline
               ></video>
             ),
