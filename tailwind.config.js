@@ -6,12 +6,12 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      xxs: "260px",
+      xs: "360px",
+      ...defaultTheme.screens,
+    },
     extend: {
-      screens: {
-        xxs: "260px",
-        xs: "360px",
-        ...defaultTheme.screens,
-      },
       fontFamily: {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],
       },
