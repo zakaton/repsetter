@@ -88,6 +88,7 @@ export default function Exercises() {
                 loop
                 className="h-28"
                 playsInline
+                controls="false"
               ></video>
             ),
           },
