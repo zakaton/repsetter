@@ -9,8 +9,4 @@
   .style-links a:hover {
     @apply text-blue-500;
   }
-
-  video.hide-controls::-webkit-media-controls {
-    display: none !important;
-  }
 }
