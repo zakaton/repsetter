@@ -8,8 +8,8 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        xs: "360px",
         xxs: "260px",
+        xs: "360px",
         ...defaultTheme.screens,
       },
       fontFamily: {
