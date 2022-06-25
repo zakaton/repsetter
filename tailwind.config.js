@@ -10,6 +10,7 @@ module.exports = {
       screens: {
         xs: "360px",
         xxs: "260px",
+        ...defaultTheme.screens,
       },
       fontFamily: {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],

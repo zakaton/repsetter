@@ -2,6 +2,7 @@ import "../styles/index.css";
 import { UserContextProvider } from "../context/user-context";
 import { OnlineContextProvider } from "../context/online-context";
 import { ClientContextProvider } from "../context/client-context";
+import { ExerciseVideoContextProvider } from "../context/videos-context";
 import Layout from "../components/layouts/Layout";
 
 function MyApp({ Component, pageProps }) {
@@ -9,9 +10,11 @@ function MyApp({ Component, pageProps }) {
   return (
     <OnlineContextProvider>
       <UserContextProvider>
-        <ClientContextProvider>
-          <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
-        </ClientContextProvider>
+        <ExerciseVideoContextProvider>
+          <ClientContextProvider>
+            <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+          </ClientContextProvider>
+        </ExerciseVideoContextProvider>
       </UserContextProvider>
     </OnlineContextProvider>
   );

@@ -10,6 +10,8 @@ import {
   FireIcon,
   ScaleIcon,
   CameraIcon,
+  ClipboardCheckIcon,
+  ClipboardIcon,
 } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 import { useUser } from "../../context/user-context";
@@ -29,7 +31,7 @@ const navigation = [
   {
     name: "My Coaches",
     href: "/account/my-coaches",
-    icon: ClipboardListIcon,
+    icon: ClipboardIcon,
   },
   {
     name: "My Clients",
@@ -40,6 +42,16 @@ const navigation = [
   {
     name: "Workouts",
     href: "/account/workouts",
+    icon: ClipboardListIcon,
+  },
+  {
+    name: "Exercises",
+    href: "/account/exercises",
+    icon: ClipboardCheckIcon,
+  },
+  {
+    name: "Progress",
+    href: "/account/progress",
     icon: FireIcon,
   },
   {

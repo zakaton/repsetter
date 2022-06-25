@@ -312,12 +312,20 @@ export default function AccountCalendarLayout({
                   );
                 })}
             </div>
-            <button
-              type="button"
-              className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Button
-            </button>
+            <div className="flex gap-x-3">
+              <button
+                type="button"
+                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Button
+              </button>
+              <button
+                type="button"
+                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Button
+              </button>
+            </div>
           </div>
           <div className="mt-8 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0">
             {children}

@@ -27,6 +27,7 @@ export default function Table({
   deleteTitle,
   HeaderButton,
   baseFilter = {},
+  resultsListener,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -45,6 +46,7 @@ export default function Table({
   const [numberOfResults, setNumberOfResults] = useState(null);
   const [isGettingNumberOfResults, setIsGettingNumberOfResults] =
     useState(false);
+
   const [pageIndex, setPageIndex] = useState(0);
   const [previousPageIndex, setPreviousPageIndex] = useState(-1);
   const getNumberOfResults = async () => {
@@ -98,6 +100,12 @@ export default function Table({
       getResults(true);
     }
   }, [filters, order]);
+
+  useEffect(() => {
+    if (resultsListener) {
+      resultsListener(results);
+    }
+  }, [results]);
 
   useEffect(() => {
     if (!isLoading && user && numberOfResults !== null) {
@@ -303,7 +311,11 @@ export default function Table({
                 key={result.id}
                 className="border-t border-gray-200 px-4 py-5 sm:px-6"
               >
-                <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <dl
+                  className={
+                    "grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                  }
+                >
                   {resultContent}
                   {DeleteResultModal && (
                     <div className="sm:col-span-1">
