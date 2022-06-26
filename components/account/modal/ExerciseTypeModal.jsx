@@ -37,6 +37,12 @@ export default function ExerciseTypeModal(props) {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (!open && selectedExercise) {
+      setSelectedExercise();
+    }
+  }, [open]);
+
   const [isCreatingExerciseType, setIsCreatingExerciseType] = useState(false);
   const [didCreateExerciseType, setDidCreateExerciseType] = useState(false);
 

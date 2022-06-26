@@ -209,7 +209,6 @@ export default function Table({
       }
     });
 
-    console.log(filters, containsFilters);
     Object.keys(containsFilters).forEach((column) => {
       const values = containsFilters[column] || [];
       if (values.length) {
