@@ -41,6 +41,7 @@ export default function Table({
   const [isGettingResults, setIsGettingResults] = useState(true);
   const [results, setResults] = useState(null);
   const [filters, setFilters] = useState({});
+  const [containsFilters, setContainsFilters] = useState({});
   const [order, setOrder] = useState(orderTypes[0].value);
 
   const [numberOfResults, setNumberOfResults] = useState(null);
@@ -51,11 +52,14 @@ export default function Table({
   const [previousPageIndex, setPreviousPageIndex] = useState(-1);
   const getNumberOfResults = async () => {
     setIsGettingNumberOfResults(true);
-    // eslint-disable-next-line no-shadow
-    const { count: numberOfResults } = await supabase
+    let query = supabase
       .from(tableName)
       .select(selectString, { count: "exact", head: true })
       .match({ ...baseFilter, ...filters });
+    for (let column in containsFilters) {
+      query = query.contains(column, containsFilters[column]);
+    }
+    const { count: numberOfResults } = await query;
     setPageIndex(0);
     setNumberOfResults(numberOfResults);
     setIsGettingNumberOfResults(false);
@@ -65,7 +69,7 @@ export default function Table({
       console.log("update number of results");
       getNumberOfResults();
     }
-  }, [filters, order]);
+  }, [filters, containsFilters, order]);
   useEffect(() => {
     if (!isLoading && user && numberOfResults === null) {
       getNumberOfResults();
@@ -76,17 +80,21 @@ export default function Table({
     if (pageIndex !== previousPageIndex || refresh) {
       setIsGettingResults(true);
       console.log(`fetching ${tableName}!`, pageIndex);
-      // eslint-disable-next-line no-shadow
-      const { data: results } = await supabase
+      let query = supabase
         .from(tableName)
         .select(selectString)
-        .match({ ...baseFilter, ...filters })
+        .match({ ...baseFilter, ...filters });
+      for (let column in containsFilters) {
+        query = query.contains(column, containsFilters[column]);
+      }
+      query = query
         .order(...order)
         .limit(numberOfResultsPerPage)
         .range(
           pageIndex * numberOfResultsPerPage,
           (pageIndex + 1) * numberOfResultsPerPage - 1
         );
+      const { data: results } = await query;
       console.log(`setting ${tableName}`, results);
       setResults(results);
       setIsGettingResults(false);
@@ -99,7 +107,7 @@ export default function Table({
       console.log(`update ${tableName}!`);
       getResults(true);
     }
-  }, [filters, order]);
+  }, [filters, containsFilters, order]);
 
   useEffect(() => {
     if (resultsListener) {
@@ -201,6 +209,14 @@ export default function Table({
       }
     });
 
+    console.log(filters, containsFilters);
+    Object.keys(containsFilters).forEach((column) => {
+      const values = containsFilters[column] || [];
+      if (values.length) {
+        query[column] = values.join(",");
+      }
+    });
+
     const sortOption = orderTypes.find(
       // eslint-disable-next-line no-shadow
       (sortOption) => sortOption.value === order
@@ -213,11 +229,14 @@ export default function Table({
     router.replace({ query: { ...router.query, ...query } }, undefined, {
       shallow: true,
     });
-  }, [filters, order]);
+  }, [filters, containsFilters, order]);
 
   const clearFilters = () => {
     if (Object.keys(filters).length > 0) {
       setFilters({});
+    }
+    if (Object.keys(containsFilters).length > 0) {
+      setContainsFilters({});
     }
   };
 
@@ -282,6 +301,8 @@ export default function Table({
         <Filters
           filters={filters}
           setFilters={setFilters}
+          containsFilters={containsFilters}
+          setContainsFilters={setContainsFilters}
           order={order}
           setOrder={setOrder}
           filterTypes={filterTypes}

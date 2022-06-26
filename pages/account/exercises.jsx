@@ -7,14 +7,34 @@ import ExerciseTypeModal from "../../components/account/modal/ExerciseTypeModal"
 import DeleteExerciseTypeModal from "../../components/account/modal/DeleteExerciseTypeModal";
 import Table from "../../components/Table";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
+import { muscles, muscleGroups } from "../../utils/exercise-utils";
 
-const filterTypes = [];
+const filterTypes = [
+  ...muscleGroups.map((muscleGroup) => ({
+    name: `Muscles (${muscleGroup})`,
+    query: "muscles",
+    column: "muscles",
+    checkboxes: muscles
+      .filter((muscle) => muscle.group === muscleGroup)
+      .map((muscle) => ({
+        value: muscle.name,
+        label: muscle.name,
+        defaultChecked: false,
+      })),
+  })),
+];
 
 const orderTypes = [
   {
     label: "Name",
     query: "name",
     value: ["name", { ascending: true }],
+    current: true,
+  },
+  {
+    label: "Date Created",
+    query: "date-created",
+    value: ["created_at", { ascending: false }],
     current: false,
   },
 ];

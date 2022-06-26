@@ -10,6 +10,8 @@ function classNames(...classes) {
 export default function Filters({
   filters,
   setFilters,
+  containsFilters,
+  setContainsFilters,
   order,
   setOrder,
   orderTypes,
@@ -28,17 +30,34 @@ export default function Filters({
     const { "sort-by": sortBy } = router.query;
 
     console.log("query", router.query);
+
     const newFilters = {};
-    filterTypes.forEach((filterType) => {
-      console.log("checking", filterType.query);
-      if (filterType.query in router.query) {
-        newFilters[filterType.column] =
-          router.query[filterType.query] === "true";
-      }
-    });
+    filterTypes
+      .filter((filterType) => !filterType.checkboxes)
+      .forEach((filterType) => {
+        console.log("checking", filterType.query);
+        if (filterType.query in router.query) {
+          newFilters[filterType.column] =
+            router.query[filterType.query] === "true";
+        }
+      });
     console.log("newFilters", newFilters);
     if (Object.keys(newFilters).length > 0) {
       setFilters(newFilters);
+    }
+
+    const newContainsFilters = {};
+    filterTypes
+      .filter((filterType) => filterType.checkboxes)
+      .forEach((filterType) => {
+        console.log("checking", filterType.query);
+        if (filterType.query in router.query) {
+          newContainsFilters[filterType.column] =
+            router.query[filterType.query].split(",");
+        }
+      });
+    if (Object.keys(newContainsFilters).length > 0) {
+      setContainsFilters(newContainsFilters);
     }
 
     if (sortBy) {
@@ -100,7 +119,7 @@ export default function Filters({
                       {filterType.name}
                     </legend>
                     <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
-                      {filterType.radios.map((radio, radioIndex) => {
+                      {filterType.radios?.map((radio, radioIndex) => {
                         const id = `${filterType.column}-${radioIndex}`;
                         const checked =
                           filterType.column in filters
@@ -132,6 +151,53 @@ export default function Filters({
                               className="ml-3 min-w-0 flex-1 text-gray-600"
                             >
                               {radio.label}
+                            </label>
+                          </div>
+                        );
+                      })}
+                      {filterType.checkboxes?.map((checkbox, checkboxIndex) => {
+                        const id = `${filterType.name}-${filterType.column}-${checkboxIndex}`;
+                        const checked = Boolean(
+                          containsFilters[filterType.column]?.includes(
+                            checkbox.value
+                          )
+                        );
+                        return (
+                          <div
+                            key={id}
+                            className="flex items-center text-base sm:text-sm"
+                          >
+                            <input
+                              id={id}
+                              name={fieldsetId}
+                              type="checkbox"
+                              className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                              checked={checked}
+                              onChange={(e) => {
+                                const newContainsFilters = {
+                                  ...containsFilters,
+                                };
+                                let newValues =
+                                  containsFilters[filterType.column]?.slice() ||
+                                  [];
+
+                                if (e.target.checked) {
+                                  newValues.push(checkbox.value);
+                                } else {
+                                  newValues = newValues.filter(
+                                    (value) => value !== checkbox.value
+                                  );
+                                }
+                                newContainsFilters[filterType.column] =
+                                  newValues;
+                                setContainsFilters(newContainsFilters);
+                              }}
+                            />
+                            <label
+                              htmlFor={id}
+                              className="ml-3 min-w-0 flex-1 text-gray-600"
+                            >
+                              {checkbox.label}
                             </label>
                           </div>
                         );
