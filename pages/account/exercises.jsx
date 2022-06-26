@@ -6,8 +6,7 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import ExerciseTypeModal from "../../components/account/modal/ExerciseTypeModal";
 import DeleteExerciseTypeModal from "../../components/account/modal/DeleteExerciseTypeModal";
 import Table from "../../components/Table";
-import { supabase } from "../../utils/supabase";
-import { useExerciseVideos } from "../../context/videos-context";
+import { useExerciseVideos } from "../../context/exercise-videos-context";
 
 const filterTypes = [];
 
@@ -44,16 +43,15 @@ export default function Exercises() {
     }
   }, [results]);
 
-  window.s = supabase;
-
   return (
     <>
       <ExerciseTypeModal
-        selectedExercise={selectedExercise}
         open={showEditExerciseTypeModal}
         setOpen={setShowEditExerciseTypeModal}
-        setEditExerciseStatus={setEditExerciseTypeStatus}
-        setShowEditExerciseNotification={setShowEditExerciseTypeNotification}
+        setCreateResultStatus={setEditExerciseTypeStatus}
+        setShowCreateResultNotification={setShowEditExerciseTypeNotification}
+        selectedExercise={selectedExercise}
+        setSelectedExercise={setSelectedExercise}
       ></ExerciseTypeModal>
       <Notification
         open={showEditExerciseTypeNotification}
@@ -77,7 +75,7 @@ export default function Exercises() {
           },
           result.muscles && {
             title: "muscles",
-            value: result.muscles.join(","),
+            value: result.muscles.join(", "),
           },
           result.id in exerciseVideos && {
             jsx: (

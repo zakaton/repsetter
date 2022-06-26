@@ -5,12 +5,16 @@ import Modal from "../../Modal";
 import { PencilAltIcon } from "@heroicons/react/outline";
 import { muscles, muscleGroups } from "../../../utils/exercise-utils";
 import { supabase } from "../../../utils/supabase";
+import { useExerciseVideos } from "../../../context/exercise-videos-context";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const videoFileSizeLimit = 50 * 1024 ** 2;
+
+const areArraysTheSame = (a, b) =>
+  a.length === b.length && a.every((value, index) => value === b[index]);
 
 export default function ExerciseTypeModal(props) {
   const {
@@ -20,9 +24,10 @@ export default function ExerciseTypeModal(props) {
     setShowCreateResultNotification: setShowExerciseTypeNotification,
 
     selectedExercise,
+    setSelectedExercise,
   } = props;
 
-  const { user } = useUser();
+  const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
 
   useEffect(() => {
     if (open && (didCreateExerciseType || didUpdateExerciseType)) {
@@ -50,8 +55,12 @@ export default function ExerciseTypeModal(props) {
   useEffect(() => {
     if (selectedExercise) {
       setExerciseTypeName(selectedExercise.name);
-      setSelectedMuscles(selectedExercise.muscles || []);
-      // FILL - video
+      setSelectedMuscles(
+        muscles.filter((muscle) =>
+          selectedExercise?.muscles?.includes(muscle.name)
+        )
+      );
+      getExerciseVideo(selectedExercise.id);
     }
   }, [selectedExercise]);
 
@@ -105,15 +114,66 @@ export default function ExerciseTypeModal(props) {
 
           if (selectedMuscles.length === 0) {
             const musclesSelect = e.target.querySelector("select");
-            const customValidity = "fuck no";
+            const customValidity = "you must have at least 1 muscle selected";
             musclesSelect.setCustomValidity(customValidity);
             musclesSelect.reportValidity();
+            return;
           }
+
+          const flattenedSelectedMuscles = selectedMuscles.map(
+            (selectedMuscle) => selectedMuscle.name
+          );
 
           if (selectedExercise) {
             setIsUpdatingExerciseType(true);
-            // FILL
-            const status = { type: "succeeded" };
+            console.log(exerciseTypeName, flattenedSelectedMuscles, videoFile);
+            let updateExerciseError, replaceVideoError;
+            if (
+              exerciseTypeName !== selectedExercise.name ||
+              !areArraysTheSame(
+                selectedExercise.muscles,
+                flattenedSelectedMuscles
+              )
+            ) {
+              console.log("updating exercise row");
+              const { data: updateExerciseType, error } = await supabase
+                .from("exercise_type")
+                .update({
+                  name: exerciseTypeName,
+                  muscles: flattenedSelectedMuscles,
+                })
+                .match({ id: selectedExercise.id });
+              updateExerciseError = error;
+              if (updateExerciseError) {
+                console.error(updateExerciseError);
+              }
+            }
+
+            if (videoFile) {
+              console.log("updating video file", videoFile);
+              const { data: replaceVideo, error } = await supabase.storage
+                .from("exercise")
+                .update(`public/${selectedExercise.id}.mp4`, videoFile);
+              replaceVideoError = error;
+              if (replaceVideoError) {
+                console.error(replaceVideoError);
+              }
+            }
+
+            let status;
+            if (!updateExerciseError && !replaceVideoError) {
+              status = {
+                type: "succeeded",
+                title: "Successfully updated Exercise",
+              };
+            } else {
+              status = {
+                type: "failed",
+                title:
+                  createdExerciseError?.message || uploadVideoError?.message,
+              };
+            }
+
             setIsUpdatingExerciseType(false);
             setDidUpdateExerciseType(true);
             setExerciseTypeStatus(status);
@@ -130,9 +190,7 @@ export default function ExerciseTypeModal(props) {
               await supabase.from("exercise_type").insert([
                 {
                   name: exerciseTypeName,
-                  muscles: selectedMuscles.map(
-                    (selectedMuscle) => selectedMuscle.name
-                  ),
+                  muscles: flattenedSelectedMuscles,
                 },
               ]);
             if (createdExerciseError) {
@@ -179,6 +237,7 @@ export default function ExerciseTypeModal(props) {
           setSelectedMuscles([]);
           setVideoUrl("");
           setVideoFile("");
+          setSelectedExercise();
         }}
       >
         <div className="my-4">
@@ -236,9 +295,7 @@ export default function ExerciseTypeModal(props) {
                       !selectedMuscles.includes(muscle)
                   )
                   .map((muscle) => (
-                    <option key={muscle.name} _value={muscle}>
-                      {muscle.name}
-                    </option>
+                    <option key={muscle.name}>{muscle.name}</option>
                   ))}
               </optgroup>
             ))}
@@ -285,7 +342,7 @@ export default function ExerciseTypeModal(props) {
           <label className="block text-sm font-medium text-gray-700">
             Video
           </label>
-          {!videoUrl && (
+          {!videoUrl && !selectedExercise && (
             <div
               id="videoUploadContainer"
               onDragOver={(e) => {
@@ -360,14 +417,18 @@ export default function ExerciseTypeModal(props) {
               </div>
             </div>
           )}
-          {videoUrl && (
+          {(videoUrl || selectedExercise) && (
             <div>
               <video
                 className="w-full"
                 autoPlay
                 muted
                 loop
-                src={videoUrl}
+                src={
+                  videoUrl ||
+                  (selectedExercise &&
+                    exerciseVideos?.[selectedExercise.id]?.url)
+                }
                 onDragOver={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -380,16 +441,18 @@ export default function ExerciseTypeModal(props) {
                   onVideoFile(file);
                 }}
               ></video>
-              <button
-                type="button"
-                className="mt-2 inline-flex items-center rounded border border-transparent bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                onClick={() => {
-                  setVideoUrl();
-                  setVideoFile("");
-                }}
-              >
-                Clear Video
-              </button>
+              {videoFile && (
+                <button
+                  type="button"
+                  className="mt-2 inline-flex items-center rounded border border-transparent bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  onClick={() => {
+                    setVideoUrl();
+                    setVideoFile("");
+                  }}
+                >
+                  Clear Video
+                </button>
+              )}
             </div>
           )}
         </div>
