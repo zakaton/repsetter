@@ -4,7 +4,7 @@ import Modal from "../../Modal";
 import { ClipboardCheckIcon } from "@heroicons/react/outline";
 import { supabase } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
-import { useUser } from "../../../context/user-context";
+import ExerciseTypesSelect from "./ExerciseTypesSelect";
 
 export default function AddExerciseModal(props) {
   const {
@@ -16,7 +16,6 @@ export default function AddExerciseModal(props) {
 
   const { selectedClient, selectedDate, amITheClient, isSelectedDateToday } =
     useClient();
-  const { user } = useUser();
 
   useEffect(() => {
     if (!open) {
@@ -33,13 +32,24 @@ export default function AddExerciseModal(props) {
   const [isAddingExercise, setIsAddingExercise] = useState(false);
   const [didAddExercise, setDidAddExercise] = useState(false);
 
+  const [selectedExerciseType, setSelectedExerciseType] = useState();
+  const [numberOfSets, setNumberOfSets] = useState(3);
+  const [numberOfReps, setNumberOfReps] = useState(10);
+
   return (
     <Modal
       {...props}
       title="Add Exercise"
-      message={`Add an exercise to ${
-        selectedClient ? `${selectedClient.client_email}'s` : "your"
-      } workout for ${selectedDate.toDateString()}`}
+      message={
+        <>
+          Add an exercise to{" "}
+          <span className="font-semibold">
+            {selectedClient ? `${selectedClient.client_email}'s` : "your"}
+          </span>{" "}
+          workout for{" "}
+          <span className="font-semibold">{selectedDate.toDateString()}</span>
+        </>
+      }
       Icon={ClipboardCheckIcon}
       Button={
         <button
@@ -58,16 +68,14 @@ export default function AddExerciseModal(props) {
       <form
         id="addExerciseForm"
         method="POST"
+        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
         onSubmit={async (e) => {
           e.preventDefault();
           setIsAddingExercise(true);
           const form = e.target;
-          const formData = new FormData(form);
-          const data = new URLSearchParams();
-          formData.forEach((value, key) => {
-            data.append(key, value);
-          });
           // FILL
+          console.log(form);
+          return;
           setIsAddingExercise(false);
           setDidAddExercise(true);
           const status = {
@@ -84,7 +92,55 @@ export default function AddExerciseModal(props) {
           }
         }}
       >
-        <div className="my-4">hello</div>
+        <div className="sm:col-span-2">
+          <ExerciseTypesSelect
+            selectedExerciseType={selectedExerciseType}
+            setSelectedExerciseType={setSelectedExerciseType}
+            open={open}
+          />
+        </div>
+        <div className="sm:col-span-1">
+          <label
+            htmlFor="sets"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Number of Sets
+          </label>
+          <div className="mt-1">
+            <input
+              required
+              type="number"
+              min="1"
+              max="10"
+              value={numberOfSets}
+              onInput={(e) => setNumberOfSets(e.target.value)}
+              name="sets"
+              id="sets"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+        </div>
+        <div className="sm:col-span-1">
+          <label
+            htmlFor="reps"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Number of Reps
+          </label>
+          <div className="mt-1">
+            <input
+              required
+              type="number"
+              min="1"
+              max="20"
+              value={numberOfReps}
+              onInput={(e) => setNumberOfReps(e.target.value)}
+              name="reps"
+              id="reps"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+        </div>
       </form>
     </Modal>
   );

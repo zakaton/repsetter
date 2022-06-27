@@ -42,6 +42,19 @@ export default function ExerciseTypeModal(props) {
     }
   }, [open]);
 
+  const resetUI = () => {
+    setExerciseTypeName("");
+    setSelectedMuscles([]);
+    setVideoUrl("");
+    setVideoFile("");
+    setSelectedExercise?.();
+  };
+  useEffect(() => {
+    if (!open) {
+      resetUI();
+    }
+  }, [open]);
+
   const [isCreatingExerciseType, setIsCreatingExerciseType] = useState(false);
   const [didCreateExerciseType, setDidCreateExerciseType] = useState(false);
 
@@ -238,11 +251,7 @@ export default function ExerciseTypeModal(props) {
             }
           }
 
-          setExerciseTypeName("");
-          setSelectedMuscles([]);
-          setVideoUrl("");
-          setVideoFile("");
-          setSelectedExercise();
+          resetUI();
         }}
       >
         <div className="my-4">
