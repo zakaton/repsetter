@@ -112,6 +112,7 @@ export default function ExerciseTypesSelect({
                       autoPlay
                       muted
                       loop
+                      playsInline
                       src={exerciseVideos?.[exerciseType.id]?.url}
                       onSuspend={(e) => {
                         document.addEventListener(
