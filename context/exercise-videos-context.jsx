@@ -9,17 +9,16 @@ export function ExerciseVideoContextProvider(props) {
   const getExerciseVideo = async (id) => {
     console.log("requesting video", id);
     if (!exerciseVideos[id]) {
-      const { data: exerciseVideoBlob, error } = await supabase.storage
+      const { publicURL: url, error } = await supabase.storage
         .from("exercise")
-        .download(`public/${id}.mp4`);
+        .getPublicUrl(`public/${id}.mp4`);
       if (error) {
         console.error(error);
       } else {
         setExerciseVideos({
           ...exerciseVideos,
           [id]: {
-            blob: exerciseVideoBlob,
-            url: URL.createObjectURL(exerciseVideoBlob),
+            url,
           },
         });
       }

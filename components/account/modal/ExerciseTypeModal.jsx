@@ -1,6 +1,5 @@
 /* eslint-disable react/destructuring-assignment */
 import { useEffect, useState } from "react";
-import { useUser } from "../../../context/user-context";
 import Modal from "../../Modal";
 import { PencilAltIcon } from "@heroicons/react/outline";
 import { muscles, muscleGroups } from "../../../utils/exercise-utils";
