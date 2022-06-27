@@ -438,6 +438,7 @@ export default function ExerciseTypeModal(props) {
                 autoPlay
                 muted
                 loop
+                playsInline
                 src={
                   videoUrl ||
                   (selectedExercise &&
