@@ -435,6 +435,11 @@ export default function ExerciseTypeModal(props) {
                   (selectedExercise &&
                     exerciseVideos?.[selectedExercise.id]?.url)
                 }
+                onSuspend={(e) => {
+                  document.addEventListener("click", () => e.target.play(), {
+                    once: true,
+                  });
+                }}
                 onDragOver={(e) => {
                   e.stopPropagation();
                   e.preventDefault();

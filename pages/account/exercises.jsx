@@ -100,6 +100,11 @@ export default function Exercises() {
           result.id in exerciseVideos && {
             jsx: (
               <video
+                onSuspend={(e) => {
+                  document.addEventListener("click", () => e.target.play(), {
+                    once: true,
+                  });
+                }}
                 src={exerciseVideos[result.id].url}
                 autoPlay
                 muted
