@@ -19,8 +19,8 @@ export default function Workouts() {
       <AddExerciseModal
         open={showAddExerciseModal}
         setOpen={setShowAddExerciseModal}
-        setCreateResultStatus={addExerciseStatus}
-        setShowCreateResultNotification={showAddExerciseNotification}
+        setCreateResultStatus={setAddExerciseStatus}
+        setShowCreateResultNotification={setShowAddExerciseNotification}
       />
       <Notification
         open={showAddExerciseNotification}

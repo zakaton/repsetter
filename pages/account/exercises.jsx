@@ -8,6 +8,7 @@ import DeleteExerciseTypeModal from "../../components/account/modal/DeleteExerci
 import Table from "../../components/Table";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
+import LazyLoad from "react-lazyload";
 
 const filterTypes = [
   ...muscleGroups.map((muscleGroup) => ({
@@ -99,19 +100,22 @@ export default function Exercises() {
           },
           result.id in exerciseVideos && {
             jsx: (
-              <video
-                onSuspend={(e) => {
-                  document.addEventListener("click", () => e.target.play(), {
-                    once: true,
-                  });
-                }}
-                src={exerciseVideos[result.id].url}
-                autoPlay
-                muted
-                loop
-                className="h-28"
-                playsInline
-              ></video>
+              <LazyLoad>
+                <video
+                  onSuspend={(e) => {
+                    document.addEventListener("click", () => e.target.play(), {
+                      once: true,
+                    });
+                  }}
+                  src={exerciseVideos[result.id].url}
+                  autoPlay={true}
+                  muted={true}
+                  loop={true}
+                  className={"aspect-[4/3], h-28"}
+                  playsInline={true}
+                  controls={false}
+                ></video>
+              </LazyLoad>
             ),
           },
           isAdmin && {

@@ -9,6 +9,7 @@ import {
 } from "../../../utils/exercise-utils";
 import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
+import { useUser } from "../../../context/user-context";
 
 export default function AddExerciseModal(props) {
   const {
@@ -20,10 +21,12 @@ export default function AddExerciseModal(props) {
 
   const { selectedClient, selectedDate, amITheClient, isSelectedDateToday } =
     useClient();
+  const { user } = useUser();
 
   useEffect(() => {
     if (!open) {
       setDidAddExercise(false);
+      resetUI();
     }
   }, [open]);
 
@@ -36,18 +39,31 @@ export default function AddExerciseModal(props) {
   const [isAddingExercise, setIsAddingExercise] = useState(false);
   const [didAddExercise, setDidAddExercise] = useState(false);
 
-  const [selectedExerciseType, setSelectedExerciseType] = useState();
+  const [selectedExerciseType, setSelectedExerciseType] = useState(null);
   const [numberOfSets, setNumberOfSets] = useState(3);
 
   const [sameRepsForEachSet, setSameRepsForEachSet] = useState(true);
   const [numberOfReps, setNumberOfReps] = useState([10]);
 
-  const [sameWeightForEachSet, setSameWeighForEachSet] = useState(true);
+  const [sameWeightForEachSet, setSameWeightForEachSet] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(true);
   const [weightKilograms, setWeightKilograms] = useState([0]);
   const [weightPounds, setWeightPounds] = useState([0]);
 
   const [isWeightInputEmptyString, setIsWeightInputEmptyString] = useState([]);
+
+  const resetUI = () => {
+    setIsAddingExercise(false);
+    setDidAddExercise(false);
+    setSelectedExerciseType(null);
+    setNumberOfSets(3);
+    setNumberOfReps([10]);
+    setWeightKilograms([0]);
+    setWeightPounds([0]);
+    setIsWeightInputEmptyString([]);
+    setSameRepsForEachSet(true);
+    setSameWeightForEachSet(true);
+  };
 
   return (
     <Modal
@@ -81,20 +97,52 @@ export default function AddExerciseModal(props) {
       <form
         id="addExerciseForm"
         method="POST"
-        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3"
         onSubmit={async (e) => {
           e.preventDefault();
           setIsAddingExercise(true);
           const form = e.target;
-          // FILL
           console.log(form);
-          return;
+          const createExerciseData = {
+            type: selectedExerciseType.id,
+            date: selectedDate,
+            number_of_sets_assigned: numberOfSets,
+            number_of_reps_assigned: numberOfReps,
+            is_weight_in_kilograms: isUsingKilograms,
+            weight_assigned: isUsingKilograms ? weightKilograms : weightPounds,
+
+            client: amITheClient ? user.id : selectedClient.client,
+            client_email: amITheClient
+              ? user.email
+              : selectedClient.client_email,
+          };
+          if (!amITheClient) {
+            Object.assign(createExerciseData, {
+              coach: user.id,
+              coach_email: user.email,
+            });
+          }
+          console.log("createExerciseData", createExerciseData);
+          const { data: createdExercise, error: createdExerciseError } =
+            await supabase.from("exercise").insert([createExerciseData]);
+          let status;
+          console.log("createdExercise", createdExercise);
+          if (createdExerciseError) {
+            console.error(createdExerciseError);
+            status = {
+              type: "failed",
+              title: "Failed to add Exercise",
+              message: createdExerciseError.message,
+            };
+          } else {
+            status = {
+              type: "succeeded",
+              title: "Successfully added Exercise",
+            };
+          }
+
           setIsAddingExercise(false);
           setDidAddExercise(true);
-          const status = {
-            type: "succeeded",
-            title: "Successfully added Exercise",
-          };
           setAddExerciseStatus(status);
           setShowAddExerciseNotification(true);
           setOpen(false);
@@ -105,7 +153,7 @@ export default function AddExerciseModal(props) {
           }
         }}
       >
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-3">
           <ExerciseTypesSelect
             selectedExerciseType={selectedExerciseType}
             setSelectedExerciseType={setSelectedExerciseType}
@@ -185,6 +233,44 @@ export default function AddExerciseModal(props) {
             </label>
           </div>
         </div>
+        <div className="relative flex self-center">
+          <div className="flex h-5 items-center">
+            <input
+              id="sameWeightForEachSet"
+              name="sameWeightForEachSet"
+              type="checkbox"
+              checked={sameWeightForEachSet}
+              onChange={(e) => {
+                const newSameWeightForEachSet = e.target.checked;
+                if (newSameWeightForEachSet) {
+                  setWeightKilograms([weightKilograms[0]]);
+                  setWeightPounds([weightPounds[0]]);
+                  setIsWeightInputEmptyString([isWeightInputEmptyString[0]]);
+                } else {
+                  setWeightKilograms(
+                    new Array(numberOfSets).fill(weightKilograms[0])
+                  );
+                  setWeightPounds(
+                    new Array(numberOfSets).fill(weightPounds[0])
+                  );
+                  setIsWeightInputEmptyString(
+                    new Array(numberOfSets).fill(isWeightInputEmptyString[0])
+                  );
+                }
+                setSameWeightForEachSet(newSameWeightForEachSet);
+              }}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+          </div>
+          <div className="ml-3 text-sm">
+            <label
+              htmlFor="sameWeightForEachSet"
+              className="font-medium text-gray-700"
+            >
+              Same Weight for Each Set
+            </label>
+          </div>
+        </div>
         {sameRepsForEachSet && (
           <div className="">
             <label
@@ -218,7 +304,7 @@ export default function AddExerciseModal(props) {
                 htmlFor={`reps-${index}`}
                 className="block text-sm font-medium text-gray-700"
               >
-                Number of Reps (set #{index + 1})
+                Number of Reps (#{index + 1})
               </label>
               <div className="mt-1">
                 <input
@@ -242,44 +328,6 @@ export default function AddExerciseModal(props) {
               </p>
             </div>
           ))}
-        <div className="relative flex self-center">
-          <div className="flex h-5 items-center">
-            <input
-              id="sameWeightForEachSet"
-              name="sameWeightForEachSet"
-              type="checkbox"
-              checked={sameWeightForEachSet}
-              onChange={(e) => {
-                const newSameWeightForEachSet = e.target.checked;
-                if (newSameWeightForEachSet) {
-                  setWeightKilograms([weightKilograms[0]]);
-                  setWeightPounds([weightPounds[0]]);
-                  setIsWeightInputEmptyString([isWeightInputEmptyString[0]]);
-                } else {
-                  setWeightKilograms(
-                    new Array(numberOfSets).fill(weightKilograms[0])
-                  );
-                  setWeightPounds(
-                    new Array(numberOfSets).fill(weightPounds[0])
-                  );
-                  setIsWeightInputEmptyString(
-                    new Array(numberOfSets).fill(isWeightInputEmptyString[0])
-                  );
-                }
-                setSameWeighForEachSet(newSameWeightForEachSet);
-              }}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-          </div>
-          <div className="ml-3 text-sm">
-            <label
-              htmlFor="sameWeightForEachSet"
-              className="font-medium text-gray-700"
-            >
-              Same Weight for Each Set
-            </label>
-          </div>
-        </div>
         {sameWeightForEachSet && (
           <div className="">
             <label
@@ -291,6 +339,7 @@ export default function AddExerciseModal(props) {
             <div className="mt-1 flex rounded-md shadow-sm">
               <div className="relative flex flex-grow items-stretch focus-within:z-10">
                 <input
+                  required
                   type="number"
                   min="0"
                   name="weight"
@@ -341,6 +390,7 @@ export default function AddExerciseModal(props) {
               <div className="mt-1 flex rounded-md shadow-sm">
                 <div className="relative flex flex-grow items-stretch focus-within:z-10">
                   <input
+                    required
                     type="number"
                     min="0"
                     name={`weight-${index}`}

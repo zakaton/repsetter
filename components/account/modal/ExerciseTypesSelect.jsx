@@ -3,6 +3,7 @@ import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Combobox } from "@headlessui/react";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
+import LazyLoad from "react-lazyload";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -83,6 +84,7 @@ export default function ExerciseTypesSelect({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
+          required
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(exerciseType) => exerciseType?.name}
@@ -107,12 +109,12 @@ export default function ExerciseTypesSelect({
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
                     <video
-                      className=""
                       width="100"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
+                      height="75"
+                      autoPlay={true}
+                      muted={true}
+                      loop={true}
+                      playsInline={true}
                       src={exerciseVideos?.[exerciseType.id]?.url}
                       onSuspend={(e) => {
                         document.addEventListener(

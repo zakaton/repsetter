@@ -5,6 +5,7 @@ import { PencilAltIcon } from "@heroicons/react/outline";
 import { muscles, muscleGroups } from "../../../utils/exercise-utils";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
+import LazyLoad from "react-lazyload";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -433,34 +434,36 @@ export default function ExerciseTypeModal(props) {
           )}
           {(videoUrl || selectedExercise) && (
             <div>
-              <video
-                className="w-full"
-                autoPlay
-                muted
-                loop
-                playsInline
-                src={
-                  videoUrl ||
-                  (selectedExercise &&
-                    exerciseVideos?.[selectedExercise.id]?.url)
-                }
-                onSuspend={(e) => {
-                  document.addEventListener("click", () => e.target.play(), {
-                    once: true,
-                  });
-                }}
-                onDragOver={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                }}
-                onDrop={(e) => {
-                  console.log(e);
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const file = e.dataTransfer.files[0];
-                  onVideoFile(file);
-                }}
-              ></video>
+              <LazyLoad>
+                <video
+                  className="aspect-[4/3] w-full"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  src={
+                    videoUrl ||
+                    (selectedExercise &&
+                      exerciseVideos?.[selectedExercise.id]?.url)
+                  }
+                  onSuspend={(e) => {
+                    document.addEventListener("click", () => e.target.play(), {
+                      once: true,
+                    });
+                  }}
+                  onDragOver={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                  onDrop={(e) => {
+                    console.log(e);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const file = e.dataTransfer.files[0];
+                    onVideoFile(file);
+                  }}
+                ></video>
+              </LazyLoad>
               {videoFile && (
                 <button
                   type="button"
