@@ -105,7 +105,7 @@ export default function ExerciseTypesSelect({
                 }
               >
                 {({ active, selected }) => (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <video
                       className=""
                       width="100"
@@ -125,23 +125,32 @@ export default function ExerciseTypesSelect({
                       }}
                     ></video>
 
-                    <span
-                      className={classNames(
-                        "block truncate text-base",
-                        selected && "font-semibold"
-                      )}
-                    >
-                      {exerciseType.name}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={classNames(
+                          "block truncate text-base",
+                          selected && "font-semibold"
+                        )}
+                      >
+                        {exerciseType.name}
+                      </span>
 
-                    <span
-                      className={classNames(
-                        "block truncate text-base",
-                        selected && "font-semibold"
-                      )}
-                    >
-                      ({exerciseType.muscles.join(", ")})
-                    </span>
+                      <span
+                        className={classNames(
+                          "block truncate text-base",
+                          selected && "font-semibold"
+                        )}
+                      >
+                        ({exerciseType.muscles.slice(0, -1).join(", ")}
+                        {exerciseType.muscles.length > 1
+                          ? " and " +
+                            exerciseType.muscles[
+                              exerciseType.muscles.length - 1
+                            ]
+                          : ""}
+                        )
+                      </span>
+                    </div>
 
                     {selected && (
                       <span

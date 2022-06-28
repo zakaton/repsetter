@@ -9,3 +9,8 @@ export const muscles = [
 muscles.forEach((muscle, index) => {
   muscle.index = index;
 });
+
+const kilogramToPoundRatio = 2.2046;
+export const kilogramsToPounds = (kilograms) =>
+  kilograms * kilogramToPoundRatio;
+export const poundsToKilograms = (pounds) => pounds / kilogramToPoundRatio;
