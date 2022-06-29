@@ -17,6 +17,7 @@ export default function AddExerciseModal(props) {
     setOpen,
     setCreateResultStatus: setAddExerciseStatus,
     setShowCreateResultNotification: setShowAddExerciseNotification,
+    existingExercises,
   } = props;
 
   const { selectedClient, selectedDate, amITheClient, isSelectedDateToday } =
@@ -158,6 +159,7 @@ export default function AddExerciseModal(props) {
             selectedExerciseType={selectedExerciseType}
             setSelectedExerciseType={setSelectedExerciseType}
             open={open}
+            existingExercises={existingExercises}
           />
         </div>
         <div className="">

@@ -12,7 +12,7 @@ function classNames(...classes) {
 export default function ExerciseTypesSelect({
   selectedExerciseType,
   setSelectedExerciseType,
-  selectedExerciseTypes = [],
+  existingExercises = [],
   open = true,
 }) {
   const [exerciseTypes, setExerciseTypes] = useState();
@@ -67,7 +67,10 @@ export default function ExerciseTypesSelect({
             });
       filteredExerciseTypes = filteredExerciseTypes.filter(
         (filteredExerciseType) =>
-          !selectedExerciseTypes.includes(filteredExerciseType)
+          !existingExercises.find(
+            (existingExercise) =>
+              existingExercise.type === filteredExerciseType.id
+          )
       );
       setFilteredExerciseTypes(filteredExerciseTypes);
     }
@@ -108,24 +111,26 @@ export default function ExerciseTypesSelect({
               >
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
-                    <video
-                      width="100"
-                      height="75"
-                      autoPlay={true}
-                      muted={true}
-                      loop={true}
-                      playsInline={true}
-                      src={exerciseVideos?.[exerciseType.id]?.url}
-                      onSuspend={(e) => {
-                        document.addEventListener(
-                          "click",
-                          () => e.target.play(),
-                          {
-                            once: true,
-                          }
-                        );
-                      }}
-                    ></video>
+                    <LazyLoad>
+                      <video
+                        width="100"
+                        height="75"
+                        autoPlay={true}
+                        muted={true}
+                        loop={true}
+                        playsInline={true}
+                        src={exerciseVideos?.[exerciseType.id]?.url}
+                        onSuspend={(e) => {
+                          document.addEventListener(
+                            "click",
+                            () => e.target.play(),
+                            {
+                              once: true,
+                            }
+                          );
+                        }}
+                      ></video>
+                    </LazyLoad>
 
                     <div className="flex flex-col gap-1">
                       <span

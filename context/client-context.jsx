@@ -81,7 +81,7 @@ export function ClientContextProvider(props) {
     if ("date" in router.query) {
       const selectedDateString = router.query.date;
       const selectedDate = new Date(selectedDateString);
-      console.log(selectedDate);
+      console.log("query selected date", selectedDate);
       setSelectedDate(selectedDate);
     } else {
       setSelectedDate(new Date());
@@ -117,6 +117,13 @@ export function ClientContextProvider(props) {
     setAmITheClient(!selectedClient);
   }, [selectedClient]);
 
+  const [selectedClientId, setSelectedClientId] = useState();
+  useEffect(() => {
+    if (!isLoading) {
+      setSelectedClientId(selectedClient ? selectedClient.client : user.id);
+    }
+  }, [selectedClient, user, isLoading]);
+
   const [isSelectedDateToday, setIsSelectedDateToday] = useState(false);
   useEffect(() => {
     if (!selectedDate) {
@@ -139,6 +146,7 @@ export function ClientContextProvider(props) {
     selectedClient,
     setSelectedClient,
     amITheClient,
+    selectedClientId,
 
     selectedDate,
     setSelectedDate,
