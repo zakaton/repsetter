@@ -51,9 +51,11 @@ export default function ExerciseModal(props) {
 
   const [selectedExerciseType, setSelectedExerciseType] = useState(null);
   const [numberOfSets, setNumberOfSets] = useState(3);
+  const [numberOfSetsPerformed, setNumberOfSetsPerformed] = useState(0);
 
   const [sameRepsForEachSet, setSameRepsForEachSet] = useState(true);
   const [numberOfReps, setNumberOfReps] = useState([10]);
+  const [numberOfRepsPerformed, setNumberOfRepsPerformed] = useState(0);
 
   const [sameWeightForEachSet, setSameWeightForEachSet] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(true);
@@ -106,6 +108,18 @@ export default function ExerciseModal(props) {
 
       const sameWeightForEachSet = selectedExercise.weight_assigned.length == 1;
       setSameWeightForEachSet(sameWeightForEachSet);
+
+      if (selectedExercise.number_of_sets_performed !== null) {
+        setNumberOfSetsPerformed(selectedExercise.number_of_sets_performed);
+      } else {
+        setNumberOfSetsPerformed(selectedExercise.number_of_sets_assigned);
+      }
+
+      if (selectedExercise.number_of_reps_performed !== null) {
+        setNumberOfRepsPerformed(selectedExercise.number_of_reps_performed);
+      } else {
+        setNumberOfRepsPerformed(selectedExercise.number_of_reps_assigned);
+      }
     }
   }, [open, selectedExercise]);
 
@@ -162,6 +176,8 @@ export default function ExerciseModal(props) {
                 : weightPounds,
 
               // FILL - more stuff
+              number_of_sets_performed: numberOfSetsPerformed,
+              number_of_reps_performed: numberOfRepsPerformed,
             };
             const { data: updatedExercise, error: updatedExerciseError } =
               await supabase
@@ -395,7 +411,7 @@ export default function ExerciseModal(props) {
                 htmlFor={`reps-${index}`}
                 className="block text-sm font-medium text-gray-700"
               >
-                Number of Reps (#{index + 1})
+                Assigned Reps #{index + 1}
               </label>
               <div className="mt-1">
                 <input
@@ -419,118 +435,154 @@ export default function ExerciseModal(props) {
               </p>
             </div>
           ))}
+        {selectedExercise && (
+          <div className="col-start-1">
+            <label
+              htmlFor="setsPerformed"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Sets Performed
+            </label>
+            <div className="mt-1">
+              <input
+                required
+                type="number"
+                min="0"
+                max="20"
+                value={numberOfSetsPerformed}
+                onInput={(e) =>
+                  setNumberOfSetsPerformed(Number(e.target.value))
+                }
+                name="setsPerformed"
+                id="setsPerformed"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              />
+            </div>
+          </div>
+        )}
+        {selectedExercise && <div>[FILL] reps performed, ratings, videos</div>}
         {sameWeightForEachSet && (
-          <div className="">
+          <div className="col-start-1">
             <label
               htmlFor="weight"
               className="block text-sm font-medium text-gray-700"
             >
               Assigned Weight
             </label>
-            <div className="mt-1 flex rounded-md shadow-sm">
-              <div className="relative flex flex-grow items-stretch focus-within:z-10">
-                <input
-                  required
-                  type="number"
-                  min="0"
-                  name="weight"
-                  id="weight"
-                  className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  value={
-                    isWeightInputEmptyString[0]
-                      ? ""
-                      : isUsingKilograms
-                      ? weightKilograms[0]
-                      : weightPounds[0]
+            <div className="relative mt-1 rounded-md shadow-sm">
+              <input
+                required
+                type="number"
+                min="0"
+                name="weight"
+                id="weight"
+                className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                value={
+                  isWeightInputEmptyString[0]
+                    ? ""
+                    : isUsingKilograms
+                    ? weightKilograms[0]
+                    : weightPounds[0]
+                }
+                placeholder={0}
+                onInput={(e) => {
+                  setIsWeightInputEmptyString([e.target.value === ""]);
+                  const weight = Number(e.target.value);
+                  if (isUsingKilograms) {
+                    setWeightKilograms([weight]);
+                    setWeightPounds([Math.round(kilogramsToPounds(weight))]);
+                  } else {
+                    setWeightPounds([weight]);
+                    setWeightKilograms([Math.round(poundsToKilograms(weight))]);
                   }
-                  placeholder={0}
-                  onInput={(e) => {
-                    setIsWeightInputEmptyString([e.target.value === ""]);
-                    const weight = Number(e.target.value);
-                    if (isUsingKilograms) {
-                      setWeightKilograms([weight]);
-                      setWeightPounds([Math.round(kilogramsToPounds(weight))]);
-                    } else {
-                      setWeightPounds([weight]);
-                      setWeightKilograms([
-                        Math.round(poundsToKilograms(weight)),
-                      ]);
-                    }
-                  }}
-                />
+                }}
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <label htmlFor="weight-type" className="sr-only">
+                  weight type
+                </label>
+                <select
+                  id="weight-type"
+                  name="weight-type"
+                  className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  onChange={(e) => setIsUsingKilograms(e.target.value === "kg")}
+                >
+                  <option>kg</option>
+                  <option>lbs</option>
+                </select>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsUsingKilograms(!isUsingKilograms)}
-                className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <span>{isUsingKilograms ? "kg" : "lbs"}</span>
-              </button>
             </div>
           </div>
         )}
         {!sameWeightForEachSet &&
           new Array(numberOfSets).fill(1).map((_, index) => (
-            <div className="" key={index}>
+            <div key={index} className={index === 0 ? "col-start-1" : ""}>
               <label
                 htmlFor={`weight-${index}`}
                 className="block text-sm font-medium text-gray-700"
               >
-                Weight (set #{index + 1})
+                Assigned Weight #{index + 1}
               </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <div className="relative flex flex-grow items-stretch focus-within:z-10">
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    name={`weight-${index}`}
-                    id={`weight-${index}`}
-                    className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    value={
-                      isWeightInputEmptyString[index]
-                        ? ""
-                        : isUsingKilograms
-                        ? weightKilograms[index]
-                        : weightPounds[index]
-                    }
-                    placeholder={0}
-                    onInput={(e) => {
-                      const newIsWeightInputEmptyString =
-                        isWeightInputEmptyString.slice();
-                      newIsWeightInputEmptyString[index] =
-                        e.target.value === "";
-                      setIsWeightInputEmptyString(newIsWeightInputEmptyString);
+              <div className="relative mt-1 rounded-md shadow-sm">
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  name={`weight-${index}`}
+                  id={`weight-${index}`}
+                  className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  value={
+                    isWeightInputEmptyString[index]
+                      ? ""
+                      : isUsingKilograms
+                      ? weightKilograms[index]
+                      : weightPounds[index]
+                  }
+                  placeholder={0}
+                  onInput={(e) => {
+                    const newIsWeightInputEmptyString =
+                      isWeightInputEmptyString.slice();
+                    newIsWeightInputEmptyString[index] = e.target.value === "";
+                    setIsWeightInputEmptyString(newIsWeightInputEmptyString);
 
-                      const weight = Number(e.target.value);
-                      const newWeightKilograms = weightKilograms.slice();
-                      const newWeightPounds = weightPounds.slice();
-                      if (isUsingKilograms) {
-                        newWeightKilograms[index] = weight;
-                        newWeightPounds[index] = Math.round(
-                          kilogramsToPounds(weight)
-                        );
-                      } else {
-                        newWeightPounds[index] = weight;
-                        newWeightKilograms[index] = Math.round(
-                          poundsToKilograms(weight)
-                        );
-                      }
-                      setWeightKilograms(newWeightKilograms);
-                      setWeightPounds(newWeightPounds);
-                    }}
-                  />
+                    const weight = Number(e.target.value);
+                    const newWeightKilograms = weightKilograms.slice();
+                    const newWeightPounds = weightPounds.slice();
+                    if (isUsingKilograms) {
+                      newWeightKilograms[index] = weight;
+                      newWeightPounds[index] = Math.round(
+                        kilogramsToPounds(weight)
+                      );
+                    } else {
+                      newWeightPounds[index] = weight;
+                      newWeightKilograms[index] = Math.round(
+                        poundsToKilograms(weight)
+                      );
+                    }
+                    setWeightKilograms(newWeightKilograms);
+                    setWeightPounds(newWeightPounds);
+                  }}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <label htmlFor="weight-type" className="sr-only">
+                    weight type
+                  </label>
+                  <select
+                    id="weight-type"
+                    name="weight-type"
+                    className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    onChange={(e) =>
+                      setIsUsingKilograms(e.target.value === "kg")
+                    }
+                  >
+                    <option>kg</option>
+                    <option>lbs</option>
+                  </select>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsUsingKilograms(!isUsingKilograms)}
-                  className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <span>{isUsingKilograms ? "kg" : "lbs"}</span>
-                </button>
               </div>
             </div>
           ))}
+        {selectedExercise && <div>[FILL] weight performed</div>}
       </form>
     </Modal>
   );
