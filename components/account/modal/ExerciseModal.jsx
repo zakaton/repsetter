@@ -435,32 +435,6 @@ export default function ExerciseModal(props) {
               </p>
             </div>
           ))}
-        {selectedExercise && (
-          <div className="col-start-1">
-            <label
-              htmlFor="setsPerformed"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Sets Performed
-            </label>
-            <div className="mt-1">
-              <input
-                required
-                type="number"
-                min="0"
-                max="20"
-                value={numberOfSetsPerformed}
-                onInput={(e) =>
-                  setNumberOfSetsPerformed(Number(e.target.value))
-                }
-                name="setsPerformed"
-                id="setsPerformed"
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              />
-            </div>
-          </div>
-        )}
-        {selectedExercise && <div>[FILL] reps performed, ratings, videos</div>}
         {sameWeightForEachSet && (
           <div className="col-start-1">
             <label
@@ -506,6 +480,7 @@ export default function ExerciseModal(props) {
                   name="weight-type"
                   className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   onChange={(e) => setIsUsingKilograms(e.target.value === "kg")}
+                  value={isUsingKilograms ? "kg" : "lbs"}
                 >
                   <option>kg</option>
                   <option>lbs</option>
@@ -564,16 +539,17 @@ export default function ExerciseModal(props) {
                   }}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center">
-                  <label htmlFor="weight-type" className="sr-only">
+                  <label htmlFor={`weight-type-${index}`} className="sr-only">
                     weight type
                   </label>
                   <select
-                    id="weight-type"
-                    name="weight-type"
+                    id={`weight-type-${index}`}
+                    name={`weight-type-${index}`}
                     className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                     onChange={(e) =>
                       setIsUsingKilograms(e.target.value === "kg")
                     }
+                    value={isUsingKilograms ? "kg" : "lbs"}
                   >
                     <option>kg</option>
                     <option>lbs</option>
@@ -582,7 +558,131 @@ export default function ExerciseModal(props) {
               </div>
             </div>
           ))}
-        {selectedExercise && <div>[FILL] weight performed</div>}
+        {selectedExercise && <hr className="w-full border sm:col-span-3"></hr>}
+        {selectedExercise && (
+          <div className="col-start-1">
+            <label
+              htmlFor="setsPerformed"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Sets Performed
+            </label>
+            <div className="mt-1">
+              <input
+                required
+                type="number"
+                min="0"
+                max="20"
+                value={numberOfSetsPerformed}
+                onInput={(e) =>
+                  setNumberOfSetsPerformed(Number(e.target.value))
+                }
+                name="setsPerformed"
+                id="setsPerformed"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              />
+            </div>
+          </div>
+        )}
+        {selectedExercise &&
+          new Array(numberOfSetsPerformed).fill(1).map((_, index) => (
+            <div className={index === 0 ? "col-start-1" : ""} key={index}>
+              <label
+                htmlFor={`reps-performed-${index}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                Reps Performed #{index + 1}
+              </label>
+              <div className="mt-1">
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  max="20"
+                  value={numberOfRepsPerformed[index]}
+                  onInput={(e) => {
+                    const newNumberOfRepsPerformed =
+                      numberOfRepsPerformed.slice();
+                    newNumberOfRepsPerformed[index] = Number(e.target.value);
+                    setNumberOfRepsPerformed(newNumberOfRepsPerformed);
+                  }}
+                  name={`reps-performed-${index}`}
+                  id={`reps-performed-${index}`}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+          ))}
+        {selectedExercise &&
+          new Array(numberOfSetsPerformed).fill(1).map((_, index) => (
+            <div key={index} className={index === 0 ? "col-start-1" : ""}>
+              <label
+                htmlFor={`weight-performed-${index}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                Weight Performed #{index + 1}
+              </label>
+              <div className="relative mt-1 rounded-md shadow-sm">
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  name={`weight-performed-${index}`}
+                  id={`weight-performed-${index}`}
+                  className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  value={
+                    isWeightInputEmptyString[index]
+                      ? ""
+                      : isUsingKilograms
+                      ? weightKilograms[index]
+                      : weightPounds[index]
+                  }
+                  placeholder={0}
+                  onInput={(e) => {
+                    const newIsWeightInputEmptyString =
+                      isWeightInputEmptyString.slice();
+                    newIsWeightInputEmptyString[index] = e.target.value === "";
+                    setIsWeightInputEmptyString(newIsWeightInputEmptyString);
+
+                    const weight = Number(e.target.value);
+                    const newWeightKilograms = weightKilograms.slice();
+                    const newWeightPounds = weightPounds.slice();
+                    if (isUsingKilograms) {
+                      newWeightKilograms[index] = weight;
+                      newWeightPounds[index] = Math.round(
+                        kilogramsToPounds(weight)
+                      );
+                    } else {
+                      newWeightPounds[index] = weight;
+                      newWeightKilograms[index] = Math.round(
+                        poundsToKilograms(weight)
+                      );
+                    }
+                    setWeightKilograms(newWeightKilograms);
+                    setWeightPounds(newWeightPounds);
+                  }}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <label
+                    htmlFor={`weight-type-performed-${index}`}
+                    className="sr-only"
+                  >
+                    weight type
+                  </label>
+                  <select
+                    id={`weight-type-performed-${index}`}
+                    name={`weight-type-performed-${index}`}
+                    className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    value={isUsingKilograms ? "kg" : "lbs"}
+                    disabled
+                  >
+                    <option>kg</option>
+                    <option>lbs</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          ))}
       </form>
     </Modal>
   );
