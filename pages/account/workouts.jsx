@@ -200,7 +200,7 @@ export default function Workouts() {
                 ></LazyVideo>
               </div>
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Exercise</dt>
+                <dt className="text-sm font-medium text-gray-500">Name</dt>
                 <dd className="mt-1 break-words text-sm text-gray-900">
                   {exercise.type.name}
                 </dd>

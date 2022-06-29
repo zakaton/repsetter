@@ -11,7 +11,7 @@ import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
 
-export default function AddExerciseModal(props) {
+export default function ExerciseModal(props) {
   const {
     open,
     setOpen,
@@ -25,13 +25,13 @@ export default function AddExerciseModal(props) {
     setShowEditResultNotification: setShowEditExerciseNotification,
   } = props;
 
-  const { selectedClient, selectedDate, amITheClient, isSelectedDateToday } =
-    useClient();
+  const { selectedClient, selectedDate, amITheClient } = useClient();
   const { user } = useUser();
 
   useEffect(() => {
     if (!open) {
       setDidAddExercise(false);
+      setDidUpdateExercise(false);
       resetUI();
     }
   }, [open]);
@@ -79,13 +79,43 @@ export default function AddExerciseModal(props) {
     setSelectedExercise?.(null);
   };
 
+  useEffect(() => {
+    if (open && selectedExercise) {
+      setNumberOfSets(selectedExercise.number_of_sets_assigned);
+      setNumberOfReps(selectedExercise.number_of_reps_assigned);
+      setIsUsingKilograms(selectedExercise.is_weight_in_kilograms);
+      if (selectedExercise.is_weight_in_kilograms) {
+        setWeightKilograms(selectedExercise.weight_assigned);
+        setWeightPounds(
+          selectedExercise.weight_assigned.map((weight) =>
+            kilogramsToPounds(weight)
+          )
+        );
+      } else {
+        setWeightPounds(selectedExercise.weight_assigned);
+        setWeightKilograms(
+          selectedExercise.weight_assigned.map((weight) =>
+            poundsToKilograms(weight)
+          )
+        );
+      }
+
+      const sameRepsForEachSet =
+        selectedExercise.number_of_reps_assigned.length == 1;
+      setSameRepsForEachSet(sameRepsForEachSet);
+
+      const sameWeightForEachSet = selectedExercise.weight_assigned.length == 1;
+      setSameWeightForEachSet(sameWeightForEachSet);
+    }
+  }, [open, selectedExercise]);
+
   return (
     <Modal
       {...props}
-      title="Add Exercise"
+      title={selectedExercise ? "Edit Exercise" : "Add Exercise"}
       message={
         <>
-          Add an exercise to{" "}
+          {selectedExercise ? "Update" : "Add an"} exercise to{" "}
           <span className="font-semibold">
             {selectedClient ? `${selectedClient.client_email}'s` : "your"}
           </span>{" "}
@@ -97,10 +127,16 @@ export default function AddExerciseModal(props) {
       Button={
         <button
           type="submit"
-          form="addExerciseForm"
+          form="exerciseForm"
           className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >
-          {isAddingExercise
+          {selectedExercise
+            ? isUpdatingExercise
+              ? "Updating Exercise..."
+              : didUpdateExercise
+              ? "Updated Exercise!"
+              : "Update Exercise"
+            : isAddingExercise
             ? "Adding Exercise..."
             : didAddExercise
             ? "Added Exercise!"
@@ -109,14 +145,48 @@ export default function AddExerciseModal(props) {
       }
     >
       <form
-        id="addExerciseForm"
+        id="exerciseForm"
         method="POST"
         className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3"
         onSubmit={async (e) => {
           e.preventDefault();
           let status;
           if (selectedExercise) {
-            // FILL
+            const updateExerciseData = {
+              type: selectedExerciseType.id,
+              number_of_sets_assigned: numberOfSets,
+              number_of_reps_assigned: numberOfReps,
+              is_weight_in_kilograms: isUsingKilograms,
+              weight_assigned: isUsingKilograms
+                ? weightKilograms
+                : weightPounds,
+
+              // FILL - more stuff
+            };
+            const { data: updatedExercise, error: updatedExerciseError } =
+              await supabase
+                .from("exercise")
+                .update(updateExerciseData)
+                .match({ id: selectedExercise.id });
+
+            console.log("updatedExercise", updatedExercise);
+            if (updatedExerciseError) {
+              console.error(updatedExerciseError);
+              status = {
+                type: "failed",
+                title: "Failed to Update Exercise",
+                message: updatedExerciseError.message,
+              };
+            } else {
+              status = {
+                type: "succeeded",
+                title: "Successfully Updated Exercise",
+              };
+            }
+            setIsUpdatingExercise(false);
+            setDidUpdateExercise(true);
+            setEditExerciseStatus(status);
+            setShowEditExerciseNotification(true);
           } else {
             setIsAddingExercise(true);
             const createExerciseData = {
