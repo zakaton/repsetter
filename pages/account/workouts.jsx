@@ -86,7 +86,7 @@ export default function Workouts() {
     if (exercises) {
       console.log(`subscribing to exercise updates`);
       const subscription = supabase
-        .from(`exercise`)
+        .from(`exercise:date=eq.${selectedDate.toDateString()}`)
         .on("INSERT", (payload) => {
           console.log(`new exercise`, payload);
           getExercises(true);
@@ -160,10 +160,7 @@ export default function Workouts() {
         }
       >
         {exercises?.map((exercise) => (
-          <div
-            key={exercise.id}
-            className="border-t border-gray-200 px-4 py-5 sm:px-6"
-          >
+          <div key={exercise.id} className="border-t border-gray-200 py-5">
             <dl
               className={
                 "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
@@ -171,6 +168,7 @@ export default function Workouts() {
             >
               <div className="sm:col-span-1">
                 <LazyVideo
+                  className="aspect-[4/3] w-full"
                   src={exerciseVideos[exercise.type.id]?.url}
                   muted={true}
                   playsInline={true}

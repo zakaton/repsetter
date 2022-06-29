@@ -141,7 +141,7 @@ export default function AccountCalendarLayout({
       </Head>
       <div className="space-y-6 px-4 pb-6 pt-6 sm:px-6 sm:pt-6">
         <div className="lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-y-6 lg:gap-x-10">
-          <div className="lg:col-start-1 lg:col-end-8 lg:row-start-1">
+          <div className="lg:col-span-8 lg:col-start-1 lg:row-start-1">
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
@@ -315,7 +315,7 @@ export default function AccountCalendarLayout({
             </div>
             {underCalendar}
           </div>
-          <div className="mt-8 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0">
+          <div className="mt-8 divide-y divide-gray-100 text-sm leading-6 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:mt-0">
             {children}
           </div>
         </div>
