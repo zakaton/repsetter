@@ -2,6 +2,7 @@ import AccountCalendarLayout from "../../components/layouts/AccountCalendarLayou
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
 import AddExerciseModal from "../../components/account/modal/AddExerciseModal";
+import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
 import { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
 import { supabase } from "../../utils/supabase";
@@ -19,6 +20,12 @@ export default function Workouts() {
   const [showAddExerciseNotification, setShowAddExerciseNotification] =
     useState(false);
   const [addExerciseStatus, setAddExerciseStatus] = useState();
+
+  const [showDeleteExerciseModal, setShowDeleteExerciseModal] = useState(false);
+  const [showDeleteExerciseNotification, setShowDeleteExerciseNotification] =
+    useState(false);
+  const [deleteExerciseStatus, setDeleteExerciseStatus] = useState();
+  const [selectedExercise, setSelectedExercise] = useState();
 
   const [gotExerciseForUserId, setGotExerciseForUserId] = useState();
   const [gotExerciseForDate, setGotExerciseForDate] = useState();
@@ -125,6 +132,19 @@ export default function Workouts() {
         status={addExerciseStatus}
       />
 
+      <DeleteExerciseModal
+        open={showDeleteExerciseModal}
+        setOpen={setShowDeleteExerciseModal}
+        selectedResult={selectedExercise}
+        setDeleteResultStatus={setDeleteExerciseStatus}
+        setShowDeleteResultNotification={setShowDeleteExerciseNotification}
+      />
+      <Notification
+        open={showDeleteExerciseNotification}
+        setOpen={setShowDeleteExerciseNotification}
+        status={deleteExerciseStatus}
+      />
+
       <AccountCalendarLayout
         tableName="workout"
         underCalendar={
@@ -140,14 +160,38 @@ export default function Workouts() {
         }
       >
         {exercises?.map((exercise) => (
-          <div key={exercise.id}>
-            <LazyVideo
-              src={exerciseVideos[exercise.type.id]?.url}
-              muted={true}
-              playsInline={true}
-              autoPlay={true}
-              loop={true}
-            ></LazyVideo>
+          <div
+            key={exercise.id}
+            className="border-t border-gray-200 px-4 py-5 sm:px-6"
+          >
+            <dl
+              className={
+                "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+              }
+            >
+              <div className="sm:col-span-1">
+                <LazyVideo
+                  src={exerciseVideos[exercise.type.id]?.url}
+                  muted={true}
+                  playsInline={true}
+                  autoPlay={true}
+                  loop={true}
+                ></LazyVideo>
+              </div>
+              <div className="sm:col-span-1">
+                <button
+                  onClick={() => {
+                    setSelectedExercise(exercise);
+                    setShowDeleteExerciseModal(true);
+                  }}
+                  type="button"
+                  className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Delete
+                  <span className="sr-only"> exercise</span>
+                </button>
+              </div>
+            </dl>
           </div>
         ))}
       </AccountCalendarLayout>

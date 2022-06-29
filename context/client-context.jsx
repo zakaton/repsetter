@@ -121,7 +121,7 @@ export function ClientContextProvider(props) {
 
   const [selectedClientId, setSelectedClientId] = useState();
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && user) {
       setSelectedClientId(selectedClient ? selectedClient.client : user.id);
     }
   }, [selectedClient, user, isLoading]);
