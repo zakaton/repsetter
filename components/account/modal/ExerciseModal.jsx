@@ -18,6 +18,11 @@ export default function AddExerciseModal(props) {
     setCreateResultStatus: setAddExerciseStatus,
     setShowCreateResultNotification: setShowAddExerciseNotification,
     existingExercises,
+
+    selectedResult: selectedExercise,
+    setSelectedResult: setSelectedExercise,
+    setEditResultStatus: setEditExerciseStatus,
+    setShowEditResultNotification: setShowEditExerciseNotification,
   } = props;
 
   const { selectedClient, selectedDate, amITheClient, isSelectedDateToday } =
@@ -34,11 +39,15 @@ export default function AddExerciseModal(props) {
   useEffect(() => {
     if (open && didAddExercise) {
       setShowAddExerciseNotification(false);
+      setShowEditExerciseNotification(false);
     }
   }, [open]);
 
   const [isAddingExercise, setIsAddingExercise] = useState(false);
   const [didAddExercise, setDidAddExercise] = useState(false);
+
+  const [isUpdatingExercise, setIsUpdatingExercise] = useState(false);
+  const [didUpdateExercise, setDidUpdateExercise] = useState(false);
 
   const [selectedExerciseType, setSelectedExerciseType] = useState(null);
   const [numberOfSets, setNumberOfSets] = useState(3);
@@ -64,6 +73,10 @@ export default function AddExerciseModal(props) {
     setIsWeightInputEmptyString([]);
     setSameRepsForEachSet(true);
     setSameWeightForEachSet(true);
+
+    setIsUpdatingExercise(false);
+    setDidUpdateExercise(false);
+    setSelectedExercise?.(null);
   };
 
   return (
@@ -101,51 +114,56 @@ export default function AddExerciseModal(props) {
         className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3"
         onSubmit={async (e) => {
           e.preventDefault();
-          setIsAddingExercise(true);
-          const form = e.target;
-          console.log(form);
-          const createExerciseData = {
-            type: selectedExerciseType.id,
-            date: selectedDate,
-            number_of_sets_assigned: numberOfSets,
-            number_of_reps_assigned: numberOfReps,
-            is_weight_in_kilograms: isUsingKilograms,
-            weight_assigned: isUsingKilograms ? weightKilograms : weightPounds,
-
-            client: amITheClient ? user.id : selectedClient.client,
-            client_email: amITheClient
-              ? user.email
-              : selectedClient.client_email,
-          };
-          if (!amITheClient) {
-            Object.assign(createExerciseData, {
-              coach: user.id,
-              coach_email: user.email,
-            });
-          }
-          console.log("createExerciseData", createExerciseData);
-          const { data: createdExercise, error: createdExerciseError } =
-            await supabase.from("exercise").insert([createExerciseData]);
           let status;
-          console.log("createdExercise", createdExercise);
-          if (createdExerciseError) {
-            console.error(createdExerciseError);
-            status = {
-              type: "failed",
-              title: "Failed to add Exercise",
-              message: createdExerciseError.message,
-            };
+          if (selectedExercise) {
+            // FILL
           } else {
-            status = {
-              type: "succeeded",
-              title: "Successfully added Exercise",
+            setIsAddingExercise(true);
+            const createExerciseData = {
+              type: selectedExerciseType.id,
+              date: selectedDate,
+              number_of_sets_assigned: numberOfSets,
+              number_of_reps_assigned: numberOfReps,
+              is_weight_in_kilograms: isUsingKilograms,
+              weight_assigned: isUsingKilograms
+                ? weightKilograms
+                : weightPounds,
+
+              client: amITheClient ? user.id : selectedClient.client,
+              client_email: amITheClient
+                ? user.email
+                : selectedClient.client_email,
             };
+            if (!amITheClient) {
+              Object.assign(createExerciseData, {
+                coach: user.id,
+                coach_email: user.email,
+              });
+            }
+            console.log("createExerciseData", createExerciseData);
+            const { data: createdExercise, error: createdExerciseError } =
+              await supabase.from("exercise").insert([createExerciseData]);
+
+            console.log("createdExercise", createdExercise);
+            if (createdExerciseError) {
+              console.error(createdExerciseError);
+              status = {
+                type: "failed",
+                title: "Failed to add Exercise",
+                message: createdExerciseError.message,
+              };
+            } else {
+              status = {
+                type: "succeeded",
+                title: "Successfully added Exercise",
+              };
+            }
+            setIsAddingExercise(false);
+            setDidAddExercise(true);
+            setAddExerciseStatus(status);
+            setShowAddExerciseNotification(true);
           }
 
-          setIsAddingExercise(false);
-          setDidAddExercise(true);
-          setAddExerciseStatus(status);
-          setShowAddExerciseNotification(true);
           setOpen(false);
           if (status.type === "succeeded") {
             console.log(status);
@@ -160,6 +178,7 @@ export default function AddExerciseModal(props) {
             setSelectedExerciseType={setSelectedExerciseType}
             open={open}
             existingExercises={existingExercises}
+            selectedExercise={selectedExercise}
           />
         </div>
         <div className="">
@@ -167,7 +186,7 @@ export default function AddExerciseModal(props) {
             htmlFor="sets"
             className="block text-sm font-medium text-gray-700"
           >
-            Number of Sets
+            Assigned Sets
           </label>
           <div className="mt-1">
             <input
@@ -279,7 +298,7 @@ export default function AddExerciseModal(props) {
               htmlFor="reps"
               className="block text-sm font-medium text-gray-700"
             >
-              Number of Reps
+              Assigned Reps
             </label>
             <div className="mt-1">
               <input
@@ -336,7 +355,7 @@ export default function AddExerciseModal(props) {
               htmlFor="weight"
               className="block text-sm font-medium text-gray-700"
             >
-              Weight
+              Assigned Weight
             </label>
             <div className="mt-1 flex rounded-md shadow-sm">
               <div className="relative flex flex-grow items-stretch focus-within:z-10">

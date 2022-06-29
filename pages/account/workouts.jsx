@@ -1,7 +1,7 @@
 import AccountCalendarLayout from "../../components/layouts/AccountCalendarLayout";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
-import AddExerciseModal from "../../components/account/modal/AddExerciseModal";
+import ExerciseModal from "../../components/account/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
 import { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
@@ -25,6 +25,12 @@ export default function Workouts() {
   const [showDeleteExerciseNotification, setShowDeleteExerciseNotification] =
     useState(false);
   const [deleteExerciseStatus, setDeleteExerciseStatus] = useState();
+
+  const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
+  const [showEditExerciseNotification, setShowEditExerciseNotification] =
+    useState(false);
+  const [editExerciseStatus, setEditExerciseStatus] = useState();
+
   const [selectedExercise, setSelectedExercise] = useState();
 
   const [gotExerciseForUserId, setGotExerciseForUserId] = useState();
@@ -119,7 +125,7 @@ export default function Workouts() {
 
   return (
     <>
-      <AddExerciseModal
+      <ExerciseModal
         open={showAddExerciseModal}
         setOpen={setShowAddExerciseModal}
         setCreateResultStatus={setAddExerciseStatus}
@@ -136,6 +142,7 @@ export default function Workouts() {
         open={showDeleteExerciseModal}
         setOpen={setShowDeleteExerciseModal}
         selectedResult={selectedExercise}
+        setSelectedResult={setSelectedExercise}
         setDeleteResultStatus={setDeleteExerciseStatus}
         setShowDeleteResultNotification={setShowDeleteExerciseNotification}
       />
@@ -143,6 +150,21 @@ export default function Workouts() {
         open={showDeleteExerciseNotification}
         setOpen={setShowDeleteExerciseNotification}
         status={deleteExerciseStatus}
+      />
+
+      <ExerciseModal
+        open={showEditExerciseModal}
+        setOpen={setShowEditExerciseModal}
+        selectedResult={selectedExercise}
+        setSelectedResult={setSelectedExercise}
+        setEditResultStatus={setEditExerciseStatus}
+        setShowEditResultNotification={setShowEditExerciseNotification}
+        existingExercises={exercises}
+      />
+      <Notification
+        open={showEditExerciseNotification}
+        setOpen={setShowEditExerciseNotification}
+        status={editExerciseStatus}
       />
 
       <AccountCalendarLayout
@@ -168,13 +190,77 @@ export default function Workouts() {
             >
               <div className="sm:col-span-1">
                 <LazyVideo
-                  className="aspect-[4/3] w-full"
+                  width="100"
+                  className="aspect-[4/3]"
                   src={exerciseVideos[exercise.type.id]?.url}
                   muted={true}
                   playsInline={true}
                   autoPlay={true}
                   loop={true}
                 ></LazyVideo>
+              </div>
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Exercise</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {exercise.type.name}
+                </dd>
+              </div>
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Muscles Used
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {exercise.type.muscles.join(", ")}
+                </dd>
+              </div>
+              {amITheClient && exercise.coach_email && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Coach</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {exercise.coach_email}
+                  </dd>
+                </div>
+              )}
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Sets Assigned
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {exercise.number_of_sets_assigned}
+                </dd>
+              </div>
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Reps Assigned
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {exercise.number_of_reps_assigned
+                    .map((reps) => (reps == 0 ? "amrap" : reps))
+                    .join(", ")}
+                </dd>
+              </div>
+              {exercise.weight_assigned.some((weight) => weight > 0) && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Weight Assigned (
+                    {exercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                  </dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {exercise.weight_assigned.join(", ")}
+                  </dd>
+                </div>
+              )}
+
+              <div className="sm:col-span-1">
+                <button
+                  onClick={() => {
+                    setSelectedExercise(exercise);
+                    setShowEditExerciseModal(true);
+                  }}
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  Edit<span className="sr-only"> exercise</span>
+                </button>
               </div>
               <div className="sm:col-span-1">
                 <button

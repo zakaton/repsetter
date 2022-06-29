@@ -13,6 +13,7 @@ export default function ExerciseTypesSelect({
   selectedExerciseType,
   setSelectedExerciseType,
   existingExercises = [],
+  selectedExercise,
   open = true,
 }) {
   const [exerciseTypes, setExerciseTypes] = useState();
@@ -46,6 +47,16 @@ export default function ExerciseTypesSelect({
     }
   }, [exerciseTypes]);
 
+  useEffect(() => {
+    if (open && selectedExercise && exerciseTypes) {
+      setSelectedExerciseType(
+        exerciseTypes.find(
+          (exerciseType) => exerciseType.id === selectedExercise.type.id
+        )
+      );
+    }
+  }, [open, selectedExercise, exerciseTypes]);
+
   const [query, setQuery] = useState("");
   const [filteredExerciseTypes, setFilteredExerciseTypes] = useState([]);
   useEffect(() => {
@@ -65,8 +76,10 @@ export default function ExerciseTypesSelect({
               );
               return includesName || includesMuscle;
             });
+      console.log("selectedExercise", selectedExercise);
       filteredExerciseTypes = filteredExerciseTypes.filter(
         (filteredExerciseType) =>
+          selectedExercise?.type.id === filteredExerciseType.id ||
           !existingExercises.find(
             (existingExercise) =>
               existingExercise.type.id === filteredExerciseType.id
