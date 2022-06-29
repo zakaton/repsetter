@@ -3,7 +3,7 @@ import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Combobox } from "@headlessui/react";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
-import LazyLoad from "react-lazyload";
+import LazyVideo from "../../LazyVideo";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -69,7 +69,7 @@ export default function ExerciseTypesSelect({
         (filteredExerciseType) =>
           !existingExercises.find(
             (existingExercise) =>
-              existingExercise.type === filteredExerciseType.id
+              existingExercise.type.id === filteredExerciseType.id
           )
       );
       setFilteredExerciseTypes(filteredExerciseTypes);
@@ -111,26 +111,24 @@ export default function ExerciseTypesSelect({
               >
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
-                    <LazyLoad>
-                      <video
-                        width="100"
-                        height="75"
-                        autoPlay={true}
-                        muted={true}
-                        loop={true}
-                        playsInline={true}
-                        src={exerciseVideos?.[exerciseType.id]?.url}
-                        onSuspend={(e) => {
-                          document.addEventListener(
-                            "click",
-                            () => e.target.play(),
-                            {
-                              once: true,
-                            }
-                          );
-                        }}
-                      ></video>
-                    </LazyLoad>
+                    <LazyVideo
+                      width="100"
+                      height="75"
+                      autoPlay={true}
+                      muted={true}
+                      loop={true}
+                      playsInline={true}
+                      src={exerciseVideos?.[exerciseType.id]?.url}
+                      onSuspend={(e) => {
+                        document.addEventListener(
+                          "click",
+                          () => e.target.play(),
+                          {
+                            once: true,
+                          }
+                        );
+                      }}
+                    ></LazyVideo>
 
                     <div className="flex flex-col gap-1">
                       <span

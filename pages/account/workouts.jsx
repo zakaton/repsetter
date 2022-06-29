@@ -6,16 +6,14 @@ import { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
 import { supabase } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
+import { useExerciseVideos } from "../../context/exercise-videos-context";
+import LazyVideo from "../../components/LazyVideo";
 
 export default function Workouts() {
   const { user } = useUser();
-  const {
-    selectedClient,
-    selectedDate,
-    amITheClient,
-    isSelectedDateToday,
-    selectedClientId,
-  } = useClient();
+  const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
+  const { selectedClient, selectedDate, amITheClient, selectedClientId } =
+    useClient();
 
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
   const [showAddExerciseNotification, setShowAddExerciseNotification] =
@@ -31,6 +29,9 @@ export default function Workouts() {
     if (exercises && !refresh) {
       return;
     }
+    if (!selectedClientId) {
+      return;
+    }
     if (isGettingExercises) {
       return;
     }
@@ -43,9 +44,10 @@ export default function Workouts() {
     if (!amITheClient) {
       matchFilters.coach = user.id;
     }
+    console.log("matchFilters", matchFilters);
     const { data: exercises, error } = await supabase
       .from("exercise")
-      .select("*")
+      .select("*, type(*)")
       .match(matchFilters);
     if (error) {
       console.error(error);
@@ -72,6 +74,41 @@ export default function Workouts() {
       getExercises(true);
     }
   }, [exercises, selectedClientId, selectedClient, selectedDate]);
+
+  useEffect(() => {
+    if (exercises) {
+      console.log(`subscribing to exercise updates`);
+      const subscription = supabase
+        .from(`exercise`)
+        .on("INSERT", (payload) => {
+          console.log(`new exercise`, payload);
+          getExercises(true);
+        })
+        .on("UPDATE", (payload) => {
+          console.log(`updated exercise`, payload);
+          getExercises(true);
+        })
+        .on("DELETE", (payload) => {
+          console.log(`deleted exercise`, payload);
+          const deletedExercise = payload.old;
+          // eslint-disable-next-line no-shadow
+          setExercises(
+            exercises.filter((exercise) => exercise?.id !== deletedExercise.id)
+          );
+        })
+        .subscribe();
+      return () => {
+        console.log("unsubscribing to exercise updates");
+        supabase.removeSubscription(subscription);
+      };
+    }
+  }, [exercises]);
+
+  useEffect(() => {
+    if (exercises) {
+      exercises.forEach((exercise) => getExerciseVideo(exercise.type.id));
+    }
+  }, [exercises]);
 
   return (
     <>
@@ -102,7 +139,17 @@ export default function Workouts() {
           </div>
         }
       >
-        Hello!
+        {exercises?.map((exercise) => (
+          <div key={exercise.id}>
+            <LazyVideo
+              src={exerciseVideos[exercise.type.id]?.url}
+              muted={true}
+              playsInline={true}
+              autoPlay={true}
+              loop={true}
+            ></LazyVideo>
+          </div>
+        ))}
       </AccountCalendarLayout>
     </>
   );

@@ -101,6 +101,8 @@ export function ClientContextProvider(props) {
     if (selectedClient) {
       console.log("selected client!", selectedClient);
       query["client"] = selectedClient.client_email;
+    } else {
+      delete router.query.client;
     }
     if (selectedDate) {
       query["date"] = selectedDate.toDateString();
