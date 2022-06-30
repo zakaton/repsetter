@@ -656,7 +656,7 @@ export default function ExerciseModal(props) {
                 className="hide-arrows block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <span className="text-gray-500 sm:text-sm" id="price-currency">
+                <span className="text-gray-500 sm:text-sm">
                   /{numberOfSets}
                 </span>
               </div>
@@ -813,16 +813,11 @@ export default function ExerciseModal(props) {
                     >
                       weight type
                     </label>
-                    <select
-                      id={`weight-type-performed-${index}`}
-                      name={`weight-type-performed-${index}`}
-                      className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      value={isUsingKilograms ? "kg" : "lbs"}
-                      disabled
-                    >
-                      <option>kg</option>
-                      <option>lbs</option>
-                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <span className="w-max text-gray-500 sm:text-sm">
+                        /{numberOfSets} {isUsingKilograms ? "kg" : "lbs"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
