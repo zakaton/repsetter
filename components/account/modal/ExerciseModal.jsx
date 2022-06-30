@@ -61,6 +61,8 @@ export default function ExerciseModal(props) {
   const [isUsingKilograms, setIsUsingKilograms] = useState(true);
   const [weightKilograms, setWeightKilograms] = useState([0]);
   const [weightPounds, setWeightPounds] = useState([0]);
+  const [weightPerformedKilograms, setWeightPerformedKilograms] = useState([0]);
+  const [weightPerformedPounds, setWeightPerformedPounds] = useState([0]);
 
   const [isWeightInputEmptyString, setIsWeightInputEmptyString] = useState([]);
 
@@ -90,14 +92,14 @@ export default function ExerciseModal(props) {
         setWeightKilograms(selectedExercise.weight_assigned);
         setWeightPounds(
           selectedExercise.weight_assigned.map((weight) =>
-            kilogramsToPounds(weight)
+            Math.round(kilogramsToPounds(weight))
           )
         );
       } else {
         setWeightPounds(selectedExercise.weight_assigned);
         setWeightKilograms(
           selectedExercise.weight_assigned.map((weight) =>
-            poundsToKilograms(weight)
+            Math.round(poundsToKilograms(weight))
           )
         );
       }
@@ -115,10 +117,36 @@ export default function ExerciseModal(props) {
         setNumberOfSetsPerformed(selectedExercise.number_of_sets_assigned);
       }
 
-      if (selectedExercise.number_of_reps_performed !== null) {
-        setNumberOfRepsPerformed(selectedExercise.number_of_reps_performed);
+      let repsPerformed =
+        selectedExercise.number_of_reps_performed !== null
+          ? selectedExercise.number_of_reps_performed
+          : selectedExercise.number_of_reps_assigned;
+      if (repsPerformed.length != selectedExercise.number_of_sets_assigned) {
+        repsPerformed = new Array(
+          selectedExercise.number_of_sets_assigned
+        ).fill(0);
+      }
+      setNumberOfRepsPerformed(repsPerformed);
+
+      let weightPerformed =
+        selectedExercise.weight_performed !== null
+          ? selectedExercise.weight_performed
+          : selectedExercise.weight_assigned;
+      if (weightPerformed.length != selectedExercise.number_of_sets_assigned) {
+        weightPerformed = new Array(
+          selectedExercise.number_of_sets_assigned
+        ).fill(weightPerformed[0]);
+      }
+      if (selectedExercise.is_weight_in_kilograms) {
+        setWeightPerformedKilograms(weightPerformed);
+        setWeightPerformedPounds(
+          weightPerformed.map((weight) => kilogramsToPounds(weight))
+        );
       } else {
-        setNumberOfRepsPerformed(selectedExercise.number_of_reps_assigned);
+        setWeightPerformedPounds(weightPerformed);
+        setWeightPerformedKilograms(
+          weightPerformed.map((weight) => poundsToKilograms(weight))
+        );
       }
     }
   }, [open, selectedExercise]);
@@ -178,7 +206,11 @@ export default function ExerciseModal(props) {
               // FILL - more stuff
               number_of_sets_performed: numberOfSetsPerformed,
               number_of_reps_performed: numberOfRepsPerformed,
+              weight_performed: isUsingKilograms
+                ? weightPerformedKilograms
+                : weightPerformedPounds,
             };
+            console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
               await supabase
                 .from("exercise")
@@ -558,7 +590,21 @@ export default function ExerciseModal(props) {
               </div>
             </div>
           ))}
-        {selectedExercise && <hr className="w-full border sm:col-span-3"></hr>}
+        {selectedExercise && (
+          <div className="relative w-full sm:col-span-3">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center">
+              <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
+                <span className="select-none">Performance</span>
+              </div>
+            </div>
+          </div>
+        )}
         {selectedExercise && (
           <div className="col-start-1">
             <label
@@ -567,7 +613,7 @@ export default function ExerciseModal(props) {
             >
               Sets Performed
             </label>
-            <div className="mt-1">
+            <div className="relative mt-1 rounded-md shadow-sm">
               <input
                 required
                 type="number"
@@ -579,8 +625,13 @@ export default function ExerciseModal(props) {
                 }
                 name="setsPerformed"
                 id="setsPerformed"
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="hide-arrows block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <span className="text-gray-500 sm:text-sm" id="price-currency">
+                  /{numberOfSets}
+                </span>
+              </div>
             </div>
           </div>
         )}
@@ -593,7 +644,7 @@ export default function ExerciseModal(props) {
               >
                 Reps Performed #{index + 1}
               </label>
-              <div className="mt-1">
+              <div className="relative mt-1 rounded-md shadow-sm">
                 <input
                   required
                   type="number"
@@ -608,8 +659,19 @@ export default function ExerciseModal(props) {
                   }}
                   name={`reps-performed-${index}`}
                   id={`reps-performed-${index}`}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span
+                    className="text-gray-500 sm:text-sm"
+                    id={`reps-performed-denominator-${index}`}
+                  >
+                    /
+                    {numberOfReps.length === 1
+                      ? numberOfReps[0]
+                      : numberOfReps[index]}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -634,8 +696,8 @@ export default function ExerciseModal(props) {
                     isWeightInputEmptyString[index]
                       ? ""
                       : isUsingKilograms
-                      ? weightKilograms[index]
-                      : weightPounds[index]
+                      ? weightPerformedKilograms[index]
+                      : weightPerformedPounds[index]
                   }
                   placeholder={0}
                   onInput={(e) => {
@@ -658,8 +720,8 @@ export default function ExerciseModal(props) {
                         poundsToKilograms(weight)
                       );
                     }
-                    setWeightKilograms(newWeightKilograms);
-                    setWeightPounds(newWeightPounds);
+                    setWeightPerformedKilograms(newWeightKilograms);
+                    setWeightPerformedPounds(newWeightPounds);
                   }}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center">

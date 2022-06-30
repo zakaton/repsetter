@@ -123,6 +123,21 @@ export default function Workouts() {
     }
   }, [exercises]);
 
+  const clearNotifications = () => {
+    setShowAddExerciseNotification(false);
+    setShowDeleteExerciseNotification(false);
+    setShowEditExerciseNotification(false);
+  };
+  useEffect(() => {
+    if (
+      showAddExerciseModal ||
+      showDeleteExerciseModal ||
+      showEditExerciseModal
+    ) {
+      clearNotifications();
+    }
+  }, [showAddExerciseModal, showDeleteExerciseModal, showEditExerciseModal]);
+
   return (
     <>
       <ExerciseModal
