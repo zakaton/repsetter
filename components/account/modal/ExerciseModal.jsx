@@ -883,7 +883,7 @@ export default function ExerciseModal(props) {
                         try {
                           const url = new URL(inputValue);
                           console.log(url);
-                          if (url.host.endsWith(".youtube.com")) {
+                          if (url.host.endsWith("youtube.com")) {
                             if (url.pathname === "/watch") {
                               videoId = url.searchParams.get("v");
                               timecode = url.searchParams.get("t") || 0;
