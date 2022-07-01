@@ -53,10 +53,15 @@ export default function ExerciseModal(props) {
   const [selectedExerciseType, setSelectedExerciseType] = useState(null);
   const [numberOfSets, setNumberOfSets] = useState(3);
   const [numberOfSetsPerformed, setNumberOfSetsPerformed] = useState(0);
+  const [isSetsPerformedEmptyString, setIsSetsPerformedEmptyString] =
+    useState(false);
 
   const [sameRepsForEachSet, setSameRepsForEachSet] = useState(true);
   const [numberOfReps, setNumberOfReps] = useState([10]);
   const [numberOfRepsPerformed, setNumberOfRepsPerformed] = useState(0);
+  const [isRepsPerformedEmptyString, setIsRepsPerformedEmptyString] = useState(
+    []
+  );
 
   const [sameWeightForEachSet, setSameWeightForEachSet] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(true);
@@ -66,6 +71,8 @@ export default function ExerciseModal(props) {
   const [weightPerformedPounds, setWeightPerformedPounds] = useState([0]);
 
   const [isWeightInputEmptyString, setIsWeightInputEmptyString] = useState([]);
+  const [isWeightPerformedEmptyString, setIsWeightPerformedEmptyString] =
+    useState([]);
 
   const [isDifficultyEmptyString, setIsDifficultyEmptyString] = useState([]);
   const [difficulty, setDifficulty] = useState([]);
@@ -652,10 +659,12 @@ export default function ExerciseModal(props) {
                 type="number"
                 min="0"
                 max="20"
-                value={numberOfSetsPerformed}
-                onInput={(e) =>
-                  setNumberOfSetsPerformed(Number(e.target.value))
-                }
+                value={isSetsPerformedEmptyString ? "" : numberOfSetsPerformed}
+                onInput={(e) => {
+                  setIsSetsPerformedEmptyString(e.target.value === "");
+                  setNumberOfSetsPerformed(Number(e.target.value));
+                }}
+                placeholder="0"
                 name="setsPerformed"
                 id="setsPerformed"
                 className="hide-arrows block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -698,13 +707,26 @@ export default function ExerciseModal(props) {
                     type="number"
                     min="0"
                     max="20"
-                    value={numberOfRepsPerformed[index]}
+                    value={
+                      isRepsPerformedEmptyString[index]
+                        ? ""
+                        : numberOfRepsPerformed[index]
+                    }
                     onInput={(e) => {
+                      const newIsRepsPerformedEmptyString =
+                        isRepsPerformedEmptyString.slice();
+                      newIsRepsPerformedEmptyString[index] =
+                        e.target.value === "";
+                      setIsRepsPerformedEmptyString(
+                        newIsRepsPerformedEmptyString
+                      );
+
                       const newNumberOfRepsPerformed =
                         numberOfRepsPerformed.slice();
                       newNumberOfRepsPerformed[index] = Number(e.target.value);
                       setNumberOfRepsPerformed(newNumberOfRepsPerformed);
                     }}
+                    placeholder="0"
                     name={`reps-performed-${index}`}
                     id={`reps-performed-${index}`}
                     className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -779,7 +801,7 @@ export default function ExerciseModal(props) {
                     id={`weight-performed-${index}`}
                     className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                     value={
-                      isWeightInputEmptyString[index]
+                      isWeightPerformedEmptyString[index]
                         ? ""
                         : isUsingKilograms
                         ? weightPerformedKilograms[index]
@@ -787,11 +809,13 @@ export default function ExerciseModal(props) {
                     }
                     placeholder={0}
                     onInput={(e) => {
-                      const newIsWeightInputEmptyString =
-                        isWeightInputEmptyString.slice();
-                      newIsWeightInputEmptyString[index] =
+                      const newIsWeightPerformedEmptyString =
+                        isWeightPerformedEmptyString.slice();
+                      newIsWeightPerformedEmptyString[index] =
                         e.target.value === "";
-                      setIsWeightInputEmptyString(newIsWeightInputEmptyString);
+                      setIsWeightPerformedEmptyString(
+                        newIsWeightPerformedEmptyString
+                      );
 
                       const weight = Number(e.target.value);
                       const newWeightKilograms = weightKilograms.slice();
@@ -822,8 +846,8 @@ export default function ExerciseModal(props) {
                       <span className="w-max text-gray-500 sm:text-sm">
                         /
                         {isUsingKilograms
-                          ? weightKilograms[index]
-                          : weightPounds[index]}{" "}
+                          ? weightKilograms[sameWeightForEachSet ? 0 : index]
+                          : weightPounds[sameWeightForEachSet ? 0 : index]}{" "}
                         {isUsingKilograms ? "kg" : "lbs"}
                       </span>
                     </div>
