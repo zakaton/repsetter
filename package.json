@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^1.29.0",
     "@supabase/gotrue-js": "^1.22.16",
     "@supabase/supabase-js": "^1.35.2",
+    "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.2",
     "cookie": "^0.5.0",

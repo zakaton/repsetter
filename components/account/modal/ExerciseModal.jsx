@@ -820,7 +820,11 @@ export default function ExerciseModal(props) {
                     </label>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                       <span className="w-max text-gray-500 sm:text-sm">
-                        /{numberOfSets} {isUsingKilograms ? "kg" : "lbs"}
+                        /
+                        {isUsingKilograms
+                          ? weightKilograms[index]
+                          : weightPounds[index]}{" "}
+                        {isUsingKilograms ? "kg" : "lbs"}
                       </span>
                     </div>
                   </div>
@@ -892,8 +896,8 @@ export default function ExerciseModal(props) {
                   <div className="sm:col-span-3">
                     <YouTube
                       videoId={video[index].videoId}
-                      className="w-full"
-                      iframeClassName="w-full"
+                      className="aspect-[16/9] w-full"
+                      iframeClassName="aspect-[16/9] w-full"
                       opts={{
                         playerVars: {
                           autoplay: 1,
