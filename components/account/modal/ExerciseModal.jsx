@@ -883,12 +883,14 @@ export default function ExerciseModal(props) {
                         try {
                           const url = new URL(inputValue);
                           console.log(url);
-                          if (
-                            url.host.endsWith(".youtube.com") &&
-                            url.pathname === "/watch"
-                          ) {
-                            videoId = url.searchParams.get("v");
-                            timecode = url.searchParams.get("t") || 0;
+                          if (url.host.endsWith(".youtube.com")) {
+                            if (url.pathname === "/watch") {
+                              videoId = url.searchParams.get("v");
+                              timecode = url.searchParams.get("t") || 0;
+                            } else if (url.pathname.startsWith("/shorts")) {
+                              videoId = url.pathname.split("/")[2];
+                              timecode = 0;
+                            }
                           } else if (url.host === "youtu.be") {
                             videoId = url.pathname.slice(1);
                             timecode = url.searchParams.get("t") || 0;
