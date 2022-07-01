@@ -205,6 +205,11 @@ export default function Workouts() {
             >
               <div className="sm:col-span-1">
                 <LazyVideo
+                  onSuspend={(e) => {
+                    document.addEventListener("click", () => e.target.play(), {
+                      once: true,
+                    });
+                  }}
                   width="100"
                   className="aspect-[4/3]"
                   src={exerciseVideos[exercise.type.id]?.url}
