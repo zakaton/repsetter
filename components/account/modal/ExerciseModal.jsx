@@ -882,7 +882,7 @@ export default function ExerciseModal(props) {
                         let timecode;
                         try {
                           const url = new URL(inputValue);
-                          console.log(url);
+                          console.log("url", url);
                           if (url.host.endsWith("youtube.com")) {
                             if (url.pathname === "/watch") {
                               videoId = url.searchParams.get("v");
@@ -925,6 +925,8 @@ export default function ExerciseModal(props) {
                       className="aspect-[16/9] w-full"
                       iframeClassName="aspect-[16/9] w-full"
                       opts={{
+                        height: "100%",
+                        width: "100%",
                         playerVars: {
                           autoplay: 1,
                           loop: 1,
@@ -938,6 +940,7 @@ export default function ExerciseModal(props) {
                       }}
                       onReady={(e) => {
                         e.target.mute();
+                        console.log("player", e.target);
                         const newVideoPlayer = videoPlayer.slice();
                         newVideoPlayer[index] = e.target;
                         setVideoPlayer(newVideoPlayer);
