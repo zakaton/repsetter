@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { useEffect, useState } from "react";
 import Modal from "../../Modal";
-import { ClipboardCheckIcon } from "@heroicons/react/outline";
+import { ClipboardCheckIcon, RefreshIcon } from "@heroicons/react/outline";
 import { supabase } from "../../../utils/supabase";
 import {
   poundsToKilograms,
@@ -10,6 +10,7 @@ import {
 import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
+import YouTube from "react-youtube";
 
 export default function ExerciseModal(props) {
   const {
@@ -68,6 +69,9 @@ export default function ExerciseModal(props) {
 
   const [isDifficultyEmptyString, setIsDifficultyEmptyString] = useState([]);
   const [difficulty, setDifficulty] = useState([]);
+
+  const [video, setVideo] = useState([]);
+  const [videoPlayer, setVideoPlayer] = useState([]);
 
   const resetUI = () => {
     setIsAddingExercise(false);
@@ -138,6 +142,11 @@ export default function ExerciseModal(props) {
         );
       }
       setDifficulty(difficulty);
+
+      const video =
+        selectedExercise.video?.map((value) => JSON.parse(value)) || [];
+      console.log("parsedVideo", video);
+      setVideo(video);
 
       let weightPerformed =
         selectedExercise.weight_performed !== null
@@ -214,7 +223,6 @@ export default function ExerciseModal(props) {
                 ? weightKilograms
                 : weightPounds,
 
-              // FILL - more stuff
               number_of_sets_performed: numberOfSetsPerformed,
               number_of_reps_performed: numberOfRepsPerformed,
               weight_performed: isUsingKilograms
@@ -222,6 +230,7 @@ export default function ExerciseModal(props) {
                 : weightPerformedPounds,
 
               difficulty,
+              video,
             };
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
@@ -327,7 +336,7 @@ export default function ExerciseModal(props) {
             </div>
           </div>
         )}
-        <div className="">
+        <div>
           <label
             htmlFor="sets"
             className="block text-sm font-medium text-gray-700"
@@ -459,9 +468,7 @@ export default function ExerciseModal(props) {
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
-            <p className="mt-2 text-sm text-gray-500" id="email-description">
-              (0 for AMRAP)
-            </p>
+            <p className="mt-2 text-sm text-gray-500">(0 for AMRAP)</p>
           </div>
         )}
         {!sameRepsForEachSet &&
@@ -490,9 +497,7 @@ export default function ExerciseModal(props) {
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
               </div>
-              <p className="mt-2 text-sm text-gray-500" id="email-description">
-                (0 for AMRAP)
-              </p>
+              <p className="mt-2 text-sm text-gray-500">(0 for AMRAP)</p>
             </div>
           ))}
         {sameWeightForEachSet && (
@@ -821,7 +826,166 @@ export default function ExerciseModal(props) {
                   </div>
                 </div>
               </div>
-              <div>youtube video</div>
+              {!video[index] && (
+                <div className="sm:col-span-3">
+                  {" "}
+                  <label
+                    htmlFor={`video-${index}`}
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    YouTube Video
+                  </label>
+                  <div className="relative mt-1 flex flex-grow items-stretch focus-within:z-10">
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="https://youtu.be/R--Nz8rkGe8?t=15179"
+                      name={`video-${index}`}
+                      id={`video-${index}`}
+                      className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const inputValue = e.target
+                          .closest("div")
+                          .querySelector("input").value;
+                        let videoId;
+                        let timecode;
+                        try {
+                          const url = new URL(inputValue);
+                          console.log(url);
+                          if (
+                            url.host.endsWith(".youtube.com") &&
+                            url.pathname === "/watch"
+                          ) {
+                            videoId = url.searchParams.get("v");
+                            timecode = url.searchParams.get("t") || 0;
+                          } else if (url.host === "youtu.be") {
+                            videoId = url.pathname.slice(1);
+                            timecode = url.searchParams.get("t") || 0;
+                          }
+                        } catch (error) {
+                          console.log("invalid url", inputValue, error);
+                        }
+
+                        console.log("videoId", videoId);
+                        console.log("timecode", timecode);
+                        console.log("video", video);
+
+                        const newVideo = video.slice();
+                        newVideo[index] = { videoId, start: timecode };
+                        setVideo(newVideo);
+                      }}
+                      className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <RefreshIcon
+                        className="h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
+                </div>
+              )}
+              {video[index] && (
+                <React.Fragment>
+                  <div className="sm:col-span-3">
+                    <YouTube
+                      videoId={video[index].videoId}
+                      className="w-full"
+                      iframeClassName="w-full"
+                      opts={{
+                        playerVars: {
+                          autoplay: 1,
+                          loop: 1,
+                          playsinline: 1,
+                          modestbranding: 1,
+                          controls: 1,
+                          enablejsapi: 1,
+                          start: video[index].start || 0,
+                          end: video[index].end,
+                        },
+                      }}
+                      onReady={(e) => {
+                        e.target.mute();
+                        const newVideoPlayer = videoPlayer.slice();
+                        newVideoPlayer[index] = e.target;
+                        setVideoPlayer(newVideoPlayer);
+                      }}
+                      onEnd={(e) => {
+                        e.target.seekTo(video[index].start || 0);
+                        e.target.playVideo();
+                      }}
+                    ></YouTube>
+                  </div>
+                  <div className="flex justify-around gap-2 sm:col-span-3">
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (video[index] && videoPlayer[index]) {
+                            const start = Math.floor(
+                              videoPlayer[index].getCurrentTime()
+                            );
+                            const newVideo = video.slice();
+                            newVideo[index].start = start;
+                            setVideo(newVideo);
+                          }
+                        }}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        Set Start
+                      </button>
+                    </div>
+                    <div className="sm:col-span-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (video[index] && videoPlayer[index]) {
+                            const end = Math.floor(
+                              videoPlayer[index].getCurrentTime()
+                            );
+                            const newVideo = video.slice();
+                            newVideo[index].end = end;
+                            setVideo(newVideo);
+                          }
+                        }}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        Set End
+                      </button>
+                    </div>
+                    <div className="sm:col-span-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (video[index] && videoPlayer[index]) {
+                            const newVideo = video.slice();
+                            delete newVideo[index].end;
+                            setVideo(newVideo);
+                          }
+                        }}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        Clear End
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => {
+                          const newVideo = video.slice();
+                          delete newVideo[index];
+                          setVideo(newVideo);
+                        }}
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      >
+                        Remove Video
+                      </button>
+                    </div>
+                  </div>
+                </React.Fragment>
+              )}
             </React.Fragment>
           ))}
       </form>
