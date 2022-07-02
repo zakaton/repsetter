@@ -243,8 +243,8 @@ export default function Workouts() {
                       once: true,
                     });
                   }}
-                  width="100"
-                  className="aspect-[4/3]"
+                  width="100%"
+                  height="100%"
                   src={exerciseVideos[exercise.type.id]?.url}
                   muted={true}
                   playsInline={true}
