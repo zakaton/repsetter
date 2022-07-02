@@ -380,7 +380,7 @@ export default function Workouts() {
                                 loop: 1,
                                 playsinline: 1,
                                 modestbranding: 1,
-                                controls: 0,
+                                controls: 1,
                                 enablejsapi: 1,
                                 start: video.start || 0,
                                 end: video.end,
