@@ -3,12 +3,13 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
 import ExerciseModal from "../../components/account/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
 import { supabase } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import LazyVideo from "../../components/LazyVideo";
+import YouTube from "react-youtube";
 
 export default function Workouts() {
   const { user } = useUser();
@@ -138,6 +139,38 @@ export default function Workouts() {
     }
   }, [showAddExerciseModal, showDeleteExerciseModal, showEditExerciseModal]);
 
+  const [videoPlayer, setVideoPlayer] = useState({});
+  useEffect(() => {
+    if (
+      showAddExerciseModal ||
+      showDeleteExerciseModal ||
+      showEditExerciseModal
+    ) {
+      for (let id in videoPlayer) {
+        videoPlayer[id].forEach((player) => player?.pauseVideo());
+      }
+    } else {
+      for (let id in videoPlayer) {
+        videoPlayer[id].forEach((player) => player?.playVideo());
+      }
+    }
+  }, [showAddExerciseModal, showDeleteExerciseModal, showEditExerciseModal]);
+
+  const [video, setVideo] = useState({});
+  useEffect(() => {
+    if (exercises) {
+      const newVideo = { ...video };
+      exercises.forEach((exercise) => {
+        if (!newVideo[exercise.id] && exercise.video !== null) {
+          newVideo[exercise.id] = exercise.video.map((video) =>
+            JSON.parse(video)
+          );
+        }
+      });
+      setVideo(newVideo);
+    }
+  }, [exercises]);
+
   return (
     <>
       <ExerciseModal
@@ -241,36 +274,138 @@ export default function Workouts() {
                   </dd>
                 </div>
               )}
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Sets Assigned
-                </dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {exercise.number_of_sets_assigned}
-                </dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Reps Assigned
-                </dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {exercise.number_of_reps_assigned
-                    .map((reps) => (reps == 0 ? "amrap" : reps))
-                    .join(", ")}
-                </dd>
-              </div>
-              {exercise.weight_assigned.some((weight) => weight > 0) && (
+              {exercise.number_of_sets_performed === null && (
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Weight Assigned (
-                    {exercise.is_weight_in_kilograms ? "kg" : "lbs"})
-                  </dt>
+                  <dt className="text-sm font-medium text-gray-500">Sets</dt>
                   <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.weight_assigned.join(", ")}
+                    {exercise.number_of_sets_assigned}
                   </dd>
                 </div>
               )}
-
+              {exercise.number_of_sets_performed !== null && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {exercise.number_of_sets_performed}/
+                    {exercise.number_of_sets_assigned}
+                  </dd>
+                </div>
+              )}
+              {exercise.number_of_reps_performed === null && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {exercise.number_of_reps_assigned
+                      .map((reps) => (reps == 0 ? "amrap" : reps))
+                      .join(", ")}
+                  </dd>
+                </div>
+              )}
+              {exercise.number_of_reps_performed !== null && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {exercise.number_of_reps_performed
+                      .map(
+                        (numberOfReps, index) =>
+                          `${numberOfReps}/${
+                            exercise.number_of_reps_assigned[index] ||
+                            exercise.number_of_reps_assigned[0]
+                          }`
+                      )
+                      .join(", ")}
+                  </dd>
+                </div>
+              )}
+              {exercise.weight_assigned.some((weight) => weight > 0) &&
+                exercise.weight_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.weight_assigned.join(", ")}
+                    </dd>
+                  </div>
+                )}
+              {exercise.weight_assigned.some((weight) => weight > 0) &&
+                exercise.weight_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.number_of_reps_performed
+                        .map(
+                          (weight, index) =>
+                            `${weight}/${
+                              exercise.weight_assigned[index] ||
+                              exercise.weight_assigned[0]
+                            }`
+                        )
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+              {exercise.number_of_reps_performed !== null && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Difficulty
+                  </dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {exercise.difficulty
+                      .map((value) => `${value}/10`)
+                      .join(", ")}
+                  </dd>
+                </div>
+              )}
+              {video[exercise.id]?.map(
+                (video, index) =>
+                  video && (
+                    <React.Fragment key={index}>
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Set #{index + 1}
+                        </dt>
+                        <dd className="mt-1 break-words text-sm text-gray-900">
+                          <YouTube
+                            videoId={video.videoId}
+                            className="aspect-[16/9] w-full"
+                            iframeClassName="aspect-[16/9] w-full"
+                            opts={{
+                              height: "100%",
+                              width: "100%",
+                              playerVars: {
+                                autoplay: 1,
+                                loop: 1,
+                                playsinline: 1,
+                                modestbranding: 1,
+                                controls: 1,
+                                enablejsapi: 1,
+                                start: video.start || 0,
+                                end: video.end,
+                              },
+                            }}
+                            onReady={(e) => {
+                              e.target.mute();
+                              console.log("player", e.target);
+                              console.log(video);
+                              const newVideoPlayer = { ...videoPlayer };
+                              newVideoPlayer[exercise.id] =
+                                newVideoPlayer[exercise.id] || [];
+                              newVideoPlayer[exercise.id][index] = e.target;
+                              setVideoPlayer(newVideoPlayer);
+                            }}
+                            onEnd={(e) => {
+                              e.target.seekTo(video.start || 0);
+                              e.target.playVideo();
+                            }}
+                          ></YouTube>
+                        </dd>
+                      </div>
+                    </React.Fragment>
+                  )
+              )}
               <div className="sm:col-span-1">
                 <button
                   onClick={() => {
