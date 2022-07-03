@@ -281,9 +281,6 @@ export default function AccountCalendarLayout({
                       (highlightedDate) => highlightedDate.date === dateString
                     ),
                   };
-                  if (day.isHighlighted) {
-                    console.log(day, date, highlightedDates, dateString);
-                  }
                   return (
                     <button
                       key={day.date.toDateString()}

@@ -33,6 +33,7 @@ export default function ExerciseModal(props) {
     if (!open) {
       setDidAddExercise(false);
       setDidUpdateExercise(false);
+      setPreviousExercise();
       resetUI();
     }
   }, [open]);
@@ -177,6 +178,55 @@ export default function ExerciseModal(props) {
       }
     }
   }, [open, selectedExercise]);
+
+  const [previousExercise, setPreviousExercise] = useState();
+  const [isGettingPreviousExercise, setIsGettingPreviousExercise] =
+    useState(false);
+  const getPreviousExercise = async () => {
+    if (!isGettingPreviousExercise) {
+      setIsGettingPreviousExercise(true);
+      console.log("getting previous exercise...");
+      const { data: previousExercises, error } = await supabase
+        .from("exercise")
+        .select("*")
+        .eq("type", selectedExerciseType.id)
+        .lt("date", selectedDate.toDateString())
+        .order("date", { ascending: false })
+        .limit(1);
+      console.log("previousExercises", previousExercises);
+      if (error) {
+        console.error(error);
+      } else {
+        if (previousExercises.length > 0) {
+          setPreviousExercise(previousExercises[0]);
+        }
+      }
+      setIsGettingPreviousExercise(false);
+    }
+  };
+  useEffect(() => {
+    if (open && !selectedExercise && selectedDate && selectedExerciseType) {
+      getPreviousExercise();
+    }
+  }, [selectedExerciseType]);
+
+  let daysSincePreviousExercise = 0;
+  if (previousExercise) {
+    daysSincePreviousExercise = Math.floor(
+      (selectedDate - new Date(previousExercise.date)) / (1000 * 60 * 60 * 24)
+    );
+  }
+
+  const [previousVideo, setPreviousVideo] = useState([]);
+  const [previousVideoPlayer, setPreviousVideoPlayer] = useState([]);
+  useEffect(() => {
+    if (open && previousExercise && !selectedExercise) {
+      const video =
+        previousExercise.video?.map((value) => JSON.parse(value)) || [];
+      console.log("parsedPreviousVideo", video);
+      setPreviousVideo(video);
+    }
+  }, [previousExercise]);
 
   return (
     <Modal
@@ -327,6 +377,13 @@ export default function ExerciseModal(props) {
             existingExercises={existingExercises}
             selectedExercise={selectedExercise}
           />
+          {previousExercise && (
+            <p className="mt-2 text-sm text-gray-500">
+              this exercise was done {daysSincePreviousExercise} day
+              {daysSincePreviousExercise > 1 && "s"} ago on{" "}
+              {previousExercise.date}
+            </p>
+          )}
         </div>
         {selectedExercise && (
           <div className="relative w-full sm:col-span-3">
@@ -468,7 +525,7 @@ export default function ExerciseModal(props) {
                 type="number"
                 min="0"
                 max="20"
-                value={numberOfReps}
+                value={numberOfReps[0]}
                 onInput={(e) => setNumberOfReps([Number(e.target.value)])}
                 name="reps"
                 id="reps"
@@ -641,6 +698,21 @@ export default function ExerciseModal(props) {
             <div className="relative flex justify-center">
               <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
                 <span className="select-none">Performance</span>
+              </div>
+            </div>
+          </div>
+        )}
+        {previousExercise && (
+          <div className="relative w-full sm:col-span-3">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center">
+              <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
+                <span className="select-none">Previous Exercise</span>
               </div>
             </div>
           </div>
