@@ -37,6 +37,9 @@ export default function AccountCalendarLayout({
   resultName,
   resultNamePlural,
   underCalendar,
+  yearsRange = [2021, 2022],
+  setCalendar: setCalendarParent,
+  highlightedDates = [],
 }) {
   resultName = resultName || tableName;
   resultNamePlural = resultNamePlural || resultName + "s";
@@ -62,10 +65,7 @@ export default function AccountCalendarLayout({
     }
   }, [clients]);
 
-  const yearsRange = [2022, 2023];
-
   const years = [];
-  // FIX - set range based on workouts range
   for (let year = yearsRange[0]; year <= yearsRange[1]; year++) {
     years.push(year);
   }
@@ -115,6 +115,10 @@ export default function AccountCalendarLayout({
 
     setCalendar(newCalendar);
   };
+
+  useEffect(() => {
+    setCalendarParent?.(calendar);
+  }, [calendar]);
 
   useLayoutEffect(() => {
     if (
@@ -259,19 +263,27 @@ export default function AccountCalendarLayout({
             <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 text-sm shadow ring-1 ring-gray-200">
               {calendar &&
                 calendar.map((date, dayIdx) => {
+                  const dateString = [
+                    date.getUTCFullYear(),
+                    date.getUTCMonth() + 1,
+                    date.getUTCDate(),
+                  ]
+                    .map((number) => (number < 10 ? `0${number}` : number))
+                    .join("-");
                   const day = {
                     date,
                     isCurrentMonth:
                       date.getUTCMonth() === selectedDate.getUTCMonth(),
                     isSelected:
-                      date.getUTCFullYear() === selectedDate.getUTCFullYear() &&
-                      date.getUTCMonth() === selectedDate.getUTCMonth() &&
-                      date.getUTCDate() === selectedDate.getUTCDate(),
-                    isToday:
-                      date.getUTCFullYear() === currentDate.getUTCFullYear() &&
-                      date.getUTCMonth() === currentDate.getUTCMonth() &&
-                      date.getUTCDate() === currentDate.getUTCDate(),
+                      date.toDateString() === selectedDate.toDateString(),
+                    isToday: date.toDateString() === currentDate.toDateString(),
+                    isHighlighted: highlightedDates.some(
+                      (highlightedDate) => highlightedDate.date === dateString
+                    ),
                   };
+                  if (day.isHighlighted) {
+                    console.log(day, date, highlightedDates, dateString);
+                  }
                   return (
                     <button
                       key={day.date.toDateString()}
@@ -292,6 +304,10 @@ export default function AccountCalendarLayout({
                           !day.isCurrentMonth &&
                           !day.isToday &&
                           "text-gray-400",
+                        !day.isSelected &&
+                          !day.isToday &&
+                          day.isHighlighted &&
+                          "text-gray-1000",
                         day.isToday && !day.isSelected && "text-blue-600",
                         dayIdx === 0 && "rounded-tl-lg",
                         dayIdx === 6 && "rounded-tr-lg",
@@ -304,7 +320,8 @@ export default function AccountCalendarLayout({
                         className={classNames(
                           "mx-auto flex h-7 w-7 items-center justify-center rounded-full",
                           day.isSelected && day.isToday && "bg-blue-600",
-                          day.isSelected && !day.isToday && "bg-gray-900"
+                          day.isSelected && !day.isToday && "bg-gray-900",
+                          !day.isSelected && day.isHighlighted && "bg-blue-200"
                         )}
                       >
                         {day.date.getUTCDate()}

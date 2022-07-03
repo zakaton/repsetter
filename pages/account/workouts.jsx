@@ -71,6 +71,8 @@ export default function Workouts() {
         selectedDate.toDateString(),
         exercises
       );
+      setVideo({});
+      setVideoPlayer({});
       setExercises(exercises);
       setGotExerciseForUserId(selectedClientId);
       setGotExerciseForDate(selectedDate);
@@ -171,6 +173,41 @@ export default function Workouts() {
     }
   }, [exercises]);
 
+  const [calendar, setCalendar] = useState();
+  const [lastSelectedDate, setLastSelectedDate] = useState();
+  const [exerciseDates, setExerciseDates] = useState();
+  const getExerciseDates = async () => {
+    console.log(
+      "getting exercise dates for the month",
+      calendar[0].toDateString(),
+      calendar[calendar.length - 1].toDateString()
+    );
+    const { data: exerciseDates, error } = await supabase
+      .rpc("get_exercise_dates", {
+        email: amITheClient ? user.email : selectedClient.client_email,
+      })
+      .gte("date", calendar[0].toDateString())
+      .lte("date", calendar[calendar.length - 1].toDateString());
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("exerciseDates", exerciseDates);
+      setExerciseDates(exerciseDates);
+    }
+  };
+  useEffect(() => {
+    if (
+      calendar &&
+      selectedDate &&
+      (!lastSelectedDate ||
+        lastSelectedDate.getUTCFullYear() !== selectedDate.getUTCFullYear() ||
+        lastSelectedDate.getUTCMonth() !== selectedDate.getUTCMonth())
+    ) {
+      setLastSelectedDate(selectedDate);
+      getExerciseDates();
+    }
+  }, [calendar]);
+
   return (
     <>
       <ExerciseModal
@@ -216,7 +253,9 @@ export default function Workouts() {
       />
 
       <AccountCalendarLayout
+        setCalendar={setCalendar}
         tableName="workout"
+        highlightedDates={exerciseDates}
         underCalendar={
           <div className="flex gap-x-3">
             <button
@@ -347,7 +386,7 @@ export default function Workouts() {
                     </dd>
                   </div>
                 )}
-              {exercise.number_of_reps_performed !== null && (
+              {exercise.difficulty !== null && (
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
                     Difficulty
