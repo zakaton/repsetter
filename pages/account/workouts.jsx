@@ -11,6 +11,10 @@ import { useExerciseVideos } from "../../context/exercise-videos-context";
 import LazyVideo from "../../components/LazyVideo";
 import YouTube from "react-youtube";
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function Workouts() {
   const { user } = useUser();
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
@@ -210,6 +214,73 @@ export default function Workouts() {
     }
   }, [calendar]);
 
+  const [copiedExercises, setCopiedExercises] = useState();
+  const copyExercises = () => {
+    if (exercises?.length > 0) {
+      setCopiedExercises(exercises);
+    }
+  };
+  const [isPastingExercises, setIsPastingExercises] = useState(false);
+  const pasteExercises = async () => {
+    if (isPastingExercises) {
+      return;
+    }
+    if (copiedExercises) {
+      setIsPastingExercises(true);
+      const uniqueExercises = copiedExercises.filter(
+        (copiedExercise) =>
+          !exercises?.find(
+            (exercise) => exercise.type.id === copiedExercise.type.id
+          )
+      );
+      const newExercises = uniqueExercises.map((uniqueExercise) => {
+        const {
+          client,
+          client_email,
+
+          coach,
+          coach_email,
+
+          number_of_sets_assigned,
+          number_of_reps_assigned,
+          is_weight_in_kilograms,
+          weight_assigned,
+        } = uniqueExercise;
+
+        const insertedExercise = {
+          type: uniqueExercise.type.id,
+
+          date: selectedDate.toDateString(),
+
+          client,
+          client_email,
+
+          number_of_sets_assigned,
+          number_of_reps_assigned,
+          is_weight_in_kilograms,
+          weight_assigned,
+        };
+
+        if (coach && coach_email) {
+          Object.assign(insertedExercise, { coach, coach_email });
+        }
+
+        return insertedExercise;
+      });
+      console.log("newExercises", newExercises);
+      const { data: pastedExercises, error } = await supabase
+        .from("exercise")
+        .insert(newExercises);
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("pastedExercises", pastedExercises);
+      }
+      setIsPastingExercises(false);
+      getExerciseDates();
+    }
+  };
+
   return (
     <>
       <ExerciseModal
@@ -273,18 +344,29 @@ export default function Workouts() {
               <button
                 type="button"
                 onClick={() => {
-                  // FILL
+                  copyExercises();
                 }}
-                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className={classNames(
+                  "mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow",
+                  exercises?.length > 0 &&
+                    "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+                  (!exercises || exercises?.length == 0) && "opacity-50"
+                )}
               >
                 Copy
               </button>
               <button
                 type="button"
+                disabled={!(copiedExercises?.length > 0)}
                 onClick={() => {
-                  // FILL
+                  pasteExercises();
                 }}
-                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className={classNames(
+                  "mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow",
+                  copiedExercises &&
+                    "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+                  !copiedExercises && "opacity-50"
+                )}
               >
                 Paste
               </button>
