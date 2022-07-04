@@ -99,6 +99,7 @@ export default function Workouts() {
         .on("INSERT", (payload) => {
           console.log(`new exercise`, payload);
           getExercises(true);
+          getExerciseDates();
         })
         .on("UPDATE", (payload) => {
           console.log(`updated exercise`, payload);
@@ -111,6 +112,7 @@ export default function Workouts() {
           setExercises(
             exercises.filter((exercise) => exercise?.id !== deletedExercise.id)
           );
+          getExerciseDates();
         })
         .subscribe();
       return () => {
@@ -257,15 +259,37 @@ export default function Workouts() {
         tableName="workout"
         highlightedDates={exerciseDates}
         underCalendar={
-          <div className="flex gap-x-3">
-            <button
-              type="button"
-              onClick={() => setShowAddExerciseModal(true)}
-              className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Add Exercise
-            </button>
-          </div>
+          <>
+            <div className="flex gap-x-3">
+              <button
+                type="button"
+                onClick={() => setShowAddExerciseModal(true)}
+                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Add Exercise
+              </button>
+            </div>
+            <div className="flex gap-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  // FILL
+                }}
+                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Copy
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // FILL
+                }}
+                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Paste
+              </button>
+            </div>
+          </>
         }
       >
         {exercises?.map((exercise) => (

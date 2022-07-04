@@ -228,6 +228,28 @@ export default function ExerciseModal(props) {
     }
   }, [previousExercise]);
 
+  useEffect(() => {
+    if (previousExercise) {
+      setNumberOfSets(previousExercise.number_of_sets_assigned);
+      setSameRepsForEachSet(
+        previousExercise.number_of_reps_assigned.length !==
+          previousExercise.number_of_sets_assigned
+      );
+      setSameWeightForEachSet(
+        previousExercise.weight_assigned.length !==
+          previousExercise.number_of_sets_assigned
+      );
+      setIsUsingKilograms(previousExercise.is_weight_in_kilograms);
+
+      setNumberOfReps(previousExercise.number_of_reps_assigned);
+      if (previousExercise.is_weight_in_kilograms) {
+        setWeightKilograms(previousExercise.weight_assigned);
+      } else {
+        setWeightPounds(previousExercise.weight_assigned);
+      }
+    }
+  }, [previousExercise]);
+
   return (
     <Modal
       {...props}
