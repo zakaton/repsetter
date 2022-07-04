@@ -6,6 +6,7 @@ import { useUser } from "../context/user-context";
 import Notification from "./Notification";
 import Filters from "./Filters";
 import Pagination from "./Pagination";
+import { useClient } from "../context/client-context";
 
 const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();
@@ -28,9 +29,19 @@ export default function Table({
   HeaderButton,
   baseFilter = {},
   resultsListener,
+  filterChildren,
+  includeClientSelect,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
+  const { getClients, clients, selectedClient, setSelectedClient } =
+    useClient();
+
+  useEffect(() => {
+    if (!clients) {
+      getClients();
+    }
+  }, [clients]);
 
   resultName = resultName || tableName;
   resultNamePlural = resultNamePlural || resultName + "s";
@@ -80,6 +91,7 @@ export default function Table({
     if (pageIndex !== previousPageIndex || refresh) {
       setIsGettingResults(true);
       console.log(`fetching ${tableName}!`, pageIndex);
+      console.log("Filters", filters, baseFilter);
       let query = supabase
         .from(tableName)
         .select(selectString)
@@ -210,9 +222,12 @@ export default function Table({
     });
 
     Object.keys(containsFilters).forEach((column) => {
-      const values = containsFilters[column] || [];
-      if (values.length) {
-        query[column] = values.join(",");
+      const filter = filterTypes.find((filter) => filter.column === column);
+      if (filter) {
+        const values = containsFilters[column] || [];
+        if (values.length) {
+          query[filter.query] = values.join(",");
+        }
       }
     });
 
@@ -273,12 +288,46 @@ export default function Table({
       />
       <div className="bg-white px-4 pt-6 sm:px-6 sm:pt-6">
         <div className="flex items-center pb-4">
-          <div className="flex-auto">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">
+          <div className="lg:col-span-8 lg:col-start-1 lg:row-start-1">
+            <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {subtitle || `View your ${resultNamePlural}`}
+            {clients?.length > 0 && (
+              <div className="w-50 ml-3 inline-block">
+                <select
+                  id="clientEmail"
+                  className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                  value={selectedClient?.client_email || user.email}
+                  onInput={(e) => {
+                    const option = e.target.selectedOptions[0];
+                    setSelectedClient(
+                      e.target.value === user.email
+                        ? null
+                        : clients.find(
+                            (client) => client.client_email === e.target.value
+                          )
+                    );
+                  }}
+                >
+                  <option value={user.email}>Me</option>
+                  {clients?.map((client) => (
+                    <option
+                      key={client.client_email}
+                      value={client.client_email}
+                    >
+                      {client.client_email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <p className="mt-2 text-sm text-gray-500">
+              {subtitle ||
+                `View and edit ${
+                  selectedClient?.client_email
+                    ? selectedClient?.client_email + "'s"
+                    : "your"
+                } ${resultNamePlural}`}
             </p>
           </div>
           <div className="mt-0 flex-none">
@@ -307,7 +356,9 @@ export default function Table({
           filterTypes={filterTypes}
           orderTypes={orderTypes}
           clearFilters={clearFilters}
-        />
+        >
+          {filterChildren}
+        </Filters>
 
         {results?.length > 0 &&
           // eslint-disable-next-line no-shadow
