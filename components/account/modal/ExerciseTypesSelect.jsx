@@ -15,6 +15,8 @@ export default function ExerciseTypesSelect({
   existingExercises = [],
   selectedExercise,
   open = true,
+  selectedExerciseTypeName,
+  setSelectedExerciseTypeName,
 }) {
   const [exerciseTypes, setExerciseTypes] = useState();
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
@@ -46,6 +48,18 @@ export default function ExerciseTypesSelect({
       );
     }
   }, [exerciseTypes]);
+
+  useEffect(() => {
+    if (selectedExerciseTypeName && exerciseTypes) {
+      const selectedExerciseType = exerciseTypes.find(
+        (exerciseType) => exerciseType.name === selectedExerciseTypeName
+      );
+      if (selectedExerciseType) {
+        setSelectedExerciseType(selectedExerciseType);
+      }
+      setSelectedExerciseTypeName();
+    }
+  }, [selectedExerciseTypeName, exerciseTypes]);
 
   useEffect(() => {
     if (open && selectedExercise && exerciseTypes) {

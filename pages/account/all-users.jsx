@@ -48,13 +48,13 @@ export default function AllUsers() {
   const { isAdmin } = useUser();
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (router.isReady && !isAdmin) {
       console.log("redirect to /account");
       router.replace("/account", undefined, {
         shallow: true,
       });
     }
-  }, []);
+  }, [router.isReady]);
 
   return (
     isAdmin && (

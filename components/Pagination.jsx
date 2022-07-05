@@ -29,13 +29,13 @@ export default function Pagination({
     }
   }, []);
   useEffect(() => {
-    if (!Number.isNaN(pageIndex)) {
+    if (router.isReady && !Number.isNaN(pageIndex)) {
       const query = { page: pageIndex };
       router.replace({ query: { ...router.query, ...query } }, undefined, {
         shallow: true,
       });
     }
-  }, [pageIndex]);
+  }, [pageIndex, router.isReady]);
 
   const [hasNextPage, setHasNextPage] = useState(false);
   const [showPagination, setShowPagination] = useState(false);

@@ -31,6 +31,7 @@ export default function Table({
   resultsListener,
   filterChildren,
   includeClientSelect,
+  clearFiltersListener,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -209,6 +210,10 @@ export default function Table({
   };
 
   useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
     const query = {};
     filterTypes.forEach((filterType) => {
       delete router.query[filterType.query];
@@ -243,7 +248,7 @@ export default function Table({
     router.replace({ query: { ...router.query, ...query } }, undefined, {
       shallow: true,
     });
-  }, [filters, containsFilters, order]);
+  }, [filters, containsFilters, order, router.isReady]);
 
   const clearFilters = () => {
     if (Object.keys(filters).length > 0) {
@@ -251,6 +256,9 @@ export default function Table({
     }
     if (Object.keys(containsFilters).length > 0) {
       setContainsFilters({});
+    }
+    if (clearFiltersListener) {
+      clearFiltersListener();
     }
   };
 
@@ -288,18 +296,17 @@ export default function Table({
       />
       <div className="bg-white px-4 pt-6 sm:px-6 sm:pt-6">
         <div className="flex items-center pb-4">
-          <div className="lg:col-span-8 lg:col-start-1 lg:row-start-1">
+          <div className="flex-auto lg:col-span-8 lg:col-start-1 lg:row-start-1">
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
-            {clients?.length > 0 && (
+            {includeClientSelect && clients?.length > 0 && (
               <div className="w-50 ml-3 inline-block">
                 <select
                   id="clientEmail"
                   className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                   value={selectedClient?.client_email || user.email}
                   onInput={(e) => {
-                    const option = e.target.selectedOptions[0];
                     setSelectedClient(
                       e.target.value === user.email
                         ? null

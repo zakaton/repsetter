@@ -6,9 +6,6 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import ExerciseModal from "../../components/account/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
 import Table from "../../components/Table";
-import { useExerciseVideos } from "../../context/exercise-videos-context";
-import { muscles, muscleGroups } from "../../utils/exercise-utils";
-import LazyVideo from "../../components/LazyVideo";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import { useClient } from "../../context/client-context";
 
@@ -42,18 +39,43 @@ export default function Progress() {
 
   const [selectedExercise, setSelectedExercise] = useState();
   const [selectedExerciseType, setSelectedExerciseType] = useState();
-
-  const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
-  const [results, setResults] = useState();
+  const [selectedExerciseTypeName, setSelectedExerciseTypeName] = useState();
+  const [checkedQuery, setCheckedQuery] = useState(false);
   useEffect(() => {
-    if (results) {
-      results.forEach((result) => {
-        getExerciseVideo(result.id);
-      });
+    if (!router.isReady || checkedQuery) {
+      return;
     }
-  }, [results]);
+    console.log(router.query, "LLOL");
+    if ("exercise-type" in router.query) {
+      const selectedExerciseTypeName = router.query["exercise-type"];
+      setSelectedExerciseTypeName(selectedExerciseTypeName);
+    }
+    setCheckedQuery(true);
+  }, [router.isReady, checkedQuery]);
 
+  useEffect(() => {
+    if (!router.isReady || !checkedQuery) {
+      return;
+    }
+
+    const query = {};
+    if (selectedExerciseType) {
+      query["exercise-type"] = selectedExerciseType.name;
+    } else {
+      delete router.query["exercise-type"];
+    }
+
+    router.replace({ query: { ...router.query, ...query } }, undefined, {
+      shallow: true,
+    });
+  }, [selectedExerciseType]);
+
+  const [results, setResults] = useState();
   const [baseFilter, setBaseFilter] = useState({});
+
+  const clearFiltersListener = () => {
+    setSelectedExerciseType();
+  };
 
   return (
     <>
@@ -71,6 +93,7 @@ export default function Progress() {
         status={editExerciseStatus}
       />
       <Table
+        clearFiltersListener={clearFiltersListener}
         includeClientSelect={true}
         baseFilter={baseFilter}
         numberOfResultsPerPage={10}
@@ -94,6 +117,8 @@ export default function Progress() {
             selectedExerciseType={selectedExerciseType}
             setSelectedExerciseType={setSelectedExerciseType}
             open={true}
+            selectedExerciseTypeName={selectedExerciseTypeName}
+            setSelectedExerciseTypeName={setSelectedExerciseTypeName}
           />
         }
       ></Table>

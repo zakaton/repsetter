@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import MyLink from '../components/MyLink';
-import { useUser } from '../context/user-context';
-import Notification from '../components/Notification';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import MyLink from "../components/MyLink";
+import { useUser } from "../context/user-context";
+import Notification from "../components/Notification";
 
 export default function SignIn() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [agree, setAgree] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -19,10 +19,10 @@ export default function SignIn() {
 
   const [redirectPathname, setRedirectPathname] = useState();
   useEffect(() => {
-    console.log('redirect_pathname', router.query.redirect_pathname);
+    console.log("redirect_pathname", router.query.redirect_pathname);
     if (router.query.redirect_pathname) {
       console.log(
-        'redirect url',
+        "redirect url",
         window.location.origin + router.query.redirect_pathname
       );
       setRedirectPathname(router.query.redirect_pathname);
@@ -30,10 +30,10 @@ export default function SignIn() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && user) {
-      router.replace(redirectPathname || '/');
+    if (router.isReady && !isLoading && user) {
+      router.replace(redirectPathname || "/");
     }
-  }, [isLoading, user]);
+  }, [isLoading, user, router.isReady]);
 
   async function signIn() {
     if (!(email && agree) || isSubmitting) {
@@ -43,20 +43,20 @@ export default function SignIn() {
     const redirectTo = redirectPathname
       ? `https://repsetter.com${redirectPathname}`
       : window.location.origin;
-    console.log('redirectTo', redirectTo);
+    console.log("redirectTo", redirectTo);
 
     const data = new URLSearchParams();
-    data.append('email', email);
-    data.append('redirectTo', redirectTo);
+    data.append("email", email);
+    data.append("redirectTo", redirectTo);
 
-    const response = await fetch('/api/account/sign-in', {
-      method: 'POST',
+    const response = await fetch("/api/account/sign-in", {
+      method: "POST",
       body: data,
     });
     const { status } = await response.json();
     console.log(status);
     setSignInStatus(status);
-    if (status.type === 'succeeded') {
+    if (status.type === "succeeded") {
       // eslint-disable-next-line no-console
       setSubmitted(true);
     } else {
@@ -133,7 +133,7 @@ export default function SignIn() {
                     htmlFor="agree"
                     className="ml-2 block text-sm text-gray-900"
                   >
-                    By signing in I agree to the{' '}
+                    By signing in I agree to the{" "}
                     <MyLink
                       href="/terms"
                       target="_blank"
@@ -152,17 +152,17 @@ export default function SignIn() {
                   className="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={(e) => {
                     e.preventDefault();
-                    const isValid = e.target.closest('form').reportValidity();
+                    const isValid = e.target.closest("form").reportValidity();
                     if (isValid) {
                       signIn();
                     }
                   }}
                 >
-                  {isSubmitting ? 'Sending Link...' : 'Send Link'}
+                  {isSubmitting ? "Sending Link..." : "Send Link"}
                 </button>
                 <div className="flex items-center justify-center pt-3">
                   <span className="text-center text-sm text-gray-500">
-                    By signing in you agree to the{' '}
+                    By signing in you agree to the{" "}
                     <MyLink href="/terms" target="_blank">
                       terms of use
                     </MyLink>

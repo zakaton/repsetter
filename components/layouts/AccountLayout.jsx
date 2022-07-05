@@ -85,7 +85,7 @@ export default function AccountLayout({ children }) {
   const { isLoading, user, isAdmin } = useUser();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (router.isReady && !isLoading && !user) {
       router.replace(
         {
           pathname: "/sign-in",
@@ -97,7 +97,7 @@ export default function AccountLayout({ children }) {
         }
       );
     }
-  }, [isLoading, user]);
+  }, [isLoading, user, router.isReady]);
 
   return (
     !isLoading &&
