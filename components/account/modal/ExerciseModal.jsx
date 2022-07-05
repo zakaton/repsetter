@@ -261,7 +261,7 @@ export default function ExerciseModal(props) {
             {selectedClient ? `${selectedClient.client_email}'s` : "your"}
           </span>{" "}
           workout for{" "}
-          <span className="font-semibold">{selectedDate.toDateString()}</span>
+          <span className="font-semibold">{selectedDate?.toDateString()}</span>
         </>
       }
       Icon={ClipboardCheckIcon}

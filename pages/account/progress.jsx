@@ -30,7 +30,7 @@ export default function Progress() {
   const router = useRouter();
   const { isAdmin, user } = useUser();
 
-  const { selectedClient } = useClient();
+  const { selectedClient, amITheClient } = useClient();
 
   const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
   const [editExerciseStatus, setEditExerciseStatus] = useState(false);
@@ -72,6 +72,21 @@ export default function Progress() {
 
   const [results, setResults] = useState();
   const [baseFilter, setBaseFilter] = useState({});
+  useEffect(() => {
+    const newBaseFilter = {};
+
+    if (selectedClient) {
+      newBaseFilter.client = selectedClient.client;
+      newBaseFilter.coach = user.id;
+    } else {
+      newBaseFilter.client = user.id;
+    }
+
+    if (selectedExerciseType) {
+      newBaseFilter["type.name"] = selectedExerciseType.name;
+    }
+    setBaseFilter(newBaseFilter);
+  }, [selectedClient, user, selectedExerciseType]);
 
   const clearFiltersListener = () => {
     setSelectedExerciseType();

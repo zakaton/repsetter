@@ -27,7 +27,7 @@ export default function Table({
   resultMap,
   deleteTitle,
   HeaderButton,
-  baseFilter = {},
+  baseFilter,
   resultsListener,
   filterChildren,
   includeClientSelect,
@@ -67,7 +67,7 @@ export default function Table({
     let query = supabase
       .from(tableName)
       .select(selectString, { count: "exact", head: true })
-      .match({ ...baseFilter, ...filters });
+      .match({ ...(baseFilter || {}), ...filters });
     for (let column in containsFilters) {
       query = query.contains(column, containsFilters[column]);
     }
@@ -96,7 +96,7 @@ export default function Table({
       let query = supabase
         .from(tableName)
         .select(selectString)
-        .match({ ...baseFilter, ...filters });
+        .match({ ...(baseFilter || {}), ...filters });
       for (let column in containsFilters) {
         query = query.contains(column, containsFilters[column]);
       }
@@ -120,7 +120,7 @@ export default function Table({
       console.log(`update ${tableName}!`);
       getResults(true);
     }
-  }, [filters, containsFilters, order]);
+  }, [filters, containsFilters, order, baseFilter]);
 
   useEffect(() => {
     if (resultsListener) {

@@ -9,6 +9,7 @@ import Table from "../../components/Table";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import LazyVideo from "../../components/LazyVideo";
+import MyLink from "../../components/MyLink";
 
 const filterTypes = [
   ...muscleGroups.map((muscleGroup) => ({
@@ -127,6 +128,14 @@ export default function Exercises() {
               >
                 Edit<span className="sr-only"> exercise</span>
               </button>
+            ),
+            jsx: (
+              <MyLink
+                href={`/account/progress?exercise-type=${result.id}`}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                View Progress
+              </MyLink>
             ),
           },
         ]}
