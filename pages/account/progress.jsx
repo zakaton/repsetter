@@ -30,7 +30,7 @@ export default function Progress() {
   const router = useRouter();
   const { isAdmin, user } = useUser();
 
-  const { selectedClient, amITheClient } = useClient();
+  const { selectedClient, setSelectedDate } = useClient();
 
   const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
   const [editExerciseStatus, setEditExerciseStatus] = useState(false);
@@ -119,12 +119,30 @@ export default function Progress() {
         resultName="exercise"
         selectString="*, type(*)"
         title="Progress"
-        subtitle="View your Progress"
+        subtitle={`View your Progress${
+          selectedExerciseType ? ` doing ${selectedExerciseType.name}` : ""
+        }`}
         DeleteResultModal={isAdmin && DeleteExerciseModal}
         resultMap={(result) => [
           {
             title: "date",
             value: result.date,
+          },
+          {
+            jsx: (
+              <button
+                onClick={() => {
+                  console.log(result.date, new Date(result.date));
+                  setSelectedDate(new Date(result.date));
+                  router.push("/account/workouts", undefined, {
+                    shallow: true,
+                  });
+                }}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                View Workout
+              </button>
+            ),
           },
         ]}
         filterChildren={
