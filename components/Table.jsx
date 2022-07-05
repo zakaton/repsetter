@@ -32,6 +32,7 @@ export default function Table({
   filterChildren,
   includeClientSelect,
   clearFiltersListener,
+  modalListener,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -191,10 +192,17 @@ export default function Table({
   }, []);
 
   useEffect(() => {
-    if (showDeleteResultModal) {
+    if (showDeleteResultModal || showCreateResultModal) {
       removeNotifications();
     }
-  }, [showDeleteResultModal]);
+  }, [showDeleteResultModal, showCreateResultModal]);
+
+  useEffect(() => {
+    if (modalListener) {
+      const areEitherModalOpen = showDeleteResultModal || showCreateResultModal;
+      modalListener(areEitherModalOpen);
+    }
+  }, [showDeleteResultModal, showCreateResultModal]);
 
   const showPrevious = async () => {
     console.log("showPrevious");
@@ -369,9 +377,10 @@ export default function Table({
 
         {results?.length > 0 &&
           // eslint-disable-next-line no-shadow
-          results.map((result) => {
-            const resultContent = resultMap(result).map(
-              ({ title, value, jsx }, index) => (
+          results.map((result, index) => {
+            const resultContent = resultMap(result, index)
+              .filter(Boolean)
+              .map(({ title, value, jsx }, index) => (
                 <div key={index} className="sm:col-span-1">
                   {jsx || (
                     <>
@@ -384,8 +393,7 @@ export default function Table({
                     </>
                   )}
                 </div>
-              )
-            );
+              ));
             return (
               <div
                 key={result.id}

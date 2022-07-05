@@ -11,6 +11,8 @@ import { useClient } from "../../context/client-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import LazyVideo from "../../components/LazyVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
+import { supabase } from "../../utils/supabase";
+import YouTube from "react-youtube";
 
 const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
   name: `Muscles (${muscleGroup})`,
@@ -62,13 +64,38 @@ export default function Exercises() {
     if (!router.isReady || checkedQuery) {
       return;
     }
-    console.log(router.query, "LLOL");
     if ("exercise-type" in router.query) {
       const selectedExerciseTypeName = router.query["exercise-type"];
       setSelectedExerciseTypeName(selectedExerciseTypeName);
     }
     setCheckedQuery(true);
   }, [router.isReady, checkedQuery]);
+
+  const [isGettingExerciseType, setIsGettingExerciseType] = useState(false);
+  const getExerciseType = async () => {
+    if (isGettingExerciseType) {
+      return;
+    }
+
+    setIsGettingExerciseType(true);
+    const { data: exerciseType, error } = await supabase
+      .from("exercise_type")
+      .select("*")
+      .eq("name", selectedExerciseTypeName)
+      .maybeSingle();
+
+    if (error) {
+      console.error(error0);
+    } else {
+      setSelectedExerciseType(exerciseType);
+    }
+    setIsGettingExerciseType(false);
+  };
+  useEffect(() => {
+    if (selectedExerciseTypeName && !selectedExerciseType) {
+      getExerciseType();
+    }
+  }, [selectedExerciseTypeName]);
 
   useEffect(() => {
     if (!router.isReady || !checkedQuery) {
@@ -87,7 +114,7 @@ export default function Exercises() {
     });
   }, [selectedExerciseType]);
 
-  const [results, setResults] = useState();
+  const [exercises, setExercises] = useState();
   const [baseFilter, setBaseFilter] = useState({});
   useEffect(() => {
     const newBaseFilter = {};
@@ -110,10 +137,39 @@ export default function Exercises() {
   };
 
   useEffect(() => {
-    if (results) {
-      results.forEach((exercise) => getExerciseVideo(exercise.type.id));
+    if (exercises) {
+      exercises.forEach((exercise) => getExerciseVideo(exercise.type.id));
     }
-  }, [results]);
+  }, [exercises]);
+
+  const [video, setVideo] = useState({});
+  const [videoPlayer, setVideoPlayer] = useState({});
+  useEffect(() => {
+    if (exercises) {
+      const newVideo = { ...video };
+      exercises.forEach((exercise) => {
+        if (!newVideo[exercise.id] && exercise.video !== null) {
+          newVideo[exercise.id] = exercise.video.map((video) =>
+            JSON.parse(video)
+          );
+        }
+      });
+      setVideo(newVideo);
+      setVideoPlayer({});
+    }
+  }, [exercises]);
+
+  const modalListener = (isAnyModalOpen) => {
+    if (isAnyModalOpen) {
+      for (let id in videoPlayer) {
+        videoPlayer[id].forEach((player) => player?.pauseVideo());
+      }
+    } else {
+      for (let id in videoPlayer) {
+        videoPlayer[id].forEach((player) => player?.playVideo());
+      }
+    }
+  };
 
   return (
     <>
@@ -135,7 +191,7 @@ export default function Exercises() {
         includeClientSelect={true}
         baseFilter={baseFilter}
         numberOfResultsPerPage={10}
-        resultsListener={setResults}
+        resultsListener={setExercises}
         filterTypes={
           selectedExerciseType
             ? baseFilterTypes
@@ -150,28 +206,29 @@ export default function Exercises() {
           selectedExerciseType ? ` doing ${selectedExerciseType.name}` : ""
         }`}
         DeleteResultModal={isAdmin && DeleteExerciseModal}
-        resultMap={(exercise) => [
+        resultMap={(exercise, index) => [
           {
             title: "date",
             value: exercise.date,
           },
-          exercise.type.id in exerciseVideos && {
-            jsx: (
-              <LazyVideo
-                onSuspend={(e) => {
-                  document.addEventListener("click", () => e.target.play(), {
-                    once: true,
-                  });
-                }}
-                width="100px"
-                src={exerciseVideos[exercise.type.id].url}
-                muted={true}
-                playsInline={true}
-                autoPlay={true}
-                loop={true}
-              ></LazyVideo>
-            ),
-          },
+          (!selectedExerciseType || index === 0) &&
+            exercise.type.id in exerciseVideos && {
+              jsx: (
+                <LazyVideo
+                  onSuspend={(e) => {
+                    document.addEventListener("click", () => e.target.play(), {
+                      once: true,
+                    });
+                  }}
+                  width="100px"
+                  src={exerciseVideos[exercise.type.id].url}
+                  muted={true}
+                  playsInline={true}
+                  autoPlay={true}
+                  loop={true}
+                ></LazyVideo>
+              ),
+            },
           {
             title: "name",
             value: exercise.type.name,
@@ -223,7 +280,46 @@ export default function Exercises() {
             title: "difficulty",
             value: exercise.difficulty.map((value) => `${value}/10`).join(", "),
           },
-          // videos
+          ...(video[exercise.id]?.map(
+            (video, index) =>
+              video && {
+                jsx: (
+                  <YouTube
+                    videoId={video.videoId}
+                    className="aspect-[16/9] w-full"
+                    iframeClassName="aspect-[16/9] w-full"
+                    opts={{
+                      height: "100%",
+                      width: "100%",
+                      playerVars: {
+                        autoplay: 1,
+                        loop: 1,
+                        playsinline: 1,
+                        modestbranding: 1,
+                        controls: 1,
+                        enablejsapi: 1,
+                        start: video.start || 0,
+                        end: video.end,
+                      },
+                    }}
+                    onReady={(e) => {
+                      e.target.mute();
+                      console.log("player", e.target);
+                      console.log(video);
+                      const newVideoPlayer = { ...videoPlayer };
+                      newVideoPlayer[exercise.id] =
+                        newVideoPlayer[exercise.id] || [];
+                      newVideoPlayer[exercise.id][index] = e.target;
+                      setVideoPlayer(newVideoPlayer);
+                    }}
+                    onEnd={(e) => {
+                      e.target.seekTo(video.start || 0);
+                      e.target.playVideo();
+                    }}
+                  ></YouTube>
+                ),
+              }
+          ) || []),
           {
             jsx: (
               <button
@@ -235,7 +331,7 @@ export default function Exercises() {
                 }}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                View Workout
+                Full Workout
               </button>
             ),
           },
@@ -249,6 +345,7 @@ export default function Exercises() {
             setSelectedExerciseTypeName={setSelectedExerciseTypeName}
           />
         }
+        modalListener={modalListener}
       ></Table>
     </>
   );
