@@ -480,7 +480,7 @@ export default function Workouts() {
                       Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
                     </dt>
                     <dd className="mt-1 break-words text-sm text-gray-900">
-                      {exercise.number_of_reps_performed
+                      {exercise.weight_performed
                         .map(
                           (weight, index) =>
                             `${weight}/${
