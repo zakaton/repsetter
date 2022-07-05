@@ -10,7 +10,7 @@ const pathnamesForQuery = [
   "pictures",
   "diet",
   "weight",
-  "progress",
+  "exercise-types",
 ].map((pathname) => "/account/" + pathname);
 
 export function ClientContextProvider(props) {

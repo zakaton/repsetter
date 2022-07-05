@@ -23,8 +23,8 @@ export default function ExerciseTypeModal(props) {
     setCreateResultStatus: setExerciseTypeStatus,
     setShowCreateResultNotification: setShowExerciseTypeNotification,
 
-    selectedExercise,
-    setSelectedExercise,
+    selectedExerciseType,
+    setSelectedExerciseType,
   } = props;
 
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
@@ -38,8 +38,8 @@ export default function ExerciseTypeModal(props) {
   }, [open]);
 
   useEffect(() => {
-    if (!open && selectedExercise) {
-      setSelectedExercise();
+    if (!open && selectedExerciseType) {
+      setSelectedExerciseType();
     }
   }, [open]);
 
@@ -48,7 +48,7 @@ export default function ExerciseTypeModal(props) {
     setSelectedMuscles([]);
     setVideoUrl("");
     setVideoFile("");
-    setSelectedExercise?.();
+    setSelectedExerciseType?.();
   };
   useEffect(() => {
     if (!open) {
@@ -72,16 +72,16 @@ export default function ExerciseTypeModal(props) {
   const [selectedMuscles, setSelectedMuscles] = useState([]);
 
   useEffect(() => {
-    if (selectedExercise) {
-      setExerciseTypeName(selectedExercise.name);
+    if (selectedExerciseType) {
+      setExerciseTypeName(selectedExerciseType.name);
       setSelectedMuscles(
         muscles.filter((muscle) =>
-          selectedExercise?.muscles?.includes(muscle.name)
+          selectedExerciseType?.muscles?.includes(muscle.name)
         )
       );
-      getExerciseVideo(selectedExercise.id);
+      getExerciseVideo(selectedExerciseType.id);
     }
-  }, [selectedExercise]);
+  }, [selectedExerciseType]);
 
   const onVideoFile = (file) => {
     console.log("onVideoFile", file);
@@ -98,9 +98,11 @@ export default function ExerciseTypeModal(props) {
   return (
     <Modal
       {...props}
-      title={selectedExercise ? "Update Exercise Type" : "Create Exercise Type"}
+      title={
+        selectedExerciseType ? "Update Exercise Type" : "Create Exercise Type"
+      }
       message={
-        selectedExercise
+        selectedExerciseType
           ? "Update Exercise"
           : "Create an Exercise Type for use in Workouts"
       }
@@ -111,7 +113,7 @@ export default function ExerciseTypeModal(props) {
           form="exerciseTypeForm"
           className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >
-          {selectedExercise
+          {selectedExerciseType
             ? isUpdatingExerciseType
               ? "Updating Exercise Type..."
               : didUpdateExerciseType
@@ -143,14 +145,14 @@ export default function ExerciseTypeModal(props) {
             (selectedMuscle) => selectedMuscle.name
           );
 
-          if (selectedExercise) {
+          if (selectedExerciseType) {
             setIsUpdatingExerciseType(true);
             console.log(exerciseTypeName, flattenedSelectedMuscles, videoFile);
             let updateExerciseError, replaceVideoError;
             if (
-              exerciseTypeName !== selectedExercise.name ||
+              exerciseTypeName !== selectedExerciseType.name ||
               !areArraysTheSame(
-                selectedExercise.muscles,
+                selectedExerciseType.muscles,
                 flattenedSelectedMuscles
               )
             ) {
@@ -161,7 +163,7 @@ export default function ExerciseTypeModal(props) {
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
                 })
-                .match({ id: selectedExercise.id });
+                .match({ id: selectedExerciseType.id });
               updateExerciseError = error;
               if (updateExerciseError) {
                 console.error(updateExerciseError);
@@ -172,7 +174,7 @@ export default function ExerciseTypeModal(props) {
               console.log("updating video file", videoFile);
               const { data: replaceVideo, error } = await supabase.storage
                 .from("exercise")
-                .update(`public/${selectedExercise.id}.mp4`, videoFile);
+                .update(`public/${selectedExerciseType.id}.mp4`, videoFile);
               replaceVideoError = error;
               if (replaceVideoError) {
                 console.error(replaceVideoError);
@@ -357,7 +359,7 @@ export default function ExerciseTypeModal(props) {
           <label className="block text-sm font-medium text-gray-700">
             Video
           </label>
-          {!videoUrl && !selectedExercise && (
+          {!videoUrl && !selectedExerciseType && (
             <div
               id="videoUploadContainer"
               onDragOver={(e) => {
@@ -432,7 +434,7 @@ export default function ExerciseTypeModal(props) {
               </div>
             </div>
           )}
-          {(videoUrl || selectedExercise) && (
+          {(videoUrl || selectedExerciseType) && (
             <div>
               <LazyVideo
                 className="aspect-[4/3] w-full"
@@ -442,8 +444,8 @@ export default function ExerciseTypeModal(props) {
                 playsInline={true}
                 src={
                   videoUrl ||
-                  (selectedExercise &&
-                    exerciseVideos?.[selectedExercise.id]?.url)
+                  (selectedExerciseType &&
+                    exerciseVideos?.[selectedExerciseType.id]?.url)
                 }
                 onSuspend={(e) => {
                   document.addEventListener("click", () => e.target.play(), {

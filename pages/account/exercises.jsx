@@ -3,19 +3,18 @@ import { useRouter } from "next/router";
 import { useUser } from "../../context/user-context";
 import Notification from "../../components/Notification";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import ExerciseTypeModal from "../../components/account/modal/ExerciseTypeModal";
-import DeleteExerciseTypeModal from "../../components/account/modal/DeleteExerciseTypeModal";
+import ExerciseModal from "../../components/account/modal/ExerciseModal";
+import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
 import Table from "../../components/Table";
-import { useExerciseVideos } from "../../context/exercise-videos-context";
+import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
+import { useClient } from "../../context/client-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
-import LazyVideo from "../../components/LazyVideo";
-import MyLink from "../../components/MyLink";
 
 const filterTypes = [
   ...muscleGroups.map((muscleGroup) => ({
     name: `Muscles (${muscleGroup})`,
     query: "muscles",
-    column: "muscles",
+    column: "type.muscles",
     checkboxes: muscles
       .filter((muscle) => muscle.group === muscleGroup)
       .map((muscle) => ({
@@ -28,117 +27,147 @@ const filterTypes = [
 
 const orderTypes = [
   {
-    label: "Name",
-    query: "name",
-    value: ["name", { ascending: true }],
+    label: "Date (Newest)",
+    query: "date-newest",
+    value: ["date", { ascending: false }],
     current: true,
   },
   {
-    label: "Date Created",
-    query: "date-created",
-    value: ["created_at", { ascending: false }],
+    label: "Date (Oldest)",
+    query: "date-oldest",
+    value: ["date", { ascending: true }],
     current: false,
   },
 ];
 
 export default function Exercises() {
   const router = useRouter();
-  const { isAdmin } = useUser();
+  const { isAdmin, user } = useUser();
 
-  const [showEditExerciseTypeModal, setShowEditExerciseTypeModal] =
+  const { selectedClient, setSelectedDate } = useClient();
+
+  const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
+  const [editExerciseStatus, setEditExerciseStatus] = useState(false);
+  const [showEditExerciseNotification, setShowEditExerciseNotification] =
     useState(false);
-  const [editExerciseTypeStatus, setEditExerciseTypeStatus] = useState(false);
-  const [
-    showEditExerciseTypeNotification,
-    setShowEditExerciseTypeNotification,
-  ] = useState(false);
 
   const [selectedExercise, setSelectedExercise] = useState();
-
-  const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
-  const [results, setResults] = useState();
+  const [selectedExerciseType, setSelectedExerciseType] = useState();
+  const [selectedExerciseTypeName, setSelectedExerciseTypeName] = useState();
+  const [checkedQuery, setCheckedQuery] = useState(false);
   useEffect(() => {
-    if (results) {
-      results.forEach((result) => {
-        getExerciseVideo(result.id);
-      });
+    if (!router.isReady || checkedQuery) {
+      return;
     }
-  }, [results]);
+    console.log(router.query, "LLOL");
+    if ("exercise-type" in router.query) {
+      const selectedExerciseTypeName = router.query["exercise-type"];
+      setSelectedExerciseTypeName(selectedExerciseTypeName);
+    }
+    setCheckedQuery(true);
+  }, [router.isReady, checkedQuery]);
+
+  useEffect(() => {
+    if (!router.isReady || !checkedQuery) {
+      return;
+    }
+
+    const query = {};
+    if (selectedExerciseType) {
+      query["exercise-type"] = selectedExerciseType.name;
+    } else {
+      delete router.query["exercise-type"];
+    }
+
+    router.replace({ query: { ...router.query, ...query } }, undefined, {
+      shallow: true,
+    });
+  }, [selectedExerciseType]);
+
+  const [results, setResults] = useState();
+  const [baseFilter, setBaseFilter] = useState({});
+  useEffect(() => {
+    const newBaseFilter = {};
+
+    if (selectedClient) {
+      newBaseFilter.client = selectedClient.client;
+      newBaseFilter.coach = user.id;
+    } else {
+      newBaseFilter.client = user.id;
+    }
+
+    if (selectedExerciseType) {
+      newBaseFilter["type.name"] = selectedExerciseType.name;
+    }
+    setBaseFilter(newBaseFilter);
+  }, [selectedClient, user, selectedExerciseType]);
+
+  const clearFiltersListener = () => {
+    setSelectedExerciseType();
+  };
 
   return (
     <>
-      <ExerciseTypeModal
-        open={showEditExerciseTypeModal}
-        setOpen={setShowEditExerciseTypeModal}
-        setCreateResultStatus={setEditExerciseTypeStatus}
-        setShowCreateResultNotification={setShowEditExerciseTypeNotification}
-        selectedExercise={selectedExercise}
-        setSelectedExercise={setSelectedExercise}
-      ></ExerciseTypeModal>
+      <ExerciseModal
+        open={showEditExerciseModal}
+        setOpen={setShowEditExerciseModal}
+        selectedResult={selectedExercise}
+        setSelectedResult={setSelectedExercise}
+        setEditResultStatus={setEditExerciseStatus}
+        setShowEditResultNotification={setShowEditExerciseNotification}
+      />
       <Notification
-        open={showEditExerciseTypeNotification}
-        setOpen={setShowEditExerciseTypeNotification}
-        status={editExerciseTypeStatus}
+        open={showEditExerciseNotification}
+        setOpen={setShowEditExerciseNotification}
+        status={editExerciseStatus}
       />
       <Table
+        clearFiltersListener={clearFiltersListener}
+        includeClientSelect={true}
+        baseFilter={baseFilter}
+        numberOfResultsPerPage={10}
         resultsListener={setResults}
         filterTypes={filterTypes}
         orderTypes={orderTypes}
-        tableName="exercise_type"
+        tableName="exercise"
         resultName="exercise"
+        selectString="*, type(*)"
         title="Exercises"
-        subtitle="View all Exercises"
-        CreateResultModal={isAdmin && ExerciseTypeModal}
-        DeleteResultModal={isAdmin && DeleteExerciseTypeModal}
+        subtitle={`View your Progress${
+          selectedExerciseType ? ` doing ${selectedExerciseType.name}` : ""
+        }`}
+        DeleteResultModal={isAdmin && DeleteExerciseModal}
         resultMap={(result) => [
           {
-            title: "name",
-            value: result.name,
+            title: "date",
+            value: result.date,
           },
-          result.muscles && {
-            title: "muscles",
-            value: result.muscles.join(", "),
-          },
-          result.id in exerciseVideos && {
-            jsx: (
-              <LazyVideo
-                onSuspend={(e) => {
-                  document.addEventListener("click", () => e.target.play(), {
-                    once: true,
-                  });
-                }}
-                src={exerciseVideos[result.id].url}
-                autoPlay={true}
-                muted={true}
-                loop={true}
-                className={"aspect-[4/3], h-28"}
-                playsInline={true}
-                controls={false}
-              ></LazyVideo>
-            ),
-          },
-          isAdmin && {
+          {
             jsx: (
               <button
                 onClick={() => {
-                  setSelectedExercise(result);
-                  setShowEditExerciseTypeModal(true);
+                  console.log(result.date, new Date(result.date));
+                  setSelectedDate(new Date(result.date));
+                  router.push("/account/workouts", undefined, {
+                    shallow: true,
+                  });
                 }}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                Edit<span className="sr-only"> exercise</span>
+                View Workout
               </button>
-            ),
-            jsx: (
-              <MyLink
-                href={`/account/progress?exercise-type=${result.id}`}
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                View Progress
-              </MyLink>
             ),
           },
         ]}
+        filterChildren={
+          <ExerciseTypesSelect
+            selectedExerciseType={selectedExerciseType}
+            setSelectedExerciseType={setSelectedExerciseType}
+            open={true}
+            selectedExerciseTypeName={selectedExerciseTypeName}
+            setSelectedExerciseTypeName={setSelectedExerciseTypeName}
+          />
+        }
       ></Table>
     </>
   );

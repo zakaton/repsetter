@@ -45,13 +45,13 @@ const navigation = [
     icon: ClipboardListIcon,
   },
   {
-    name: "Exercises",
-    href: "/account/exercises",
+    name: "Exercise Types",
+    href: "/account/exercise-types",
     icon: ClipboardCheckIcon,
   },
   {
-    name: "Progress",
-    href: "/account/progress",
+    name: "Exercises",
+    href: "/account/exercises",
     icon: ChartBarIcon,
   },
   {
