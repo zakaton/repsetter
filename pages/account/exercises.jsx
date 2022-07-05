@@ -10,20 +10,19 @@ import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSel
 import { useClient } from "../../context/client-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 
-const filterTypes = [
-  ...muscleGroups.map((muscleGroup) => ({
-    name: `Muscles (${muscleGroup})`,
-    query: "muscles",
-    column: "type.muscles",
-    checkboxes: muscles
-      .filter((muscle) => muscle.group === muscleGroup)
-      .map((muscle) => ({
-        value: muscle.name,
-        label: muscle.name,
-        defaultChecked: false,
-      })),
-  })),
-];
+const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
+  name: `Muscles (${muscleGroup})`,
+  query: "muscles",
+  column: "type.muscles",
+  checkboxes: muscles
+    .filter((muscle) => muscle.group === muscleGroup)
+    .map((muscle) => ({
+      value: muscle.name,
+      label: muscle.name,
+      defaultChecked: false,
+    })),
+}));
+const baseFilterTypes = [];
 
 const orderTypes = [
   {
@@ -127,11 +126,15 @@ export default function Exercises() {
         baseFilter={baseFilter}
         numberOfResultsPerPage={10}
         resultsListener={setResults}
-        filterTypes={filterTypes}
+        filterTypes={
+          selectedExerciseType
+            ? baseFilterTypes
+            : [...baseFilterTypes, ...muscleFilterTypes]
+        }
         orderTypes={orderTypes}
         tableName="exercise"
         resultName="exercise"
-        selectString="*, type(*)"
+        selectString="*, type!inner(*)"
         title="Exercises"
         subtitle={`View your Progress${
           selectedExerciseType ? ` doing ${selectedExerciseType.name}` : ""
