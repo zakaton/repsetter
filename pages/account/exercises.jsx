@@ -211,7 +211,7 @@ export default function Exercises() {
             title: "date",
             value: exercise.date,
           },
-          (!selectedExerciseType || index === 0) &&
+          !selectedExerciseType &&
             exercise.type.id in exerciseVideos && {
               jsx: (
                 <LazyVideo
