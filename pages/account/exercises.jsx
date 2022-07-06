@@ -85,7 +85,7 @@ export default function Exercises() {
       .maybeSingle();
 
     if (error) {
-      console.error(error0);
+      console.error(error);
     } else {
       setSelectedExerciseType(exerciseType);
     }
