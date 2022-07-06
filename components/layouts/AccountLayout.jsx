@@ -6,7 +6,6 @@ import {
   UserCircleIcon,
   UserGroupIcon,
   ClipboardListIcon,
-  HeartIcon,
   ScaleIcon,
   CameraIcon,
   ClipboardCheckIcon,
@@ -53,11 +52,6 @@ const navigation = [
     name: "Exercises",
     href: "/account/exercises",
     icon: ChartBarIcon,
-  },
-  {
-    name: "Diet",
-    href: "/account/diet",
-    icon: HeartIcon,
   },
   {
     name: "Weight",
