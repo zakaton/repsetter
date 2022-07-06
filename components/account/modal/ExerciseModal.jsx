@@ -71,6 +71,55 @@ export default function ExerciseModal(props) {
   const [weightPerformedKilograms, setWeightPerformedKilograms] = useState([0]);
   const [weightPerformedPounds, setWeightPerformedPounds] = useState([0]);
 
+  useEffect(() => {
+    if (isUsingKilograms) {
+      setWeightPounds(
+        weightKilograms.map((weight) => Math.round(kilogramsToPounds(weight)))
+      );
+    }
+  }, [weightKilograms]);
+  useEffect(() => {
+    if (!isUsingKilograms) {
+      setWeightKilograms(
+        weightPounds.map((weight) => Math.round(poundsToKilograms(weight)))
+      );
+    }
+  }, [weightPounds]);
+
+  const setWeight = (weight, useKilograms = isUsingKilograms) => {
+    if (useKilograms) {
+      setWeightKilograms(weight);
+    } else {
+      setWeightPounds(weight);
+    }
+  };
+  const setWeightPerformed = (weight, useKilograms = isUsingKilograms) => {
+    if (useKilograms) {
+      setWeightPerformedKilograms(weight);
+    } else {
+      setWeightPerformedPounds(weight);
+    }
+  };
+
+  useEffect(() => {
+    if (isUsingKilograms) {
+      setWeightPerformedPounds(
+        weightPerformedKilograms.map((weight) =>
+          Math.round(kilogramsToPounds(weight))
+        )
+      );
+    }
+  }, [weightPerformedKilograms]);
+  useEffect(() => {
+    if (!isUsingKilograms) {
+      setWeightPerformedKilograms(
+        weightPerformedPounds.map((weight) =>
+          Math.round(poundsToKilograms(weight))
+        )
+      );
+    }
+  }, [weightPerformedPounds]);
+
   const [isWeightInputEmptyString, setIsWeightInputEmptyString] = useState([]);
   const [isWeightPerformedEmptyString, setIsWeightPerformedEmptyString] =
     useState([]);
@@ -87,8 +136,7 @@ export default function ExerciseModal(props) {
     setSelectedExerciseType(null);
     setNumberOfSets(3);
     setNumberOfReps([10]);
-    setWeightKilograms([0]);
-    setWeightPounds([0]);
+    setWeight([0]);
     setIsWeightInputEmptyString([]);
     setSameRepsForEachSet(true);
     setSameWeightForEachSet(true);
@@ -103,21 +151,7 @@ export default function ExerciseModal(props) {
       setNumberOfSets(selectedExercise.number_of_sets_assigned);
       setNumberOfReps(selectedExercise.number_of_reps_assigned);
       setIsUsingKilograms(selectedExercise.is_weight_in_kilograms);
-      if (selectedExercise.is_weight_in_kilograms) {
-        setWeightKilograms(selectedExercise.weight_assigned);
-        setWeightPounds(
-          selectedExercise.weight_assigned.map((weight) =>
-            Math.round(kilogramsToPounds(weight))
-          )
-        );
-      } else {
-        setWeightPounds(selectedExercise.weight_assigned);
-        setWeightKilograms(
-          selectedExercise.weight_assigned.map((weight) =>
-            Math.round(poundsToKilograms(weight))
-          )
-        );
-      }
+      setWeight(selectedExercise.weight_assigned);
 
       const sameRepsForEachSet =
         selectedExercise.number_of_reps_assigned.length == 1;
@@ -167,14 +201,8 @@ export default function ExerciseModal(props) {
       }
       if (selectedExercise.is_weight_in_kilograms) {
         setWeightPerformedKilograms(weightPerformed);
-        setWeightPerformedPounds(
-          weightPerformed.map((weight) => kilogramsToPounds(weight))
-        );
       } else {
         setWeightPerformedPounds(weightPerformed);
-        setWeightPerformedKilograms(
-          weightPerformed.map((weight) => poundsToKilograms(weight))
-        );
       }
     }
   }, [open, selectedExercise]);
@@ -242,11 +270,10 @@ export default function ExerciseModal(props) {
       setIsUsingKilograms(previousExercise.is_weight_in_kilograms);
 
       setNumberOfReps(previousExercise.number_of_reps_assigned);
-      if (previousExercise.is_weight_in_kilograms) {
-        setWeightKilograms(previousExercise.weight_assigned);
-      } else {
-        setWeightPounds(previousExercise.weight_assigned);
-      }
+      setWeight(
+        previousExercise.weight_assigned,
+        previousExercise.is_weight_in_kilograms
+      );
     }
   }, [previousExercise]);
 
@@ -440,18 +467,18 @@ export default function ExerciseModal(props) {
                 const newNumberOfSets = Number(e.target.value);
                 if (sameRepsForEachSet) {
                   setNumberOfReps([numberOfReps[0]]);
-                  setWeightKilograms([weightKilograms[0]]);
-                  setWeightPounds([weightPounds[0]]);
+                  setWeight(
+                    isUsingKilograms ? [weightKilograms[0]] : [weightPounds[0]]
+                  );
                   setIsWeightInputEmptyString([isWeightInputEmptyString[0]]);
                 } else {
                   setNumberOfReps(
                     new Array(newNumberOfSets).fill(numberOfReps[0])
                   );
-                  setWeightKilograms(
-                    new Array(newNumberOfSets).fill(weightKilograms[0])
-                  );
-                  setWeightPounds(
-                    new Array(newNumberOfSets).fill(weightPounds[0])
+                  setWeight(
+                    isUsingKilograms
+                      ? new Array(newNumberOfSets).fill(weightKilograms[0])
+                      : new Array(newNumberOfSets).fill(weightPounds[0])
                   );
                   setIsWeightInputEmptyString(
                     new Array(newNumberOfSets).fill(isWeightInputEmptyString[0])
@@ -505,15 +532,15 @@ export default function ExerciseModal(props) {
               onChange={(e) => {
                 const newSameWeightForEachSet = e.target.checked;
                 if (newSameWeightForEachSet) {
-                  setWeightKilograms([weightKilograms[0]]);
-                  setWeightPounds([weightPounds[0]]);
+                  setWeight(
+                    isUsingKilograms ? [weightKilograms[0]] : [weightPounds[0]]
+                  );
                   setIsWeightInputEmptyString([isWeightInputEmptyString[0]]);
                 } else {
-                  setWeightKilograms(
-                    new Array(numberOfSets).fill(weightKilograms[0])
-                  );
-                  setWeightPounds(
-                    new Array(numberOfSets).fill(weightPounds[0])
+                  setWeight(
+                    isUsingKilograms
+                      ? new Array(numberOfSets).fill(weightKilograms[0])
+                      : new Array(numberOfSets).fill(weightPounds[0])
                   );
                   setIsWeightInputEmptyString(
                     new Array(numberOfSets).fill(isWeightInputEmptyString[0])
@@ -613,13 +640,7 @@ export default function ExerciseModal(props) {
                 onInput={(e) => {
                   setIsWeightInputEmptyString([e.target.value === ""]);
                   const weight = Number(e.target.value);
-                  if (isUsingKilograms) {
-                    setWeightKilograms([weight]);
-                    setWeightPounds([Math.round(kilogramsToPounds(weight))]);
-                  } else {
-                    setWeightPounds([weight]);
-                    setWeightKilograms([Math.round(poundsToKilograms(weight))]);
-                  }
+                  setWeight([weight]);
                 }}
               />
               <div className="absolute inset-y-0 right-0 flex items-center">
@@ -672,21 +693,15 @@ export default function ExerciseModal(props) {
                     setIsWeightInputEmptyString(newIsWeightInputEmptyString);
 
                     const weight = Number(e.target.value);
-                    const newWeightKilograms = weightKilograms.slice();
-                    const newWeightPounds = weightPounds.slice();
                     if (isUsingKilograms) {
+                      const newWeightKilograms = weightKilograms.slice();
                       newWeightKilograms[index] = weight;
-                      newWeightPounds[index] = Math.round(
-                        kilogramsToPounds(weight)
-                      );
+                      setWeight(newWeightKilograms);
                     } else {
+                      const newWeightPounds = weightPounds.slice();
                       newWeightPounds[index] = weight;
-                      newWeightKilograms[index] = Math.round(
-                        poundsToKilograms(weight)
-                      );
+                      setWeight(newWeightPounds);
                     }
-                    setWeightKilograms(newWeightKilograms);
-                    setWeightPounds(newWeightPounds);
                   }}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center">
@@ -1051,21 +1066,16 @@ export default function ExerciseModal(props) {
                       );
 
                       const weight = Number(e.target.value);
-                      const newWeightKilograms = weightKilograms.slice();
-                      const newWeightPounds = weightPounds.slice();
                       if (isUsingKilograms) {
+                        const newWeightKilograms =
+                          weightPerformedKilograms.slice();
                         newWeightKilograms[index] = weight;
-                        newWeightPounds[index] = Math.round(
-                          kilogramsToPounds(weight)
-                        );
+                        setWeightPerformed(newWeightKilograms);
                       } else {
+                        const newWeightPounds = weightPerformedPounds.slice();
                         newWeightPounds[index] = weight;
-                        newWeightKilograms[index] = Math.round(
-                          poundsToKilograms(weight)
-                        );
+                        setWeightPerformed(newWeightPounds);
                       }
-                      setWeightPerformedKilograms(newWeightKilograms);
-                      setWeightPerformedPounds(newWeightPounds);
                     }}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center">
