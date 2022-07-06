@@ -11,6 +11,7 @@ import {
   ClipboardCheckIcon,
   ClipboardIcon,
   ChartBarIcon,
+  HeartIcon,
 } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 import { useUser } from "../../context/user-context";
@@ -51,6 +52,11 @@ const navigation = [
   {
     name: "Exercises",
     href: "/account/exercises",
+    icon: HeartIcon,
+  },
+  {
+    name: "Progress",
+    href: "/account/progress",
     icon: ChartBarIcon,
   },
   {
