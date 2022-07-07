@@ -3,6 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
 import { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
 import { useClient } from "../../context/client-context";
+import ClientsSelect from "../account/ClientsSelect";
 
 const months = [
   "January",
@@ -149,35 +150,7 @@ export default function AccountCalendarLayout({
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
-            {clients?.length > 0 && (
-              <div className="w-50 ml-3 inline-block">
-                <select
-                  id="clientEmail"
-                  className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                  value={selectedClient?.client_email || user.email}
-                  onInput={(e) => {
-                    const option = e.target.selectedOptions[0];
-                    setSelectedClient(
-                      e.target.value === user.email
-                        ? null
-                        : clients.find(
-                            (client) => client.client_email === e.target.value
-                          )
-                    );
-                  }}
-                >
-                  <option value={user.email}>Me</option>
-                  {clients?.map((client) => (
-                    <option
-                      key={client.client_email}
-                      value={client.client_email}
-                    >
-                      {client.client_email}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <ClientsSelect />
             <p className="mt-2 text-sm text-gray-500">
               {subtitle ||
                 `View and edit ${
