@@ -1,16 +1,44 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
 import { useState } from "react";
-import { useUser } from "../../context/user-context";
-import MyLink from "../../components/MyLink";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import { useClient } from "../../context/client-context";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
+import Filters from "../../components/Filters";
+
+const filterTypes = [];
+const orderTypes = [
+  {
+    label: "Date (Newest)",
+    query: "date-newest",
+    value: ["date", { ascending: false }],
+    current: true,
+  },
+  {
+    label: "Date (Oldest)",
+    query: "date-oldest",
+    value: ["date", { ascending: true }],
+    current: false,
+  },
+];
 
 export default function Progress() {
   const { selectedClient } = useClient();
   const [selectedExerciseType, setSelectedExerciseType] = useState();
+  const [selectedExerciseTypeName, setSelectedExerciseTypeName] = useState();
+
+  const [filters, setFilters] = useState({});
+  const [containsFilters, setContainsFilters] = useState({});
+  const [order, setOrder] = useState(orderTypes[0].value);
+  const clearFilters = () => {
+    if (Object.keys(filters).length > 0) {
+      setFilters({});
+    }
+    if (Object.keys(containsFilters).length > 0) {
+      setContainsFilters({});
+    }
+  };
 
   return (
     <>
@@ -27,10 +55,23 @@ export default function Progress() {
           </p>
         </div>
 
-        <ExerciseTypesSelect
-          selectedExerciseType={selectedExerciseType}
-          setSelectedExerciseType={setSelectedExerciseType}
-        />
+        <Filters
+          filters={filters}
+          setFilters={setFilters}
+          containsFilters={containsFilters}
+          setContainsFilters={setContainsFilters}
+          order={order}
+          setOrder={setOrder}
+          filterTypes={filterTypes}
+          orderTypes={orderTypes}
+        >
+          <ExerciseTypesSelect
+            selectedExerciseType={selectedExerciseType}
+            setSelectedExerciseType={setSelectedExerciseType}
+            selectedExerciseTypeName={selectedExerciseTypeName}
+            setSelectedExerciseTypeName={setSelectedExerciseTypeName}
+          />
+        </Filters>
       </div>
     </>
   );

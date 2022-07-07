@@ -3,6 +3,7 @@ import { UserContextProvider } from "../context/user-context";
 import { OnlineContextProvider } from "../context/online-context";
 import { ClientContextProvider } from "../context/client-context";
 import { ExerciseVideoContextProvider } from "../context/exercise-videos-context";
+import { SelectedExerciseTypeContextProvider } from "../context/selected-exercise-context";
 import Layout from "../components/layouts/Layout";
 
 function MyApp({ Component, pageProps }) {
@@ -12,7 +13,9 @@ function MyApp({ Component, pageProps }) {
       <UserContextProvider>
         <ExerciseVideoContextProvider>
           <ClientContextProvider>
-            <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+            <SelectedExerciseTypeContextProvider>
+              <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+            </SelectedExerciseTypeContextProvider>
           </ClientContextProvider>
         </ExerciseVideoContextProvider>
       </UserContextProvider>

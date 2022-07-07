@@ -11,8 +11,8 @@ import { useClient } from "../../context/client-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import LazyVideo from "../../components/LazyVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
-import { supabase } from "../../utils/supabase";
 import YouTube from "react-youtube";
+import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 
 const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
   name: `Muscles (${muscleGroup})`,
@@ -57,62 +57,12 @@ export default function Exercises() {
     useState(false);
 
   const [selectedExercise, setSelectedExercise] = useState();
-  const [selectedExerciseType, setSelectedExerciseType] = useState();
-  const [selectedExerciseTypeName, setSelectedExerciseTypeName] = useState();
-  const [checkedQuery, setCheckedQuery] = useState(false);
-  useEffect(() => {
-    if (!router.isReady || checkedQuery) {
-      return;
-    }
-    if ("exercise-type" in router.query) {
-      const selectedExerciseTypeName = router.query["exercise-type"];
-      setSelectedExerciseTypeName(selectedExerciseTypeName);
-    }
-    setCheckedQuery(true);
-  }, [router.isReady, checkedQuery]);
-
-  const [isGettingExerciseType, setIsGettingExerciseType] = useState(false);
-  const getExerciseType = async () => {
-    if (isGettingExerciseType) {
-      return;
-    }
-
-    setIsGettingExerciseType(true);
-    const { data: exerciseType, error } = await supabase
-      .from("exercise_type")
-      .select("*")
-      .eq("name", selectedExerciseTypeName)
-      .maybeSingle();
-
-    if (error) {
-      console.error(error);
-    } else {
-      setSelectedExerciseType(exerciseType);
-    }
-    setIsGettingExerciseType(false);
-  };
-  useEffect(() => {
-    if (selectedExerciseTypeName && !selectedExerciseType) {
-      getExerciseType();
-    }
-  }, [selectedExerciseTypeName]);
-
-  useEffect(() => {
-    if (!router.isReady || !checkedQuery) {
-      return;
-    }
-
-    const query = {};
-    if (selectedExerciseType) {
-      query["exercise-type"] = selectedExerciseType.name;
-    } else {
-      delete router.query["exercise-type"];
-    }
-
-    router.replace({ query: { ...router.query, ...query } }, undefined, {
-      shallow: true,
-    });
-  }, [selectedExerciseType]);
+  const {
+    selectedExerciseType,
+    setSelectedExerciseType,
+    selectedExerciseTypeName,
+    setSelectedExerciseTypeName,
+  } = useSelectedExerciseType();
 
   const [exercises, setExercises] = useState();
   const [baseFilter, setBaseFilter] = useState({});
