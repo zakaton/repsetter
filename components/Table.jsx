@@ -211,59 +211,6 @@ export default function Table({
     }
   };
 
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-
-    const query = {};
-    filterTypes.forEach((filterType) => {
-      delete router.query[filterType.query];
-    });
-    Object.keys(filters).forEach((column) => {
-      // eslint-disable-next-line no-shadow
-      const filter = filterTypes.find((filter) => filter.column === column);
-      if (filter) {
-        query[filter.query] = filters[column];
-      }
-    });
-
-    Object.keys(containsFilters).forEach((column) => {
-      const filter = filterTypes.find((filter) => filter.column === column);
-      if (filter) {
-        const values = containsFilters[column] || [];
-        if (values.length) {
-          query[filter.query] = values.join(",");
-        }
-      }
-    });
-
-    const sortOption = orderTypes.find(
-      // eslint-disable-next-line no-shadow
-      (sortOption) => sortOption.value === order
-    );
-    if (sortOption) {
-      query["sort-by"] = sortOption.query;
-    }
-
-    console.log("final query", query);
-    router.replace({ query: { ...router.query, ...query } }, undefined, {
-      shallow: true,
-    });
-  }, [filters, containsFilters, order, router.isReady]);
-
-  const clearFilters = () => {
-    if (Object.keys(filters).length > 0) {
-      setFilters({});
-    }
-    if (Object.keys(containsFilters).length > 0) {
-      setContainsFilters({});
-    }
-    if (clearFiltersListener) {
-      clearFiltersListener();
-    }
-  };
-
   return (
     <>
       <Head>
@@ -337,7 +284,7 @@ export default function Table({
           setOrder={setOrder}
           filterTypes={filterTypes}
           orderTypes={orderTypes}
-          clearFilters={clearFilters}
+          clearFiltersListener={clearFiltersListener}
         >
           {filterChildren}
         </Filters>

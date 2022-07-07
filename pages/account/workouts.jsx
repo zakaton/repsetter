@@ -18,8 +18,19 @@ function classNames(...classes) {
 export default function Workouts() {
   const { user } = useUser();
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
-  const { selectedClient, selectedDate, amITheClient, selectedClientId } =
-    useClient();
+  const {
+    selectedClient,
+    selectedDate,
+    amITheClient,
+    selectedClientId,
+    getSelectedDate,
+  } = useClient();
+
+  useEffect(() => {
+    if (!selectedDate) {
+      getSelectedDate();
+    }
+  }, []);
 
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
   const [showAddExerciseNotification, setShowAddExerciseNotification] =
@@ -85,6 +96,10 @@ export default function Workouts() {
   };
 
   useEffect(() => {
+    if (!selectedDate) {
+      return;
+    }
+
     if (!exercises) {
       getExercises();
     } else if (

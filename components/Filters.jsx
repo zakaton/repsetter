@@ -14,12 +14,54 @@ export default function Filters({
   setContainsFilters,
   order,
   setOrder,
+  showSort = true,
   orderTypes,
   filterTypes,
   children,
-  clearFilters,
+  clearFiltersListener,
 }) {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
+    const query = {};
+    filterTypes.forEach((filterType) => {
+      delete router.query[filterType.query];
+    });
+    Object.keys(filters).forEach((column) => {
+      // eslint-disable-next-line no-shadow
+      const filter = filterTypes.find((filter) => filter.column === column);
+      if (filter) {
+        query[filter.query] = filters[column];
+      }
+    });
+
+    Object.keys(containsFilters).forEach((column) => {
+      const filter = filterTypes.find((filter) => filter.column === column);
+      if (filter) {
+        const values = containsFilters[column] || [];
+        if (values.length) {
+          query[filter.query] = values.join(",");
+        }
+      }
+    });
+
+    const sortOption = orderTypes.find(
+      // eslint-disable-next-line no-shadow
+      (sortOption) => sortOption.value === order
+    );
+    if (sortOption) {
+      query["sort-by"] = sortOption.query;
+    }
+
+    console.log("final query", query);
+    router.replace({ query: { ...router.query, ...query } }, undefined, {
+      shallow: true,
+    });
+  }, [filters, containsFilters, order, router.isReady]);
 
   const [numberOfActiveFilters, setNumberOfActiveFilters] = useState(0);
   useEffect(() => {
@@ -73,6 +115,16 @@ export default function Filters({
   useEffect(() => {
     checkQuery();
   }, []);
+
+  const clearFilters = () => {
+    if (Object.keys(filters).length > 0) {
+      setFilters({});
+    }
+    if (Object.keys(containsFilters).length > 0) {
+      setContainsFilters({});
+    }
+    clearFiltersListener?.();
+  };
 
   return (
     <>
@@ -213,15 +265,17 @@ export default function Filters({
         <div className="col-start-1 row-start-1 py-4">
           <div className="mx-auto flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
             <Menu as="div" className="relative inline-block">
-              <div className="flex">
-                <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                  Sort
-                  <ChevronDownIcon
-                    className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                    aria-hidden="true"
-                  />
-                </Menu.Button>
-              </div>
+              {showSort && (
+                <div className="flex">
+                  <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                    Sort
+                    <ChevronDownIcon
+                      className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                      aria-hidden="true"
+                    />
+                  </Menu.Button>
+                </div>
+              )}
 
               <Transition
                 as={Fragment}

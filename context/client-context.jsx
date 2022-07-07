@@ -34,6 +34,17 @@ export function ClientContextProvider(props) {
     }
   };
 
+  const getSelectedDate = () => {
+    if ("date" in router.query) {
+      const selectedDateString = router.query.date;
+      const selectedDate = new Date(selectedDateString);
+      console.log("query selected date", selectedDate);
+      setSelectedDate(selectedDate);
+    } else {
+      setSelectedDate(new Date());
+    }
+  };
+
   useEffect(() => {
     if (clients) {
       console.log(`subscribing to subscription updates`);
@@ -82,14 +93,6 @@ export function ClientContextProvider(props) {
       return;
     }
     console.log("CHECK QUERY", router.query);
-    if ("date" in router.query) {
-      const selectedDateString = router.query.date;
-      const selectedDate = new Date(selectedDateString);
-      console.log("query selected date", selectedDate);
-      setSelectedDate(selectedDate);
-    } else {
-      setSelectedDate(new Date());
-    }
   }, [router.isReady]);
 
   useEffect(() => {
@@ -156,6 +159,7 @@ export function ClientContextProvider(props) {
 
     selectedDate,
     setSelectedDate,
+    getSelectedDate,
     isSelectedDateToday,
   };
 

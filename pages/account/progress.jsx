@@ -6,6 +6,7 @@ import ClientsSelect from "../../components/account/ClientsSelect";
 import { useClient } from "../../context/client-context";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import Filters from "../../components/Filters";
+import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 
 const filterTypes = [];
 const orderTypes = [
@@ -25,8 +26,13 @@ const orderTypes = [
 
 export default function Progress() {
   const { selectedClient } = useClient();
-  const [selectedExerciseType, setSelectedExerciseType] = useState();
-  const [selectedExerciseTypeName, setSelectedExerciseTypeName] = useState();
+
+  const {
+    selectedExerciseType,
+    setSelectedExerciseType,
+    selectedExerciseTypeName,
+    setSelectedExerciseTypeName,
+  } = useSelectedExerciseType();
 
   const [filters, setFilters] = useState({});
   const [containsFilters, setContainsFilters] = useState({});
@@ -64,6 +70,7 @@ export default function Progress() {
           setOrder={setOrder}
           filterTypes={filterTypes}
           orderTypes={orderTypes}
+          showSort={false}
         >
           <ExerciseTypesSelect
             selectedExerciseType={selectedExerciseType}
