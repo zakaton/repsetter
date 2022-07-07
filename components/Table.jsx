@@ -37,13 +37,7 @@ export default function Table({
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
-  const { getClients, clients, selectedClient } = useClient();
-
-  useEffect(() => {
-    if (!clients) {
-      getClients();
-    }
-  }, [clients]);
+  const { selectedClient } = useClient();
 
   resultName = resultName || tableName;
   resultNamePlural = resultNamePlural || resultName + "s";

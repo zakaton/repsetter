@@ -1,10 +1,18 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { useClient } from "../../context/client-context";
 import { useUser } from "../../context/user-context";
+import { useEffect } from "react";
 
 export default function ClientsSelect() {
   const { user } = useUser();
-  const { clients, selectedClient, setSelectedClient } = useClient();
+
+  const { clients, getClients, selectedClient, setSelectedClient } =
+    useClient();
+  useEffect(() => {
+    if (!clients) {
+      getClients();
+    }
+  }, [clients]);
 
   return (
     clients?.length > 0 && (

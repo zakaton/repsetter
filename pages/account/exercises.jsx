@@ -202,7 +202,9 @@ export default function Exercises() {
         resultName="exercise"
         selectString="*, type!inner(*)"
         title="Exercises"
-        subtitle={`View your Progress${
+        subtitle={`View ${
+          selectedClient ? `${selectedClient.client_email}'s` : "your"
+        } progress${
           selectedExerciseType ? ` doing ${selectedExerciseType.name}` : ""
         }`}
         DeleteResultModal={isAdmin && DeleteExerciseModal}
@@ -340,7 +342,6 @@ export default function Exercises() {
           <ExerciseTypesSelect
             selectedExerciseType={selectedExerciseType}
             setSelectedExerciseType={setSelectedExerciseType}
-            open={true}
             selectedExerciseTypeName={selectedExerciseTypeName}
             setSelectedExerciseTypeName={setSelectedExerciseTypeName}
           />

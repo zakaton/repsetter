@@ -50,21 +50,7 @@ export default function AccountCalendarLayout({
 
   title = title || ResultNamePlural;
 
-  const { user } = useUser();
-  const {
-    getClients,
-    clients,
-    selectedClient,
-    setSelectedClient,
-    selectedDate,
-    setSelectedDate,
-  } = useClient();
-
-  useEffect(() => {
-    if (!clients) {
-      getClients();
-    }
-  }, [clients]);
+  const { selectedClient, selectedDate, setSelectedDate } = useClient();
 
   const years = [];
   for (let year = yearsRange[0]; year <= yearsRange[1]; year++) {
