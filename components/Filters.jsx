@@ -22,52 +22,6 @@ export default function Filters({
 }) {
   const router = useRouter();
 
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-
-    const query = {};
-    filterTypes.forEach((filterType) => {
-      delete router.query[filterType.query];
-    });
-    Object.keys(filters).forEach((column) => {
-      // eslint-disable-next-line no-shadow
-      const filter = filterTypes.find((filter) => filter.column === column);
-      if (filter) {
-        query[filter.query] = filters[column];
-      }
-    });
-
-    Object.keys(containsFilters).forEach((column) => {
-      const filter = filterTypes.find((filter) => filter.column === column);
-      if (filter) {
-        const values = containsFilters[column] || [];
-        if (values.length) {
-          query[filter.query] = values.join(",");
-        }
-      }
-    });
-
-    const sortOption = orderTypes.find(
-      // eslint-disable-next-line no-shadow
-      (sortOption) => sortOption.value === order
-    );
-    if (sortOption) {
-      query["sort-by"] = sortOption.query;
-    }
-
-    console.log("final query", query);
-    router.replace({ query: { ...router.query, ...query } }, undefined, {
-      shallow: true,
-    });
-  }, [filters, containsFilters, order, router.isReady]);
-
-  const [numberOfActiveFilters, setNumberOfActiveFilters] = useState(0);
-  useEffect(() => {
-    setNumberOfActiveFilters(Object.keys(filters).length);
-  }, [filters]);
-
   const checkQuery = () => {
     const { "sort-by": sortBy } = router.query;
 
@@ -115,6 +69,58 @@ export default function Filters({
   useEffect(() => {
     checkQuery();
   }, []);
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
+    const query = {};
+    filterTypes.forEach((filterType) => {
+      delete router.query[filterType.query];
+    });
+    Object.keys(filters).forEach((column) => {
+      // eslint-disable-next-line no-shadow
+      const filter = filterTypes.find((filter) => filter.column === column);
+      if (filter) {
+        query[filter.query] = filters[column];
+      }
+    });
+
+    Object.keys(containsFilters).forEach((column) => {
+      const filter = filterTypes.find((filter) => filter.column === column);
+      if (filter) {
+        const values = containsFilters[column] || [];
+        if (values.length) {
+          query[filter.query] = values.join(",");
+        }
+      }
+    });
+
+    const sortOption = orderTypes.find(
+      // eslint-disable-next-line no-shadow
+      (sortOption) => sortOption.value === order
+    );
+    if (sortOption) {
+      query["sort-by"] = sortOption.query;
+    }
+
+    console.log("final query", query);
+    router.replace({ query: { ...router.query, ...query } }, undefined, {
+      shallow: true,
+    });
+  }, [filters, containsFilters, order, router.isReady]);
+
+  const [numberOfActiveFilters, setNumberOfActiveFilters] = useState(0);
+  useEffect(() => {
+    setNumberOfActiveFilters(
+      Object.keys(filters).length +
+        Object.keys(containsFilters).reduce(
+          (count, key) => count + containsFilters[key].length,
+          0
+        )
+    );
+  }, [filters, containsFilters]);
 
   const clearFilters = () => {
     if (Object.keys(filters).length > 0) {

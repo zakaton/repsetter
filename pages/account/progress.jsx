@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import { useClient } from "../../context/client-context";
@@ -14,8 +14,9 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const filterTypes = [
   {
-    name: "type",
+    name: "Type",
     query: "type",
+    column: "type",
     checkboxes: [
       {
         value: "top-set",
@@ -42,12 +43,6 @@ const filterTypes = [
 ];
 const orderTypes = [
   {
-    label: "Date (Newest)",
-    query: "date-newest",
-    value: ["date", { ascending: false }],
-    current: true,
-  },
-  {
     label: "Date (Oldest)",
     query: "date-oldest",
     value: ["date", { ascending: true }],
@@ -68,14 +63,10 @@ export default function Progress() {
   const [filters, setFilters] = useState({});
   const [containsFilters, setContainsFilters] = useState({});
   const [order, setOrder] = useState(orderTypes[0].value);
-  const clearFilters = () => {
-    if (Object.keys(filters).length > 0) {
-      setFilters({});
-    }
-    if (Object.keys(containsFilters).length > 0) {
-      setContainsFilters({});
-    }
-  };
+
+  useEffect(() => {
+    console.log("containsFilters", containsFilters);
+  }, [containsFilters]);
 
   return (
     <>
