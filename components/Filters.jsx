@@ -254,6 +254,18 @@ export default function Filters({
                           </div>
                         );
                       })}
+                      {filterType.options?.map((option, index) => {
+                        const id = `${filterType.name}-${filterType.column}-${index}`;
+                        // FILL
+                        return (
+                          <div
+                            key={id}
+                            className="flex items-center text-base sm:text-sm"
+                          >
+                            FILL
+                          </div>
+                        );
+                      })}
                     </div>
                   </fieldset>
                 );

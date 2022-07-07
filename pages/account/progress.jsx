@@ -12,7 +12,34 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const filterTypes = [];
+const filterTypes = [
+  {
+    name: "type",
+    query: "type",
+    checkboxes: [
+      {
+        value: "top-set",
+        label: "Top Set",
+        defaultChecked: true,
+      },
+      {
+        value: "number-of-sets",
+        label: "Number of Sets",
+        defaultChecked: false,
+      },
+      {
+        value: "number-of-reps",
+        label: "Number of Reps",
+        defaultChecked: false,
+      },
+      {
+        value: "difficulty",
+        label: "Difficulty",
+        defaultChecked: false,
+      },
+    ],
+  },
+];
 const orderTypes = [
   {
     label: "Date (Newest)",
@@ -52,8 +79,8 @@ export default function Progress() {
 
   return (
     <>
-      <div className="space-y-6 bg-white px-4 pb-2 pt-6 sm:px-6 sm:pt-6">
-        <div>
+      <div className="bg-white px-4 pb-2 pt-6 sm:px-6 sm:pt-6">
+        <div className="pb-4">
           <h3 className="inline text-lg font-medium leading-6 text-gray-900">
             Progress
           </h3>
@@ -84,37 +111,37 @@ export default function Progress() {
           />
         </Filters>
 
-        <div className="border-t border-gray-200"></div>
-
-        <div className="w-1/2">
-          <Doughnut
-            data={{
-              labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-              datasets: [
-                {
-                  label: "# of Votes",
-                  data: [12, 19, 3, 5, 2, 3],
-                  backgroundColor: [
-                    "rgba(255, 99, 132, 0.2)",
-                    "rgba(54, 162, 235, 0.2)",
-                    "rgba(255, 206, 86, 0.2)",
-                    "rgba(75, 192, 192, 0.2)",
-                    "rgba(153, 102, 255, 0.2)",
-                    "rgba(255, 159, 64, 0.2)",
-                  ],
-                  borderColor: [
-                    "rgba(255, 99, 132, 1)",
-                    "rgba(54, 162, 235, 1)",
-                    "rgba(255, 206, 86, 1)",
-                    "rgba(75, 192, 192, 1)",
-                    "rgba(153, 102, 255, 1)",
-                    "rgba(255, 159, 64, 1)",
-                  ],
-                  borderWidth: 1,
-                },
-              ],
-            }}
-          />
+        <div className="border-t border-gray-200 pt-2">
+          <div className="w-1/2">
+            <Doughnut
+              data={{
+                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                datasets: [
+                  {
+                    label: "# of Votes",
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                      "rgba(255, 99, 132, 0.2)",
+                      "rgba(54, 162, 235, 0.2)",
+                      "rgba(255, 206, 86, 0.2)",
+                      "rgba(75, 192, 192, 0.2)",
+                      "rgba(153, 102, 255, 0.2)",
+                      "rgba(255, 159, 64, 0.2)",
+                    ],
+                    borderColor: [
+                      "rgba(255, 99, 132, 1)",
+                      "rgba(54, 162, 235, 1)",
+                      "rgba(255, 206, 86, 1)",
+                      "rgba(75, 192, 192, 1)",
+                      "rgba(153, 102, 255, 1)",
+                      "rgba(255, 159, 64, 1)",
+                    ],
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+            />
+          </div>
         </div>
       </div>
     </>
