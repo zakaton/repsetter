@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import { useClient } from "../../context/client-context";
+import { useUser } from "../../context/user-context";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import Filters from "../../components/Filters";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { supabase } from "../../utils/supabase";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -71,6 +73,7 @@ const orderTypes = [
 
 export default function Progress() {
   const { selectedClient } = useClient();
+  const { user } = useUser();
 
   const {
     selectedExerciseType,
@@ -80,13 +83,80 @@ export default function Progress() {
   } = useSelectedExerciseType();
 
   const [filters, setFilters] = useState({ "date-range": "past month" });
-  console.log("filters", filters);
   const [containsFilters, setContainsFilters] = useState({ type: ["top set"] });
   const [order, setOrder] = useState(orderTypes[0].value);
 
+  const [baseFilter, setBaseFilter] = useState({});
   useEffect(() => {
-    console.log("containsFilters", containsFilters);
-  }, [containsFilters]);
+    const newBaseFilter = {};
+
+    if (selectedClient) {
+      newBaseFilter.client = selectedClient.client;
+      newBaseFilter.coach = user.id;
+    } else {
+      newBaseFilter.client = user.id;
+    }
+
+    if (selectedExerciseType) {
+      newBaseFilter["type.name"] = selectedExerciseType.name;
+    }
+    console.log("newBaseFilter", newBaseFilter);
+    setBaseFilter(newBaseFilter);
+  }, [selectedClient, user, selectedExerciseType]);
+
+  const getFromDate = () => {
+    let date = new Date();
+    switch (filters["date-range"]) {
+      case "past week":
+        date.setUTCDate(date.getUTCDate() - 7);
+        break;
+      case "past month":
+        date.setUTCMonth(date.getUTCMonth() - 1);
+        break;
+      case "past 6 months":
+        date.setUTCMonth(date.getUTCMonth() - 6);
+        break;
+      case "past year":
+        date.setUTCFullYear(date.getUTCFullYear() - 1);
+        break;
+    }
+    return date;
+  };
+
+  const [exercises, setExercises] = useState();
+  const [isGettingExercises, setIsGettingExercises] = useState(false);
+  const getExercises = async (refresh) => {
+    if (!exercises || refresh) {
+      if (isGettingExercises) {
+        return;
+      }
+      setIsGettingExercises(true);
+
+      console.log("getting exercises with filters", baseFilter, filters);
+
+      const fromDate = getFromDate();
+      const { data: exercises, error } = await supabase
+        .from("exercise")
+        .select("*, type!inner(*)")
+        .match(baseFilter)
+        .gte("date", fromDate.toDateString())
+        .order("date", { ascending: true });
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("exercises", exercises);
+        setExercises(exercises);
+      }
+
+      setIsGettingExercises(false);
+    }
+  };
+
+  useEffect(() => {
+    if ("type.name" in baseFilter && "client" in baseFilter) {
+      getExercises(true);
+    }
+  }, [baseFilter, filters]);
 
   return (
     <>
