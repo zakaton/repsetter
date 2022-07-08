@@ -33,8 +33,12 @@ export default function Filters({
       .forEach((filterType) => {
         console.log("checking", filterType.query);
         if (filterType.query in router.query) {
-          newFilters[filterType.column] =
-            router.query[filterType.query] === "true";
+          if (filterType.options) {
+            newFilters[filterType.column] = router.query[filterType.query];
+          } else if (filterType.radios) {
+            newFilters[filterType.column] =
+              router.query[filterType.query] === "true";
+          }
         }
       });
     console.log("newFilters", newFilters);
@@ -168,7 +172,7 @@ export default function Filters({
         </div>
         <Disclosure.Panel className="border-t border-gray-200 bg-gray-50 py-10">
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
-            <div className="grid auto-rows-min grid-cols-1 gap-y-10 sm:grid-cols-2 md:grid-cols-3 md:gap-x-6">
+            <div className="grid auto-rows-min grid-cols-1 gap-y-10 sm:grid-cols-2 sm:gap-x-4 md:grid-cols-3 md:gap-x-6">
               {filterTypes.map((filterType) => {
                 const fieldsetId = filterType.name;
                 return (
@@ -176,103 +180,120 @@ export default function Filters({
                     <legend className="block font-medium">
                       {filterType.name}
                     </legend>
-                    <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
-                      {filterType.radios?.map((radio, radioIndex) => {
-                        const id = `${filterType.column}-${radioIndex}`;
-                        const checked =
-                          filterType.column in filters
-                            ? filters[filterType.column] === radio.value
-                            : radio.defaultChecked;
-                        return (
-                          <div
-                            key={id}
-                            className="flex items-center text-base sm:text-sm"
-                          >
-                            <input
-                              id={id}
-                              name={fieldsetId}
-                              type="radio"
-                              className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
-                              checked={checked}
-                              onChange={() => {
-                                const newFilters = { ...filters };
-                                if (radio.value === null) {
-                                  delete newFilters[filterType.column];
-                                } else {
-                                  newFilters[filterType.column] = radio.value;
-                                }
-                                setFilters(newFilters);
-                              }}
-                            />
-                            <label
-                              htmlFor={id}
-                              className="ml-3 min-w-0 flex-1 text-gray-600"
+                    {(filterType.radios || filterType.checkboxes) && (
+                      <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
+                        {filterType.radios?.map((radio, radioIndex) => {
+                          const id = `${filterType.column}-${radioIndex}`;
+                          const checked =
+                            filterType.column in filters
+                              ? filters[filterType.column] === radio.value
+                              : radio.defaultChecked;
+                          return (
+                            <div
+                              key={id}
+                              className="flex items-center text-base sm:text-sm"
                             >
-                              {radio.label}
-                            </label>
-                          </div>
-                        );
-                      })}
-                      {filterType.checkboxes?.map((checkbox, checkboxIndex) => {
-                        const id = `${filterType.name}-${filterType.column}-${checkboxIndex}`;
-                        const checked = Boolean(
-                          containsFilters[filterType.column]?.includes(
-                            checkbox.value
-                          )
-                        );
-                        return (
-                          <div
-                            key={id}
-                            className="flex items-center text-base sm:text-sm"
-                          >
-                            <input
-                              id={id}
-                              name={fieldsetId}
-                              type="checkbox"
-                              className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
-                              checked={checked}
-                              onChange={(e) => {
-                                const newContainsFilters = {
-                                  ...containsFilters,
-                                };
-                                let newValues =
-                                  containsFilters[filterType.column]?.slice() ||
-                                  [];
+                              <input
+                                id={id}
+                                name={fieldsetId}
+                                type="radio"
+                                className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                                checked={checked}
+                                onChange={() => {
+                                  const newFilters = { ...filters };
+                                  if (radio.value === null) {
+                                    delete newFilters[filterType.column];
+                                  } else {
+                                    newFilters[filterType.column] = radio.value;
+                                  }
+                                  setFilters(newFilters);
+                                }}
+                              />
+                              <label
+                                htmlFor={id}
+                                className="ml-3 min-w-0 flex-1 text-gray-600"
+                              >
+                                {radio.label}
+                              </label>
+                            </div>
+                          );
+                        })}
+                        {filterType.checkboxes?.map(
+                          (checkbox, checkboxIndex) => {
+                            const id = `${filterType.name}-${filterType.column}-${checkboxIndex}`;
+                            const checked = Boolean(
+                              containsFilters[filterType.column]?.includes(
+                                checkbox.value
+                              )
+                            );
+                            return (
+                              <div
+                                key={id}
+                                className="flex items-center text-base sm:text-sm"
+                              >
+                                <input
+                                  id={id}
+                                  name={fieldsetId}
+                                  type="checkbox"
+                                  className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                                  checked={checked}
+                                  onChange={(e) => {
+                                    const newContainsFilters = {
+                                      ...containsFilters,
+                                    };
+                                    let newValues =
+                                      containsFilters[
+                                        filterType.column
+                                      ]?.slice() || [];
 
-                                if (e.target.checked) {
-                                  newValues.push(checkbox.value);
-                                } else {
-                                  newValues = newValues.filter(
-                                    (value) => value !== checkbox.value
-                                  );
-                                }
-                                newContainsFilters[filterType.column] =
-                                  newValues;
-                                setContainsFilters(newContainsFilters);
-                              }}
-                            />
-                            <label
-                              htmlFor={id}
-                              className="ml-3 min-w-0 flex-1 text-gray-600"
+                                    if (e.target.checked) {
+                                      newValues.push(checkbox.value);
+                                    } else {
+                                      newValues = newValues.filter(
+                                        (value) => value !== checkbox.value
+                                      );
+                                    }
+                                    newContainsFilters[filterType.column] =
+                                      newValues;
+                                    setContainsFilters(newContainsFilters);
+                                  }}
+                                />
+                                <label
+                                  htmlFor={id}
+                                  className="ml-3 min-w-0 flex-1 text-gray-600"
+                                >
+                                  {checkbox.label}
+                                </label>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    )}
+                    {filterType.options && (
+                      <select
+                        className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                        value={filters[filterType.column]}
+                        onInput={(e) => {
+                          const newFilters = { ...filters };
+                          newFilters[filterType.column] = e.target.value;
+                          setFilters(newFilters);
+                        }}
+                      >
+                        {filterType.options?.map((option, index) => {
+                          const id = `${filterType.name}-${filterType.column}-${index}`;
+                          return (
+                            <option
+                              key={id}
+                              value={option.value}
+                              className="flex items-center text-base sm:text-sm"
                             >
-                              {checkbox.label}
-                            </label>
-                          </div>
-                        );
-                      })}
-                      {filterType.options?.map((option, index) => {
-                        const id = `${filterType.name}-${filterType.column}-${index}`;
-                        // FILL
-                        return (
-                          <div
-                            key={id}
-                            className="flex items-center text-base sm:text-sm"
-                          >
-                            FILL
-                          </div>
-                        );
-                      })}
-                    </div>
+                              {option.label}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    )}
                   </fieldset>
                 );
               })}

@@ -19,24 +19,43 @@ const filterTypes = [
     column: "type",
     checkboxes: [
       {
-        value: "top-set",
+        value: "top set",
         label: "Top Set",
-        defaultChecked: true,
       },
       {
-        value: "number-of-sets",
+        value: "number of sets",
         label: "Number of Sets",
-        defaultChecked: false,
       },
       {
-        value: "number-of-reps",
+        value: "number of reps",
         label: "Number of Reps",
-        defaultChecked: false,
       },
       {
         value: "difficulty",
         label: "Difficulty",
-        defaultChecked: false,
+      },
+    ],
+  },
+  {
+    name: "Date Range",
+    query: "date-range",
+    column: "date-range",
+    options: [
+      {
+        value: "past week",
+        label: "Past Week",
+      },
+      {
+        value: "past month",
+        label: "Past Month",
+      },
+      {
+        value: "past 6 months",
+        label: "Past 6 Months",
+      },
+      {
+        value: "past year",
+        label: "Past Year",
       },
     ],
   },
@@ -60,8 +79,9 @@ export default function Progress() {
     setSelectedExerciseTypeName,
   } = useSelectedExerciseType();
 
-  const [filters, setFilters] = useState({});
-  const [containsFilters, setContainsFilters] = useState({});
+  const [filters, setFilters] = useState({ "date-range": "past month" });
+  console.log("filters", filters);
+  const [containsFilters, setContainsFilters] = useState({ type: ["top set"] });
   const [order, setOrder] = useState(orderTypes[0].value);
 
   useEffect(() => {
@@ -100,6 +120,14 @@ export default function Progress() {
             selectedExerciseTypeName={selectedExerciseTypeName}
             setSelectedExerciseTypeName={setSelectedExerciseTypeName}
           />
+          <div>
+            <label
+              htmlFor="date-range"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Date Range
+            </label>
+          </div>
         </Filters>
 
         <div className="border-t border-gray-200 pt-2">
