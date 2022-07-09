@@ -17,9 +17,9 @@ import {
   LineElement,
   Legend,
   Tooltip,
-  TimeSeriesScale,
+  TimeScale,
 } from "chart.js";
-import { Chart, Bar } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { supabase } from "../../utils/supabase";
 
@@ -31,7 +31,7 @@ ChartJS.register(
   LineElement,
   Legend,
   Tooltip,
-  TimeSeriesScale
+  TimeScale
 );
 
 const defaultDateRange = "past month";
