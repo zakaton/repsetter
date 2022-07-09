@@ -204,17 +204,18 @@ export default function Progress() {
       setChartData(newChartData);
 
       const newChartOptions = {
-        animation: false,
+        animation: true,
         scales: {
           x: {
-            type: "timeseries",
+            type: "time",
             time: {
               unit: "day",
-              min: getFromDate(),
-              max: new Date(),
+              unitStepSize: 1,
             },
+            min: getFromDate(),
+            max: new Date(),
             ticks: {
-              autoSkip: false,
+              maxTicksLimit: 20,
             },
           },
           y: {
