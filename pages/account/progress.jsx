@@ -66,14 +66,31 @@ const filterTypes = [
         requiresExercise: true,
       },
       {
-        value: "weight",
-        label: "weight",
-        requiresExercise: true,
-      },
-      {
         value: "bodyweight",
-        label: "bodyweight",
+        label: "Bodyweight",
       },
+    ],
+  },
+  {
+    name: "Weight Unit",
+    query: "weight-unit",
+    column: "weight-unit",
+    requiresTopSet: true,
+    defaultValue: "lbs",
+    radios: [
+      { value: "lbs", label: "lbs", defaultChecked: true },
+      { value: "kgs", label: "kgs" },
+    ],
+  },
+  {
+    name: "Bodyweight Unit",
+    query: "bodyweight-unit",
+    column: "bodyweight-unit",
+    requiresBodyweight: true,
+    defaultValue: "lbs",
+    radios: [
+      { value: "lbs", label: "lbs", defaultChecked: true },
+      { value: "kgs", label: "kgs" },
     ],
   },
   {
@@ -115,9 +132,31 @@ const graphTypes = {
   "top set": {
     label: "Top Set",
     type: "bar",
-    getData(exercises) {
-      return [];
+    borderColor: "rgb(53, 162, 235)",
+    backgroundColor: "rgba(53, 162, 235, 0.5)",
+    getData: (exercises) => {
+      return exercises.map((exercise) => {
+        const y =
+          exercise.weight_performed?.reduce(
+            (max, value) => Math.max(max, value),
+            0
+          ) || 0;
+        return { x: exercise.date, y };
+      });
     },
+  },
+  "number of sets": {
+    label: "Number of Sets",
+    type: "bar",
+    borderColor: "rgb(255, 99, 132)",
+    backgroundColor: "rgba(255, 99, 132, 0.5)",
+    getData: (exercises) => {
+      return exercises.map((exercise) => {
+        const y = exercise.number_of_sets_performed || 0;
+        return { x: exercise.date, y };
+      });
+    },
+    yAxisID: "y1",
   },
 };
 
@@ -213,76 +252,87 @@ export default function Progress() {
   const [chartData, setChartData] = useState();
 
   useEffect(() => {
-    if (exercises) {
-      const baseDataset = {
-        borderColor: "rgb(29, 78, 216)",
-        backgroundColor: "rgba(29, 78, 216, 0.5)",
-      };
-      const newChartData = {
-        _datasets: filters.type?.map((filterType) => {
-          // FILL
-          const { type, label, getData } = graphTypes[filterType];
+    const newChartData = {
+      datasets:
+        containsFilters.type?.map((filterType) => {
+          console.log("filterType", filterType, graphTypes);
+          const {
+            type,
+            label,
+            getData,
+            borderColor,
+            backgroundColor,
+            yAxisID,
+          } = graphTypes[filterType];
           return {
             type,
             label,
+            borderColor,
+            backgroundColor,
             data: getData(exercises),
-            ...baseDataset,
+            yAxisID: yAxisID || "y",
           };
-        }),
-        datasets: [
-          {
-            type: "bar",
-            label: "Top Set",
-            data: exercises.map((exercise) => ({
-              x: exercise.date,
-              y: exercise.weight_assigned.reduce(
-                (max, value) => Math.max(max, value),
-                0
-              ),
-            })),
-            ...baseDataset,
-          },
-        ],
-      };
-      setChartData(newChartData);
+        }) || [],
+    };
+    setChartData(newChartData);
 
-      const newChartOptions = {
-        animation: true,
-        scales: {
-          x: {
-            type: "time",
-            time: {
-              unit: "day",
-              unitStepSize: 1,
+    const newChartOptions = {
+      animation: true,
+      scales: {
+        x: {
+          type: "time",
+          time: {
+            unit: "day",
+            unitStepSize: 1,
+          },
+          min: getFromDate(),
+          max: new Date(),
+          ticks: {
+            maxTicksLimit: 20,
+          },
+        },
+        y: {
+          type: "linear",
+          display: true,
+          position: "left",
+        },
+        y1: {
+          type: "linear",
+          display: containsFilters.type?.includes("bodyweight"),
+          position: "right",
+          grid: {
+            drawOnChartArea: false,
+          },
+        },
+        y2: {
+          type: "linear",
+          display: false,
+        },
+      },
+      responsive: true,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: false,
+          text: "Chart.js Line Chart",
+        },
+        tooltip: {
+          callbacks: {
+            title: function (context) {
+              return context[0].label.split(",").slice(0, 2).join(",");
             },
-            min: getFromDate(),
-            max: new Date(),
-            ticks: {
-              maxTicksLimit: 20,
-            },
-          },
-          y: {
-            min: 0,
           },
         },
-        responsive: true,
-        interaction: {
-          mode: "index",
-          intersect: false,
-        },
-        plugins: {
-          legend: {
-            position: "top",
-          },
-          title: {
-            display: false,
-            text: "Chart.js Line Chart",
-          },
-        },
-      };
-      setChartOptions(newChartOptions);
-    }
-  }, [exercises]);
+      },
+    };
+    setChartOptions(newChartOptions);
+  }, [exercises, containsFilters]);
 
   return (
     <>
@@ -306,16 +356,28 @@ export default function Progress() {
           setContainsFilters={setContainsFilters}
           order={order}
           setOrder={setOrder}
-          filterTypes={filterTypes.map((filterType) =>
-            filterType.requiresExercise && !selectedExerciseType
-              ? {
+          filterTypes={filterTypes
+            .filter(
+              (filterType) =>
+                !filterType.requiresBodyweight ||
+                containsFilters.type?.includes("bodyweight")
+            )
+            .filter(
+              (filterType) =>
+                !filterType.requiresTopSet ||
+                containsFilters.type?.includes("top set")
+            )
+            .map((filterType) => {
+              if (filterType.requiresExercise && !selectedExerciseType) {
+                filterType = {
                   ...filterType,
                   checkboxes: filterType.checkboxes.filter(
                     (checkbox) => !checkbox.requiresExercise
                   ),
-                }
-              : filterType
-          )}
+                };
+              }
+              return filterType;
+            })}
           orderTypes={orderTypes}
           showSort={false}
           clearFiltersListener={() => {

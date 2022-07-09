@@ -194,7 +194,7 @@ export default function Filters({
                           const checked =
                             filterType.column in filters
                               ? filters[filterType.column] === radio.value
-                              : radio.defaultChecked;
+                              : Boolean(radio.defaultChecked);
                           return (
                             <div
                               key={id}
