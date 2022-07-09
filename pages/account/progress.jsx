@@ -19,7 +19,7 @@ import {
   Tooltip,
   TimeSeriesScale,
 } from "chart.js";
-import { Chart } from "react-chartjs-2";
+import { Chart, Bar } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { supabase } from "../../utils/supabase";
 
