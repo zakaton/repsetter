@@ -10,25 +10,28 @@ import Filters from "../../components/Filters";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import {
   Chart as ChartJS,
-  CategoryScale,
   LinearScale,
+  CategoryScale,
+  BarElement,
   PointElement,
   LineElement,
-  Title,
-  Tooltip,
   Legend,
+  Tooltip,
+  TimeSeriesScale,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
+import "chartjs-adapter-date-fns";
 import { supabase } from "../../utils/supabase";
 
 ChartJS.register(
-  CategoryScale,
   LinearScale,
+  CategoryScale,
+  BarElement,
   PointElement,
   LineElement,
-  Title,
+  Legend,
   Tooltip,
-  Legend
+  TimeSeriesScale
 );
 
 const filterTypes = [
@@ -137,6 +140,7 @@ export default function Progress() {
         date.setUTCFullYear(date.getUTCFullYear() - 1);
         break;
     }
+    console.log("from date", date);
     return date;
   };
 
@@ -175,46 +179,66 @@ export default function Progress() {
     }
   }, [baseFilter, filters]);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: false,
-        text: "Chart.js Line Chart",
-      },
-    },
-  };
+  const [chartOptions, setChartOptions] = useState();
+  const [chartData, setChartData] = useState();
 
-  const labels = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-  ];
+  useEffect(() => {
+    if (exercises) {
+      const newChartData = {
+        datasets: [
+          {
+            type: "bar",
+            label: "Top Set",
+            data: exercises.map((exercise) => ({
+              x: exercise.date,
+              y: exercise.weight_assigned.reduce(
+                (max, value) => Math.max(max, value),
+                0
+              ),
+            })),
+            borderColor: "rgb(255, 99, 132)",
+            backgroundColor: "rgba(255, 99, 132, 0.5)",
+          },
+        ],
+      };
+      setChartData(newChartData);
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Dataset 1",
-        data: labels.map(() => Math.random() * 100),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-      {
-        label: "Dataset 2",
-        data: labels.map(() => Math.random() * 100),
-        borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
-    ],
-  };
+      const newChartOptions = {
+        animation: false,
+        scales: {
+          x: {
+            type: "timeseries",
+            time: {
+              unit: "day",
+              min: getFromDate(),
+              max: new Date(),
+            },
+            ticks: {
+              autoSkip: false,
+            },
+          },
+          y: {
+            min: 0,
+          },
+        },
+        responsive: true,
+        interaction: {
+          mode: "index",
+          intersect: false,
+        },
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: false,
+            text: "Chart.js Line Chart",
+          },
+        },
+      };
+      setChartOptions(newChartOptions);
+    }
+  }, [exercises]);
 
   return (
     <>
@@ -241,6 +265,10 @@ export default function Progress() {
           filterTypes={filterTypes}
           orderTypes={orderTypes}
           showSort={false}
+          clearFiltersListener={() => {
+            setSelectedExerciseType();
+            setSelectedExerciseTypeName("");
+          }}
         >
           <ExerciseTypesSelect
             selectedExerciseType={selectedExerciseType}
@@ -248,20 +276,14 @@ export default function Progress() {
             selectedExerciseTypeName={selectedExerciseTypeName}
             setSelectedExerciseTypeName={setSelectedExerciseTypeName}
           />
-          <div>
-            <label
-              htmlFor="date-range"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Date Range
-            </label>
-          </div>
         </Filters>
 
         <div className="border-t border-gray-200 pt-2">
-          <div className="">
-            <Line options={options} data={data} />
-          </div>
+          {chartOptions && chartData && (
+            <div className="">
+              <Chart type="bar" data={chartData} options={chartOptions} />
+            </div>
+          )}
         </div>
       </div>
     </>

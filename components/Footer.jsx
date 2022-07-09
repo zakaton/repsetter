@@ -19,7 +19,7 @@ const navigation = {
         />
       ),
     },
-    false && {
+    {
       name: "GitHub",
       href: "https://github.com/zakaton/repsetter",
       icon: (props) => (
