@@ -24,6 +24,7 @@ import "chartjs-adapter-date-fns";
 import { supabase } from "../../utils/supabase";
 
 ChartJS.register(
+  Chart,
   LinearScale,
   CategoryScale,
   BarElement,
