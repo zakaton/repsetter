@@ -34,27 +34,43 @@ ChartJS.register(
   TimeSeriesScale
 );
 
+const defaultDateRange = "past month";
+
 const filterTypes = [
   {
-    name: "Type",
+    name: "Graph Types",
     query: "type",
     column: "type",
+    requiresExercise: true,
     checkboxes: [
       {
         value: "top set",
         label: "Top Set",
+        requiresExercise: true,
       },
       {
         value: "number of sets",
         label: "Number of Sets",
+        requiresExercise: true,
       },
       {
         value: "number of reps",
         label: "Number of Reps",
+        requiresExercise: true,
       },
       {
         value: "difficulty",
         label: "Difficulty",
+        requiresExercise: true,
+      },
+      {
+        value: "weight",
+        label: "weight",
+        requiresExercise: true,
+      },
+      {
+        value: "bodyweight",
+        label: "bodyweight",
       },
     ],
   },
@@ -62,6 +78,7 @@ const filterTypes = [
     name: "Date Range",
     query: "date-range",
     column: "date-range",
+    defaultValue: defaultDateRange,
     options: [
       {
         value: "past week",
@@ -91,6 +108,17 @@ const orderTypes = [
   },
 ];
 
+// FILL
+const graphTypes = {
+  "top set": {
+    label: "Top Set",
+    type: "bar",
+    getData(exercises) {
+      return [];
+    },
+  },
+};
+
 export default function Progress() {
   const { selectedClient } = useClient();
   const { user } = useUser();
@@ -102,8 +130,8 @@ export default function Progress() {
     setSelectedExerciseTypeName,
   } = useSelectedExerciseType();
 
-  const [filters, setFilters] = useState({ "date-range": "past month" });
-  const [containsFilters, setContainsFilters] = useState({ type: ["top set"] });
+  const [filters, setFilters] = useState({});
+  const [containsFilters, setContainsFilters] = useState({});
   const [order, setOrder] = useState(orderTypes[0].value);
 
   const [baseFilter, setBaseFilter] = useState({});
@@ -126,7 +154,7 @@ export default function Progress() {
 
   const getFromDate = () => {
     let date = new Date();
-    switch (filters["date-range"]) {
+    switch (filters["date-range"] || defaultDateRange) {
       case "past week":
         date.setUTCDate(date.getUTCDate() - 7);
         break;
@@ -184,7 +212,21 @@ export default function Progress() {
 
   useEffect(() => {
     if (exercises) {
+      const baseDataset = {
+        borderColor: "rgb(29, 78, 216)",
+        backgroundColor: "rgba(29, 78, 216, 0.5)",
+      };
       const newChartData = {
+        _datasets: filters.type?.map((filterType) => {
+          // FILL
+          const { type, label, getData } = graphTypes[filterType];
+          return {
+            type,
+            label,
+            data: getData(exercises),
+            ...baseDataset,
+          };
+        }),
         datasets: [
           {
             type: "bar",
@@ -196,8 +238,7 @@ export default function Progress() {
                 0
               ),
             })),
-            borderColor: "rgb(255, 99, 132)",
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
+            ...baseDataset,
           },
         ],
       };
@@ -263,7 +304,16 @@ export default function Progress() {
           setContainsFilters={setContainsFilters}
           order={order}
           setOrder={setOrder}
-          filterTypes={filterTypes}
+          filterTypes={filterTypes.map((filterType) =>
+            filterType.requiresExercise && !selectedExerciseType
+              ? {
+                  ...filterType,
+                  checkboxes: filterType.checkboxes.filter(
+                    (checkbox) => !checkbox.requiresExercise
+                  ),
+                }
+              : filterType
+          )}
           orderTypes={orderTypes}
           showSort={false}
           clearFiltersListener={() => {

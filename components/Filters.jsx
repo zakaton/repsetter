@@ -118,7 +118,14 @@ export default function Filters({
   const [numberOfActiveFilters, setNumberOfActiveFilters] = useState(0);
   useEffect(() => {
     setNumberOfActiveFilters(
-      Object.keys(filters).length +
+      Object.keys(filters).reduce(
+        (count, key) =>
+          count +
+          filterTypes.find((filterType) => filterType.column === key)?.options
+            ? 0
+            : 1,
+        0
+      ) +
         Object.keys(containsFilters).reduce(
           (count, key) => count + containsFilters[key].length,
           0
@@ -273,7 +280,11 @@ export default function Filters({
                     {filterType.options && (
                       <select
                         className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                        value={filters[filterType.column]}
+                        value={
+                          filters[filterType.column] ||
+                          filterType.defaultValue ||
+                          ""
+                        }
                         onInput={(e) => {
                           const newFilters = { ...filters };
                           newFilters[filterType.column] = e.target.value;
