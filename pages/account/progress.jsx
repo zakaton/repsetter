@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import { useClient } from "../../context/client-context";
@@ -20,13 +20,14 @@ import {
   TimeScale,
   BarController,
 } from "chart.js";
-import { Chart } from "react-chartjs-2";
+import { Chart, getElementAtEvent } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { supabase } from "../../utils/supabase";
 import {
   poundsToKilograms,
   kilogramsToPounds,
 } from "../../utils/exercise-utils";
+import { useRouter } from "next/router";
 
 ChartJS.register(
   LinearScale,
@@ -267,7 +268,7 @@ const graphTypes = {
 };
 
 export default function Progress() {
-  const { selectedClient } = useClient();
+  const { selectedClient, setSelectedDate } = useClient();
   const { user } = useUser();
 
   const {
@@ -416,10 +417,10 @@ export default function Progress() {
         },
         y1: {
           type: "linear",
-          display: containsFilters.type?.includes("bodyweight"),
+          display: containsFilters.type?.includes("bodyweight") || false,
           position: "right",
           title: {
-            display: true,
+            display: containsFilters.type?.includes("bodyweight"),
             text: `Bodyweight (${isBodyweightInKgs ? "kgs" : "lbs"})`,
           },
           grid: {
@@ -433,10 +434,6 @@ export default function Progress() {
         y3: {
           type: "linear",
           display: false,
-          ticks: {
-            min: 0,
-            max: 10,
-          },
         },
         y4: {
           type: "linear",
@@ -479,6 +476,27 @@ export default function Progress() {
     };
     setChartOptions(newChartOptions);
   }, [exercises, containsFilters]);
+
+  const router = useRouter();
+  const chartRef = useRef();
+  const onChartClick = (event) => {
+    const { current: chart } = chartRef;
+
+    if (!chart) {
+      return;
+    }
+
+    const { datasetIndex, index } = getElementAtEvent(chart, event)[0];
+    const dataset = chartData.datasets[datasetIndex];
+    const data = dataset.data[index];
+    const date = new Date(data.x);
+    setSelectedDate(date);
+    if (dataset.label === "Bodyweight") {
+      router.push("/account/weight");
+    } else {
+      router.push("/account/workouts");
+    }
+  };
 
   return (
     <>
@@ -542,7 +560,13 @@ export default function Progress() {
         <div className="border-t border-gray-200 pt-2">
           {chartOptions && chartData && (
             <div className="">
-              <Chart type="bar" data={chartData} options={chartOptions} />
+              <Chart
+                type="bar"
+                data={chartData}
+                options={chartOptions}
+                ref={chartRef}
+                onClick={onChartClick}
+              />
             </div>
           )}
         </div>
