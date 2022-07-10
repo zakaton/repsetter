@@ -327,12 +327,17 @@ export default function Progress() {
 
   const [exercises, setExercises] = useState();
   const [isGettingExercises, setIsGettingExercises] = useState(false);
+  const [previousFilters, setPreviousFilters] = useState();
   const getExercises = async (refresh) => {
     if (!exercises || refresh) {
+      if (previousFilters?.["date-range"] === filters["date-range"]) {
+        return;
+      }
       if (isGettingExercises) {
         return;
       }
       setIsGettingExercises(true);
+      setPreviousFilters(filters);
 
       console.log("getting exercises with filters", baseFilter, filters);
 
