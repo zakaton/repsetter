@@ -23,6 +23,10 @@ import {
 import { Chart } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { supabase } from "../../utils/supabase";
+import {
+  poundsToKilograms,
+  kilogramsToPounds,
+} from "../../utils/exercise-utils";
 
 ChartJS.register(
   LinearScale,
@@ -37,7 +41,13 @@ ChartJS.register(
 );
 
 const defaultDateRange = "past month";
-
+const graphTypeOrder = [
+  "top set",
+  "number of sets",
+  "number of reps",
+  "difficulty",
+  "bodyweight",
+];
 const filterTypes = [
   {
     name: "Graph Types",
@@ -127,21 +137,40 @@ const orderTypes = [
   },
 ];
 
-// FILL
 const graphTypes = {
   "top set": {
     label: "Top Set",
     type: "bar",
     borderColor: "rgb(53, 162, 235)",
     backgroundColor: "rgba(53, 162, 235, 0.5)",
-    getData: (exercises) => {
-      return exercises.map((exercise) => {
-        const y =
-          exercise.weight_performed?.reduce(
-            (max, value) => Math.max(max, value),
-            0
-          ) || 0;
-        return { x: exercise.date, y };
+    getData: ({ exercises, filters }) => {
+      return exercises?.map((exercise) => {
+        let topWeightAssigned = 0;
+        let topWeightPerformed = 0;
+        exercise.weight_assigned?.forEach((weightAssigned, index) => {
+          if (weightAssigned > topWeightAssigned) {
+            topWeightAssigned = weightAssigned;
+            topWeightPerformed = exercise.weight_performed?.[index] || 0;
+          }
+        });
+        const showKilograms = (filters["weight-unit"] || "kgs") === "kgs";
+        if (exercise.is_weight_in_kilograms !== showKilograms) {
+          if (showKilograms) {
+            topWeightPerformed =
+              poundsToKilograms(topWeightPerformed).toFixed(0);
+            topWeightAssigned = poundsToKilograms(topWeightAssigned).toFixed(0);
+          } else {
+            topWeightPerformed =
+              kilogramsToPounds(topWeightPerformed).toFixed(0);
+            topWeightAssigned = kilogramsToPounds(topWeightAssigned).toFixed(0);
+          }
+        }
+        return {
+          x: exercise.date,
+          y: topWeightPerformed,
+          denominator: topWeightAssigned,
+          suffix: showKilograms ? "kgs" : "lbs",
+        };
       });
     },
   },
@@ -150,13 +179,90 @@ const graphTypes = {
     type: "bar",
     borderColor: "rgb(255, 99, 132)",
     backgroundColor: "rgba(255, 99, 132, 0.5)",
-    getData: (exercises) => {
-      return exercises.map((exercise) => {
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
         const y = exercise.number_of_sets_performed || 0;
-        return { x: exercise.date, y };
+        return {
+          x: exercise.date,
+          y,
+          denominator: exercise.number_of_sets_assigned,
+        };
       });
     },
     yAxisID: "y1",
+  },
+  "number of reps": {
+    label: "Number of Reps",
+    type: "bar",
+    borderColor: "rgb(34, 197, 94)",
+    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let maxRepsAssigned = 0;
+        let maxRepsPerformed = 0;
+        exercise.number_of_reps_assigned?.forEach((repsAssigned, index) => {
+          if (repsAssigned > maxRepsAssigned) {
+            maxRepsAssigned = repsAssigned;
+            maxRepsPerformed = exercise.number_of_reps_performed?.[index] || 0;
+          }
+        });
+        return {
+          x: exercise.date,
+          y: maxRepsPerformed,
+          denominator: maxRepsAssigned,
+        };
+      });
+    },
+    yAxisID: "y2",
+  },
+  difficulty: {
+    label: "Difficulty",
+    type: "bar",
+    borderColor: "rgb(250, 204, 21)",
+    backgroundColor: "rgba(250, 204, 21, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let difficulty = 0;
+        let topWeightAssigned = 0;
+        exercise.weight_assigned?.forEach((weightAssigned, index) => {
+          if (weightAssigned > topWeightAssigned) {
+            topWeightAssigned = weightAssigned;
+            difficulty = exercise.difficulty?.[index] || 0;
+          }
+        });
+        return {
+          x: exercise.date,
+          y: difficulty,
+          denominator: 10,
+        };
+      });
+    },
+    yAxisID: "y3",
+  },
+  bodyweight: {
+    label: "Bodyweight",
+    type: "line",
+    borderColor: "rgb(250, 204, 21)",
+    backgroundColor: "rgba(250, 204, 21, 0.5)",
+    getData: ({ bodyweight }) => {
+      return bodyweight?.map((bodyweight) => {
+        const showKilograms = (filters["bodyweight-unit"] || "kgs") === "kgs";
+        let weight = bodyweight.weight;
+        if (bodyweight.is_weight_in_kilograms !== showKilograms) {
+          if (showKilograms) {
+            weight = poundsToKilograms(weight).toFixed(0);
+          } else {
+            weight = kilogramsToPounds(weight).toFixed(0);
+          }
+        }
+        return {
+          x: weight.date,
+          y: weight,
+          suffix: showKilograms ? "kgs" : "lbs",
+        };
+      });
+    },
+    yAxisID: "y4",
   },
 };
 
@@ -254,28 +360,36 @@ export default function Progress() {
   useEffect(() => {
     const newChartData = {
       datasets:
-        containsFilters.type?.map((filterType) => {
-          console.log("filterType", filterType, graphTypes);
-          const {
-            type,
-            label,
-            getData,
-            borderColor,
-            backgroundColor,
-            yAxisID,
-          } = graphTypes[filterType];
-          return {
-            type,
-            label,
-            borderColor,
-            backgroundColor,
-            data: getData(exercises),
-            yAxisID: yAxisID || "y",
-          };
-        }) || [],
+        containsFilters.type
+          ?.sort((a, b) => {
+            const aIndex = graphTypeOrder.indexOf(a);
+            const bIndex = graphTypeOrder.indexOf(b);
+            return aIndex - bIndex;
+          })
+          .map((filterType) => {
+            console.log("filterType", filterType, graphTypes);
+            const {
+              type,
+              label,
+              getData,
+              borderColor,
+              backgroundColor,
+              yAxisID,
+            } = graphTypes[filterType];
+            return {
+              type,
+              label,
+              borderColor,
+              backgroundColor,
+              data: getData({ exercises, filters }),
+              yAxisID: yAxisID || "y",
+            };
+          }) || [],
     };
     setChartData(newChartData);
 
+    const isWeightInKgs = (filters["weight-unit"] || "kgs") === "kgs";
+    const isBodyweightInKgs = (filters["bodyweight-unit"] || "kgs") === "kgs";
     const newChartOptions = {
       animation: true,
       scales: {
@@ -295,16 +409,36 @@ export default function Progress() {
           type: "linear",
           display: true,
           position: "left",
+          title: {
+            display: true,
+            text: `Top Set (${isWeightInKgs ? "kgs" : "lbs"})`,
+          },
         },
         y1: {
           type: "linear",
           display: containsFilters.type?.includes("bodyweight"),
           position: "right",
+          title: {
+            display: true,
+            text: `Bodyweight (${isBodyweightInKgs ? "kgs" : "lbs"})`,
+          },
           grid: {
             drawOnChartArea: false,
           },
         },
         y2: {
+          type: "linear",
+          display: false,
+        },
+        y3: {
+          type: "linear",
+          display: false,
+          ticks: {
+            min: 0,
+            max: 10,
+          },
+        },
+        y4: {
           type: "linear",
           display: false,
         },
@@ -327,6 +461,18 @@ export default function Progress() {
             title: function (context) {
               return context[0].label.split(",").slice(0, 2).join(",");
             },
+            label: function (context) {
+              const label = context.dataset.label;
+              let data = context.dataset.data[context.dataIndex];
+              let value = data.y;
+              if ("denominator" in data) {
+                value += `/${data.denominator}`;
+              }
+              if ("suffix" in data) {
+                value += ` ${data.suffix}`;
+              }
+              return `${label}: ${value}`;
+            },
           },
         },
       },
@@ -336,7 +482,7 @@ export default function Progress() {
 
   return (
     <>
-      <div className="bg-white px-4 pb-2 pt-6 sm:px-6 sm:pt-6">
+      <div className="bg-whitepx-4 pb-2 pt-6 sm:px-6 sm:pt-6">
         <div className="pb-4">
           <h3 className="inline text-lg font-medium leading-6 text-gray-900">
             Progress
