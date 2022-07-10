@@ -4,6 +4,7 @@ import { OnlineContextProvider } from "../context/online-context";
 import { ClientContextProvider } from "../context/client-context";
 import { ExerciseVideoContextProvider } from "../context/exercise-videos-context";
 import { SelectedExerciseTypeContextProvider } from "../context/selected-exercise-context";
+import { ProgressContextProvider } from "../context/progress-context";
 import Layout from "../components/layouts/Layout";
 
 function MyApp({ Component, pageProps }) {
@@ -14,7 +15,9 @@ function MyApp({ Component, pageProps }) {
         <ExerciseVideoContextProvider>
           <ClientContextProvider>
             <SelectedExerciseTypeContextProvider>
-              <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+              <ProgressContextProvider>
+                <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+              </ProgressContextProvider>
             </SelectedExerciseTypeContextProvider>
           </ClientContextProvider>
         </ExerciseVideoContextProvider>

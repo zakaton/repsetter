@@ -8,6 +8,7 @@ import { useUser } from "../../context/user-context";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import Filters from "../../components/Filters";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
+import { useProgress } from "../../context/progress-context";
 import {
   Chart as ChartJS,
   LinearScale,
@@ -278,8 +279,12 @@ export default function Progress() {
     setSelectedExerciseTypeName,
   } = useSelectedExerciseType();
 
-  const [filters, setFilters] = useState({});
-  const [containsFilters, setContainsFilters] = useState({});
+  const {
+    progressFilters: filters,
+    setProgressFilters: setFilters,
+    progressContainsFilters: containsFilters,
+    setProgressContainsFilters: setContainsFilters,
+  } = useProgress();
   const [order, setOrder] = useState(orderTypes[0].value);
 
   const [baseFilter, setBaseFilter] = useState({});
@@ -483,6 +488,9 @@ export default function Progress() {
     const { current: chart } = chartRef;
 
     if (!chart) {
+      return;
+    }
+    if (event.nativeEvent.pointerType === "touch") {
       return;
     }
 
