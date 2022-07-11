@@ -30,7 +30,7 @@ export function SelectedExerciseTypeContextProvider(props) {
         shallow: true,
       });
     }
-  }, [router.query]);
+  }, [router.pathname]);
 
   const [isGettingExerciseType, setIsGettingExerciseType] = useState(false);
   const getExerciseType = async () => {
