@@ -504,11 +504,7 @@ export default function Progress() {
     const data = dataset.data[index];
     const date = new Date(data.x);
     setSelectedDate(date);
-    if (dataset.label === "Bodyweight") {
-      router.push("/account/weight");
-    } else {
-      router.push("/account/workouts");
-    }
+    router.push("/account/diary");
   };
 
   return (

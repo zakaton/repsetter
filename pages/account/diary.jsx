@@ -15,7 +15,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Workouts() {
+export default function Diary() {
   const { user } = useUser();
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
   const {
@@ -342,7 +342,8 @@ export default function Workouts() {
 
       <AccountCalendarLayout
         setCalendar={setCalendar}
-        tableName="workout"
+        tableName="diary"
+        resultNamePlural="diary"
         highlightedDates={exerciseDates}
         underCalendar={
           <>
@@ -598,4 +599,4 @@ export default function Workouts() {
   );
 }
 
-Workouts.getLayout = getAccountLayout;
+Diary.getLayout = getAccountLayout;

@@ -40,8 +40,8 @@ const navigation = [
     canCoach: true,
   },
   {
-    name: "Workouts",
-    href: "/account/workouts",
+    name: "Diary",
+    href: "/account/diary",
     icon: ClipboardListIcon,
   },
   {
@@ -58,16 +58,6 @@ const navigation = [
     name: "Progress",
     href: "/account/progress",
     icon: ChartBarIcon,
-  },
-  {
-    name: "Weight",
-    href: "/account/weight",
-    icon: ScaleIcon,
-  },
-  {
-    name: "Pictures",
-    href: "/account/pictures",
-    icon: CameraIcon,
   },
   {
     name: "Notifications",
