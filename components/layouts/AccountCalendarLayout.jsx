@@ -1,4 +1,3 @@
-import { useUser } from "../../context/user-context";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
 import { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
@@ -210,81 +209,110 @@ export default function AccountCalendarLayout({
                 <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="mt-6 grid grid-cols-7 text-xs leading-6 text-gray-500">
-              <div>S</div>
-              <div>M</div>
-              <div>T</div>
-              <div>W</div>
-              <div>T</div>
-              <div>F</div>
-              <div>S</div>
-            </div>
-            <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 text-sm shadow ring-1 ring-gray-200">
-              {calendar &&
-                calendar.map((date, dayIdx) => {
-                  const dateString = [
-                    date.getUTCFullYear(),
-                    date.getUTCMonth() + 1,
-                    date.getUTCDate(),
-                  ]
-                    .map((number) => (number < 10 ? `0${number}` : number))
-                    .join("-");
-                  const day = {
-                    date,
-                    isCurrentMonth:
-                      date.getUTCMonth() === selectedDate.getUTCMonth(),
-                    isSelected:
-                      date.toDateString() === selectedDate.toDateString(),
-                    isToday: date.toDateString() === currentDate.toDateString(),
-                    isHighlighted: highlightedDates.some(
-                      (highlightedDate) => highlightedDate.date === dateString
-                    ),
-                  };
-                  return (
-                    <button
-                      key={day.date.toDateString()}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDate(day.date);
-                      }}
-                      className={classNames(
-                        "py-1.5 hover:bg-gray-100 focus:z-10",
-                        day.isCurrentMonth ? "bg-white" : "bg-gray-50",
-                        (day.isSelected || day.isToday) && "font-semibold",
-                        day.isSelected && "text-white",
-                        !day.isSelected &&
-                          day.isCurrentMonth &&
-                          !day.isToday &&
-                          "text-gray-900",
-                        !day.isSelected &&
-                          !day.isCurrentMonth &&
-                          !day.isToday &&
-                          "text-gray-400",
-                        !day.isSelected &&
-                          !day.isToday &&
-                          day.isHighlighted &&
-                          "text-gray-1000",
-                        day.isToday && !day.isSelected && "text-blue-600",
-                        dayIdx === 0 && "rounded-tl-lg",
-                        dayIdx === 6 && "rounded-tr-lg",
-                        dayIdx === calendar.length - 7 && "rounded-bl-lg",
-                        dayIdx === calendar.length - 1 && "rounded-br-lg"
-                      )}
-                    >
-                      <time
-                        dateTime={day.date.toDateString()}
-                        className={classNames(
-                          "mx-auto flex h-7 w-7 items-center justify-center rounded-full",
-                          day.isSelected && day.isToday && "bg-blue-600",
-                          day.isSelected && !day.isToday && "bg-gray-900",
-                          !day.isSelected && day.isHighlighted && "bg-blue-200"
-                        )}
-                      >
-                        {day.date.getUTCDate()}
-                      </time>
-                    </button>
-                  );
-                })}
+
+            <div className="mt-2 overflow-hidden rounded-md shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
+              <div className="grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs font-semibold leading-6 text-gray-700 lg:flex-none">
+                <div className="bg-white py-2">
+                  S<span className="sr-only sm:not-sr-only">un</span>
+                </div>
+                <div className="bg-white py-2">
+                  M<span className="sr-only sm:not-sr-only">on</span>
+                </div>
+                <div className="bg-white py-2">
+                  T<span className="sr-only sm:not-sr-only">ue</span>
+                </div>
+                <div className="bg-white py-2">
+                  W<span className="sr-only sm:not-sr-only">ed</span>
+                </div>
+                <div className="bg-white py-2">
+                  T<span className="sr-only sm:not-sr-only">hu</span>
+                </div>
+                <div className="bg-white py-2">
+                  F<span className="sr-only sm:not-sr-only">ri</span>
+                </div>
+                <div className="bg-white py-2">
+                  S<span className="sr-only sm:not-sr-only">at</span>
+                </div>
+              </div>
+              <div className="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
+                <div className="isolate grid w-full grid-cols-7 gap-px">
+                  {calendar &&
+                    calendar.map((date, dayIdx) => {
+                      const dateString = [
+                        date.getUTCFullYear(),
+                        date.getUTCMonth() + 1,
+                        date.getUTCDate(),
+                      ]
+                        .map((number) => (number < 10 ? `0${number}` : number))
+                        .join("-");
+                      const day = {
+                        date,
+                        isCurrentMonth:
+                          date.getUTCMonth() === selectedDate.getUTCMonth(),
+                        isSelected:
+                          date.toDateString() === selectedDate.toDateString(),
+                        isToday:
+                          date.toDateString() === currentDate.toDateString(),
+                        isHighlighted: highlightedDates.some(
+                          (highlightedDate) =>
+                            highlightedDate.date === dateString
+                        ),
+                        events: [],
+                      };
+                      return (
+                        <button
+                          key={day.date}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDate(day.date);
+                          }}
+                          className={classNames(
+                            day.isCurrentMonth ? "bg-white" : "bg-gray-50",
+                            (day.isSelected || day.isToday) && "font-semibold",
+                            day.isSelected && "text-white",
+                            !day.isSelected && day.isToday && "text-blue-600",
+                            !day.isSelected &&
+                              day.isCurrentMonth &&
+                              !day.isToday &&
+                              "text-gray-900",
+                            !day.isSelected &&
+                              !day.isCurrentMonth &&
+                              !day.isToday &&
+                              "text-gray-500",
+                            "flex h-14 flex-col py-2 px-3 hover:bg-gray-100 focus:z-10"
+                          )}
+                        >
+                          <time
+                            dateTime={day.date}
+                            className={classNames(
+                              day.isSelected &&
+                                "flex h-6 w-6 items-center justify-center rounded-full",
+                              day.isSelected && day.isToday && "bg-blue-600",
+                              day.isSelected && !day.isToday && "bg-gray-900",
+                              "ml-auto"
+                            )}
+                          >
+                            {day.date.getUTCDate()}
+                          </time>
+                          {/* FILL - exercises, weight, selfies */}
+                          <span className="sr-only">
+                            {day.events.length} events
+                          </span>
+                          {day.events.length > 0 && (
+                            <span className="-mx-0.5 mt-auto flex flex-wrap-reverse">
+                              {day.events.map((event, index) => (
+                                <span
+                                  key={index}
+                                  className="mx-0.5 mb-1 h-1.5 w-1.5 rounded-full bg-gray-400"
+                                />
+                              ))}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
             </div>
             {underCalendar}
           </div>
