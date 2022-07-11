@@ -22,6 +22,16 @@ export function SelectedExerciseTypeContextProvider(props) {
     setCheckedQuery(true);
   }, [router.isReady, checkedQuery]);
 
+  useEffect(() => {
+    if (router.isReady && checkedQuery && selectedExerciseType) {
+      const query = {};
+      query["exercise-type"] = selectedExerciseType.name;
+      router.replace({ query: { ...router.query, ...query } }, undefined, {
+        shallow: true,
+      });
+    }
+  }, [router.query]);
+
   const [isGettingExerciseType, setIsGettingExerciseType] = useState(false);
   const getExerciseType = async () => {
     if (isGettingExerciseType) {

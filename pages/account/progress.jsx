@@ -501,7 +501,6 @@ export default function Progress() {
       return;
     }
 
-    console.log(getElementAtEvent(chart, event)[0]);
     const elementAtEvent = getElementAtEvent(chart, event)[0];
     if (!elementAtEvent) {
       return;
