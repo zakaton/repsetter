@@ -4,6 +4,7 @@ import {
   getUserProfile,
   isUserAdmin,
   getUserByAccessToken,
+  paginationSize,
 } from "../../../utils/supabase";
 import Stripe from "stripe";
 
@@ -117,12 +118,20 @@ export default async function handler(req, res) {
     deleteClientSubscriptionsResult
   );
 
-  // FILL - delete workouts
-  // FILL - delete diet
-  // FILL - delete weight
+  const { error: deleteExercisesError } = await supabase
+    .from("exercise")
+    .delete()
+    .match({ client: profile.id });
+  console.log("deleteExercisesError", deleteExercisesError);
+
+  const { error: deleteWeightError } = await supabase
+    .from("weight")
+    .delete()
+    .match({ client: profile.id });
+  console.log("deleteWeightError", deleteWeightError);
+
   // FILL - delete pictures
 
-  // delete stripe customer/account
   try {
     await stripe.customers.del(profile.stripe_customer);
   } catch (error) {

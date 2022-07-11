@@ -8,7 +8,6 @@ export const ClientContext = createContext();
 const pathnamesForQuery = [
   "workouts",
   "pictures",
-  "diet",
   "weight",
   "exercise-types",
 ].map((pathname) => "/account/" + pathname);
