@@ -418,7 +418,7 @@ export default function Progress() {
         },
         y: {
           type: "linear",
-          display: true,
+          display: containsFilters.type?.includes("top set") || false,
           position: "left",
           title: {
             display: true,
@@ -428,13 +428,15 @@ export default function Progress() {
         y1: {
           type: "linear",
           display: containsFilters.type?.includes("bodyweight") || false,
-          position: "right",
+          position: containsFilters.type?.includes("top set")
+            ? "right"
+            : "left",
           title: {
             display: containsFilters.type?.includes("bodyweight"),
             text: `Bodyweight (${isBodyweightInKgs ? "kgs" : "lbs"})`,
           },
           grid: {
-            drawOnChartArea: false,
+            drawOnChartArea: !containsFilters.type?.includes("top set"),
           },
         },
         y2: {
@@ -499,7 +501,12 @@ export default function Progress() {
       return;
     }
 
-    const { datasetIndex, index } = getElementAtEvent(chart, event)[0];
+    console.log(getElementAtEvent(chart, event)[0]);
+    const elementAtEvent = getElementAtEvent(chart, event)[0];
+    if (!elementAtEvent) {
+      return;
+    }
+    const { datasetIndex, index } = elementAtEvent;
     const dataset = chartData.datasets[datasetIndex];
     const data = dataset.data[index];
     const date = new Date(data.x);
