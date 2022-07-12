@@ -421,7 +421,7 @@ export default function Diary() {
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
-          <div className="relative flex justify-center">
+          <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
               <button
                 type="button"
@@ -439,17 +439,10 @@ export default function Diary() {
               </button>
               <button
                 type="button"
-                className="relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <span className="sr-only">Copy</span>
                 <ClipboardIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <span className="sr-only">Delete</span>
-                <TrashIcon className="h-5 w-5" aria-hidden="true" />
               </button>
             </span>
           </div>
