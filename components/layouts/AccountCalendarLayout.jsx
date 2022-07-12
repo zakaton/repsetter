@@ -312,7 +312,7 @@ export default function AccountCalendarLayout({
             </div>
             {underCalendar}
           </div>
-          <div className="mt-8 divide-y divide-gray-100 text-sm leading-6 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:mt-0">
+          <div className="mt-8 text-sm leading-6 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:mt-0">
             {children}
           </div>
         </div>

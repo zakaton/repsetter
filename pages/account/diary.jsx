@@ -10,6 +10,12 @@ import { useUser } from "../../context/user-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import LazyVideo from "../../components/LazyVideo";
 import YouTube from "react-youtube";
+import {
+  PaperClipIcon,
+  PlusIcon,
+  TrashIcon,
+  ClipboardIcon,
+} from "@heroicons/react/outline";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -403,8 +409,59 @@ export default function Diary() {
           </>
         }
       >
-        {exercises?.map((exercise) => (
-          <div key={exercise.id} className="border-t border-gray-200 py-5">
+        <div className="relative">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
+            <div className="relative flex justify-start">
+              <span className="bg-white pr-2 text-base text-gray-500">
+                Exercises
+              </span>
+            </div>
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+              <button
+                type="button"
+                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Add</span>
+                <PlusIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Copy</span>
+                <PaperClipIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Copy</span>
+                <ClipboardIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Delete</span>
+                <TrashIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </span>
+          </div>
+        </div>
+        {exercises?.map((exercise, index) => (
+          <div
+            key={exercise.id}
+            className={classNames(
+              "py-5",
+              index === 0 ? "" : "border-gray-20 border-t"
+            )}
+          >
             <dl
               className={
                 "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
