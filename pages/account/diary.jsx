@@ -3,6 +3,7 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
 import ExerciseModal from "../../components/account/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
+import WeightModal from "../../components/account/modal/WeightModal";
 import React, { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
 import { supabase } from "../../utils/supabase";
@@ -13,8 +14,6 @@ import YouTube from "react-youtube";
 import {
   PaperClipIcon,
   PlusIcon,
-  CameraIcon,
-  ScaleIcon,
   ClipboardIcon,
 } from "@heroicons/react/outline";
 
@@ -58,7 +57,6 @@ export default function Diary() {
 
   const [gotExerciseForUserId, setGotExerciseForUserId] = useState();
   const [gotExerciseForDate, setGotExerciseForDate] = useState();
-
   const [exercises, setExercises] = useState();
   const [isGettingExercises, setIsGettingExercises] = useState(false);
   const getExercises = async (refresh) => {
@@ -342,6 +340,93 @@ export default function Diary() {
     }
   };
 
+  const [showWeightModal, setShowWeightModal] = useState(false);
+  const [showWeightNotification, setShowWeightNotification] = useState(false);
+  const [weightStatus, setWeightStatus] = useState();
+
+  const [selectedWeight, setSelectedWeight] = useState();
+  const [gotWeightForUserId, setGotWeightForUserId] = useState();
+  const [gotWeightForDate, setGotWeightForDate] = useState();
+  const [weights, setWeights] = useState();
+  const [isGettingWeights, setIsGettingWeights] = useState(false);
+  const getWeights = async (refresh) => {
+    if (weights && !refresh) {
+      return;
+    }
+    if (!selectedClientId) {
+      return;
+    }
+    if (isGettingWeights) {
+      return;
+    }
+    console.log("getting weights for date", selectedDate.toDateString());
+    setIsGettingWeights(true);
+    const matchFilters = {
+      client: selectedClientId,
+      date: selectedDate.toDateString(),
+    };
+    console.log("matchFilters", matchFilters);
+    const { data: weights, error } = await supabase
+      .from("weight")
+      .select("*, type(*)")
+      .match(matchFilters);
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("got weights for date", selectedDate.toDateString(), weights);
+      setWeights(weights);
+      setGotWeightForUserId(selectedClientId);
+      setGotWeightForDate(selectedDate);
+    }
+    setIsGettingWeights(false);
+  };
+
+  useEffect(() => {
+    if (!selectedDate) {
+      return;
+    }
+
+    if (!weights) {
+      getWeights();
+    } else if (
+      gotWeightForUserId != selectedClientId ||
+      selectedDate != gotWeightForDate
+    ) {
+      getWeights(true);
+    }
+  }, [weights, selectedClientId, selectedClient, selectedDate]);
+
+  useEffect(() => {
+    if (weights) {
+      console.log(`subscribing to weight updates`);
+      const subscription = supabase
+        .from(`weight:date=eq.${selectedDate.toDateString()}`)
+        .on("INSERT", (payload) => {
+          console.log(`new weight`, payload);
+          getWeights(true);
+          getWeightDates();
+        })
+        .on("UPDATE", (payload) => {
+          console.log(`updated weight`, payload);
+          getWeights(true);
+        })
+        .on("DELETE", (payload) => {
+          console.log(`deleted weight`, payload);
+          const deletedWeight = payload.old;
+          // eslint-disable-next-line no-shadow
+          setWeights(
+            weights.filter((weight) => weight?.id !== deletedWeight.id)
+          );
+          getWeightDates();
+        })
+        .subscribe();
+      return () => {
+        console.log("unsubscribing to weight updates");
+        supabase.removeSubscription(subscription);
+      };
+    }
+  }, [weights]);
+
   return (
     <>
       <ExerciseModal
@@ -386,6 +471,21 @@ export default function Diary() {
         status={editExerciseStatus}
       />
 
+      <WeightModal
+        open={showWeightModal}
+        setOpen={setShowWeightModal}
+        selectedResult={selectedWeight}
+        setSelectedResult={setSelectedWeight}
+        existingResults={weights}
+        setResultStatus={setWeightStatus}
+        setShowResultNotification={setShowWeightNotification}
+      />
+      <Notification
+        open={showWeightNotification}
+        setOpen={setShowWeightNotification}
+        status={weightStatus}
+      />
+
       <AccountCalendarLayout
         setCalendar={setCalendar}
         tableName="diary"
@@ -399,20 +499,33 @@ export default function Diary() {
             aria-hidden="true"
           >
             <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-gray-500">
-                Weight
+              <span className="bg-white pr-2 text-base text-yellow-600">
+                Bodyweight
               </span>
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
+          <div className="relative flex justify-end sm:justify-center">
+            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+              <button
+                type="button"
+                onClick={() => setShowWeightModal(true)}
+                className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Add</span>
+                <PlusIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </span>
+          </div>
         </div>
-        <div className="relative mt-3">
+        <br></br>
+        <div className="relative mt-8">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
             <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-gray-500">
+              <span className="bg-white pr-2 text-base text-blue-500">
                 Exercises
               </span>
             </div>
