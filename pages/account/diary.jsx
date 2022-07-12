@@ -156,16 +156,23 @@ export default function Diary() {
     setShowAddExerciseNotification(false);
     setShowDeleteExerciseNotification(false);
     setShowEditExerciseNotification(false);
+    setShowWeightNotification(false);
   };
   useEffect(() => {
     if (
       showAddExerciseModal ||
       showDeleteExerciseModal ||
-      showEditExerciseModal
+      showEditExerciseModal ||
+      showWeightModal
     ) {
       clearNotifications();
     }
-  }, [showAddExerciseModal, showDeleteExerciseModal, showEditExerciseModal]);
+  }, [
+    showAddExerciseModal,
+    showDeleteExerciseModal,
+    showEditExerciseModal,
+    showWeightModal,
+  ]);
 
   const [videoPlayer, setVideoPlayer] = useState({});
   useEffect(() => {
@@ -368,7 +375,7 @@ export default function Diary() {
     console.log("matchFilters", matchFilters);
     const { data: weights, error } = await supabase
       .from("weight")
-      .select("*, type(*)")
+      .select("*")
       .match(matchFilters);
     if (error) {
       console.error(error);

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ScaleIcon } from "@heroicons/react/outline";
+import { supabase } from "../../../utils/supabase";
 
 export default function WeightModal(props) {
   const {
@@ -18,6 +19,8 @@ export default function WeightModal(props) {
     if (!open) {
       setDidCreateWeight(false);
       setDidUpdateWeight(false);
+      setIsCreatingWeight(false);
+      setIsUpdatingWeight(false);
       setWeight(0);
       setIsWeightEmptyString(true);
       setIncludeTime(false);
@@ -30,12 +33,6 @@ export default function WeightModal(props) {
     }
   }, [open, selectedWeight]);
 
-  useEffect(() => {
-    if (open) {
-      setShowWeightNotification(false);
-    }
-  }, [open]);
-
   const [isCreatingWeight, setIsCreatingWeight] = useState(false);
   const [didCreateWeight, setDidCreateWeight] = useState(false);
 
@@ -45,6 +42,7 @@ export default function WeightModal(props) {
   const [includeTime, setIncludeTime] = useState(false);
 
   const [weight, setWeight] = useState(0);
+  const [time, setTime] = useState();
   const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
 
@@ -79,13 +77,15 @@ export default function WeightModal(props) {
         id="weightForm"
         onSubmit={async (e) => {
           e.preventDefault();
-          // FILL
           let status = {};
           if (selectedWeight) {
+            // FILL
             setIsUpdatingWeight(true);
             setDidUpdateWeight(true);
             setSelectedWeight();
           } else {
+            // FILL
+            console.log("args", weight, includeTime, time);
             setIsCreatingWeight(true);
             setDidCreateWeight(true);
           }
@@ -107,13 +107,14 @@ export default function WeightModal(props) {
               required
               type="number"
               min="0"
+              placeholder="0"
               name="weight"
               id="weight"
               className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={0}
-              placeholder={0}
+              value={isWeightEmptyString ? "" : weight}
               onInput={(e) => {
-                // FILL
+                setIsWeightEmptyString(e.target.value === "");
+                setWeight(Number(e.target.value));
               }}
             />
             <div className="absolute inset-y-0 right-0 flex items-center">
@@ -167,8 +168,9 @@ export default function WeightModal(props) {
                 name="time"
                 id="time"
                 className="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                value={time || ""}
                 onInput={(e) => {
-                  // FILL
+                  setTime(e.target.value);
                 }}
               />
             </div>
