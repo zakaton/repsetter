@@ -39,7 +39,7 @@ export default function AccountCalendarLayout({
   underCalendar,
   yearsRange = [2021, 2022],
   setCalendar: setCalendarParent,
-  highlightedDates = [],
+  datesDots = {},
 }) {
   resultName = resultName || tableName;
   resultNamePlural = resultNamePlural || resultName + "s";
@@ -253,11 +253,7 @@ export default function AccountCalendarLayout({
                           date.toDateString() === selectedDate.toDateString(),
                         isToday:
                           date.toDateString() === currentDate.toDateString(),
-                        isHighlighted: highlightedDates.some(
-                          (highlightedDate) =>
-                            highlightedDate.date === dateString
-                        ),
-                        events: [],
+                        dots: datesDots[dateString] || [],
                       };
                       return (
                         <button
@@ -295,15 +291,15 @@ export default function AccountCalendarLayout({
                             {day.date.getUTCDate()}
                           </time>
                           {/* FILL - exercises, weight, selfies */}
-                          <span className="sr-only">
-                            {day.events.length} events
-                          </span>
-                          {day.events.length > 0 && (
+                          {day.dots.length > 0 && (
                             <span className="-mx-0.5 mt-auto flex flex-wrap-reverse">
-                              {day.events.map((event, index) => (
+                              {day.dots.map(({ color }, index) => (
                                 <span
                                   key={index}
-                                  className="mx-0.5 mb-1 h-1.5 w-1.5 rounded-full bg-gray-400"
+                                  className={classNames(
+                                    "mx-0.5 mb-1 h-1.5 w-1.5 rounded-full",
+                                    color || "bg-gray-400"
+                                  )}
                                 />
                               ))}
                             </span>

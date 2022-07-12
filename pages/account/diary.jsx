@@ -229,6 +229,19 @@ export default function Diary() {
     }
   }, [calendar]);
 
+  const [datesDots, setDatesDots] = useState({});
+  useEffect(() => {
+    if (exerciseDates) {
+      const newDatesDots = {};
+      exerciseDates.forEach((exerciseDate) => {
+        const dots = newDatesDots[exerciseDate.date] || [];
+        dots.push({ color: "bg-blue-500" });
+        newDatesDots[exerciseDate.date] = dots;
+      });
+      setDatesDots(newDatesDots);
+    }
+  }, [exerciseDates]);
+
   const [copiedExercises, setCopiedExercises] = useState();
   const copyExercises = () => {
     if (exercises?.length > 0) {
@@ -344,7 +357,7 @@ export default function Diary() {
         setCalendar={setCalendar}
         tableName="diary"
         resultNamePlural="diary"
-        highlightedDates={exerciseDates}
+        datesDots={datesDots}
         underCalendar={
           <>
             <div className="flex gap-x-3">
