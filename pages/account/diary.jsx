@@ -364,41 +364,6 @@ export default function Diary() {
         tableName="diary"
         resultNamePlural="diary"
         datesDots={datesDots}
-        underCalendar={
-          <>
-            <div className="flex gap-x-3">
-              <button
-                type="button"
-                onClick={() => {
-                  copyExercises();
-                }}
-                className={classNames(
-                  "mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow",
-                  exercises?.length > 0 &&
-                    "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-                  (!exercises || exercises?.length == 0) && "opacity-50"
-                )}
-              >
-                Copy
-              </button>
-              <button
-                type="button"
-                disabled={!(copiedExercises?.length > 0)}
-                onClick={() => {
-                  pasteExercises();
-                }}
-                className={classNames(
-                  "mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow",
-                  copiedExercises &&
-                    "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-                  !copiedExercises && "opacity-50"
-                )}
-              >
-                Paste
-              </button>
-            </div>
-          </>
-        }
       >
         <div className="relative">
           <div
