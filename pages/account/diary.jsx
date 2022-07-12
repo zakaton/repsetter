@@ -13,7 +13,8 @@ import YouTube from "react-youtube";
 import {
   PaperClipIcon,
   PlusIcon,
-  TrashIcon,
+  CameraIcon,
+  ScaleIcon,
   ClipboardIcon,
 } from "@heroicons/react/outline";
 
@@ -372,6 +373,37 @@ export default function Diary() {
           >
             <div className="relative flex justify-start">
               <span className="bg-white pr-2 text-base text-gray-500">
+                Weight
+              </span>
+            </div>
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-end sm:justify-center">
+            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+              <button
+                type="button"
+                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Set Weight</span>
+                <ScaleIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span className="sr-only">Set Picture</span>
+                <CameraIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </span>
+          </div>
+        </div>
+        <div className="relative mt-3">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
+            <div className="relative flex justify-start">
+              <span className="bg-white pr-2 text-base text-gray-500">
                 Exercises
               </span>
             </div>
@@ -392,10 +424,10 @@ export default function Diary() {
                 onClick={() => {
                   copyExercises();
                 }}
-                disabled={exercises.length === 0}
+                disabled={exercises?.length === 0}
                 className={classNames(
                   "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
-                  exercises.length > 0
+                  exercises?.length > 0
                     ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     : "bg-gray-100"
                 )}
