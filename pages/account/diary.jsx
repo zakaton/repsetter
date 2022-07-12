@@ -369,15 +369,6 @@ export default function Diary() {
             <div className="flex gap-x-3">
               <button
                 type="button"
-                onClick={() => setShowAddExerciseModal(true)}
-                className="mt-4 w-full rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Add Exercise
-              </button>
-            </div>
-            <div className="flex gap-x-3">
-              <button
-                type="button"
                 onClick={() => {
                   copyExercises();
                 }}
@@ -425,6 +416,7 @@ export default function Diary() {
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
               <button
                 type="button"
+                onClick={() => setShowAddExerciseModal(true)}
                 className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <span className="sr-only">Add</span>
@@ -432,16 +424,34 @@ export default function Diary() {
               </button>
               <button
                 type="button"
-                className="relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                onClick={() => {
+                  copyExercises();
+                }}
+                disabled={exercises.length === 0}
+                className={classNames(
+                  "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
+                  exercises.length > 0
+                    ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    : "bg-gray-100"
+                )}
               >
                 <span className="sr-only">Copy</span>
                 <PaperClipIcon className="h-5 w-5" aria-hidden="true" />
               </button>
               <button
                 type="button"
-                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={!(copiedExercises?.length > 0)}
+                onClick={() => {
+                  pasteExercises();
+                }}
+                className={classNames(
+                  "relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
+                  copiedExercises?.length > 0
+                    ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    : "bg-gray-100"
+                )}
               >
-                <span className="sr-only">Copy</span>
+                <span className="sr-only">Paste</span>
                 <ClipboardIcon className="h-5 w-5" aria-hidden="true" />
               </button>
             </span>
