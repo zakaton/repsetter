@@ -434,6 +434,8 @@ export default function Diary() {
     }
   }, [weights]);
 
+  const [isUsingKilograms, setIsUsingKilograms] = useState(false);
+
   return (
     <>
       <ExerciseModal
@@ -512,20 +514,34 @@ export default function Diary() {
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
-          {amITheClient && (
-            <div className="relative flex justify-end sm:justify-center">
-              <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+          <div className="relative flex justify-end sm:justify-center">
+            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+              {amITheClient && (
                 <button
                   type="button"
                   onClick={() => setShowWeightModal(true)}
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className={classNames(
+                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                    "rounded-l-md"
+                  )}
                 >
-                  <span className="sr-only">Add</span>
+                  <span className="sr-only">Add Weight</span>
                   <PlusIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
-              </span>
-            </div>
-          )}
+              )}
+              <button
+                type="button"
+                onClick={() => setIsUsingKilograms(!isUsingKilograms)}
+                className={classNames(
+                  "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                  "rounded-r-md"
+                )}
+              >
+                <span className="sr-only">Toggle Weight</span>
+                {isUsingKilograms ? "kg" : "lbs"}
+              </button>
+            </span>
+          </div>
         </div>
         <br></br>
         <div className="relative mt-8">
