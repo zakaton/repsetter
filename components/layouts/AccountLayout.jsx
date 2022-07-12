@@ -40,14 +40,14 @@ const navigation = [
     canCoach: true,
   },
   {
-    name: "Diary",
-    href: "/account/diary",
-    icon: ClipboardListIcon,
-  },
-  {
     name: "Exercise Types",
     href: "/account/exercise-types",
     icon: ClipboardCheckIcon,
+  },
+  {
+    name: "Diary",
+    href: "/account/diary",
+    icon: ClipboardListIcon,
   },
   {
     name: "Exercises",

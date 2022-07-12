@@ -223,6 +223,26 @@ export default function Diary() {
       setExerciseDates(exerciseDates);
     }
   };
+  const [weightDates, setWeightDates] = useState();
+  const getWeightDates = async () => {
+    console.log(
+      "getting weight dates for the month",
+      calendar[0].toDateString(),
+      calendar[calendar.length - 1].toDateString()
+    );
+    const { data: weightDates, error } = await supabase
+      .rpc("get_weight_dates", {
+        email: amITheClient ? user.email : selectedClient.client_email,
+      })
+      .gte("date", calendar[0].toDateString())
+      .lte("date", calendar[calendar.length - 1].toDateString());
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("weightDates", weightDates);
+      setWeightDates(weightDates);
+    }
+  };
   useEffect(() => {
     if (
       calendar &&
@@ -233,21 +253,27 @@ export default function Diary() {
     ) {
       setLastSelectedDate(selectedDate);
       getExerciseDates();
+      getWeightDates();
     }
   }, [calendar]);
 
   const [datesDots, setDatesDots] = useState({});
   useEffect(() => {
-    if (exerciseDates) {
+    if (exerciseDates || weightDates) {
       const newDatesDots = {};
-      exerciseDates.forEach((exerciseDate) => {
+      exerciseDates?.forEach((exerciseDate) => {
         const dots = newDatesDots[exerciseDate.date] || [];
         dots.push({ color: "bg-blue-500" });
         newDatesDots[exerciseDate.date] = dots;
       });
+      weightDates?.forEach((weightDate) => {
+        const dots = newDatesDots[weightDate.date] || [];
+        dots.push({ color: "bg-yellow-500" });
+        newDatesDots[weightDate.date] = dots;
+      });
       setDatesDots(newDatesDots);
     }
-  }, [exerciseDates]);
+  }, [exerciseDates, weightDates]);
 
   const [copiedExercises, setCopiedExercises] = useState();
   const copyExercises = () => {
@@ -364,6 +390,7 @@ export default function Diary() {
         setCalendar={setCalendar}
         tableName="diary"
         resultNamePlural="diary"
+        subtitle="View and edit your weight, pictures, and exercises"
         datesDots={datesDots}
       >
         <div className="relative">
@@ -377,24 +404,6 @@ export default function Diary() {
               </span>
             </div>
             <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-end sm:justify-center">
-            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              <button
-                type="button"
-                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <span className="sr-only">Set Weight</span>
-                <ScaleIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <span className="sr-only">Set Picture</span>
-                <CameraIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </span>
           </div>
         </div>
         <div className="relative mt-3">
