@@ -594,9 +594,6 @@ export default function Diary() {
         plugins: {
           tooltip: {
             callbacks: {
-              _title: function (context) {
-                return context[0].label.split(",").slice(0, 2).join(",");
-              },
               _label: function (context) {
                 const label = context.dataset.label;
                 let data = context.dataset.data[context.dataIndex];
@@ -654,7 +651,7 @@ export default function Diary() {
       setWeightChartOptions();
       setWeightChartData();
     }
-  }, [weights, lastWeightBeforeToday, firstWeightAfterToday]);
+  }, [weights, lastWeightBeforeToday, firstWeightAfterToday, isUsingKilograms]);
 
   return (
     <>
