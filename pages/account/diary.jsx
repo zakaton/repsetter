@@ -372,6 +372,9 @@ export default function Diary() {
     } else {
       console.log("got weights for date", selectedDate.toDateString(), weights);
       setWeights(weights);
+      if (weights.length > 0) {
+        setIsUsingKilograms(weights[0].is_weight_in_kilograms);
+      }
       setGotWeightForUserId(selectedClientId);
       setGotWeightForDate(selectedDate);
 
@@ -675,7 +678,7 @@ export default function Diary() {
                           }
                         >
                           ({weightDifference < 0 ? "" : "+"}
-                          {weightDifference})
+                          {weightDifference.toFixed(1)})
                         </span>
                       )}
                     </dd>
