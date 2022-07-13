@@ -157,31 +157,6 @@ export default function Diary() {
     }
   }, [exercises]);
 
-  const clearNotifications = () => {
-    setShowAddExerciseNotification(false);
-    setShowDeleteExerciseNotification(false);
-    setShowEditExerciseNotification(false);
-    setShowWeightNotification(false);
-    setShowDeleteWeightNotification(false);
-  };
-  useEffect(() => {
-    if (
-      showAddExerciseModal ||
-      showDeleteExerciseModal ||
-      showEditExerciseModal ||
-      showWeightModal ||
-      showDeleteWeightModal
-    ) {
-      clearNotifications();
-    }
-  }, [
-    showAddExerciseModal,
-    showDeleteExerciseModal,
-    showEditExerciseModal,
-    showWeightModal,
-    showDeleteWeightModal,
-  ]);
-
   const [videoPlayer, setVideoPlayer] = useState({});
   useEffect(() => {
     if (
@@ -460,6 +435,31 @@ export default function Diary() {
     }
     return `${hours}:${minutes} ${suffix}`;
   };
+
+  const clearNotifications = () => {
+    setShowAddExerciseNotification(false);
+    setShowDeleteExerciseNotification(false);
+    setShowEditExerciseNotification(false);
+    setShowWeightNotification(false);
+    setShowDeleteWeightNotification(false);
+  };
+  useEffect(() => {
+    if (
+      showAddExerciseModal ||
+      showDeleteExerciseModal ||
+      showEditExerciseModal ||
+      showWeightModal ||
+      showDeleteWeightModal
+    ) {
+      clearNotifications();
+    }
+  }, [
+    showAddExerciseModal,
+    showDeleteExerciseModal,
+    showEditExerciseModal,
+    showWeightModal,
+    showDeleteWeightModal,
+  ]);
 
   return (
     <>
