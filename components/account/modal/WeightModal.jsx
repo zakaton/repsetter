@@ -9,6 +9,7 @@ import {
   kilogramsToPounds,
   poundsToKilograms,
 } from "../../../utils/exercise-utils";
+import { weightEvents } from "../../../utils/weight-utils";
 
 export default function WeightModal(props) {
   const {
@@ -21,7 +22,7 @@ export default function WeightModal(props) {
     existingResults: existingWeights = [],
   } = props;
 
-  const { selectedClient, selectedDate, amITheClient } = useClient();
+  const { selectedDate } = useClient();
   const { user } = useUser();
 
   useEffect(() => {
@@ -31,12 +32,6 @@ export default function WeightModal(props) {
 
       setIsAddingWeight(false);
       setIsUpdatingWeight(false);
-
-      setWeight(0);
-      setIsWeightEmptyString(true);
-
-      setIncludeTime(false);
-      setSelectedWeight();
     }
   }, [open]);
 
@@ -49,9 +44,13 @@ export default function WeightModal(props) {
         setIsUsingKilograms(selectedWeight.is_weight_in_kilograms);
         if (selectedWeight.time !== null) {
           setTime(selectedWeight.time);
+          setWeightEvent(selectedWeight.event);
           setIncludeTime(true);
         }
       } else {
+        setWeight(0);
+        setIsWeightEmptyString(true);
+        setIncludeTime(existingWeights?.length > 0);
         setTime(new Date().toTimeString().split(" ")[0]);
       }
     }
@@ -67,6 +66,7 @@ export default function WeightModal(props) {
 
   const [weight, setWeight] = useState(0);
   const [time, setTime] = useState();
+  const [weightEvent, setWeightEvent] = useState();
   const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
   const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
@@ -110,7 +110,7 @@ export default function WeightModal(props) {
       }
     >
       <form
-        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3"
+        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
         id="weightForm"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -123,8 +123,10 @@ export default function WeightModal(props) {
             };
             if (includeTime) {
               updateWeightData.time = time;
+              updateWeightData.event = weightEvent;
             } else {
               updateWeightData.time = null;
+              updateWeightData.event = null;
             }
             console.log("updateWeightData", updateWeightData);
             const { data: updatedWeight, error: updatedWeightError } =
@@ -158,6 +160,7 @@ export default function WeightModal(props) {
             };
             if (includeTime) {
               addWeightData.time = time;
+              addWeightData.event = weightEvent;
             }
             const { data: addedWeight, error: addWeightError } = await supabase
               .from("weight")
@@ -226,6 +229,7 @@ export default function WeightModal(props) {
               id="includeTime"
               name="includeTime"
               type="checkbox"
+              disabled={!selectedWeight && existingWeights?.length > 0}
               checked={includeTime}
               onChange={(e) => {
                 setIncludeTime(e.target.checked);
@@ -257,11 +261,34 @@ export default function WeightModal(props) {
                 className="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 value={time?.split(":").slice(0, 2).join(":") || ""}
                 onInput={(e) => {
-                  console.log(e.target);
                   setTime(e.target.value);
                 }}
               />
             </div>
+          </div>
+        )}
+        {includeTime && (
+          <div className="col-span-1">
+            <label
+              htmlFor="event"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event
+            </label>
+            <select
+              id="event"
+              name="event"
+              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              value={weightEvent || ""}
+              onInput={(e) => {
+                setWeightEvent(e.target.value);
+              }}
+            >
+              <option>none</option>
+              {weightEvents.map((weightEvent) => (
+                <option key={weightEvent}>{weightEvent}</option>
+              ))}
+            </select>
           </div>
         )}
       </form>

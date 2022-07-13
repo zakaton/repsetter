@@ -558,7 +558,10 @@ export default function Diary() {
               {amITheClient && !weights?.some((weight) => weight.time == null) && (
                 <button
                   type="button"
-                  onClick={() => setShowWeightModal(true)}
+                  onClick={() => {
+                    setSelectedWeight();
+                    setShowWeightModal(true);
+                  }}
                   className={classNames(
                     "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
                     "rounded-l-md"
@@ -587,12 +590,14 @@ export default function Diary() {
         {weights
           ?.slice()
           .sort((a, b) => {
-            const [aHour, aMinute] = a.time.split(":");
-            const [bHour, bMinute] = b.time.split(":");
+            const [aHour, aMinute, aCreated_at] = a.time.split(":");
+            const [bHour, bMinute, bCreated_at] = b.time.split(":");
             if (aHour != bHour) {
               return aHour - bHour;
-            } else {
+            } else if (aMinute != bMinute) {
               return aMinute - bMinute;
+            } else {
+              return aCreated_at - bCreated_at;
             }
           })
           .map((weight, index) => (
@@ -605,7 +610,7 @@ export default function Diary() {
             >
               <dl
                 className={
-                  "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                  "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
                 }
               >
                 <div className="sm:col-span-1">
@@ -625,6 +630,14 @@ export default function Diary() {
                     <dt className="text-sm font-medium text-gray-500">Time</dt>
                     <dd className="mt-1 break-words text-sm text-gray-900">
                       {formatTime(weight.time)}
+                    </dd>
+                  </div>
+                )}
+                {weight.time !== null && weight.event !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Event</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {weight.event}
                     </dd>
                   </div>
                 )}
