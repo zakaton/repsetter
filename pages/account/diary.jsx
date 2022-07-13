@@ -592,6 +592,13 @@ export default function Diary() {
           intersect: false,
         },
         plugins: {
+          title: {
+            display: false,
+          },
+          legend: {
+            position: "top",
+            display: false, // FILL
+          },
           tooltip: {
             callbacks: {
               _label: function (context) {
@@ -636,8 +643,13 @@ export default function Diary() {
             label: "Weight",
             data: allWeights.map((weight) => {
               const date = dateFromDateAndTime(weight.date, weight.time);
-              console.log(date);
-              return { x: date, y: weight.weight };
+              let weightValue = weight.weight;
+              if (isUsingKilograms != weight.is_weight_in_kilograms) {
+                weightValue = isUsingKilograms
+                  ? poundsToKilograms(weightValue)
+                  : kilogramsToPounds(weightValue);
+              }
+              return { x: date, y: weightValue };
             }),
             borderColor: "rgb(250, 204, 21)",
             backgroundColor: "rgba(250, 204, 21, 0.5)",

@@ -463,7 +463,6 @@ export default function Progress() {
         },
         title: {
           display: false,
-          text: "Chart.js Line Chart",
         },
         tooltip: {
           callbacks: {
