@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ScaleIcon } from "@heroicons/react/outline";
 import { supabase } from "../../../utils/supabase";
+import { useClient } from "../../../context/client-context";
+import { useUser } from "../../../context/user-context";
 
 export default function WeightModal(props) {
   const {
@@ -15,14 +17,20 @@ export default function WeightModal(props) {
     existingResults: existingWeights = [],
   } = props;
 
+  const { selectedClient, selectedDate, amITheClient } = useClient();
+  const { user } = useUser();
+
   useEffect(() => {
     if (!open) {
-      setDidCreateWeight(false);
+      setDidAddWeight(false);
       setDidUpdateWeight(false);
-      setIsCreatingWeight(false);
+
+      setIsAddingWeight(false);
       setIsUpdatingWeight(false);
+
       setWeight(0);
       setIsWeightEmptyString(true);
+
       setIncludeTime(false);
     }
   }, [open]);
@@ -33,8 +41,8 @@ export default function WeightModal(props) {
     }
   }, [open, selectedWeight]);
 
-  const [isCreatingWeight, setIsCreatingWeight] = useState(false);
-  const [didCreateWeight, setDidCreateWeight] = useState(false);
+  const [isAddingWeight, setIsAddingWeight] = useState(false);
+  const [didAddWeight, setDidAddWeight] = useState(false);
 
   const [isUpdatingWeight, setIsUpdatingWeight] = useState(false);
   const [didUpdateWeight, setDidUpdateWeight] = useState(false);
@@ -64,9 +72,9 @@ export default function WeightModal(props) {
               : didUpdateWeight
               ? "Updated Weight!"
               : "Update Weight"
-            : isCreatingWeight
+            : isAddingWeight
             ? "Adding Weight..."
-            : didCreateWeight
+            : didAddWeight
             ? "Added Weight!"
             : "Add Weight"}
         </button>
@@ -85,9 +93,32 @@ export default function WeightModal(props) {
             setSelectedWeight();
           } else {
             // FILL
+            setIsAddingWeight(true);
             console.log("args", weight, includeTime, time);
-            setIsCreatingWeight(true);
-            setDidCreateWeight(true);
+            const addWeightData = {
+              date: selectedDate,
+              weight,
+              is_weight_in_kilograms: isUsingKilograms,
+              client: user.id,
+              client_email: user.email,
+            };
+            if (includeTime) {
+              addWeightData.time = time;
+            }
+            const { data: addedWeight, error: addWeightError } = await supabase
+              .from("weight")
+              .insert([addWeightData]);
+            if (addWeightError) {
+              console.error(addWeightError);
+              status = { type: "failed", message: addWeightError.message };
+            } else {
+              console.log("addedWeight", addedWeight);
+              status = {
+                type: "succeeded",
+                message: "Successfully added Bodyweight",
+              };
+            }
+            setDidAddWeight(true);
           }
 
           setWeightStatus(status);
