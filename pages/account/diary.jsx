@@ -566,13 +566,13 @@ export default function Diary() {
             offset: true,
             type: "time",
             time: {
-              unit: "minute",
-              unitStepSize: 1,
+              unit: "hour",
+              //unitStepSize: 1,
             },
             min: fromDate,
             max: toDate,
             ticks: {
-              maxTicksLimit: 20,
+              //maxTicksLimit: 25,
             },
           },
           y: {
@@ -596,8 +596,7 @@ export default function Diary() {
             display: false,
           },
           legend: {
-            position: "top",
-            display: false, // FILL
+            display: false,
           },
           tooltip: {
             callbacks: {
