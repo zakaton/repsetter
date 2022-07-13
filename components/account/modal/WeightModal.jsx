@@ -45,12 +45,13 @@ export default function WeightModal(props) {
       if (selectedWeight) {
         setWeight(selectedWeight.weight);
         setIsWeightEmptyString(false);
+        setPreviousIsUsingKilograms(selectedWeight.is_weight_in_kilograms);
+        setIsUsingKilograms(selectedWeight.is_weight_in_kilograms);
         if (selectedWeight.time !== null) {
           setTime(selectedWeight.time);
           setIncludeTime(true);
         }
       } else {
-        console.log("set time");
         setTime(new Date().toTimeString().split(" ")[0]);
       }
     }
@@ -68,11 +69,16 @@ export default function WeightModal(props) {
   const [time, setTime] = useState();
   const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
+  const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
+    useState(false);
   useEffect(() => {
-    const newWeight = isUsingKilograms
-      ? poundsToKilograms(weight)
-      : kilogramsToPounds(weight);
-    setWeight(newWeight.toFixed(1));
+    if (isUsingKilograms !== previousIsUsingKilograms) {
+      const newWeight = isUsingKilograms
+        ? poundsToKilograms(weight)
+        : kilogramsToPounds(weight);
+      setWeight(newWeight.toFixed(1));
+      setPreviousIsUsingKilograms(isUsingKilograms);
+    }
   }, [isUsingKilograms]);
 
   return (
