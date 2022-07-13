@@ -679,7 +679,10 @@ export default function Diary() {
                           }
                         >
                           ({weightDifference < 0 ? "" : "+"}
-                          {weightDifference.toFixed(1)})
+                          {weightDifference.toFixed(
+                            Number.isInteger(weightDifference) ? 0 : 1
+                          )}
+                          )
                         </span>
                       )}
                     </dd>
