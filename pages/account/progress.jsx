@@ -402,7 +402,6 @@ export default function Progress() {
     const isWeightInKgs = (filters["weight-unit"] || "kgs") === "kgs";
     const isBodyweightInKgs = (filters["bodyweight-unit"] || "kgs") === "kgs";
     const newChartOptions = {
-      animation: true,
       scales: {
         x: {
           type: "time",
@@ -453,6 +452,7 @@ export default function Progress() {
         },
       },
       responsive: true,
+      animation: true,
       interaction: {
         mode: "index",
         intersect: false,

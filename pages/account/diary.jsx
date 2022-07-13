@@ -22,6 +22,30 @@ import {
   poundsToKilograms,
 } from "../../utils/exercise-utils";
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  TimeScale,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import "chartjs-adapter-date-fns";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  TimeScale,
+  Legend
+);
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -346,6 +370,7 @@ export default function Diary() {
   const [weights, setWeights] = useState();
   const [isGettingWeights, setIsGettingWeights] = useState(false);
   const [lastWeightBeforeToday, setLastWeightBeforeToday] = useState();
+  const [firstWeightAfterToday, setFirstWeightAfterToday] = useState();
   const getWeights = async (refresh) => {
     if (weights && !refresh) {
       return;
@@ -374,6 +399,7 @@ export default function Diary() {
       console.log("got weights for date", selectedDate.toDateString(), weights);
       setWeights(weights);
       setLastWeightBeforeToday();
+      setFirstWeightAfterToday();
       if (weights.length > 0) {
         setIsUsingKilograms(weights[0].is_weight_in_kilograms);
       }
@@ -396,6 +422,24 @@ export default function Diary() {
       } else {
         console.log("lastWeightBeforeToday", lastWeightBeforeToday);
         setLastWeightBeforeToday(lastWeightBeforeToday);
+      }
+
+      const {
+        data: firstWeightAfterToday,
+        error: getFirstWeightAfterTodayError,
+      } = await supabase
+        .from("weight")
+        .select("*")
+        .match({ client: selectedClientId })
+        .gt("date", selectedDate.toDateString())
+        .order("date", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (getFirstWeightAfterTodayError) {
+        console.error(getFirstWeightAfterTodayError);
+      } else {
+        console.log("firstWeightAfterToday", firstWeightAfterToday);
+        setFirstWeightAfterToday(firstWeightAfterToday);
       }
     }
     setIsGettingWeights(false);
@@ -462,6 +506,14 @@ export default function Diary() {
     return `${hours}:${minutes} ${suffix}`;
   };
 
+  const dateFromDateAndTime = (date, time) => {
+    const fullDate = new Date(date);
+    const [hours, minutes] = time.split(":");
+    fullDate.setHours(hours);
+    fullDate.setMinutes(minutes);
+    return fullDate;
+  };
+
   const clearNotifications = () => {
     setShowAddExerciseNotification(false);
     setShowDeleteExerciseNotification(false);
@@ -486,6 +538,109 @@ export default function Diary() {
     showWeightModal,
     showDeleteWeightModal,
   ]);
+
+  const [weightChartOptions, setWeightChartOptions] = useState();
+  const [weightChartData, setWeightChartData] = useState();
+  useEffect(() => {
+    if (
+      weights &&
+      weights.length > 1 &&
+      weights?.every((weight) => weight.time)
+    ) {
+      const newWeightChartOptions = {
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: "minute",
+              unitStepSize: 1,
+            },
+            // FILL
+            //min: "00:00:00",
+            //max: "24:00:00",
+            ticks: {
+              maxTicksLimit: 20,
+            },
+          },
+          y: {
+            type: "linear",
+            display: true,
+            title: {
+              display: true,
+              text: `Weight (${isUsingKilograms ? "kg" : "lbs"})`,
+            },
+          },
+        },
+        responsive: true,
+        animation: true,
+        interaction: {
+          mode: "index",
+          intersect: false,
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              _title: function (context) {
+                return context[0].label.split(",").slice(0, 2).join(",");
+              },
+              _label: function (context) {
+                const label = context.dataset.label;
+                let data = context.dataset.data[context.dataIndex];
+                let value = data.y;
+                return `${label}: ${value}`;
+              },
+            },
+          },
+        },
+      };
+      console.log("newWeightChartOptions", newWeightChartOptions);
+      setWeightChartOptions(newWeightChartOptions);
+      const allWeights = [];
+      if (lastWeightBeforeToday?.time) {
+        const date = dateFromDateAndTime(
+          lastWeightBeforeToday.date,
+          lastWeightBeforeToday.time
+        );
+        if (selectedDate.getTime() - date.getTime() < 1000 * 60 * 60 * 12) {
+          allWeights.push(lastWeightBeforeToday);
+        }
+      }
+      allWeights.push(...weights);
+      if (firstWeightAfterToday?.time) {
+        const date = dateFromDateAndTime(
+          firstWeightAfterToday.date,
+          firstWeightAfterToday.time
+        );
+        if (date.getTime() - selectedDate.getTime() < 1000 * 60 * 60 * 12) {
+          allWeights.push(firstWeightAfterToday);
+        }
+      }
+      const newWeightChartData = {
+        datasets: [
+          {
+            label: "Weight",
+            data: allWeights.map((weight) => {
+              const time = new Date(weight.date);
+              if (weight.time) {
+                const [hours, minutes] = weight.time.split(":");
+                time.setHours(hours);
+                time.setMinutes(minutes);
+              }
+              return { x: time, y: weight.weight };
+            }),
+            borderColor: "rgb(250, 204, 21)",
+            backgroundColor: "rgba(250, 204, 21, 0.5)",
+          },
+        ],
+      };
+      console.log("newWeightChartData", newWeightChartData);
+      setWeightChartData(newWeightChartData);
+    } else {
+      console.log("Clearing chart data/options");
+      setWeightChartOptions();
+      setWeightChartData();
+    }
+  }, [weights, lastWeightBeforeToday, firstWeightAfterToday]);
 
   return (
     <>
@@ -614,6 +769,9 @@ export default function Diary() {
             </span>
           </div>
         </div>
+        {weightChartData && weightChartOptions && (
+          <Line options={weightChartOptions} data={weightChartData} />
+        )}
         {weights
           ?.slice()
           .sort((a, b) => {
