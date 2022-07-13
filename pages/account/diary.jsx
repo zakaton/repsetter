@@ -344,6 +344,7 @@ export default function Diary() {
   const [gotWeightForDate, setGotWeightForDate] = useState();
   const [weights, setWeights] = useState();
   const [isGettingWeights, setIsGettingWeights] = useState(false);
+  const [lastWeightBeforeToday, setLastWeightBeforeToday] = useState();
   const getWeights = async (refresh) => {
     if (weights && !refresh) {
       return;
@@ -364,7 +365,8 @@ export default function Diary() {
     const { data: weights, error } = await supabase
       .from("weight")
       .select("*")
-      .match(matchFilters);
+      .match(matchFilters)
+      .order("time", { ascending: true });
     if (error) {
       console.error(error);
     } else {
@@ -372,6 +374,24 @@ export default function Diary() {
       setWeights(weights);
       setGotWeightForUserId(selectedClientId);
       setGotWeightForDate(selectedDate);
+
+      const {
+        data: lastWeightBeforeToday,
+        error: getLastWeightBeforeTodayError,
+      } = await supabase
+        .from("weight")
+        .select("*")
+        .match({ client: selectedClientId })
+        .lt("date", selectedDate.toDateString())
+        .order("date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (getLastWeightBeforeTodayError) {
+        console.error(getLastWeightBeforeTodayError);
+      } else {
+        console.log("lastWeightBeforeToday", lastWeightBeforeToday);
+        setLastWeightBeforeToday(lastWeightBeforeToday);
+      }
     }
     setIsGettingWeights(false);
   };
@@ -513,6 +533,7 @@ export default function Diary() {
         existingResults={weights}
         setResultStatus={setWeightStatus}
         setShowResultNotification={setShowWeightNotification}
+        lastWeightBeforeToday={lastWeightBeforeToday}
       />
       <Notification
         open={showWeightNotification}

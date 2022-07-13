@@ -1,1 +1,8 @@
-export const weightEvents = ["worked out", "urinated"];
+export const weightEvents = [
+  "none",
+  "ate",
+  "drank",
+  "urinated",
+  "pooped",
+  "worked out",
+];

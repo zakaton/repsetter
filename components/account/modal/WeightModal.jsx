@@ -20,6 +20,7 @@ export default function WeightModal(props) {
     setResultStatus: setWeightStatus,
     setShowResultNotification: setShowWeightNotification,
     existingResults: existingWeights = [],
+    lastWeightBeforeToday,
   } = props;
 
   const { selectedDate } = useClient();
@@ -37,10 +38,10 @@ export default function WeightModal(props) {
 
   useEffect(() => {
     if (open) {
+      console.log("existingWeights", existingWeights, selectedWeight);
       if (selectedWeight) {
         setWeight(selectedWeight.weight);
         setIsWeightEmptyString(false);
-        setPreviousIsUsingKilograms(selectedWeight.is_weight_in_kilograms);
         setIsUsingKilograms(selectedWeight.is_weight_in_kilograms);
         if (selectedWeight.time !== null) {
           setTime(selectedWeight.time);
@@ -48,8 +49,20 @@ export default function WeightModal(props) {
           setIncludeTime(true);
         }
       } else {
-        setWeight(0);
-        setIsWeightEmptyString(true);
+        if (existingWeights?.length > 0) {
+          const latestWeightToday = existingWeights[existingWeights.length - 1];
+          console.log("latestWeightToday", latestWeightToday);
+          setWeight(latestWeightToday.weight);
+          setIsUsingKilograms(latestWeightToday.is_weight_in_kilograms);
+          setIsWeightEmptyString(false);
+        } else if (lastWeightBeforeToday) {
+          setWeight(lastWeightBeforeToday.weight);
+          setIsUsingKilograms(lastWeightBeforeToday.is_weight_in_kilograms);
+          setIsWeightEmptyString(false);
+        } else {
+          setWeight(0);
+          setIsWeightEmptyString(true);
+        }
         setIncludeTime(existingWeights?.length > 0);
         setTime(new Date().toTimeString().split(" ")[0]);
       }
@@ -70,8 +83,13 @@ export default function WeightModal(props) {
   const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
   const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
-    useState(false);
+    useState(null);
   useEffect(() => {
+    if (previousIsUsingKilograms === null) {
+      setPreviousIsUsingKilograms(isUsingKilograms);
+      return;
+    }
+
     if (isUsingKilograms !== previousIsUsingKilograms) {
       const newWeight = isUsingKilograms
         ? poundsToKilograms(weight)
@@ -284,7 +302,6 @@ export default function WeightModal(props) {
                 setWeightEvent(e.target.value);
               }}
             >
-              <option>none</option>
               {weightEvents.map((weightEvent) => (
                 <option key={weightEvent}>{weightEvent}</option>
               ))}
