@@ -621,78 +621,117 @@ export default function Diary() {
               return aCreated_at - bCreated_at;
             }
           })
-          .map((weight, index) => (
-            <div
-              key={weight.id}
-              className={classNames(
-                "py-5",
-                index === 0 ? "" : "border-gray-20 border-t"
-              )}
-            >
-              <dl
-                className={
-                  "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
-                }
+          .map((weight, index, weights) => {
+            let previousWeight;
+            if (index === 0) {
+              previousWeight = lastWeightBeforeToday;
+            } else {
+              previousWeight = weights[index - 1];
+            }
+            let weightDifference;
+            if (previousWeight) {
+              let previousWeightValue = previousWeight.weight;
+              if (
+                weight.is_weight_in_kilograms !==
+                previousWeight.is_weight_in_kilograms
+              ) {
+                previousWeightValue = weight.is_weight_in_kilograms
+                  ? poundsToKilograms(previousWeightValue)
+                  : kilogramsToPounds(previousWeightValue);
+              }
+              weightDifference = weight.weight - previousWeightValue;
+            }
+            return (
+              <div
+                key={weight.id}
+                className={classNames(
+                  "py-5",
+                  index === 0 ? "" : "border-gray-20 border-t"
+                )}
               >
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Weight</dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {weight.is_weight_in_kilograms == isUsingKilograms
-                      ? weight.weight
-                      : (isUsingKilograms
-                          ? poundsToKilograms(weight.weight)
-                          : kilogramsToPounds(weight.weight)
-                        ).toFixed(1)}{" "}
-                    {isUsingKilograms ? "kgs" : "lbs"}
-                  </dd>
-                </div>
-                {weight.time !== null && (
+                <dl
+                  className={
+                    "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
+                  }
+                >
                   <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Time</dt>
+                    <dt className="text-sm font-medium text-gray-500">
+                      Weight
+                    </dt>
                     <dd className="mt-1 break-words text-sm text-gray-900">
-                      {formatTime(weight.time)}
+                      {weight.is_weight_in_kilograms == isUsingKilograms
+                        ? weight.weight
+                        : (isUsingKilograms
+                            ? poundsToKilograms(weight.weight)
+                            : kilogramsToPounds(weight.weight)
+                          ).toFixed(1)}{" "}
+                      {isUsingKilograms ? "kgs" : "lbs"}{" "}
+                      {previousWeight && (
+                        <span
+                          className={
+                            weightDifference < 0
+                              ? "text-red-500"
+                              : "text-green-500"
+                          }
+                        >
+                          ({weightDifference < 0 ? "" : "+"}
+                          {weightDifference})
+                        </span>
+                      )}
                     </dd>
                   </div>
-                )}
-                {weight.time !== null && weight.event !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Event</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {weight.event}
-                    </dd>
-                  </div>
-                )}
-                {amITheClient && (
-                  <div className="sm:col-span-1">
-                    <button
-                      onClick={() => {
-                        setSelectedWeight(weight);
-                        setShowWeightModal(true);
-                      }}
-                      className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                    >
-                      Edit<span className="sr-only"> weight</span>
-                    </button>
-                  </div>
-                )}
-                {amITheClient && (
-                  <div className="sm:col-span-1">
-                    <button
-                      onClick={() => {
-                        setSelectedWeight(weight);
-                        setShowDeleteWeightModal(true);
-                      }}
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    >
-                      Delete
-                      <span className="sr-only"> weight</span>
-                    </button>
-                  </div>
-                )}
-              </dl>
-            </div>
-          ))}
+                  {weight.time !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Time
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {formatTime(weight.time)}
+                      </dd>
+                    </div>
+                  )}
+                  {weight.time !== null && weight.event !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Event
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {weight.event}
+                      </dd>
+                    </div>
+                  )}
+                  {amITheClient && (
+                    <div className="sm:col-span-1">
+                      <button
+                        onClick={() => {
+                          setSelectedWeight(weight);
+                          setShowWeightModal(true);
+                        }}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        Edit<span className="sr-only"> weight</span>
+                      </button>
+                    </div>
+                  )}
+                  {amITheClient && (
+                    <div className="sm:col-span-1">
+                      <button
+                        onClick={() => {
+                          setSelectedWeight(weight);
+                          setShowDeleteWeightModal(true);
+                        }}
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      >
+                        Delete
+                        <span className="sr-only"> weight</span>
+                      </button>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            );
+          })}
         <div className="relative pt-2">
           <div
             className="absolute inset-0 flex items-center"
