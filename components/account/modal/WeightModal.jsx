@@ -302,8 +302,8 @@ export default function WeightModal(props) {
                 setWeightEvent(e.target.value);
               }}
             >
-              {weightEvents.map((weightEvent) => (
-                <option key={weightEvent}>{weightEvent}</option>
+              {weightEvents.map(({ name }) => (
+                <option key={name}>{name}</option>
               ))}
             </select>
           </div>

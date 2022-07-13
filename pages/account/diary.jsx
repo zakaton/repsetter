@@ -35,6 +35,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
+import { weightEventColors } from "../../utils/weight-utils";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -567,13 +568,9 @@ export default function Diary() {
             type: "time",
             time: {
               unit: "hour",
-              //unitStepSize: 1,
             },
             min: fromDate,
             max: toDate,
-            ticks: {
-              //maxTicksLimit: 25,
-            },
           },
           y: {
             type: "linear",
@@ -600,11 +597,11 @@ export default function Diary() {
           },
           tooltip: {
             callbacks: {
-              _label: function (context) {
-                const label = context.dataset.label;
-                let data = context.dataset.data[context.dataIndex];
-                let value = data.y;
-                return `${label}: ${value}`;
+              footer: function (context) {
+                const { event } = context[0].raw;
+                if (event?.length > 0 && event !== "none") {
+                  return `${event}`;
+                }
               },
             },
           },
@@ -648,8 +645,18 @@ export default function Diary() {
                   ? poundsToKilograms(weightValue)
                   : kilogramsToPounds(weightValue);
               }
-              return { x: date, y: weightValue };
+              return { x: date, y: weightValue, event: weight.event };
             }),
+            segment: {
+              borderColor: (context) => {
+                const { event } = context.p1.raw;
+                return weightEventColors[event || "none"];
+              },
+            },
+            pointBackgroundColor: (context) => {
+              const { event } = context.raw;
+              return weightEventColors[event || "none"];
+            },
             borderColor: "rgb(250, 204, 21)",
             backgroundColor: "rgba(250, 204, 21, 0.5)",
           },
