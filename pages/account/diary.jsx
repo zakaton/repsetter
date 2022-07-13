@@ -450,7 +450,6 @@ export default function Diary() {
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
 
   const formatTime = (time) => {
-    console.log(time);
     let [hours, minutes] = time.split(":");
     let suffix = "AM";
     if (hours >= 12) {
@@ -460,7 +459,6 @@ export default function Diary() {
       }
     }
     return `${hours}:${minutes} ${suffix}`;
-    return time;
   };
 
   return (
@@ -587,7 +585,16 @@ export default function Diary() {
           </div>
         </div>
         {weights
-          ?.sort((a, b) => a < b)
+          ?.slice()
+          .sort((a, b) => {
+            const [aHour, aMinute] = a.time.split(":");
+            const [bHour, bMinute] = b.time.split(":");
+            if (aHour != bHour) {
+              return aHour - bHour;
+            } else {
+              return aMinute - bMinute;
+            }
+          })
           .map((weight, index) => (
             <div
               key={weight.id}
