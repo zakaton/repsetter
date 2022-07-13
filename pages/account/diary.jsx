@@ -117,6 +117,7 @@ export default function Diary() {
       selectedDate != gotExerciseForDate
     ) {
       getExercises(true);
+      getExerciseDates();
     }
   }, [exercises, selectedClientId, selectedClient, selectedDate]);
 
@@ -412,6 +413,7 @@ export default function Diary() {
       selectedDate != gotWeightForDate
     ) {
       getWeights(true);
+      getWeightDates();
     }
   }, [weights, selectedClientId, selectedClient, selectedDate]);
 
