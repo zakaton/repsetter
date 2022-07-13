@@ -5,6 +5,10 @@ import { ScaleIcon } from "@heroicons/react/outline";
 import { supabase } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
+import {
+  kilogramsToPounds,
+  poundsToKilograms,
+} from "../../../utils/exercise-utils";
 
 export default function WeightModal(props) {
   const {
@@ -32,12 +36,23 @@ export default function WeightModal(props) {
       setIsWeightEmptyString(true);
 
       setIncludeTime(false);
+      setSelectedWeight();
     }
   }, [open]);
 
   useEffect(() => {
-    if (open && selectedWeight) {
-      // FILL - populate fields
+    if (open) {
+      if (selectedWeight) {
+        setWeight(selectedWeight.weight);
+        setIsWeightEmptyString(false);
+        if (selectedWeight.time !== null) {
+          setTime(selectedWeight.time);
+          setIncludeTime(true);
+        }
+      } else {
+        console.log("set time");
+        setTime(new Date().toTimeString().split(" ")[0]);
+      }
     }
   }, [open, selectedWeight]);
 
@@ -53,12 +68,20 @@ export default function WeightModal(props) {
   const [time, setTime] = useState();
   const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
+  useEffect(() => {
+    const newWeight = isUsingKilograms
+      ? poundsToKilograms(weight)
+      : kilogramsToPounds(weight);
+    setWeight(newWeight.toFixed(1));
+  }, [isUsingKilograms]);
 
   return (
     <Modal
       {...props}
       title={selectedWeight ? "Update Bodyweight" : "Add Bodyweight"}
-      message="Add today's bodyweight, optionally including the time of day"
+      message={`${
+        selectedWeight ? "Update" : "Add"
+      } today's bodyweight, and optionally the time of day`}
       Icon={ScaleIcon}
       Button={
         <button
@@ -87,12 +110,37 @@ export default function WeightModal(props) {
           e.preventDefault();
           let status = {};
           if (selectedWeight) {
-            // FILL
             setIsUpdatingWeight(true);
+            const updateWeightData = {
+              weight,
+              is_weight_in_kilograms: isUsingKilograms,
+            };
+            if (includeTime) {
+              updateWeightData.time = time;
+            } else {
+              updateWeightData.time = null;
+            }
+            console.log("updateWeightData", updateWeightData);
+            const { data: updatedWeight, error: updatedWeightError } =
+              await supabase
+                .from("weight")
+                .update(updateWeightData)
+                .match({ id: selectedWeight.id });
+            if (updatedWeightError) {
+              console.error(updatedWeightError);
+              status = {
+                type: "failed",
+                title: "Failed to Update Weight",
+                message: updatedWeightError.message,
+              };
+            } else {
+              status = {
+                type: "succeeded",
+                title: "Successfully Updated Weight",
+              };
+            }
             setDidUpdateWeight(true);
-            setSelectedWeight();
           } else {
-            // FILL
             setIsAddingWeight(true);
             console.log("args", weight, includeTime, time);
             const addWeightData = {
@@ -141,6 +189,7 @@ export default function WeightModal(props) {
               placeholder="0"
               name="weight"
               id="weight"
+              step="0.1"
               className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               value={isWeightEmptyString ? "" : weight}
               onInput={(e) => {
@@ -198,9 +247,11 @@ export default function WeightModal(props) {
                 type="time"
                 name="time"
                 id="time"
+                step="60"
                 className="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={time || ""}
+                value={time?.split(":").slice(0, 2).join(":") || ""}
                 onInput={(e) => {
+                  console.log(e.target);
                   setTime(e.target.value);
                 }}
               />

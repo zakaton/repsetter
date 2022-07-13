@@ -3,6 +3,7 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
 import ExerciseModal from "../../components/account/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
+import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal";
 import WeightModal from "../../components/account/modal/WeightModal";
 import React, { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
@@ -16,6 +17,10 @@ import {
   PlusIcon,
   ClipboardIcon,
 } from "@heroicons/react/outline";
+import {
+  kilogramsToPounds,
+  poundsToKilograms,
+} from "../../utils/exercise-utils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -157,13 +162,15 @@ export default function Diary() {
     setShowDeleteExerciseNotification(false);
     setShowEditExerciseNotification(false);
     setShowWeightNotification(false);
+    setShowDeleteWeightNotification(false);
   };
   useEffect(() => {
     if (
       showAddExerciseModal ||
       showDeleteExerciseModal ||
       showEditExerciseModal ||
-      showWeightModal
+      showWeightModal ||
+      showDeleteWeightModal
     ) {
       clearNotifications();
     }
@@ -172,6 +179,7 @@ export default function Diary() {
     showDeleteExerciseModal,
     showEditExerciseModal,
     showWeightModal,
+    showDeleteWeightModal,
   ]);
 
   const [videoPlayer, setVideoPlayer] = useState({});
@@ -266,15 +274,15 @@ export default function Diary() {
   useEffect(() => {
     if (exerciseDates || weightDates) {
       const newDatesDots = {};
-      exerciseDates?.forEach((exerciseDate) => {
-        const dots = newDatesDots[exerciseDate.date] || [];
-        dots.push({ color: "bg-blue-500" });
-        newDatesDots[exerciseDate.date] = dots;
-      });
       weightDates?.forEach((weightDate) => {
         const dots = newDatesDots[weightDate.date] || [];
         dots.push({ color: "bg-yellow-500" });
         newDatesDots[weightDate.date] = dots;
+      });
+      exerciseDates?.forEach((exerciseDate) => {
+        const dots = newDatesDots[exerciseDate.date] || [];
+        dots.push({ color: "bg-blue-500" });
+        newDatesDots[exerciseDate.date] = dots;
       });
       setDatesDots(newDatesDots);
     }
@@ -350,6 +358,11 @@ export default function Diary() {
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showWeightNotification, setShowWeightNotification] = useState(false);
   const [weightStatus, setWeightStatus] = useState();
+
+  const [showDeleteWeightModal, setShowDeleteWeightModal] = useState(false);
+  const [showDeleteWeightNotification, setShowDeleteWeightNotification] =
+    useState(false);
+  const [deleteWeightStatus, setDeleteWeightStatus] = useState();
 
   const [selectedWeight, setSelectedWeight] = useState();
   const [gotWeightForUserId, setGotWeightForUserId] = useState();
@@ -436,6 +449,20 @@ export default function Diary() {
 
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
 
+  const formatTime = (time) => {
+    console.log(time);
+    let [hours, minutes] = time.split(":");
+    let suffix = "AM";
+    if (hours >= 12) {
+      suffix = "PM";
+      if (hours > 12) {
+        hours -= 12;
+      }
+    }
+    return `${hours}:${minutes} ${suffix}`;
+    return time;
+  };
+
   return (
     <>
       <ExerciseModal
@@ -495,6 +522,20 @@ export default function Diary() {
         status={weightStatus}
       />
 
+      <DeleteWeightModal
+        open={showDeleteWeightModal}
+        setOpen={setShowDeleteWeightModal}
+        selectedResult={selectedWeight}
+        setSelectedResult={setSelectedWeight}
+        setDeleteResultStatus={setDeleteWeightStatus}
+        setShowDeleteResultNotification={setShowDeleteWeightNotification}
+      />
+      <Notification
+        open={showDeleteWeightNotification}
+        setOpen={setShowDeleteWeightNotification}
+        status={deleteWeightStatus}
+      />
+
       <AccountCalendarLayout
         setCalendar={setCalendar}
         tableName="diary"
@@ -516,7 +557,7 @@ export default function Diary() {
           </div>
           <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && (
+              {amITheClient && !weights?.some((weight) => weight.time == null) && (
                 <button
                   type="button"
                   onClick={() => setShowWeightModal(true)}
@@ -534,7 +575,9 @@ export default function Diary() {
                 onClick={() => setIsUsingKilograms(!isUsingKilograms)}
                 className={classNames(
                   "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                  "rounded-r-md"
+                  !weights?.some((weight) => weight.time == null)
+                    ? "rounded-r-md"
+                    : "rounded-md"
                 )}
               >
                 <span className="sr-only">Toggle Weight</span>
@@ -543,8 +586,73 @@ export default function Diary() {
             </span>
           </div>
         </div>
-        <br></br>
-        <div className="relative mt-8">
+        {weights
+          ?.sort((a, b) => a < b)
+          .map((weight, index) => (
+            <div
+              key={weight.id}
+              className={classNames(
+                "py-5",
+                index === 0 ? "" : "border-gray-20 border-t"
+              )}
+            >
+              <dl
+                className={
+                  "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                }
+              >
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Weight</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {weight.is_weight_in_kilograms == isUsingKilograms
+                      ? weight.weight
+                      : (isUsingKilograms
+                          ? poundsToKilograms(weight.weight)
+                          : kilogramsToPounds(weight.weight)
+                        ).toFixed(1)}{" "}
+                    {isUsingKilograms ? "kgs" : "lbs"}
+                  </dd>
+                </div>
+                {weight.time !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Time</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {formatTime(weight.time)}
+                    </dd>
+                  </div>
+                )}
+                {amITheClient && (
+                  <div className="sm:col-span-1">
+                    <button
+                      onClick={() => {
+                        setSelectedWeight(weight);
+                        setShowWeightModal(true);
+                      }}
+                      className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      Edit<span className="sr-only"> weight</span>
+                    </button>
+                  </div>
+                )}
+                {amITheClient && (
+                  <div className="sm:col-span-1">
+                    <button
+                      onClick={() => {
+                        setSelectedWeight(weight);
+                        setShowDeleteWeightModal(true);
+                      }}
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    >
+                      Delete
+                      <span className="sr-only"> weight</span>
+                    </button>
+                  </div>
+                )}
+              </dl>
+            </div>
+          ))}
+        <div className="relative pt-2">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -605,7 +713,7 @@ export default function Diary() {
           <div
             key={exercise.id}
             className={classNames(
-              "py-5",
+              "pt-5",
               index === 0 ? "" : "border-gray-20 border-t"
             )}
           >
