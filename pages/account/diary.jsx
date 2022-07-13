@@ -507,7 +507,13 @@ export default function Diary() {
   };
 
   const dateFromDateAndTime = (date, time) => {
-    const fullDate = new Date(date);
+    const fullDate = new Date();
+
+    const [year, month, day] = date.split("-");
+    fullDate.setUTCFullYear(year);
+    fullDate.setUTCMonth(month - 1);
+    fullDate.setUTCDate(day);
+
     const [hours, minutes] = time.split(":");
     fullDate.setHours(hours);
     fullDate.setMinutes(minutes);
@@ -541,6 +547,13 @@ export default function Diary() {
 
   const [weightChartOptions, setWeightChartOptions] = useState();
   const [weightChartData, setWeightChartData] = useState();
+
+  const fromDate = new Date(selectedDate);
+  fromDate.setHours(0);
+  const toDate = new Date(selectedDate);
+  toDate.setHours(24);
+
+  console.log("from-to", fromDate, toDate);
   useEffect(() => {
     if (
       weights &&
@@ -550,14 +563,14 @@ export default function Diary() {
       const newWeightChartOptions = {
         scales: {
           x: {
+            offset: true,
             type: "time",
             time: {
               unit: "minute",
               unitStepSize: 1,
             },
-            // FILL
-            //min: "00:00:00",
-            //max: "24:00:00",
+            min: fromDate,
+            max: toDate,
             ticks: {
               maxTicksLimit: 20,
             },
@@ -565,6 +578,7 @@ export default function Diary() {
           y: {
             type: "linear",
             display: true,
+            min: 0,
             title: {
               display: true,
               text: `Weight (${isUsingKilograms ? "kg" : "lbs"})`,
@@ -611,22 +625,22 @@ export default function Diary() {
           firstWeightAfterToday.date,
           firstWeightAfterToday.time
         );
-        if (date.getTime() - selectedDate.getTime() < 1000 * 60 * 60 * 12) {
+        if (
+          date.getTime() - selectedDate.getTime() <
+          1000 * 60 * 60 * (24 + 12)
+        ) {
           allWeights.push(firstWeightAfterToday);
         }
       }
+      console.log("allWeights", allWeights);
       const newWeightChartData = {
         datasets: [
           {
             label: "Weight",
             data: allWeights.map((weight) => {
-              const time = new Date(weight.date);
-              if (weight.time) {
-                const [hours, minutes] = weight.time.split(":");
-                time.setHours(hours);
-                time.setMinutes(minutes);
-              }
-              return { x: time, y: weight.weight };
+              const date = dateFromDateAndTime(weight.date, weight.time);
+              console.log(date);
+              return { x: date, y: weight.weight };
             }),
             borderColor: "rgb(250, 204, 21)",
             backgroundColor: "rgba(250, 204, 21, 0.5)",
