@@ -372,6 +372,7 @@ export default function Diary() {
     } else {
       console.log("got weights for date", selectedDate.toDateString(), weights);
       setWeights(weights);
+      setLastWeightBeforeToday();
       if (weights.length > 0) {
         setIsUsingKilograms(weights[0].is_weight_in_kilograms);
       }
