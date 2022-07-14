@@ -416,6 +416,7 @@ export default function Diary() {
         .match({ client: selectedClientId })
         .lt("date", selectedDate.toDateString())
         .order("date", { ascending: false })
+        .order("time", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (getLastWeightBeforeTodayError) {
@@ -434,6 +435,7 @@ export default function Diary() {
         .match({ client: selectedClientId })
         .gt("date", selectedDate.toDateString())
         .order("date", { ascending: true })
+        .order("time", { ascending: true })
         .limit(1)
         .maybeSingle();
       if (getFirstWeightAfterTodayError) {
@@ -516,8 +518,9 @@ export default function Diary() {
     fullDate.setUTCDate(day);
 
     const [hours, minutes] = time.split(":");
-    fullDate.setHours(hours);
-    fullDate.setMinutes(minutes);
+    fullDate.setUTCHours(hours);
+    fullDate.setUTCMinutes(minutes);
+
     return fullDate;
   };
 
@@ -649,12 +652,12 @@ export default function Diary() {
             }),
             segment: {
               borderColor: (context) => {
-                const { event } = context.p1.raw;
+                const event = context?.p1?.raw?.event;
                 return weightEventColors[event || "none"];
               },
             },
             pointBackgroundColor: (context) => {
-              const { event } = context.raw;
+              const event = context?.raw?.event;
               return weightEventColors[event || "none"];
             },
             borderColor: "rgb(250, 204, 21)",
