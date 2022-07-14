@@ -51,6 +51,9 @@ export const dateFromDateAndTime = (date, time) => {
     const [hours, minutes] = time.split(":");
     fullDate.setHours(hours);
     fullDate.setMinutes(minutes);
+  } else {
+    fullDate.setHours(0);
+    fullDate.setMinutes(0);
   }
 
   return fullDate;

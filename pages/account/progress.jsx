@@ -51,6 +51,31 @@ const graphTypeOrder = [
   "difficulty",
   "bodyweight",
 ];
+const dateRangeFilterType = {
+  name: "Date Range",
+  query: "date-range",
+  column: "date-range",
+  defaultValue: defaultDateRange,
+  options: [
+    {
+      value: "past week",
+      label: "Past Week",
+    },
+    {
+      value: "past month",
+      label: "Past Month",
+    },
+    {
+      value: "past 6 months",
+      label: "Past 6 Months",
+    },
+    {
+      value: "past year",
+      label: "Past Year",
+    },
+  ],
+};
+const dateRanges = dateRangeFilterType.options.map(({ value }) => value);
 const filterTypes = [
   {
     name: "Graph Types",
@@ -106,30 +131,7 @@ const filterTypes = [
       { value: "kgs", label: "kgs" },
     ],
   },
-  {
-    name: "Date Range",
-    query: "date-range",
-    column: "date-range",
-    defaultValue: defaultDateRange,
-    options: [
-      {
-        value: "past week",
-        label: "Past Week",
-      },
-      {
-        value: "past month",
-        label: "Past Month",
-      },
-      {
-        value: "past 6 months",
-        label: "Past 6 Months",
-      },
-      {
-        value: "past year",
-        label: "Past Year",
-      },
-    ],
-  },
+  dateRangeFilterType,
 ];
 const orderTypes = [
   {
@@ -316,6 +318,9 @@ export default function Progress() {
       newBaseFilter.client = user.id;
     }
 
+    setMaxDateRange();
+    setPreviousFilters();
+
     if (selectedExerciseType) {
       newBaseFilter["type.name"] = selectedExerciseType.name;
     }
@@ -323,11 +328,11 @@ export default function Progress() {
     setBaseFilter(newBaseFilter);
   }, [selectedClient, user, selectedExerciseType]);
 
-  const getFromDate = () => {
+  const getFromDate = (dayOffset = 0) => {
     let date = new Date();
     switch (filters["date-range"] || defaultDateRange) {
       case "past week":
-        date.setUTCDate(date.getUTCDate() - 7);
+        date.setUTCDate(date.getUTCDate() - 7 - dayOffset);
         break;
       case "past month":
         date.setUTCMonth(date.getUTCMonth() - 1);
@@ -386,7 +391,7 @@ export default function Progress() {
       const matchFilters = {
         client: baseFilter.client,
       };
-      const fromDate = getFromDate();
+      const fromDate = getFromDate(1);
       const { data: weights, error } = await supabase
         .from("weight")
         .select("*")
@@ -405,23 +410,33 @@ export default function Progress() {
     }
   };
 
+  const [maxDateRange, setMaxDateRange] = useState();
   useEffect(() => {
     if ("client" in baseFilter) {
-      console.log(previousFilters?.["date-range"], filters["date-range"]);
-      if (previousFilters?.["date-range"] === filters["date-range"]) {
+      let didDateRangeExpand = didDateRangeExpand;
+      if (previousFilters?.["date-range"] !== filters["date-range"]) {
+        console.log("new date range");
         setPreviousFilters(filters);
-        return;
+
+        if (
+          !maxDateRange ||
+          dateRanges.indexOf(filters["date-range"]) >
+            dateRanges.indexOf(maxDateRange)
+        ) {
+          didDateRangeExpand = true;
+          setMaxDateRange(filters["date-range"]);
+        }
       }
 
       if ("type.name" in baseFilter) {
-        getExercises(true);
-      } else {
+        getExercises(didDateRangeExpand);
+      } else if (didDateRangeExpand) {
         setExercises();
       }
 
       if (containsFilters?.type?.includes("bodyweight")) {
-        getWeights(true);
-      } else {
+        getWeights(didDateRangeExpand);
+      } else if (didDateRangeExpand) {
         setWeights();
       }
     }

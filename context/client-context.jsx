@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 
 export const ClientContext = createContext();
 
-const pathnamesForQuery = ["diary", "exercise-types"].map(
+const pathnamesForQuery = ["diary", "exercise-types", "progress"].map(
   (pathname) => "/account/" + pathname
 );
 
