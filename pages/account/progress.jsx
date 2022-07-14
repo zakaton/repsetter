@@ -490,7 +490,7 @@ export default function Progress() {
           min: getFromDate(),
           max: new Date(),
           ticks: {
-            maxTicksLimit: 20,
+            //maxTicksLimit: 20,
           },
         },
         y: {
@@ -532,7 +532,7 @@ export default function Progress() {
       responsive: true,
       animation: true,
       interaction: {
-        mode: "index",
+        mode: "x",
         intersect: false,
       },
       plugins: {
@@ -560,6 +560,7 @@ export default function Progress() {
               if ("suffix" in data) {
                 value += ` ${data.suffix}`;
               }
+              console.log(context); // DELETE
               return `${label}: ${value}`;
             },
           },
