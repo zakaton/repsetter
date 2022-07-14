@@ -23,7 +23,8 @@ import {
 } from "chart.js";
 import { Chart, getElementAtEvent } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
-import { supabase } from "../../utils/supabase";
+import { supabase, dateFromDateAndTime } from "../../utils/supabase";
+
 import {
   poundsToKilograms,
   kilogramsToPounds,
@@ -168,7 +169,7 @@ const graphTypes = {
           }
         }
         return {
-          x: exercise.date,
+          x: dateFromDateAndTime(exercise.date),
           y: topWeightPerformed,
           denominator: topWeightAssigned,
           suffix: showKilograms ? "kgs" : "lbs",
@@ -185,7 +186,7 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         const y = exercise.number_of_sets_performed || 0;
         return {
-          x: exercise.date,
+          x: dateFromDateAndTime(exercise.date),
           y,
           denominator: exercise.number_of_sets_assigned,
         };
@@ -209,7 +210,7 @@ const graphTypes = {
           }
         });
         return {
-          x: exercise.date,
+          x: dateFromDateAndTime(exercise.date),
           y: maxRepsPerformed,
           denominator: maxRepsAssigned,
         };
@@ -233,7 +234,7 @@ const graphTypes = {
           }
         });
         return {
-          x: exercise.date,
+          x: dateFromDateAndTime(exercise.date),
           y: difficulty,
           denominator: 10,
         };
@@ -246,23 +247,40 @@ const graphTypes = {
     type: "line",
     borderColor: "rgb(250, 204, 21)",
     backgroundColor: "rgba(250, 204, 21, 0.5)",
-    getData: ({ bodyweight }) => {
-      return bodyweight?.map((bodyweight) => {
-        const showKilograms = (filters["bodyweight-unit"] || "kgs") === "kgs";
-        let weight = bodyweight.weight;
-        if (bodyweight.is_weight_in_kilograms !== showKilograms) {
+    getData: ({ weights, filters }) => {
+      const data = [];
+      weights?.forEach((weight) => {
+        const showKilograms = (filters["bodyweight-unit"] || "lbs") === "kgs";
+        let weightValue = Number(weight.weight);
+        if (weight.is_weight_in_kilograms !== showKilograms) {
           if (showKilograms) {
-            weight = poundsToKilograms(weight).toFixed(0);
+            weightValue = poundsToKilograms(weightValue);
           } else {
-            weight = kilogramsToPounds(weight).toFixed(0);
+            weightValue = kilogramsToPounds(weightValue);
           }
         }
-        return {
-          x: weight.date,
-          y: weight,
-          suffix: showKilograms ? "kgs" : "lbs",
-        };
+
+        const date = dateFromDateAndTime(weight.date);
+        let datum = data.find((_data) => _data._date === weight.date);
+        if (datum) {
+          datum.sum += weightValue;
+          datum.numberOfWeights += 1;
+          datum.y = datum.sum / datum.numberOfWeights;
+        } else {
+          datum = {
+            x: date,
+            y: weightValue,
+            sum: weightValue,
+            numberOfWeights: 1,
+            _date: weight.date,
+            suffix: showKilograms ? "kgs" : "lbs",
+            toFixed: 1,
+          };
+          data.push(datum);
+        }
       });
+
+      return data;
     },
     yAxisID: "y4",
   },
@@ -321,7 +339,6 @@ export default function Progress() {
         date.setUTCFullYear(date.getUTCFullYear() - 1);
         break;
     }
-    console.log("from date", date);
     return date;
   };
 
@@ -330,14 +347,10 @@ export default function Progress() {
   const [previousFilters, setPreviousFilters] = useState();
   const getExercises = async (refresh) => {
     if (!exercises || refresh) {
-      if (previousFilters?.["date-range"] === filters["date-range"]) {
-        return;
-      }
       if (isGettingExercises) {
         return;
       }
       setIsGettingExercises(true);
-      setPreviousFilters(filters);
 
       console.log("getting exercises with filters", baseFilter, filters);
 
@@ -359,11 +372,60 @@ export default function Progress() {
     }
   };
 
-  useEffect(() => {
-    if ("type.name" in baseFilter && "client" in baseFilter) {
-      getExercises(true);
+  const [weights, setWeights] = useState();
+  const [isGettingWeights, setIsGettingWeights] = useState(false);
+  const getWeights = async (refresh) => {
+    if (!weights || refresh) {
+      if (isGettingWeights) {
+        return;
+      }
+      setIsGettingWeights(true);
+
+      console.log("getting weights with filters", baseFilter, filters);
+
+      const matchFilters = {
+        client: baseFilter.client,
+      };
+      const fromDate = getFromDate();
+      const { data: weights, error } = await supabase
+        .from("weight")
+        .select("*")
+        .match(matchFilters)
+        .gte("date", fromDate.toDateString())
+        .order("date", { ascending: true })
+        .order("time", { ascending: true });
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("weights", weights);
+        setWeights(weights);
+      }
+
+      setIsGettingWeights(false);
     }
-  }, [baseFilter, filters]);
+  };
+
+  useEffect(() => {
+    if ("client" in baseFilter) {
+      console.log(previousFilters?.["date-range"], filters["date-range"]);
+      if (previousFilters?.["date-range"] === filters["date-range"]) {
+        setPreviousFilters(filters);
+        return;
+      }
+
+      if ("type.name" in baseFilter) {
+        getExercises(true);
+      } else {
+        setExercises();
+      }
+
+      if (containsFilters?.type?.includes("bodyweight")) {
+        getWeights(true);
+      } else {
+        setWeights();
+      }
+    }
+  }, [baseFilter, filters, containsFilters]);
 
   const [chartOptions, setChartOptions] = useState();
   const [chartData, setChartData] = useState();
@@ -392,15 +454,16 @@ export default function Progress() {
               label,
               borderColor,
               backgroundColor,
-              data: getData({ exercises, filters }),
+              data: getData({ weights, exercises, filters }),
               yAxisID: yAxisID || "y",
             };
           }) || [],
     };
+    console.log("newChartData", newChartData);
     setChartData(newChartData);
 
     const isWeightInKgs = (filters["weight-unit"] || "kgs") === "kgs";
-    const isBodyweightInKgs = (filters["bodyweight-unit"] || "kgs") === "kgs";
+    const isBodyweightInKgs = (filters["bodyweight-unit"] || "lbs") === "kgs";
     const newChartOptions = {
       scales: {
         x: {
@@ -426,17 +489,7 @@ export default function Progress() {
         },
         y1: {
           type: "linear",
-          display: containsFilters.type?.includes("bodyweight") || false,
-          position: containsFilters.type?.includes("top set")
-            ? "right"
-            : "left",
-          title: {
-            display: containsFilters.type?.includes("bodyweight"),
-            text: `Bodyweight (${isBodyweightInKgs ? "kgs" : "lbs"})`,
-          },
-          grid: {
-            drawOnChartArea: !containsFilters.type?.includes("top set"),
-          },
+          display: false,
         },
         y2: {
           type: "linear",
@@ -448,7 +501,17 @@ export default function Progress() {
         },
         y4: {
           type: "linear",
-          display: false,
+          display: containsFilters.type?.includes("bodyweight") || false,
+          position: containsFilters.type?.includes("top set")
+            ? "right"
+            : "left",
+          title: {
+            display: containsFilters.type?.includes("bodyweight"),
+            text: `Bodyweight (${isBodyweightInKgs ? "kgs" : "lbs"})`,
+          },
+          grid: {
+            drawOnChartArea: !containsFilters.type?.includes("top set"),
+          },
         },
       },
       responsive: true,
@@ -473,6 +536,9 @@ export default function Progress() {
               const label = context.dataset.label;
               let data = context.dataset.data[context.dataIndex];
               let value = data.y;
+              if ("toFixed" in data) {
+                value = value.toFixed(data.toFixed);
+              }
               if ("denominator" in data) {
                 value += `/${data.denominator}`;
               }
@@ -485,8 +551,9 @@ export default function Progress() {
         },
       },
     };
+    console.log("newChartOptions", newChartOptions);
     setChartOptions(newChartOptions);
-  }, [exercises, containsFilters]);
+  }, [exercises, weights, containsFilters, filters]);
 
   const router = useRouter();
   const chartRef = useRef();

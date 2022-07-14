@@ -7,7 +7,7 @@ import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal"
 import WeightModal from "../../components/account/modal/WeightModal";
 import React, { useEffect, useState } from "react";
 import Notification from "../../components/Notification";
-import { supabase } from "../../utils/supabase";
+import { supabase, dateFromDateAndTime } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import LazyVideo from "../../components/LazyVideo";
@@ -507,21 +507,6 @@ export default function Diary() {
       }
     }
     return `${hours}:${minutes} ${suffix}`;
-  };
-
-  const dateFromDateAndTime = (date, time) => {
-    const fullDate = new Date();
-
-    const [year, month, day] = date.split("-");
-    fullDate.setUTCFullYear(year);
-    fullDate.setMonth(month - 1);
-    fullDate.setDate(day);
-
-    const [hours, minutes] = time.split(":");
-    fullDate.setHours(hours);
-    fullDate.setMinutes(minutes);
-
-    return fullDate;
   };
 
   const clearNotifications = () => {
