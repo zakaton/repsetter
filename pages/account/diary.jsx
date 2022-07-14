@@ -514,12 +514,12 @@ export default function Diary() {
 
     const [year, month, day] = date.split("-");
     fullDate.setUTCFullYear(year);
-    fullDate.setUTCMonth(month - 1);
-    fullDate.setUTCDate(day);
+    fullDate.setMonth(month - 1);
+    fullDate.setDate(day);
 
     const [hours, minutes] = time.split(":");
-    fullDate.setUTCHours(hours);
-    fullDate.setUTCMinutes(minutes);
+    fullDate.setHours(hours);
+    fullDate.setMinutes(minutes);
 
     return fullDate;
   };
