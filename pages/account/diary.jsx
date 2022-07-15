@@ -1,14 +1,16 @@
+import React, { useEffect, useState } from "react";
 import AccountCalendarLayout from "../../components/layouts/AccountCalendarLayout";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import { useClient } from "../../context/client-context";
 import ExerciseModal from "../../components/account/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
-import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal";
 import WeightModal from "../../components/account/modal/WeightModal";
-import React, { useEffect, useState } from "react";
+import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal";
+import PictureModal from "../../components/account/modal/PictureModal";
+import DeletePictureModal from "../../components/account/modal/DeletePictureModal";
 import Notification from "../../components/Notification";
 import { supabase, dateFromDateAndTime } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
+import { useClient } from "../../context/client-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import LazyVideo from "../../components/LazyVideo";
 import YouTube from "react-youtube";
@@ -509,12 +511,25 @@ export default function Diary() {
     return `${hours}:${minutes} ${suffix}`;
   };
 
+  const [showPictureModal, setShowPictureModal] = useState(false);
+  const [showPictureNotification, setShowPictureNotification] = useState(false);
+  const [pictureStatus, setPictureStatus] = useState();
+
+  const [showDeletePictureModal, setShowDeletePictureModal] = useState(false);
+  const [showDeletePictureNotification, setShowDeletePictureNotification] =
+    useState(false);
+  const [deletePictureStatus, setDeletePictureStatus] = useState();
+
+  const [selectedPicture, setSelectedPicture] = useState();
+
   const clearNotifications = () => {
     setShowAddExerciseNotification(false);
     setShowDeleteExerciseNotification(false);
     setShowEditExerciseNotification(false);
     setShowWeightNotification(false);
     setShowDeleteWeightNotification(false);
+    setShowPictureNotification(false);
+    setShowDeletePictureNotification(false);
   };
   useEffect(() => {
     if (
@@ -522,7 +537,9 @@ export default function Diary() {
       showDeleteExerciseModal ||
       showEditExerciseModal ||
       showWeightModal ||
-      showDeleteWeightModal
+      showDeleteWeightModal ||
+      showPictureModal ||
+      showDeletePictureModal
     ) {
       clearNotifications();
     }
@@ -532,6 +549,8 @@ export default function Diary() {
     showEditExerciseModal,
     showWeightModal,
     showDeleteWeightModal,
+    showPictureModal,
+    showDeletePictureModal,
   ]);
 
   const [weightChartOptions, setWeightChartOptions] = useState();
@@ -733,6 +752,34 @@ export default function Diary() {
         status={deleteWeightStatus}
       />
 
+      <PictureModal
+        open={showPictureModal}
+        setOpen={setShowPictureModal}
+        selectedResult={selectedPicture}
+        setSelectedResult={setSelectedPicture}
+        setResultStatus={setPictureStatus}
+        setShowResultNotification={setShowPictureNotification}
+      />
+      <Notification
+        open={showPictureNotification}
+        setOpen={setShowPictureNotification}
+        status={pictureStatus}
+      />
+
+      <DeletePictureModal
+        open={showDeletePictureModal}
+        setOpen={setShowDeletePictureModal}
+        selectedResult={selectedPicture}
+        setSelectedResult={setSelectedPicture}
+        setDeleteResultStatus={setDeletePictureStatus}
+        setShowDeleteResultNotification={setShowDeletePictureNotification}
+      />
+      <Notification
+        open={showDeletePictureNotification}
+        setOpen={setShowDeletePictureNotification}
+        status={deletePictureStatus}
+      />
+
       <AccountCalendarLayout
         setCalendar={setCalendar}
         tableName="diary"
@@ -758,7 +805,8 @@ export default function Diary() {
                 <button
                   type="button"
                   onClick={() => {
-                    // FILL
+                    setSelectedPicture();
+                    setShowPictureModal(true);
                   }}
                   className={classNames(
                     "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",

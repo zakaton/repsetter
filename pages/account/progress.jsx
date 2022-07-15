@@ -9,6 +9,7 @@ import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSel
 import Filters from "../../components/Filters";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import { useProgress } from "../../context/progress-context";
+import { isMobile } from "react-device-detect";
 import {
   Chart as ChartJS,
   LinearScale,
@@ -590,7 +591,7 @@ export default function Progress() {
     if (!chart) {
       return;
     }
-    if (event.nativeEvent.pointerType === "touch") {
+    if (isMobile) {
       return;
     }
 
