@@ -10,6 +10,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+const pictureFileSizeLimit = 50 * 1024 ** 2;
+
 export default function PictureModal(props) {
   const {
     open,
@@ -53,6 +55,14 @@ export default function PictureModal(props) {
   const [pictureUrl, setPictureUrl] = useState();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
+  const onPictureFile = (file) => {
+    console.log("onPictureFile", file);
+    // FILL - compress
+    return;
+    setPictureFile(file);
+    setPictureUrl(URL.createObjectURL(file));
+  };
+
   return (
     <Modal
       {...props}
@@ -81,6 +91,7 @@ export default function PictureModal(props) {
     >
       <form
         id="pictureForm"
+        className="mt-3"
         onSubmit={async (e) => {
           e.preventDefault();
           let status = {};
@@ -136,7 +147,7 @@ export default function PictureModal(props) {
       >
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Picture
+            Upload Picture
           </label>
           {!pictureUrl && !selectedPicture && (
             <div

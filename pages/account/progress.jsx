@@ -67,6 +67,10 @@ const dateRangeFilterType = {
       label: "Past Month",
     },
     {
+      value: "past 3 months",
+      label: "Past 3 Months",
+    },
+    {
       value: "past 6 months",
       label: "Past 6 Months",
     },
@@ -337,6 +341,9 @@ export default function Progress() {
         break;
       case "past month":
         date.setUTCMonth(date.getUTCMonth() - 1);
+        break;
+      case "past 3 months":
+        date.setUTCMonth(date.getUTCMonth() - 3);
         break;
       case "past 6 months":
         date.setUTCMonth(date.getUTCMonth() - 6);
