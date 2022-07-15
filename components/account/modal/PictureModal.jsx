@@ -6,6 +6,10 @@ import { supabase } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function PictureModal(props) {
   const {
     open,
@@ -43,29 +47,11 @@ export default function PictureModal(props) {
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
   const [didUpdatePicture, setDidUpdatePicture] = useState(false);
 
-  const [includeTime, setIncludeTime] = useState(false);
-
   const [picture, setPicture] = useState(0);
-  const [time, setTime] = useState();
-  const [pictureEvent, setPictureEvent] = useState();
   const [isPictureEmptyString, setIsPictureEmptyString] = useState(true);
-  const [isUsingKilograms, setIsUsingKilograms] = useState(false);
-  const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
-    useState(null);
-  useEffect(() => {
-    if (previousIsUsingKilograms === null) {
-      setPreviousIsUsingKilograms(isUsingKilograms);
-      return;
-    }
-
-    if (isUsingKilograms !== previousIsUsingKilograms) {
-      const newPicture = isUsingKilograms
-        ? poundsToKilograms(picture)
-        : kilogramsToPounds(picture);
-      setPicture(newPicture.toFixed(1));
-      setPreviousIsUsingKilograms(isUsingKilograms);
-    }
-  }, [isUsingKilograms]);
+  const [pictureFile, setPictureFile] = useState();
+  const [pictureUrl, setPictureUrl] = useState();
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   return (
     <Modal
@@ -94,7 +80,6 @@ export default function PictureModal(props) {
       }
     >
       <form
-        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
         id="pictureForm"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -149,7 +134,104 @@ export default function PictureModal(props) {
           setOpen(false);
         }}
       >
-        lol
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Picture
+          </label>
+          {!pictureUrl && !selectedPicture && (
+            <div
+              id="pictureUploadContainer"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!isDraggingOver) {
+                  setIsDraggingOver(true);
+                }
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (
+                  isDraggingOver &&
+                  e.target.id === "pictureUploadContainer"
+                ) {
+                  setIsDraggingOver(false);
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isDraggingOver) {
+                  setIsDraggingOver(false);
+                  const file = e.dataTransfer.files[0];
+                  onPictureFile(file);
+                }
+              }}
+              className={classNames(
+                "mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6",
+                isDraggingOver ? "bg-slate-100" : ""
+              )}
+            >
+              <div className="space-y-1 text-center">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <div className="flex text-sm text-gray-600">
+                  <label
+                    htmlFor="picture-upload"
+                    className={classNames(
+                      "relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500",
+                      isDraggingOver ? "bg-slate-100" : ""
+                    )}
+                  >
+                    <span>Upload Picture</span>
+                    <input
+                      required
+                      id="picture-upload"
+                      name="picture-upload"
+                      type="file"
+                      className="sr-only"
+                      accept="image/*"
+                      value={pictureFile}
+                      onInput={(e) => {
+                        const file = e.target.files[0];
+                        onPictureFile(file);
+                      }}
+                    />
+                  </label>
+                  <p className="pl-1">or drag and drop</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {(pictureUrl || selectedPicture) && (
+            <div>
+              {pictureFile && (
+                <button
+                  type="button"
+                  className="mt-2 inline-flex items-center rounded border border-transparent bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  onClick={() => {
+                    setPictureUrl();
+                    setPictureFile("");
+                  }}
+                >
+                  Clear Picture
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </form>
     </Modal>
   );
