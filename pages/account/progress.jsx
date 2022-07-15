@@ -171,7 +171,7 @@ const graphTypes = {
           }
         }
         return {
-          x: dateFromDateAndTime(exercise.date),
+          x: dateFromDateAndTime(exercise.date, null),
           y: topWeightPerformed,
           denominator: topWeightAssigned,
           suffix: showKilograms ? "kgs" : "lbs",
@@ -444,7 +444,7 @@ export default function Progress() {
 
   const [chartOptions, setChartOptions] = useState();
   const [chartData, setChartData] = useState();
-
+  const chartRef = useRef();
   useEffect(() => {
     const newChartData = {
       datasets:
@@ -471,6 +471,11 @@ export default function Progress() {
               backgroundColor,
               data: getData({ weights, exercises, filters }),
               yAxisID: yAxisID || "y",
+              id: graphTypeOrder.indexOf(filterType),
+              barPercentage: 1,
+              barThickness: 6,
+              maxBarThickness: 10,
+              minBarLength: 2,
             };
           }) || [],
     };
@@ -491,6 +496,7 @@ export default function Progress() {
           max: new Date(),
           ticks: {
             //maxTicksLimit: 20,
+            autoSkip: true,
           },
         },
         y: {
@@ -505,23 +511,15 @@ export default function Progress() {
         y1: {
           type: "linear",
           display: false,
-          grid: {
-            drawOnChartArea: false,
-          },
+          beginAtZero: true,
         },
         y2: {
           type: "linear",
           display: false,
-          grid: {
-            drawOnChartArea: false,
-          },
         },
         y3: {
           type: "linear",
           display: false,
-          grid: {
-            drawOnChartArea: false,
-          },
         },
         y4: {
           type: "linear",
@@ -536,6 +534,7 @@ export default function Progress() {
           grid: {
             drawOnChartArea: !containsFilters.type?.includes("top set"),
           },
+          beginAtZero: true,
         },
       },
       responsive: true,
@@ -577,10 +576,9 @@ export default function Progress() {
     };
     console.log("newChartOptions", newChartOptions);
     setChartOptions(newChartOptions);
-  }, [exercises, weights, containsFilters, filters]);
+  }, [exercises, weights, containsFilters, filters, chartRef]);
 
   const router = useRouter();
-  const chartRef = useRef();
   const onChartClick = (event) => {
     const { current: chart } = chartRef;
 
@@ -666,6 +664,7 @@ export default function Progress() {
           {chartOptions && chartData && (
             <div className="">
               <Chart
+                datasetIdKey="id"
                 type="bar"
                 data={chartData}
                 options={chartOptions}
