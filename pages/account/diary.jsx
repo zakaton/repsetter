@@ -746,46 +746,81 @@ export default function Diary() {
             aria-hidden="true"
           >
             <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-yellow-600">
-                Bodyweight
+              <span className="bg-white pr-2 text-base text-green-600">
+                Pictures
               </span>
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && !weights?.some((weight) => weight.time == null) && (
+              {amITheClient && (
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedWeight();
-                    setShowWeightModal(true);
+                    // FILL
                   }}
                   className={classNames(
                     "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                    "rounded-l-md"
+                    "rounded-md"
                   )}
                 >
                   <span className="sr-only">Add Weight</span>
                   <PlusIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
-              <button
-                type="button"
-                onClick={() => setIsUsingKilograms(!isUsingKilograms)}
-                className={classNames(
-                  "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                  !weights?.some((weight) => weight.time == null)
-                    ? "rounded-r-md"
-                    : "rounded-md"
-                )}
-              >
-                <span className="sr-only">Toggle Weight</span>
-                {isUsingKilograms ? "kg" : "lbs"}
-              </button>
             </span>
           </div>
         </div>
+        {(amITheClient || weights?.length > 0) && (
+          <div className="relative pt-2">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
+              <div className="relative flex justify-start">
+                <span className="bg-white pr-2 text-base text-yellow-600">
+                  Bodyweight
+                </span>
+              </div>
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-end sm:justify-center">
+              <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+                {amITheClient &&
+                  !weights?.some((weight) => weight.time == null) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedWeight();
+                        setShowWeightModal(true);
+                      }}
+                      className={classNames(
+                        "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                        "rounded-l-md"
+                      )}
+                    >
+                      <span className="sr-only">Add Weight</span>
+                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  )}
+                <button
+                  type="button"
+                  onClick={() => setIsUsingKilograms(!isUsingKilograms)}
+                  className={classNames(
+                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                    !weights?.some((weight) => weight.time == null)
+                      ? "rounded-r-md"
+                      : "rounded-md"
+                  )}
+                >
+                  <span className="sr-only">Toggle Weight</span>
+                  {isUsingKilograms ? "kg" : "lbs"}
+                </button>
+              </span>
+            </div>
+          </div>
+        )}
         {weightChartData && weightChartOptions && (
           <Line options={weightChartOptions} data={weightChartData} />
         )}

@@ -446,6 +446,12 @@ export default function Progress() {
   const [chartData, setChartData] = useState();
   const chartRef = useRef();
   useEffect(() => {
+    const numberOfBarCharts = containsFilters.type?.reduce(
+      (count, filterType) =>
+        graphTypes[filterType].type === "bar" ? count + 1 : count,
+      0
+    );
+    console.log("numberOfBarCharts", numberOfBarCharts);
     const newChartData = {
       datasets:
         containsFilters.type
@@ -472,7 +478,6 @@ export default function Progress() {
               data: getData({ weights, exercises, filters }),
               yAxisID: yAxisID || "y",
               id: graphTypeOrder.indexOf(filterType),
-              barPercentage: 1,
               barThickness: 6,
               maxBarThickness: 10,
               minBarLength: 2,
