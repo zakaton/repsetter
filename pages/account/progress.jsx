@@ -505,14 +505,23 @@ export default function Progress() {
         y1: {
           type: "linear",
           display: false,
+          grid: {
+            drawOnChartArea: false,
+          },
         },
         y2: {
           type: "linear",
           display: false,
+          grid: {
+            drawOnChartArea: false,
+          },
         },
         y3: {
           type: "linear",
           display: false,
+          grid: {
+            drawOnChartArea: false,
+          },
         },
         y4: {
           type: "linear",
@@ -560,7 +569,6 @@ export default function Progress() {
               if ("suffix" in data) {
                 value += ` ${data.suffix}`;
               }
-              console.log(context); // DELETE
               return `${label}: ${value}`;
             },
           },
