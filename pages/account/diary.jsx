@@ -561,7 +561,6 @@ export default function Diary() {
   const toDate = new Date(selectedDate);
   toDate.setHours(24);
 
-  console.log("from-to", fromDate, toDate);
   useEffect(() => {
     if (
       weights &&
