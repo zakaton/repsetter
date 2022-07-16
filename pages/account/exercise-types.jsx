@@ -127,6 +127,8 @@ export default function ExerciseTypes() {
                 Edit<span className="sr-only"> exercise</span>
               </button>
             ),
+          },
+          isAdmin && {
             jsx: (
               <MyLink
                 href={`/account/exercises?exercise-type=${result.name}`}
