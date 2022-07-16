@@ -5,19 +5,16 @@ import { CameraIcon } from "@heroicons/react/outline";
 import { supabase } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
+import { compressAccurately } from "image-conversion";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const pictureFileSizeLimit = 50 * 1024 ** 2;
-
 export default function PictureModal(props) {
   const {
     open,
     setOpen,
-    selectedResult: selectedPicture,
-    setSelectedResult: setSelectedPicture,
     setResultStatus: setPictureStatus,
     setShowResultNotification: setShowPictureNotification,
   } = props;
@@ -35,39 +32,61 @@ export default function PictureModal(props) {
     }
   }, [open]);
 
-  useEffect(() => {
-    if (open) {
-      if (selectedPicture) {
-      } else {
-      }
-    }
-  }, [open, selectedPicture]);
-
   const [isAddingPicture, setIsAddingPicture] = useState(false);
   const [didAddPicture, setDidAddPicture] = useState(false);
 
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
   const [didUpdatePicture, setDidUpdatePicture] = useState(false);
 
-  const [picture, setPicture] = useState(0);
-  const [isPictureEmptyString, setIsPictureEmptyString] = useState(true);
   const [pictureFile, setPictureFile] = useState();
   const [pictureUrl, setPictureUrl] = useState();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
-  const onPictureFile = (file) => {
+  const [existingPicture, setExistingPicture] = useState();
+
+  const onPictureFile = async (file) => {
     console.log("onPictureFile", file);
-    // FILL - compress
-    return;
-    setPictureFile(file);
-    setPictureUrl(URL.createObjectURL(file));
+    const compressedFile = await compressAccurately(file, {
+      size: 50,
+      type: "image/jpeg",
+      width: 300,
+      // FIX
+    });
+    console.log(compressedFile);
+    setPictureFile(compressedFile);
+    setPictureUrl(URL.createObjectURL(compressedFile));
   };
+
+  const resetUI = () => {
+    setPictureUrl("");
+    setPictureFile("");
+  };
+  useEffect(() => {
+    if (!open) {
+      resetUI();
+    }
+  }, [open]);
+
+  const getExistingPicture = async () => {
+    const { signedURL, error } = await supabase.storage
+      .from("picture")
+      .createSignedUrl(`${user.id}/${selectedDate.toDateString()}.jpeg`);
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(signedURL);
+    }
+  };
+  useEffect(() => {
+    if (open) {
+    }
+  }, [open]);
 
   return (
     <Modal
       {...props}
-      title={selectedPicture ? "Update Picture" : "Add Picture"}
-      message={`${selectedPicture ? "Update" : "Add"} today's picture`}
+      title={existingPicture ? "Update Picture" : "Add Picture"}
+      message={`${existingPicture ? "Update" : "Add"} today's picture`}
       Icon={CameraIcon}
       Button={
         <button
@@ -75,7 +94,7 @@ export default function PictureModal(props) {
           form="pictureForm"
           className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >
-          {selectedPicture
+          {existingPicture
             ? isUpdatingPicture
               ? "Updating Picture..."
               : didUpdatePicture
@@ -95,48 +114,13 @@ export default function PictureModal(props) {
         onSubmit={async (e) => {
           e.preventDefault();
           let status = {};
-          if (selectedPicture) {
+          if (existingPicture) {
             setIsUpdatingPicture(true);
-            console.log("updatePictureData", updatePictureData);
-            const { data: updatedPicture, error: updatedPictureError } =
-              await supabase
-                .from("picture")
-                .update(updatePictureData)
-                .match({ id: selectedPicture.id });
-            if (updatedPictureError) {
-              console.error(updatedPictureError);
-              status = {
-                type: "failed",
-                title: "Failed to Update Picture",
-                message: updatedPictureError.message,
-              };
-            } else {
-              status = {
-                type: "succeeded",
-                title: "Successfully Updated Picture",
-              };
-            }
+            // FILL - UPDATE PICTURE
             setDidUpdatePicture(true);
           } else {
             setIsAddingPicture(true);
-            const addPictureData = {
-              date: selectedDate,
-              picture,
-              client: user.id,
-              client_email: user.email,
-            };
-            const { data: addedPicture, error: addPictureError } =
-              await supabase.from("picture").insert([addPictureData]);
-            if (addPictureError) {
-              console.error(addPictureError);
-              status = { type: "failed", message: addPictureError.message };
-            } else {
-              console.log("addedPicture", addedPicture);
-              status = {
-                type: "succeeded",
-                message: "Successfully added Picture",
-              };
-            }
+            // FILL - upload picture
             setDidAddPicture(true);
           }
 
@@ -146,10 +130,7 @@ export default function PictureModal(props) {
         }}
       >
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Upload Picture
-          </label>
-          {!pictureUrl && !selectedPicture && (
+          {!pictureUrl && !existingPicture && (
             <div
               id="pictureUploadContainer"
               onDragOver={(e) => {
@@ -169,13 +150,13 @@ export default function PictureModal(props) {
                   setIsDraggingOver(false);
                 }
               }}
-              onDrop={(e) => {
+              onDrop={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 if (isDraggingOver) {
                   setIsDraggingOver(false);
                   const file = e.dataTransfer.files[0];
-                  onPictureFile(file);
+                  await onPictureFile(file);
                 }
               }}
               className={classNames(
@@ -215,9 +196,9 @@ export default function PictureModal(props) {
                       className="sr-only"
                       accept="image/*"
                       value={pictureFile}
-                      onInput={(e) => {
+                      onInput={async (e) => {
                         const file = e.target.files[0];
-                        onPictureFile(file);
+                        await onPictureFile(file);
                       }}
                     />
                   </label>
@@ -226,8 +207,9 @@ export default function PictureModal(props) {
               </div>
             </div>
           )}
-          {(pictureUrl || selectedPicture) && (
+          {(pictureUrl || existingPicture) && (
             <div>
+              <img src={pictureUrl || existingPicture}></img>
               {pictureFile && (
                 <button
                   type="button"

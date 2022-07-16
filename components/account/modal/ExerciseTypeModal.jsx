@@ -174,7 +174,7 @@ export default function ExerciseTypeModal(props) {
               console.log("updating video file", videoFile);
               const { data: replaceVideo, error } = await supabase.storage
                 .from("exercise")
-                .update(`public/${selectedExerciseType.id}.mp4`, videoFile);
+                .update(`${selectedExerciseType.id}.mp4`, videoFile);
               replaceVideoError = error;
               if (replaceVideoError) {
                 console.error(replaceVideoError);
@@ -223,7 +223,7 @@ export default function ExerciseTypeModal(props) {
             const { data: uploadedVideo, error: uploadVideoError } =
               await supabase.storage
                 .from("exercise")
-                .upload(`public/${createdExerciseType.id}.mp4`, videoFile);
+                .upload(`${createdExerciseType.id}.mp4`, videoFile);
             if (uploadVideoError) {
               console.error(uploadVideoError);
             }

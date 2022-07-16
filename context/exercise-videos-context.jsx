@@ -11,7 +11,7 @@ export function ExerciseVideoContextProvider(props) {
     if (!exerciseVideos[id]) {
       const { publicURL: url, error } = await supabase.storage
         .from("exercise")
-        .getPublicUrl(`public/${id}.mp4`);
+        .getPublicUrl(`${id}.mp4`);
       if (error) {
         console.error(error);
       } else {

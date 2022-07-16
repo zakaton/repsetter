@@ -2,18 +2,21 @@
 import { useState, useEffect } from "react";
 import Modal from "../../Modal";
 import { supabase } from "../../../utils/supabase";
+import { useUser } from "../../../context/user-context";
+import { useClient } from "../../../context/client-context";
 
 export default function DeletePictureModal(props) {
   const {
     open,
     setOpen,
-    selectedResult: selectedPicture,
-    setSelectedResult: setSelectedPicture,
     setDeleteResultStatus: setDeletePictureStatus,
     setShowDeleteResultNotification: setShowDeletePictureNotification,
   } = props;
   const [isDeleting, setIsDeleting] = useState(false);
   const [didDelete, setDidDelete] = useState(false);
+
+  const { selectedDate } = useClient();
+  const { user } = useUser();
 
   useEffect(() => {
     if (open) {
@@ -32,18 +35,8 @@ export default function DeletePictureModal(props) {
         <button
           role="button"
           onClick={async () => {
-            console.log("DELETING", selectedPicture);
             setIsDeleting(true);
-            const { data: deletePictureResult, error: deletePictureError } =
-              await supabase
-                .from("picture")
-                .delete()
-                .eq("id", selectedPicture.id);
-            console.log("deletePictureResult", deletePictureResult);
-            if (deletePictureError) {
-              console.error(deletePictureError);
-            }
-
+            // FILL
             setIsDeleting(false);
             setDidDelete(true);
             const status = {
@@ -54,7 +47,6 @@ export default function DeletePictureModal(props) {
             setDeletePictureStatus(status);
             setShowDeletePictureNotification(true);
             setOpen(false);
-            setSelectedPicture?.(null);
           }}
           className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >

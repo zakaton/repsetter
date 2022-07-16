@@ -520,8 +520,6 @@ export default function Diary() {
     useState(false);
   const [deletePictureStatus, setDeletePictureStatus] = useState();
 
-  const [selectedPicture, setSelectedPicture] = useState();
-
   const clearNotifications = () => {
     setShowAddExerciseNotification(false);
     setShowDeleteExerciseNotification(false);
@@ -754,8 +752,6 @@ export default function Diary() {
       <PictureModal
         open={showPictureModal}
         setOpen={setShowPictureModal}
-        selectedResult={selectedPicture}
-        setSelectedResult={setSelectedPicture}
         setResultStatus={setPictureStatus}
         setShowResultNotification={setShowPictureNotification}
       />
@@ -768,8 +764,6 @@ export default function Diary() {
       <DeletePictureModal
         open={showDeletePictureModal}
         setOpen={setShowDeletePictureModal}
-        selectedResult={selectedPicture}
-        setSelectedResult={setSelectedPicture}
         setDeleteResultStatus={setDeletePictureStatus}
         setShowDeleteResultNotification={setShowDeletePictureNotification}
       />
@@ -804,7 +798,6 @@ export default function Diary() {
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedPicture();
                     setShowPictureModal(true);
                   }}
                   className={classNames(

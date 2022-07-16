@@ -48,7 +48,7 @@ export default function DeleteExerciseTypeModal(props) {
             const { data: deleteVideoResult, error: deleteExerciseVideoError } =
               await supabase.storage
                 .from("exercise")
-                .remove([`public/${selectedExerciseType.id}.mp4`]);
+                .remove([`${selectedExerciseType.id}.mp4`]);
             console.log("deleteVideoResult", deleteVideoResult);
             if (deleteExerciseVideoError) {
               console.error(deleteExerciseVideoError);
