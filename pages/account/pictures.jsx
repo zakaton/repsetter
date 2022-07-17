@@ -5,6 +5,7 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
 import Head from "next/head";
 import ClientsSelect from "../../components/account/ClientsSelect";
+import Pagination from "../../components/Pagination";
 
 const files = [
   {
@@ -113,6 +114,15 @@ export default function Photos() {
             </li>
           ))}
         </ul>
+        <Pagination
+          name={"pictures"}
+          numberOfResults={99}
+          numberOfResultsPerPage={20}
+          pageIndex={0}
+          setPageIndex={() => {}}
+          showPrevious={() => {}}
+          showNext={() => {}}
+        />
       </div>
     </>
   );
