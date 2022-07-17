@@ -90,7 +90,9 @@ export default function PictureModal(props) {
     <Modal
       {...props}
       title={doesPictureExist ? "Update Picture" : "Add Picture"}
-      message={`${doesPictureExist ? "Update" : "Add"} today's picture`}
+      message={`${
+        doesPictureExist ? "Update" : "Add"
+      } progress picture for ${selectedDate.toDateString()}`}
       Icon={CameraIcon}
       Button={
         <button

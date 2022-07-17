@@ -4,6 +4,7 @@ import Modal from "../../Modal";
 import { supabase } from "../../../utils/supabase";
 import { useUser } from "../../../context/user-context";
 import { useClient } from "../../../context/client-context";
+import { dateToString } from "../../../utils/picture-utils";
 
 export default function DeletePictureModal(props) {
   const {
@@ -40,7 +41,7 @@ export default function DeletePictureModal(props) {
             const { data: removePictureData, error: removePictureError } =
               await supabase.storage
                 .from("picture")
-                .remove([`${user.id}/${selectedDate.toDateString()}.jpg`]);
+                .remove([`${user.id}/${dateToString(selectedDate)}.jpg`]);
             if (removePictureError) {
               status = {
                 type: "failed",

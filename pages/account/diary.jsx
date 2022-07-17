@@ -18,12 +18,14 @@ import {
   PaperClipIcon,
   PlusIcon,
   ClipboardIcon,
+  PencilIcon,
+  TrashIcon,
 } from "@heroicons/react/outline";
 import {
   kilogramsToPounds,
   poundsToKilograms,
 } from "../../utils/exercise-utils";
-import { dateToString, stringToDate } from "../../utils/picture-utils";
+import { dateToString } from "../../utils/picture-utils";
 
 import {
   Chart as ChartJS,
@@ -274,29 +276,6 @@ export default function Diary() {
       getPictureDates();
     }
   }, [calendar]);
-
-  const [datesDots, setDatesDots] = useState({});
-  useEffect(() => {
-    if (exerciseDates || weightDates || pictureDates) {
-      const newDatesDots = {};
-      weightDates?.forEach((weightDate) => {
-        const dots = newDatesDots[weightDate.date] || [];
-        dots.push({ color: "bg-yellow-500" });
-        newDatesDots[weightDate.date] = dots;
-      });
-      exerciseDates?.forEach((exerciseDate) => {
-        const dots = newDatesDots[exerciseDate.date] || [];
-        dots.push({ color: "bg-blue-500" });
-        newDatesDots[exerciseDate.date] = dots;
-      });
-      pictureDates?.forEach((pictureDate) => {
-        const dots = newDatesDots[pictureDate.date] || [];
-        dots.push({ color: "bg-green-500" });
-        newDatesDots[pictureDate.date] = dots;
-      });
-      setDatesDots(newDatesDots);
-    }
-  }, [exerciseDates, weightDates, pictureDates]);
 
   const [copiedExercises, setCopiedExercises] = useState();
   const copyExercises = () => {
@@ -720,11 +699,13 @@ export default function Diary() {
   useEffect(() => {
     if (pictureStatus?.type === "succeeded") {
       getPicture();
+      getPictureDates();
     }
   }, [pictureStatus]);
   useEffect(() => {
     if (deletePictureStatus?.type === "succeeded") {
       getPicture();
+      getPictureDates();
     }
   }, [deletePictureStatus]);
 
@@ -767,6 +748,29 @@ export default function Diary() {
     console.log("newPictureDates", newPictureDates);
     setPictureDates(newPictureDates);
   };
+
+  const [datesDots, setDatesDots] = useState({});
+  useEffect(() => {
+    if (exerciseDates || weightDates || pictureDates) {
+      const newDatesDots = {};
+      weightDates?.forEach((weightDate) => {
+        const dots = newDatesDots[weightDate.date] || [];
+        dots.push({ color: "bg-yellow-500" });
+        newDatesDots[weightDate.date] = dots;
+      });
+      exerciseDates?.forEach((exerciseDate) => {
+        const dots = newDatesDots[exerciseDate.date] || [];
+        dots.push({ color: "bg-blue-500" });
+        newDatesDots[exerciseDate.date] = dots;
+      });
+      pictureDates?.forEach((pictureDate) => {
+        const dots = newDatesDots[pictureDate.date] || [];
+        dots.push({ color: "bg-green-500" });
+        newDatesDots[pictureDate.date] = dots;
+      });
+      setDatesDots(newDatesDots);
+    }
+  }, [exerciseDates, weightDates, pictureDates]);
 
   return (
     <>
@@ -887,7 +891,7 @@ export default function Diary() {
           </div>
           <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && (
+              {amITheClient && !pictureUrl && (
                 <button
                   type="button"
                   onClick={() => {
@@ -902,16 +906,44 @@ export default function Diary() {
                   <PlusIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
+              {amITheClient && pictureUrl && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPictureModal(true);
+                  }}
+                  className={classNames(
+                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                    "rounded-l-md"
+                  )}
+                >
+                  <span className="sr-only">Edit Picture</span>
+                  <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
+              {amITheClient && pictureUrl && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeletePictureModal(true);
+                  }}
+                  className={classNames(
+                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                    "rounded-r-md"
+                  )}
+                >
+                  <span className="sr-only">Delete Picture</span>
+                  <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
             </span>
           </div>
         </div>
-        <div className="">
-          {pictureUrl && (
-            <>
-              <img src={pictureUrl}></img>
-            </>
-          )}
-        </div>
+        {pictureUrl && (
+          <div className="mt-4">
+            <img src={pictureUrl}></img>
+          </div>
+        )}
         {(amITheClient || weights?.length > 0) && (
           <div className="relative pt-2">
             <div
