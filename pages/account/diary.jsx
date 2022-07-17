@@ -887,7 +887,7 @@ export default function Diary() {
           >
             <div className="relative flex justify-start">
               <span className="bg-white pr-2 text-base text-green-600">
-                Pictures
+                Picture
               </span>
             </div>
             <div className="w-full border-t border-gray-300" />

@@ -95,6 +95,7 @@ export default function PictureModal(props) {
   return (
     <Modal
       {...props}
+      className="sm:w-fit"
       title={doesPictureExist ? "Update Picture" : "Add Picture"}
       message={`${doesPictureExist ? "Update" : "Add"} progress picture ${
         selectedDate ? `for ${selectedDate.toDateString()}` : ""
