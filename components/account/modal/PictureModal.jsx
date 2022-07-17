@@ -7,6 +7,7 @@ import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import { compressAccurately } from "image-conversion";
 import { dateToString } from "../../../utils/picture-utils";
+import { data } from "autoprefixer";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -127,8 +128,9 @@ export default function PictureModal(props) {
             setIsAddingPicture(true);
           }
 
-          const { data: uploadPictureData, error: uploadPictureError } =
-            await supabase.storage
+          let uploadPictureData, uploadPictureError;
+          if (pictureFile) {
+            const { data, error } = await supabase.storage
               .from("picture")
               .upload(
                 `${user.id}/${dateToString(selectedDate)}.jpg`,
@@ -138,6 +140,17 @@ export default function PictureModal(props) {
                   upsert: true,
                 }
               );
+            uploadPictureData = data;
+            uploadPictureError = error;
+          } else {
+            const { data, error } = await supabase.storage
+              .from("picture")
+              .remove([`${user.id}/${dateToString(selectedDate)}.jpg`]);
+
+            uploadPictureData = data;
+            uploadPictureError = error;
+          }
+
           console.log("uploadPictureData", uploadPictureData);
           if (uploadPictureError) {
             status = {
@@ -227,7 +240,6 @@ export default function PictureModal(props) {
                   >
                     <span>Upload Picture</span>
                     <input
-                      required
                       id="picture-upload"
                       name="picture-upload"
                       type="file"
@@ -248,7 +260,7 @@ export default function PictureModal(props) {
           {pictureUrl && (
             <>
               <img src={pictureUrl}></img>
-              {pictureFile && (
+              {
                 <button
                   type="button"
                   className="mt-2 inline-flex items-center rounded border border-transparent bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -259,7 +271,7 @@ export default function PictureModal(props) {
                 >
                   Clear Picture
                 </button>
-              )}
+              }
             </>
           )}
         </div>
