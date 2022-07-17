@@ -46,6 +46,7 @@ export default function PictureModal(props) {
   const [doesPictureExist, setDoesPictureExist] = useState(false);
 
   const onPictureFile = async (file) => {
+    console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
       size: 50,
       type: "image/jpeg",

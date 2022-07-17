@@ -23,7 +23,7 @@ import {
   kilogramsToPounds,
   poundsToKilograms,
 } from "../../utils/exercise-utils";
-import { dateToString } from "../../utils/picture-utils";
+import { dateToString, stringToDate } from "../../utils/picture-utils";
 
 import {
   Chart as ChartJS,
@@ -277,7 +277,7 @@ export default function Diary() {
 
   const [datesDots, setDatesDots] = useState({});
   useEffect(() => {
-    if (exerciseDates || weightDates) {
+    if (exerciseDates || weightDates || pictureDates) {
       const newDatesDots = {};
       weightDates?.forEach((weightDate) => {
         const dots = newDatesDots[weightDate.date] || [];
@@ -289,9 +289,14 @@ export default function Diary() {
         dots.push({ color: "bg-blue-500" });
         newDatesDots[exerciseDate.date] = dots;
       });
+      pictureDates?.forEach((pictureDate) => {
+        const dots = newDatesDots[pictureDate.date] || [];
+        dots.push({ color: "bg-green-500" });
+        newDatesDots[pictureDate.date] = dots;
+      });
       setDatesDots(newDatesDots);
     }
-  }, [exerciseDates, weightDates]);
+  }, [exerciseDates, weightDates, pictureDates]);
 
   const [copiedExercises, setCopiedExercises] = useState();
   const copyExercises = () => {
@@ -687,6 +692,7 @@ export default function Diary() {
       .createSignedUrl(`${userId}/${dateToString(selectedDate)}.jpg`, 60);
     if (error) {
       console.error(error);
+      setPictureUrl();
     } else {
       setPictureUrl(signedURL);
       setGotPictureForDate(selectedDate);
@@ -722,26 +728,43 @@ export default function Diary() {
     }
   }, [deletePictureStatus]);
 
-  const [pictureDates, setPictureDates] = useState({});
+  const [pictureDates, setPictureDates] = useState();
   const getPictureDates = async () => {
     const userId = amITheClient ? user.id : selectedClientId;
 
-    const newPictureDates = {};
-    const {
-      data: currentMonthPictureDates,
-      error: getCurrentMonthPictureDatesError,
-    } = await supabase.storage.from("picture").list(userId, {
-      limit: 31,
-      sortBy: { column: "name", order: "asc" },
-      search: dateToString(selectedDate).split("-").slice(0, 1).join("-"),
-    });
-    if (getCurrentMonthPictureDatesError) {
-      console.error(getCurrentMonthPictureDatesError);
-    } else {
-      // FILL
-      console.log("currentMonthPictureDates", currentMonthPictureDates);
-    }
+    const newPictureDates = [];
+    const previousMonth = new Date(selectedDate);
+    previousMonth.setUTCDate(15);
+    previousMonth.setUTCMonth(previousMonth.getUTCMonth() - 1);
+    const nextMonth = new Date(selectedDate);
+    nextMonth.setUTCDate(15);
+    nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1);
+    const searchDates = [previousMonth, selectedDate, nextMonth];
+    const searches = searchDates.map((date) =>
+      dateToString(date).split("-").slice(0, 2).join("-")
+    );
 
+    console.log("getPictureDates", searches, searchDates);
+    await Promise.all(
+      searches.map(async (search) => {
+        const { data: monthPictureDates, error: monthPictureDatesError } =
+          await supabase.storage.from("picture").list(userId, {
+            limit: 31,
+            sortBy: { column: "name", order: "asc" },
+            search,
+          });
+        if (monthPictureDatesError) {
+          console.error(monthPictureDatesError);
+        } else {
+          console.log("monthPictureDates", search, monthPictureDates);
+          monthPictureDates.forEach(({ name }) =>
+            newPictureDates.push({ date: name.split(".")[0] })
+          );
+        }
+      })
+    );
+
+    console.log("newPictureDates", newPictureDates);
     setPictureDates(newPictureDates);
   };
 
