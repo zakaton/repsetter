@@ -23,6 +23,7 @@ import {
   kilogramsToPounds,
   poundsToKilograms,
 } from "../../utils/exercise-utils";
+import { dateToString } from "../../utils/picture-utils";
 
 import {
   Chart as ChartJS,
@@ -270,6 +271,7 @@ export default function Diary() {
       setLastSelectedDate(selectedDate);
       getExerciseDates();
       getWeightDates();
+      getPictureDates();
     }
   }, [calendar]);
 
@@ -675,24 +677,39 @@ export default function Diary() {
     }
   }, [weights, lastWeightBeforeToday, firstWeightAfterToday, isUsingKilograms]);
 
+  const [gotPictureForUserId, setGotPictureForUserId] = useState();
+  const [gotPictureForDate, setGotPictureForDate] = useState();
   const [pictureUrl, setPictureUrl] = useState();
   const getPicture = async () => {
     const userId = amITheClient ? user.id : selectedClientId;
     const { signedURL, error } = await supabase.storage
       .from("picture")
-      .createSignedUrl(`${userId}/${selectedDate.toDateString()}.jpg`, 60);
+      .createSignedUrl(`${userId}/${dateToString(selectedDate)}.jpg`, 60);
     if (error) {
       console.error(error);
     } else {
       setPictureUrl(signedURL);
+      setGotPictureForDate(selectedDate);
+      setGotPictureForUserId(selectedClientId);
     }
     console.log(error, signedURL);
   };
+
   useEffect(() => {
-    if (selectedDate) {
-      getPicture();
+    if (!selectedDate) {
+      return;
     }
-  }, [amITheClient, selectedClientId, selectedDate]);
+
+    if (!pictureUrl) {
+      getPicture();
+    } else if (
+      gotPictureForUserId != selectedClientId ||
+      selectedDate != gotPictureForDate
+    ) {
+      getPicture(true);
+      getPictureDates();
+    }
+  }, [pictureUrl, selectedClientId, selectedClient, selectedDate]);
 
   useEffect(() => {
     if (pictureStatus?.type === "succeeded") {
@@ -704,6 +721,29 @@ export default function Diary() {
       getPicture();
     }
   }, [deletePictureStatus]);
+
+  const [pictureDates, setPictureDates] = useState({});
+  const getPictureDates = async () => {
+    const userId = amITheClient ? user.id : selectedClientId;
+
+    const newPictureDates = {};
+    const {
+      data: currentMonthPictureDates,
+      error: getCurrentMonthPictureDatesError,
+    } = await supabase.storage.from("picture").list(userId, {
+      limit: 31,
+      sortBy: { column: "name", order: "asc" },
+      search: dateToString(selectedDate).split("-").slice(0, 1).join("-"),
+    });
+    if (getCurrentMonthPictureDatesError) {
+      console.error(getCurrentMonthPictureDatesError);
+    } else {
+      // FILL
+      console.log("currentMonthPictureDates", currentMonthPictureDates);
+    }
+
+    setPictureDates(newPictureDates);
+  };
 
   return (
     <>
@@ -841,6 +881,13 @@ export default function Diary() {
               )}
             </span>
           </div>
+        </div>
+        <div className="">
+          {pictureUrl && (
+            <>
+              <img src={pictureUrl}></img>
+            </>
+          )}
         </div>
         {(amITheClient || weights?.length > 0) && (
           <div className="relative pt-2">

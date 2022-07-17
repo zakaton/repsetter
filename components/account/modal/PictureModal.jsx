@@ -6,6 +6,7 @@ import { supabase } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import { compressAccurately } from "image-conversion";
+import { dateToString } from "../../../utils/picture-utils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -70,7 +71,7 @@ export default function PictureModal(props) {
   const getExistingPicture = async () => {
     const { signedURL, error } = await supabase.storage
       .from("picture")
-      .createSignedUrl(`${user.id}/${selectedDate.toDateString()}.jpg`, 60);
+      .createSignedUrl(`${user.id}/${dateToString(selectedDate)}.jpg`, 60);
     if (error) {
       console.error(error);
     } else {
@@ -127,7 +128,7 @@ export default function PictureModal(props) {
             await supabase.storage
               .from("picture")
               .upload(
-                `${user.id}/${selectedDate.toDateString()}.jpg`,
+                `${user.id}/${dateToString(selectedDate)}.jpg`,
                 pictureFile,
                 {
                   cacheControl: "3600",
