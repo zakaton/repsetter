@@ -21,6 +21,7 @@ export default function WeightModal(props) {
     setShowResultNotification: setShowWeightNotification,
     existingResults: existingWeights = [],
     lastWeightBeforeToday,
+    isUsingKilograms: _isUsingKilograms,
   } = props;
 
   const { selectedDate } = useClient();

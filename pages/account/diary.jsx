@@ -1060,7 +1060,7 @@ export default function Diary() {
                             ? poundsToKilograms(weight.weight)
                             : kilogramsToPounds(weight.weight)
                           ).toFixed(1)}{" "}
-                      {isUsingKilograms ? "kgs" : "lbs"}{" "}
+                      {isUsingKilograms ? "kg" : "lbs"}{" "}
                       {previousWeight && (
                         <span
                           className={

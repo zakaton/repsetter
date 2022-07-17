@@ -8,7 +8,7 @@ import { supabase } from "../../utils/supabase";
 import { stringToDate } from "../../utils/picture-utils";
 import MyLink from "../../components/MyLink";
 
-const numberOfPicturesPerPage = 2;
+const numberOfPicturesPerPage = 10;
 
 export default function Photos() {
   const { selectedClientId, selectedClient, setSelectedDate } = useClient();
@@ -188,7 +188,7 @@ export default function Photos() {
                 {weight && (
                   <p className="pointer-events-none block text-sm font-medium text-gray-500">
                     {weight.weight}{" "}
-                    {weight.is_weight_in_kilograms ? "kgs" : "lbs"}
+                    {weight.is_weight_in_kilograms ? "kg" : "lbs"}
                   </p>
                 )}
               </li>

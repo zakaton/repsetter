@@ -122,7 +122,7 @@ const filterTypes = [
     defaultValue: "lbs",
     radios: [
       { value: "lbs", label: "lbs", defaultChecked: true },
-      { value: "kgs", label: "kgs" },
+      { value: "kg", label: "kg" },
     ],
   },
   {
@@ -133,7 +133,7 @@ const filterTypes = [
     defaultValue: "lbs",
     radios: [
       { value: "lbs", label: "lbs", defaultChecked: true },
-      { value: "kgs", label: "kgs" },
+      { value: "kg", label: "kg" },
     ],
   },
   dateRangeFilterType,
@@ -163,7 +163,7 @@ const graphTypes = {
             topWeightPerformed = exercise.weight_performed?.[index] || 0;
           }
         });
-        const showKilograms = (filters["weight-unit"] || "kgs") === "kgs";
+        const showKilograms = (filters["weight-unit"] || "kg") === "kg";
         if (exercise.is_weight_in_kilograms !== showKilograms) {
           if (showKilograms) {
             topWeightPerformed =
@@ -179,7 +179,7 @@ const graphTypes = {
           x: dateFromDateAndTime(exercise.date, null),
           y: topWeightPerformed,
           denominator: topWeightAssigned,
-          suffix: showKilograms ? "kgs" : "lbs",
+          suffix: showKilograms ? "kg" : "lbs",
         };
       });
     },
@@ -257,7 +257,7 @@ const graphTypes = {
     getData: ({ weights, filters }) => {
       const data = [];
       weights?.forEach((weight) => {
-        const showKilograms = (filters["bodyweight-unit"] || "lbs") === "kgs";
+        const showKilograms = (filters["bodyweight-unit"] || "lbs") === "kg";
         let weightValue = Number(weight.weight);
         if (weight.is_weight_in_kilograms !== showKilograms) {
           if (showKilograms) {
@@ -280,7 +280,7 @@ const graphTypes = {
             sum: weightValue,
             numberOfWeights: 1,
             _date: weight.date,
-            suffix: showKilograms ? "kgs" : "lbs",
+            suffix: showKilograms ? "kg" : "lbs",
             toFixed: 1,
           };
           data.push(datum);
@@ -495,8 +495,8 @@ export default function Progress() {
     console.log("newChartData", newChartData);
     setChartData(newChartData);
 
-    const isWeightInKgs = (filters["weight-unit"] || "kgs") === "kgs";
-    const isBodyweightInKgs = (filters["bodyweight-unit"] || "lbs") === "kgs";
+    const isWeightInKgs = (filters["weight-unit"] || "kg") === "kg";
+    const isBodyweightInKgs = (filters["bodyweight-unit"] || "lbs") === "kg";
     const newChartOptions = {
       scales: {
         x: {
@@ -518,7 +518,7 @@ export default function Progress() {
           position: "left",
           title: {
             display: true,
-            text: `Top Set (${isWeightInKgs ? "kgs" : "lbs"})`,
+            text: `Top Set (${isWeightInKgs ? "kg" : "lbs"})`,
           },
         },
         y1: {
@@ -542,7 +542,7 @@ export default function Progress() {
             : "left",
           title: {
             display: containsFilters.type?.includes("bodyweight"),
-            text: `Bodyweight (${isBodyweightInKgs ? "kgs" : "lbs"})`,
+            text: `Bodyweight (${isBodyweightInKgs ? "kg" : "lbs"})`,
           },
           grid: {
             drawOnChartArea: !containsFilters.type?.includes("top set"),
