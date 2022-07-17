@@ -944,7 +944,7 @@ export default function Diary() {
         </div>
         {pictureUrl && (
           <div className="mt-4 mb-2">
-            <img src={pictureUrl}></img>
+            <img src={pictureUrl} className="m-auto"></img>
           </div>
         )}
         {(amITheClient || weights?.length > 0) && (
