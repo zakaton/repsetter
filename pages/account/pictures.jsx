@@ -6,6 +6,9 @@ import { useClient } from "../../context/client-context";
 import Head from "next/head";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import Pagination from "../../components/Pagination";
+import { supabase } from "../../utils/supabase";
+
+const numberOfPicturesPerPage = 20;
 
 const files = [
   {
@@ -21,9 +24,29 @@ while (files.length < 8) {
 
 export default function Photos() {
   const router = useRouter();
-  const { isAdmin, user } = useUser();
-  const { selectedClient } = useClient();
+  const { user } = useUser();
+  const { amITheClient, selectedClientId, selectedClient } = useClient();
   const [pictures, setPictures] = useState();
+
+  const [numberOfPictures, setNumberOfPictures] = useState(0);
+  const getNumberOfPictures = async () => {
+    const userId = amITheClient ? user.id : selectedClientId;
+    const { data: pictureList, error: listPicturesError } =
+      await supabase.storage
+        .from("picture")
+        .list(userId, { sortBy: { column: "name", order: "desc" } });
+
+    if (listPicturesError) {
+      console.error(listPicturesError);
+    } else {
+      console.log("pictureList", pictureList);
+      setNumberOfPictures(pictureList.length);
+    }
+  };
+
+  useEffect(() => {
+    getNumberOfPictures();
+  }, [selectedClientId]);
 
   return (
     <>
@@ -76,8 +99,8 @@ export default function Photos() {
         </ul>
         <Pagination
           name={"picture"}
-          numberOfResults={99}
-          numberOfResultsPerPage={20}
+          numberOfResults={numberOfPictures}
+          numberOfResultsPerPage={numberOfPicturesPerPage}
           pageIndex={0}
           setPageIndex={() => {}}
           showPrevious={() => {}}

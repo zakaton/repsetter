@@ -697,7 +697,7 @@ export default function Diary() {
       getPicture(true);
       getPictureDates();
     }
-  }, [pictureUrl, selectedClientId, selectedClient, selectedDate]);
+  }, [pictureUrl, selectedClientId, selectedDate]);
 
   useEffect(() => {
     if (pictureStatus?.type === "succeeded") {
