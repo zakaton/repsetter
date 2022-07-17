@@ -460,6 +460,7 @@ export default function ExerciseModal(props) {
             <input
               required
               type="number"
+              inputMode="numeric"
               min="1"
               max="10"
               value={numberOfSets}
@@ -572,6 +573,7 @@ export default function ExerciseModal(props) {
               <input
                 required
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="20"
                 value={numberOfReps[0]}
@@ -597,6 +599,7 @@ export default function ExerciseModal(props) {
                 <input
                   required
                   type="number"
+                  inputMode="numeric"
                   min="0"
                   max="20"
                   value={numberOfReps[index]}
@@ -625,6 +628,7 @@ export default function ExerciseModal(props) {
               <input
                 required
                 type="number"
+                inputMode="decimal"
                 min="0"
                 name="weight"
                 id="weight"
@@ -674,6 +678,7 @@ export default function ExerciseModal(props) {
                 <input
                   required
                   type="number"
+                  inputMode="decimal"
                   min="0"
                   name={`weight-${index}`}
                   id={`weight-${index}`}
@@ -905,6 +910,7 @@ export default function ExerciseModal(props) {
               <input
                 required
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="20"
                 value={isSetsPerformedEmptyString ? "" : numberOfSetsPerformed}
@@ -953,6 +959,7 @@ export default function ExerciseModal(props) {
                   <input
                     required
                     type="number"
+                    inputMode="numeric"
                     min="0"
                     max="20"
                     value={
@@ -1003,6 +1010,7 @@ export default function ExerciseModal(props) {
                   <input
                     required
                     type="number"
+                    inputMode="numeric"
                     min="0"
                     max="10"
                     value={
@@ -1044,6 +1052,7 @@ export default function ExerciseModal(props) {
                   <input
                     required
                     type="number"
+                    inputMode="decimal"
                     min="0"
                     name={`weight-performed-${index}`}
                     id={`weight-performed-${index}`}

@@ -212,6 +212,7 @@ export default function WeightModal(props) {
             <input
               required
               type="number"
+              inputMode="decimal"
               min="0"
               placeholder="0"
               name="weight"

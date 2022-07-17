@@ -675,6 +675,36 @@ export default function Diary() {
     }
   }, [weights, lastWeightBeforeToday, firstWeightAfterToday, isUsingKilograms]);
 
+  const [pictureUrl, setPictureUrl] = useState();
+  const getPicture = async () => {
+    const userId = amITheClient ? user.id : selectedClientId;
+    const { signedURL, error } = await supabase.storage
+      .from("picture")
+      .createSignedUrl(`${userId}/${selectedDate.toDateString()}.jpg`, 60);
+    if (error) {
+      console.error(error);
+    } else {
+      setPictureUrl(signedURL);
+    }
+    console.log(error, signedURL);
+  };
+  useEffect(() => {
+    if (selectedDate) {
+      getPicture();
+    }
+  }, [amITheClient, selectedClientId, selectedDate]);
+
+  useEffect(() => {
+    if (pictureStatus?.type === "succeeded") {
+      getPicture();
+    }
+  }, [pictureStatus]);
+  useEffect(() => {
+    if (deletePictureStatus?.type === "succeeded") {
+      getPicture();
+    }
+  }, [deletePictureStatus]);
+
   return (
     <>
       <ExerciseModal

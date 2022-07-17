@@ -86,6 +86,9 @@ export default function ExerciseTypes() {
         resultName="exercise"
         title="Exercise Types"
         subtitle="View all Exercise Types"
+        className={
+          "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
+        }
         CreateResultModal={isAdmin && ExerciseTypeModal}
         DeleteResultModal={isAdmin && DeleteExerciseTypeModal}
         resultMap={(result) => [
@@ -109,7 +112,7 @@ export default function ExerciseTypes() {
                 autoPlay={true}
                 muted={true}
                 loop={true}
-                className={"aspect-[4/3], h-28"}
+                className={"aspect-[4/3]"}
                 playsInline={true}
                 controls={false}
               ></LazyVideo>
@@ -134,7 +137,7 @@ export default function ExerciseTypes() {
                 href={`/account/exercises?exercise-type=${result.name}`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                View Exercises
+                View
               </MyLink>
             ),
           },

@@ -34,6 +34,7 @@ export default function Table({
   includeClientSelect,
   clearFiltersListener,
   modalListener,
+  className,
 }) {
   const router = useRouter();
   const { isLoading, user } = useUser();
@@ -315,6 +316,7 @@ export default function Table({
               >
                 <dl
                   className={
+                    className ||
                     "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
                   }
                 >

@@ -42,17 +42,16 @@ export default function PictureModal(props) {
   const [pictureUrl, setPictureUrl] = useState();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
-  const [existingPicture, setExistingPicture] = useState();
+  const [doesPictureExist, setDoesPictureExist] = useState(false);
 
   const onPictureFile = async (file) => {
-    console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
       size: 50,
       type: "image/jpeg",
       width: 300,
       // FIX
     });
-    console.log(compressedFile);
+    console.log("compressedFile", compressedFile);
     setPictureFile(compressedFile);
     setPictureUrl(URL.createObjectURL(compressedFile));
   };
@@ -60,6 +59,7 @@ export default function PictureModal(props) {
   const resetUI = () => {
     setPictureUrl("");
     setPictureFile("");
+    setDoesPictureExist(false);
   };
   useEffect(() => {
     if (!open) {
@@ -70,23 +70,25 @@ export default function PictureModal(props) {
   const getExistingPicture = async () => {
     const { signedURL, error } = await supabase.storage
       .from("picture")
-      .createSignedUrl(`${user.id}/${selectedDate.toDateString()}.jpeg`);
+      .createSignedUrl(`${user.id}/${selectedDate.toDateString()}.jpg`, 60);
     if (error) {
       console.error(error);
     } else {
-      console.log(signedURL);
+      setPictureUrl(signedURL);
+      setDoesPictureExist(true);
     }
   };
   useEffect(() => {
     if (open) {
+      getExistingPicture();
     }
   }, [open]);
 
   return (
     <Modal
       {...props}
-      title={existingPicture ? "Update Picture" : "Add Picture"}
-      message={`${existingPicture ? "Update" : "Add"} today's picture`}
+      title={doesPictureExist ? "Update Picture" : "Add Picture"}
+      message={`${doesPictureExist ? "Update" : "Add"} today's picture`}
       Icon={CameraIcon}
       Button={
         <button
@@ -94,7 +96,7 @@ export default function PictureModal(props) {
           form="pictureForm"
           className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >
-          {existingPicture
+          {doesPictureExist
             ? isUpdatingPicture
               ? "Updating Picture..."
               : didUpdatePicture
@@ -113,14 +115,46 @@ export default function PictureModal(props) {
         className="mt-3"
         onSubmit={async (e) => {
           e.preventDefault();
-          let status = {};
-          if (existingPicture) {
+          let status;
+
+          if (doesPictureExist) {
             setIsUpdatingPicture(true);
-            // FILL - UPDATE PICTURE
-            setDidUpdatePicture(true);
           } else {
             setIsAddingPicture(true);
-            // FILL - upload picture
+          }
+
+          const { data: uploadPictureData, error: uploadPictureError } =
+            await supabase.storage
+              .from("picture")
+              .upload(
+                `${user.id}/${selectedDate.toDateString()}.jpg`,
+                pictureFile,
+                {
+                  cacheControl: "3600",
+                  upsert: true,
+                }
+              );
+          console.log("uploadPictureData", uploadPictureData);
+          if (uploadPictureError) {
+            status = {
+              type: "failed",
+              title: `Failed to ${
+                doesPictureExist ? "Update" : "Upload"
+              } Picture`,
+              message: uploadPictureError.message,
+            };
+          } else {
+            status = {
+              type: "succeeded",
+              title: `Successfully ${
+                doesPictureExist ? "Updated" : "Uploaded"
+              } Picture`,
+            };
+          }
+
+          if (doesPictureExist) {
+            setDidUpdatePicture(true);
+          } else {
             setDidAddPicture(true);
           }
 
@@ -130,7 +164,7 @@ export default function PictureModal(props) {
         }}
       >
         <div>
-          {!pictureUrl && !existingPicture && (
+          {!pictureUrl && (
             <div
               id="pictureUploadContainer"
               onDragOver={(e) => {
@@ -207,9 +241,9 @@ export default function PictureModal(props) {
               </div>
             </div>
           )}
-          {(pictureUrl || existingPicture) && (
-            <div>
-              <img src={pictureUrl || existingPicture}></img>
+          {pictureUrl && (
+            <>
+              <img src={pictureUrl}></img>
               {pictureFile && (
                 <button
                   type="button"
@@ -222,7 +256,7 @@ export default function PictureModal(props) {
                   Clear Picture
                 </button>
               )}
-            </div>
+            </>
           )}
         </div>
       </form>

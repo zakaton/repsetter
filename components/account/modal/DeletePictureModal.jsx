@@ -36,14 +36,25 @@ export default function DeletePictureModal(props) {
           role="button"
           onClick={async () => {
             setIsDeleting(true);
-            // FILL
+            let status;
+            const { data: removePictureData, error: removePictureError } =
+              await supabase.storage
+                .from("picture")
+                .remove([`${user.id}/${selectedDate.toDateString()}.jpg`]);
+            if (removePictureError) {
+              status = {
+                type: "failed",
+                title: "Failed to Delete Picture",
+                message: removePictureError.message,
+              };
+            } else {
+              status = {
+                type: "succeeded",
+                title: "Successfully deleted Picture",
+              };
+            }
             setIsDeleting(false);
             setDidDelete(true);
-            const status = {
-              type: "succeeded",
-              title: "Successfully deleted Picture",
-            };
-            console.log("status", status);
             setDeletePictureStatus(status);
             setShowDeletePictureNotification(true);
             setOpen(false);
