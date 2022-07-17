@@ -1066,9 +1066,10 @@ export default function Diary() {
                           }
                         >
                           ({weightDifference < 0 ? "" : "+"}
-                          {weightDifference.toFixed(
-                            Number.isInteger(weightDifference) ? 0 : 1
-                          )}
+                          {(isUsingKilograms
+                            ? poundsToKilograms(weightDifference)
+                            : kilogramsToPounds(weightDifference)
+                          ).toFixed(Number.isInteger(weightDifference) ? 0 : 1)}
                           )
                         </span>
                       )}
