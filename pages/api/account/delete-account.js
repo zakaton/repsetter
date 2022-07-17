@@ -5,6 +5,7 @@ import {
   isUserAdmin,
   getUserByAccessToken,
   paginationSize,
+  storagePaginationSize,
 } from "../../../utils/supabase";
 import Stripe from "stripe";
 
@@ -130,7 +131,21 @@ export default async function handler(req, res) {
     .match({ client: profile.id });
   console.log("deleteWeightError", deleteWeightError);
 
-  // FILL - delete pictures
+  const { data: picturesList, error: listPicturesError } =
+    await supabase.storage.from("picture").list(`${profile.id}`);
+  if (listPicturesError) {
+    console.error(listPicturesError);
+  } else {
+    console.log("picturesList", picturesList);
+  }
+  const picturesToRemove = picturesList.map(
+    (picture) => `${profile.id}/${picture.name}`
+  );
+  const { data: removedPictures, error: removePicturesError } =
+    await supabase.storage.from("picture").remove(picturesToRemove);
+  if (removePicturesError) {
+    console.error(removePicturesError);
+  }
 
   try {
     await stripe.customers.del(profile.stripe_customer);

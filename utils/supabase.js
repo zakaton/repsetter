@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import cookie from "cookie";
 
 export const paginationSize = 1_000;
+export const storagePaginationSize = 100;
 
 export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,

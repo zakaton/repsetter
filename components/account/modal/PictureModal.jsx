@@ -7,7 +7,6 @@ import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import { compressAccurately } from "image-conversion";
 import { dateToString } from "../../../utils/picture-utils";
-import { data } from "autoprefixer";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -70,7 +69,12 @@ export default function PictureModal(props) {
     }
   }, [open]);
 
+  const [isGettingPictureUrl, setIsGettingPictureUrl] = useState(false);
   const getExistingPicture = async () => {
+    if (isGettingPictureUrl) {
+      return;
+    }
+    setIsGettingPictureUrl(true);
     const { signedURL, error } = await supabase.storage
       .from("picture")
       .createSignedUrl(`${user.id}/${dateToString(selectedDate)}.jpg`, 60);
@@ -80,6 +84,7 @@ export default function PictureModal(props) {
       setPictureUrl(signedURL);
       setDoesPictureExist(true);
     }
+    setIsGettingPictureUrl(false);
   };
   useEffect(() => {
     if (open) {
@@ -181,7 +186,7 @@ export default function PictureModal(props) {
         }}
       >
         <div>
-          {!pictureUrl && (
+          {!pictureUrl && !isGettingPictureUrl && (
             <div
               id="pictureUploadContainer"
               onDragOver={(e) => {
@@ -259,7 +264,36 @@ export default function PictureModal(props) {
           )}
           {pictureUrl && (
             <>
-              <img src={pictureUrl}></img>
+              <img
+                src={pictureUrl}
+                alt="progress picture"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isDraggingOver) {
+                    setIsDraggingOver(true);
+                  }
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (
+                    isDraggingOver &&
+                    e.target.id === "pictureUploadContainer"
+                  ) {
+                    setIsDraggingOver(false);
+                  }
+                }}
+                onDrop={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (isDraggingOver) {
+                    setIsDraggingOver(false);
+                    const file = e.dataTransfer.files[0];
+                    await onPictureFile(file);
+                  }
+                }}
+              ></img>
               {
                 <button
                   type="button"
