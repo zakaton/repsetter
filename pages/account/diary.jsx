@@ -943,7 +943,7 @@ export default function Diary() {
           </div>
         </div>
         {pictureUrl && (
-          <div className="mt-4">
+          <div className="mt-4 mb-2">
             <img src={pictureUrl}></img>
           </div>
         )}
