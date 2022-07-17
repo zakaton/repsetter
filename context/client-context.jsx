@@ -75,23 +75,25 @@ export function ClientContextProvider(props) {
 
   const router = useRouter();
 
+  const [initialClientEmail, setInitialClientEmail] = useState();
   useEffect(() => {
-    if (clients && "client" in router.query) {
-      const selectedClientEmail = router.query.client;
+    if (clients && initialClientEmail) {
       const selectedClient = clients.find(
-        (client) => client.client_email === selectedClientEmail
+        (client) => client.client_email === initialClientEmail
       );
       if (selectedClient) {
         setSelectedClient(selectedClient);
       }
     }
-  }, [clients]);
+  }, [clients, initialClientEmail]);
 
   useEffect(() => {
-    if (!router.isReady) {
-      return;
+    if (router.isReady) {
+      console.log("CHECK QUERY", router.query);
+      if ("client" in router.query) {
+        setInitialClientEmail(router.query.client);
+      }
     }
-    console.log("CHECK QUERY", router.query);
   }, [router.isReady]);
 
   useEffect(() => {
