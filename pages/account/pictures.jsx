@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { useUser } from "../../context/user-context";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
@@ -25,9 +24,9 @@ while (files.length < 8) {
 }
 
 export default function Photos() {
-  const router = useRouter();
   const { user } = useUser();
-  const { amITheClient, selectedClientId, selectedClient } = useClient();
+  const { amITheClient, selectedClientId, selectedClient, setSelectedDate } =
+    useClient();
 
   const [picturesList, setPicturesList] = useState();
   const getPicturesList = async () => {
@@ -104,6 +103,9 @@ export default function Photos() {
             <li key={picture.path} className="relative">
               <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                 <MyLink
+                  onClick={() => {
+                    setSelectedDate(picture.date);
+                  }}
                   href={`/account/diary?date=${picture.date.toDateString()}`}
                 >
                   <img
