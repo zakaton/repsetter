@@ -616,7 +616,7 @@ export default function Progress() {
 
   return (
     <>
-      <div className="bg-whitepx-4 pb-2 pt-6 sm:px-6 sm:pt-6">
+      <div className="bg-white px-4 pb-2 pt-6 sm:px-6 sm:pt-6">
         <div className="pb-4">
           <h3 className="inline text-lg font-medium leading-6 text-gray-900">
             Progress
