@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useUser } from "../../context/user-context";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import { useClient } from "../../context/client-context";
 import Head from "next/head";
@@ -9,32 +8,25 @@ import { supabase } from "../../utils/supabase";
 import { stringToDate } from "../../utils/picture-utils";
 import MyLink from "../../components/MyLink";
 
-const numberOfPicturesPerPage = 20;
-
-const files = [
-  {
-    title: "IMG_4985.HEIC",
-    size: "3.9 MB",
-    source:
-      "https://images.unsplash.com/photo-1582053433976-25c00369fc93?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=512&q=80",
-  },
-];
-while (files.length < 8) {
-  files.push(files[0]);
-}
+const numberOfPicturesPerPage = 2;
 
 export default function Photos() {
-  const { user } = useUser();
-  const { amITheClient, selectedClientId, selectedClient, setSelectedDate } =
-    useClient();
+  const { selectedClientId, selectedClient, setSelectedDate } = useClient();
+
+  const [pageIndex, setPageIndex] = useState(0);
 
   const [picturesList, setPicturesList] = useState();
+  const [isGettingPicturesList, setIsGettingPicturesList] = useState(false);
   const getPicturesList = async () => {
-    const userId = amITheClient ? user.id : selectedClientId;
+    if (isGettingPicturesList) {
+      return;
+    }
+    setIsGettingPicturesList(true);
+
     const { data: picturesList, error: listPicturesError } =
-      await supabase.storage
-        .from("picture")
-        .list(userId, { sortBy: { column: "name", order: "desc" } });
+      await supabase.storage.from("picture").list(selectedClientId, {
+        sortBy: { column: "name", order: "desc" },
+      });
 
     if (listPicturesError) {
       console.error(listPicturesError);
@@ -42,12 +34,31 @@ export default function Photos() {
       console.log("picturesList", picturesList);
       setPicturesList(picturesList);
     }
+
+    setIsGettingPicturesList(false);
   };
 
+  useEffect(() => {
+    if (selectedClientId) {
+      setPageIndex(0);
+      getPicturesList();
+    }
+  }, [selectedClientId]);
+
   const [pictures, setPictures] = useState();
+  const [isGettingPictures, setIsGettingPictures] = useState(false);
   const getPictures = async () => {
-    const userId = amITheClient ? user.id : selectedClientId;
-    const signedUrls = picturesList.map(({ name }) => `${userId}/${name}`);
+    if (isGettingPictures) {
+      return;
+    }
+
+    setIsGettingPictures(true);
+    const signedUrls = picturesList
+      .slice(
+        pageIndex * numberOfPicturesPerPage,
+        (pageIndex + 1) * numberOfPicturesPerPage
+      )
+      .map(({ name }) => `${selectedClientId}/${name}`);
     const { data: pictures, error: getPicturesError } = await supabase.storage
       .from("picture")
       .createSignedUrls(signedUrls, 60);
@@ -62,17 +73,65 @@ export default function Photos() {
       });
       setPictures(pictures);
     }
+    setIsGettingPictures(false);
   };
 
   useEffect(() => {
     if (picturesList) {
       getPictures();
     }
-  }, [picturesList]);
+  }, [picturesList, pageIndex]);
 
+  const [weights, setWeights] = useState();
+  const [isGettingWeights, setIsGettingWeights] = useState(false);
+  const getWeights = async () => {
+    if (isGettingWeights) {
+      return;
+    }
+    setIsGettingWeights(true);
+
+    console.log(pictures);
+
+    console.log(
+      pictures[0].date.toDateString(),
+      pictures[pictures.length - 1].date.toDateString()
+    );
+
+    const { data: weights, error: getWeightsError } = await supabase
+      .from("weight")
+      .select("*")
+      .match({ client: selectedClientId })
+      .lte("date", pictures[0].date.toDateString())
+      .gte("date", pictures[pictures.length - 1].date.toDateString())
+      .order("time", { ascending: true });
+
+    if (getWeightsError) {
+      console.error(getWeightsError);
+    } else {
+      console.log("weights", weights);
+      setWeights(weights);
+    }
+
+    setIsGettingWeights(false);
+  };
   useEffect(() => {
-    getPicturesList();
-  }, [selectedClientId]);
+    if (pictures) {
+      getWeights();
+    }
+  }, [pictures]);
+
+  const showPrevious = async () => {
+    console.log("showPrevious");
+    if (pageIndex > 0) {
+      setPageIndex(pageIndex - 1);
+    }
+  };
+  const showNext = async () => {
+    console.log("showNext");
+    if ((pageIndex + 1) * numberOfPicturesPerPage < picturesList.length) {
+      setPageIndex(pageIndex + 1);
+    }
+  };
 
   return (
     <>
@@ -99,40 +158,52 @@ export default function Photos() {
           role="list"
           className="grid grid-cols-2 gap-x-4 gap-y-8 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
         >
-          {pictures?.map((picture) => (
-            <li key={picture.path} className="relative">
-              <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                <MyLink
-                  onClick={() => {
-                    setSelectedDate(picture.date);
-                  }}
-                  href={`/account/diary?date=${picture.date.toDateString()}`}
-                >
-                  <img
-                    src={picture.signedURL}
-                    alt={`progress picture for ${picture.date.toDateString()}`}
-                    className="pointer-events-none focus:outline-none group-hover:opacity-75"
-                  />
-                </MyLink>
-              </div>
-              <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {picture.date.toDateString()}
-              </p>
-              <p className="pointer-events-none block text-sm font-medium text-gray-500">
-                weight
-              </p>
-            </li>
-          ))}
+          {pictures?.map((picture) => {
+            const weight = weights?.find(
+              (weight) => weight.date === picture.dateString
+            );
+            return (
+              <li key={picture.path} className="relative">
+                <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                  <MyLink
+                    onClick={() => {
+                      setSelectedDate(picture.date);
+                    }}
+                    href={`/account/diary?date=${picture.date.toDateString()}${
+                      selectedClient
+                        ? `&client=${selectedClient.client_email}`
+                        : ""
+                    }`}
+                  >
+                    <img
+                      src={picture.signedURL}
+                      alt={`progress picture for ${picture.date.toDateString()}`}
+                      className="pointer-events-none focus:outline-none group-hover:opacity-75"
+                    />
+                  </MyLink>
+                </div>
+                <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+                  {picture.date.toDateString()}
+                </p>
+                {weight && (
+                  <p className="pointer-events-none block text-sm font-medium text-gray-500">
+                    {weight.weight}{" "}
+                    {weight.is_weight_in_kilograms ? "kgs" : "lbs"}
+                  </p>
+                )}
+              </li>
+            );
+          })}
         </ul>
         {pictures && (
           <Pagination
             name={"picture"}
-            numberOfResults={pictures.length}
+            numberOfResults={picturesList.length}
             numberOfResultsPerPage={numberOfPicturesPerPage}
-            pageIndex={0}
-            setPageIndex={() => {}}
-            showPrevious={() => {}}
-            showNext={() => {}}
+            pageIndex={pageIndex}
+            setPageIndex={setPageIndex}
+            showPrevious={showPrevious}
+            showNext={showNext}
           />
         )}
       </div>

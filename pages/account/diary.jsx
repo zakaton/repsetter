@@ -668,10 +668,12 @@ export default function Diary() {
   const [gotPictureForDate, setGotPictureForDate] = useState();
   const [pictureUrl, setPictureUrl] = useState();
   const getPicture = async () => {
-    const userId = amITheClient ? user.id : selectedClientId;
     const { signedURL, error } = await supabase.storage
       .from("picture")
-      .createSignedUrl(`${userId}/${dateToString(selectedDate)}.jpg`, 60);
+      .createSignedUrl(
+        `${selectedClientId}/${dateToString(selectedDate)}.jpg`,
+        60
+      );
     if (error) {
       console.error(error);
       setPictureUrl();
@@ -714,8 +716,6 @@ export default function Diary() {
 
   const [pictureDates, setPictureDates] = useState();
   const getPictureDates = async () => {
-    const userId = amITheClient ? user.id : selectedClientId;
-
     const newPictureDates = [];
     const previousMonth = new Date(selectedDate);
     previousMonth.setUTCDate(15);
@@ -732,7 +732,7 @@ export default function Diary() {
     await Promise.all(
       searches.map(async (search) => {
         const { data: monthPictureDates, error: monthPictureDatesError } =
-          await supabase.storage.from("picture").list(userId, {
+          await supabase.storage.from("picture").list(selectedClientId, {
             limit: 31,
             sortBy: { column: "name", order: "asc" },
             search,

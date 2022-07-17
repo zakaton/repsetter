@@ -6,11 +6,9 @@ export const dateToString = (date) => {
 
 export const stringToDate = (string) => {
   const [year, month, day] = string.split("-");
-  console.log("stringToDate", year, month, day);
   const date = new Date();
   date.setUTCFullYear(year);
   date.setUTCMonth(month - 1);
   date.setUTCDate(day);
-  console.log(date);
   return date;
 };
