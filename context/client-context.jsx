@@ -5,9 +5,12 @@ import { useRouter } from "next/router";
 
 export const ClientContext = createContext();
 
-const pathnamesForQuery = ["diary", "exercise-types", "progress"].map(
-  (pathname) => "/account/" + pathname
-);
+const pathnamesForQuery = [
+  "diary",
+  "exercise-types",
+  "progress",
+  "pictures",
+].map((pathname) => "/account/" + pathname);
 
 export function ClientContextProvider(props) {
   const { user, isLoading } = useUser();

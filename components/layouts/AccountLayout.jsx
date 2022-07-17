@@ -6,7 +6,6 @@ import {
   UserCircleIcon,
   UserGroupIcon,
   ClipboardListIcon,
-  ScaleIcon,
   CameraIcon,
   ClipboardCheckIcon,
   ClipboardIcon,
@@ -58,6 +57,11 @@ const navigation = [
     name: "Progress",
     href: "/account/progress",
     icon: ChartBarIcon,
+  },
+  {
+    name: "Pictures",
+    href: "/account/pictures",
+    icon: CameraIcon,
   },
   {
     name: "Notifications",
