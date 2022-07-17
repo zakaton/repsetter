@@ -69,7 +69,7 @@ export default function Photos() {
       <Head>
         <title>Pictures - Repsetter</title>
       </Head>
-      <div className="bg-white px-4 pt-6 sm:px-6 sm:pt-6">
+      <div className="bg-white px-4 pt-4 sm:px-6">
         <div className="flex items-center pb-4">
           <div className="flex-auto lg:col-span-8 lg:col-start-1 lg:row-start-1">
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">

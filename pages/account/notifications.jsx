@@ -52,7 +52,7 @@ export default function Notifications() {
           setIsUpdatingNotifications(false);
         }}
       >
-        <div className="space-y-6 bg-white py-6 px-4 sm:p-6">
+        <div className="space-y-6 bg-white py-4 px-4">
           <div>
             <h3 className="text-lg font-medium leading-6 text-gray-900">
               Notifications

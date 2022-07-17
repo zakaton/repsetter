@@ -129,7 +129,7 @@ export default function AccountCalendarLayout({
       <Head>
         <title>{title} - Repsetter</title>
       </Head>
-      <div className="space-y-6 px-4 pb-6 pt-6 sm:px-6 sm:pt-6">
+      <div className="space-y-6 px-4 pb-6 pt-4 sm:px-6">
         <div className="lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-y-6 lg:gap-x-8">
           <div className="lg:col-span-8 lg:col-start-1 lg:row-start-1">
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
