@@ -7,6 +7,8 @@ import Head from "next/head";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import Pagination from "../../components/Pagination";
 import { supabase } from "../../utils/supabase";
+import { stringToDate } from "../../utils/picture-utils";
+import MyLink from "../../components/MyLink";
 
 const numberOfPicturesPerPage = 20;
 
@@ -26,12 +28,11 @@ export default function Photos() {
   const router = useRouter();
   const { user } = useUser();
   const { amITheClient, selectedClientId, selectedClient } = useClient();
-  const [pictures, setPictures] = useState();
 
-  const [numberOfPictures, setNumberOfPictures] = useState(0);
-  const getNumberOfPictures = async () => {
+  const [picturesList, setPicturesList] = useState();
+  const getPicturesList = async () => {
     const userId = amITheClient ? user.id : selectedClientId;
-    const { data: pictureList, error: listPicturesError } =
+    const { data: picturesList, error: listPicturesError } =
       await supabase.storage
         .from("picture")
         .list(userId, { sortBy: { column: "name", order: "desc" } });
@@ -39,13 +40,39 @@ export default function Photos() {
     if (listPicturesError) {
       console.error(listPicturesError);
     } else {
-      console.log("pictureList", pictureList);
-      setNumberOfPictures(pictureList.length);
+      console.log("picturesList", picturesList);
+      setPicturesList(picturesList);
+    }
+  };
+
+  const [pictures, setPictures] = useState();
+  const getPictures = async () => {
+    const userId = amITheClient ? user.id : selectedClientId;
+    const signedUrls = picturesList.map(({ name }) => `${userId}/${name}`);
+    const { data: pictures, error: getPicturesError } = await supabase.storage
+      .from("picture")
+      .createSignedUrls(signedUrls, 60);
+    if (getPicturesError) {
+      console.error(getPicturesError);
+    } else {
+      console.log("pictures", pictures);
+      pictures.forEach((picture) => {
+        const dateString = picture.path.split("/")[1].split(".")[0];
+        const date = stringToDate(dateString);
+        Object.assign(picture, { date, dateString });
+      });
+      setPictures(pictures);
     }
   };
 
   useEffect(() => {
-    getNumberOfPictures();
+    if (picturesList) {
+      getPictures();
+    }
+  }, [picturesList]);
+
+  useEffect(() => {
+    getPicturesList();
   }, [selectedClientId]);
 
   return (
@@ -73,39 +100,39 @@ export default function Photos() {
           role="list"
           className="grid grid-cols-2 gap-x-4 gap-y-8 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
         >
-          {files.map((file, index) => (
-            <li key={index} className="relative">
-              <div className="group aspect-w-10 aspect-h-7 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                <img
-                  src={file.source}
-                  alt=""
-                  className="pointer-events-none object-cover group-hover:opacity-75"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-0 focus:outline-none"
+          {pictures?.map((picture) => (
+            <li key={picture.path} className="relative">
+              <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                <MyLink
+                  href={`/account/diary?date=${picture.date.toDateString()}`}
                 >
-                  <span className="sr-only">View details for {file.title}</span>
-                </button>
+                  <img
+                    src={picture.signedURL}
+                    alt={`progress picture for ${picture.date.toDateString()}`}
+                    className="pointer-events-none focus:outline-none group-hover:opacity-75"
+                  />
+                </MyLink>
               </div>
               <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {file.title}
+                {picture.date.toDateString()}
               </p>
               <p className="pointer-events-none block text-sm font-medium text-gray-500">
-                {file.size}
+                weight
               </p>
             </li>
           ))}
         </ul>
-        <Pagination
-          name={"picture"}
-          numberOfResults={numberOfPictures}
-          numberOfResultsPerPage={numberOfPicturesPerPage}
-          pageIndex={0}
-          setPageIndex={() => {}}
-          showPrevious={() => {}}
-          showNext={() => {}}
-        />
+        {pictures && (
+          <Pagination
+            name={"picture"}
+            numberOfResults={pictures.length}
+            numberOfResultsPerPage={numberOfPicturesPerPage}
+            pageIndex={0}
+            setPageIndex={() => {}}
+            showPrevious={() => {}}
+            showNext={() => {}}
+          />
+        )}
       </div>
     </>
   );

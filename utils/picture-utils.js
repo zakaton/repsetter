@@ -9,7 +9,7 @@ export const stringToDate = (string) => {
   console.log("stringToDate", year, month, day);
   const date = new Date();
   date.setUTCFullYear(year);
-  date.setUTCMonth(month);
+  date.setUTCMonth(month - 1);
   date.setUTCDate(day);
   console.log(date);
   return date;
