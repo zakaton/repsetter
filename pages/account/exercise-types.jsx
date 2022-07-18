@@ -63,6 +63,17 @@ export default function ExerciseTypes() {
     }
   }, [results]);
 
+  const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
+  const modalListener = (isAnyModalOpen) => {
+    setIsAnyModalOpen(isAnyModalOpen);
+  };
+
+  useEffect(() => {
+    if (showEditExerciseTypeModal || isAnyModalOpen) {
+      setShowEditExerciseTypeNotification(false);
+    }
+  }, [showEditExerciseTypeModal, isAnyModalOpen]);
+
   return (
     <>
       <ExerciseTypeModal
@@ -79,6 +90,7 @@ export default function ExerciseTypes() {
         status={editExerciseTypeStatus}
       />
       <Table
+        modalListener={modalListener}
         resultsListener={setResults}
         filterTypes={filterTypes}
         orderTypes={orderTypes}
@@ -109,6 +121,7 @@ export default function ExerciseTypes() {
                   });
                 }}
                 src={exerciseVideos[result.id].url}
+                poster={exerciseVideos[result.id].thumbnailUrl}
                 autoPlay={true}
                 muted={true}
                 loop={true}

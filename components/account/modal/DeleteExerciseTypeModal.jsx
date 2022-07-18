@@ -54,6 +54,17 @@ export default function DeleteExerciseTypeModal(props) {
               console.error(deleteExerciseVideoError);
             }
 
+            const {
+              data: deletePictureResult,
+              error: deleteExercisePictureError,
+            } = await supabase.storage
+              .from("exercise")
+              .remove([`${selectedExerciseType.id}.jpg`]);
+            console.log("deletePictureResult", deletePictureResult);
+            if (deleteExercisePictureError) {
+              console.error(deleteExercisePictureError);
+            }
+
             setIsDeleting(false);
             setDidDelete(true);
             const status = {

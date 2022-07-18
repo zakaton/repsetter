@@ -184,6 +184,7 @@ export default function Exercises() {
                   }}
                   width="100px"
                   src={exerciseVideos[exercise.type.id].url}
+                  poster={exerciseVideos[exercise.type.id].thumbnailUrl}
                   muted={true}
                   playsInline={true}
                   autoPlay={true}

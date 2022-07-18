@@ -23,6 +23,9 @@ export default function LazyVideo({
   onDragOver,
   onDrop,
   onSuspend,
+
+  onLoadedMetadata,
+  poster,
 }) {
   useEffect(() => {
     if (!document.lazyLoadInstance) {
@@ -48,6 +51,8 @@ export default function LazyVideo({
       onSuspend={onSuspend}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onLoadedMetadata={onLoadedMetadata}
+      poster={poster}
     />
   );
 }

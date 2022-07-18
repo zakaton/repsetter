@@ -5,13 +5,13 @@ import { PencilAltIcon } from "@heroicons/react/outline";
 import { muscles, muscleGroups } from "../../../utils/exercise-utils";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
-import LazyVideo from "../../LazyVideo";
+import { compressAccurately } from "image-conversion";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const videoFileSizeLimit = 50 * 1024 ** 2;
+const videoFileSizeLimit = 60 * 1024;
 
 const areArraysTheSame = (a, b) =>
   a.length === b.length && a.every((value, index) => value === b[index]);
@@ -49,6 +49,8 @@ export default function ExerciseTypeModal(props) {
     setVideoUrl("");
     setVideoFile("");
     setSelectedExerciseType?.();
+    setVideoDuration(0);
+    setVideoThumbnailTime(null);
   };
   useEffect(() => {
     if (!open) {
@@ -93,6 +95,26 @@ export default function ExerciseTypeModal(props) {
       setVideoFile(file);
       setVideoUrl(URL.createObjectURL(file));
     }
+  };
+
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [videoThumbnailTime, setVideoThumbnailTime] = useState(null);
+
+  const getThumbnailImage = async () => {
+    const canvas = document.getElementById("thumbnailCanvas");
+    const video = document.getElementById("thumbnailVideo");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageBlob = await new Promise((resolve) => canvas.toBlob(resolve));
+    const imageFile = await compressAccurately(imageBlob, {
+      size: 50,
+      type: "image/jpeg",
+      width: 320, // FIX
+    });
+    console.log("imageFile", imageFile);
+    return imageFile;
   };
 
   return (
@@ -148,7 +170,7 @@ export default function ExerciseTypeModal(props) {
           if (selectedExerciseType) {
             setIsUpdatingExerciseType(true);
             console.log(exerciseTypeName, flattenedSelectedMuscles, videoFile);
-            let updateExerciseError, replaceVideoError;
+            let updateExerciseError, replaceVideoError, replaceImageError;
             if (
               exerciseTypeName !== selectedExerciseType.name ||
               !areArraysTheSame(
@@ -181,17 +203,36 @@ export default function ExerciseTypeModal(props) {
               }
             }
 
+            if (videoThumbnailTime !== null) {
+              const imageFile = await getThumbnailImage();
+
+              console.log("updating image file", imageFile);
+              const { data, error } = await supabase.storage
+                .from("exercise")
+                .update(`${selectedExerciseType.id}.jpg`, imageFile);
+              replaceImageError = error;
+              if (replaceImageError) {
+                console.error(replaceImageError);
+              }
+            }
+
             let status;
-            if (!updateExerciseError && !replaceVideoError) {
+            if (
+              !updateExerciseError &&
+              !replaceVideoError &&
+              !replaceImageError
+            ) {
               status = {
                 type: "succeeded",
-                title: "Successfully updated Exercise",
+                title: "Successfully updated Exercise Type",
               };
             } else {
               status = {
                 type: "failed",
                 title:
-                  createdExerciseError?.message || uploadVideoError?.message,
+                  updateExerciseError?.message ||
+                  replaceVideoError?.message ||
+                  replaceImageError?.message,
               };
             }
 
@@ -228,17 +269,33 @@ export default function ExerciseTypeModal(props) {
               console.error(uploadVideoError);
             }
 
+            const imageFile = await getThumbnailImage();
+            console.log("uploading image file", imageFile);
+            const { data: uploadedImage, error: uploadImageError } =
+              await supabase.storage
+                .from("exercise")
+                .upload(`${createdExerciseType.id}.jpg`, imageFile);
+            if (uploadImageError) {
+              console.error(uploadImageError);
+            }
+
             let status;
-            if (!createdExerciseError && !uploadVideoError) {
+            if (
+              !createdExerciseError &&
+              !uploadVideoError &&
+              !uploadImageError
+            ) {
               status = {
                 type: "succeeded",
-                title: "Successfully created Exercise",
+                title: "Successfully created Exercise Type",
               };
             } else {
               status = {
                 type: "failed",
                 title:
-                  createdExerciseError?.message || uploadVideoError?.message,
+                  createdExerciseError?.message ||
+                  uploadVideoError?.message ||
+                  uploadImageError?.message,
               };
             }
 
@@ -271,7 +328,7 @@ export default function ExerciseTypeModal(props) {
             id="exerciseName"
             name="exerciseName"
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="Dumbell Splits"
+            placeholder="Type an Exercise Name"
             value={exerciseTypeName}
             max={maxExerciseTypeLength}
             onInput={(e) => setExerciseTypeName(e.target.value)}
@@ -436,7 +493,10 @@ export default function ExerciseTypeModal(props) {
           )}
           {(videoUrl || selectedExerciseType) && (
             <div>
-              <LazyVideo
+              <video
+                onLoadedMetadata={(e) => {
+                  setVideoDuration(e.target.duration);
+                }}
                 className="aspect-[4/3] w-full"
                 autoPlay={true}
                 muted={true}
@@ -463,7 +523,7 @@ export default function ExerciseTypeModal(props) {
                   const file = e.dataTransfer.files[0];
                   onVideoFile(file);
                 }}
-              ></LazyVideo>
+              />
               {videoFile && (
                 <button
                   type="button"
@@ -475,6 +535,58 @@ export default function ExerciseTypeModal(props) {
                 >
                   Clear Video
                 </button>
+              )}
+
+              {selectedExerciseType && (
+                <>
+                  <label className="mt-4 block text-sm font-medium text-gray-700">
+                    Current Thumbnail
+                  </label>
+                  <img
+                    src={
+                      exerciseVideos?.[selectedExerciseType.id]?.thumbnailUrl
+                    }
+                  />
+                </>
+              )}
+
+              {videoDuration > 0 && (
+                <>
+                  <label className="mt-4 block text-sm font-medium text-gray-700">
+                    Set Thumbnail
+                  </label>
+                  <video
+                    crossOrigin="anonymous"
+                    id="thumbnailVideo"
+                    className="aspect-[4/3] w-full"
+                    src={
+                      videoUrl ||
+                      (selectedExerciseType &&
+                        exerciseVideos?.[selectedExerciseType.id]?.url)
+                    }
+                  />
+                  <canvas
+                    id="thumbnailCanvas"
+                    hidden
+                    className="invisible"
+                  ></canvas>
+                  <input
+                    type="range"
+                    min="0"
+                    step="0.01"
+                    max={videoDuration}
+                    value={videoThumbnailTime || 0}
+                    onInput={(e) => {
+                      const newVideoThumbnailTime = Number(e.target.value);
+                      const video = document.getElementById("thumbnailVideo");
+                      if (video) {
+                        video.currentTime = newVideoThumbnailTime;
+                      }
+                      setVideoThumbnailTime(newVideoThumbnailTime);
+                    }}
+                    className="w-full"
+                  ></input>
+                </>
               )}
             </div>
           )}

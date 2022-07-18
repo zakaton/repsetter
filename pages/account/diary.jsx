@@ -1223,6 +1223,7 @@ export default function Diary() {
                   width="100%"
                   height="100%"
                   src={exerciseVideos[exercise.type.id]?.url}
+                  poster={exerciseVideos[exercise.type.id]?.thumbnailUrl}
                   muted={true}
                   playsInline={true}
                   autoPlay={true}

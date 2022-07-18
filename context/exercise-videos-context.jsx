@@ -7,20 +7,27 @@ export function ExerciseVideoContextProvider(props) {
   const [exerciseVideos, setExerciseVideos] = useState({});
 
   const getExerciseVideo = async (id) => {
-    console.log("requesting video", id);
+    console.log("requesting video and poster", id);
     if (!exerciseVideos[id]) {
-      const { publicURL: url, error } = await supabase.storage
+      const { publicURL: url, error: getVideoUrlError } = await supabase.storage
         .from("exercise")
         .getPublicUrl(`${id}.mp4`);
-      if (error) {
-        console.error(error);
+
+      const { publicURL: thumbnailUrl, error: getVideoPosterError } =
+        await supabase.storage.from("exercise").getPublicUrl(`${id}.jpg`);
+
+      if (getVideoUrlError || getVideoPosterError) {
+        console.error(getVideoUrlError || getVideoPosterError);
       } else {
-        setExerciseVideos({
+        const newExerciseVideos = {
           ...exerciseVideos,
           [id]: {
             url,
+            thumbnailUrl,
           },
-        });
+        };
+        console.log("newExerciseVideos", newExerciseVideos);
+        setExerciseVideos(newExerciseVideos);
       }
     } else {
       console.log("exercise video cache hit");

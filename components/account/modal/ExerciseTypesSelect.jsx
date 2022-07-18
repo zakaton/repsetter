@@ -146,6 +146,7 @@ export default function ExerciseTypesSelect({
                       loop={true}
                       playsInline={true}
                       src={exerciseVideos?.[exerciseType.id]?.url}
+                      poster={exerciseVideos?.[exerciseType.id]?.thumbnailUrl}
                       onSuspend={(e) => {
                         document.addEventListener(
                           "click",
