@@ -493,18 +493,6 @@ export default function Diary() {
 
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
 
-  const formatTime = (time) => {
-    let [hours, minutes] = time.split(":");
-    let suffix = "AM";
-    if (hours >= 12) {
-      suffix = "PM";
-      if (hours > 12) {
-        hours -= 12;
-      }
-    }
-    return `${hours}:${minutes} ${suffix}`;
-  };
-
   const [showPictureModal, setShowPictureModal] = useState(false);
   const [showPictureNotification, setShowPictureNotification] = useState(false);
   const [pictureStatus, setPictureStatus] = useState();
@@ -1092,7 +1080,9 @@ export default function Diary() {
                         Time
                       </dt>
                       <dd className="mt-1 break-words text-sm text-gray-900">
-                        {formatTime(weight.time)}
+                        {timeToDate(weight.time).toLocaleTimeString([], {
+                          timeStyle: "short",
+                        })}
                       </dd>
                     </div>
                   )}
