@@ -115,7 +115,7 @@ export default function Diary() {
       date: selectedDate.toDateString(),
     };
     if (!amITheClient) {
-      matchFilters.coach = user.id;
+      //matchFilters.coach = user.id;
     }
     console.log("matchFilters", matchFilters);
     const { data: exercises, error } = await supabase
@@ -756,6 +756,7 @@ export default function Diary() {
   const [datesDots, setDatesDots] = useState({});
   useEffect(() => {
     if (exerciseDates || weightDates || pictureDates) {
+      console.log("updating date dots");
       const newDatesDots = {};
       weightDates?.forEach((weightDate) => {
         const dots = newDatesDots[weightDate.date] || [];
@@ -772,6 +773,7 @@ export default function Diary() {
         dots.push({ color: "bg-green-500" });
         newDatesDots[pictureDate.date] = dots;
       });
+      console.log("newDatesDots", newDatesDots);
       setDatesDots(newDatesDots);
     }
   }, [exerciseDates, weightDates, pictureDates]);

@@ -13,6 +13,8 @@ import LazyVideo from "../../components/LazyVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
+import MyLink from "../../components/MyLink";
+import { stringToDate } from "../../utils/picture-utils";
 
 const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
   name: `Muscles (${muscleGroup})`,
@@ -282,17 +284,19 @@ export default function Exercises() {
           ) || []),
           {
             jsx: (
-              <button
+              <MyLink
                 onClick={() => {
-                  setSelectedDate(new Date(exercise.date));
-                  router.push("/account/diary", undefined, {
-                    shallow: true,
-                  });
+                  setSelectedDate(stringToDate(exercise.date));
                 }}
+                href={`/account/diary?date=${stringToDate(
+                  exercise.date
+                ).toDateString()}${
+                  selectedClient ? `&client=${selectedClient.client_email}` : ""
+                }`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 Full Diary
-              </button>
+              </MyLink>
             ),
           },
         ]}
