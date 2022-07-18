@@ -176,10 +176,11 @@ const graphTypes = {
           }
         }
         return {
-          x: dateFromDateAndTime(exercise.date, null),
+          x: dateFromDateAndTime(exercise.date, exercise.time),
           y: topWeightPerformed,
           denominator: topWeightAssigned,
           suffix: showKilograms ? "kg" : "lbs",
+          includeTime: exercise.time,
         };
       });
     },
@@ -193,9 +194,10 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         const y = exercise.number_of_sets_performed || 0;
         return {
-          x: dateFromDateAndTime(exercise.date),
+          x: dateFromDateAndTime(exercise.date, exercise.time),
           y,
           denominator: exercise.number_of_sets_assigned,
+          includeTime: exercise.time,
         };
       });
     },
@@ -217,9 +219,10 @@ const graphTypes = {
           }
         });
         return {
-          x: dateFromDateAndTime(exercise.date),
+          x: dateFromDateAndTime(exercise.date, exercise.time),
           y: maxRepsPerformed,
           denominator: maxRepsAssigned,
+          includeTime: exercise.time,
         };
       });
     },
@@ -241,9 +244,10 @@ const graphTypes = {
           }
         });
         return {
-          x: dateFromDateAndTime(exercise.date),
+          x: dateFromDateAndTime(exercise.date, exercise.time),
           y: difficulty,
           denominator: 10,
+          includeTime: exercise.time,
         };
       });
     },
@@ -267,7 +271,8 @@ const graphTypes = {
           }
         }
 
-        const date = dateFromDateAndTime(weight.date);
+        // TODO - use first weight or average it?
+        const date = dateFromDateAndTime(weight.date, weight.time);
         let datum = data.find((_data) => _data._date === weight.date);
         if (datum) {
           datum.sum += weightValue;
@@ -282,6 +287,7 @@ const graphTypes = {
             _date: weight.date,
             suffix: showKilograms ? "kg" : "lbs",
             toFixed: 1,
+            //includeTime: weight.time,
           };
           data.push(datum);
         }
@@ -566,7 +572,12 @@ export default function Progress() {
         tooltip: {
           callbacks: {
             title: function (context) {
-              return context[0].label.split(",").slice(0, 2).join(",");
+              const { includeTime } = context[0].raw;
+              let label = context[0].label;
+              if (!includeTime) {
+                label = label.split(",").slice(0, 2).join(",");
+              }
+              return label;
             },
             label: function (context) {
               const label = context.dataset.label;
