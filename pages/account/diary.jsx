@@ -584,6 +584,10 @@ export default function Diary() {
           },
           tooltip: {
             callbacks: {
+              title: function (context) {
+                const { time } = context[0].raw;
+                return time;
+              },
               footer: function (context) {
                 const { event } = context[0].raw;
                 if (event?.length > 0 && event !== "none") {
@@ -632,7 +636,14 @@ export default function Diary() {
                   ? poundsToKilograms(weightValue)
                   : kilogramsToPounds(weightValue);
               }
-              return { x: date, y: weightValue, event: weight.event };
+              return {
+                x: date,
+                y: weightValue,
+                event: weight.event,
+                time: date.toLocaleTimeString([], {
+                  timeStyle: "short",
+                }),
+              };
             }),
             segment: {
               borderColor: (context) => {
