@@ -149,6 +149,17 @@ export function ClientContextProvider(props) {
     setIsSelectedDateToday(isSelectedDateToday);
   }, [selectedDate]);
 
+  const [isSelectedDateAfterToday, setIsSelectedDateAfterToday] =
+    useState(false);
+  useEffect(() => {
+    if (!selectedDate) {
+      return;
+    }
+
+    const currentDate = new Date();
+    setIsSelectedDateAfterToday(selectedDate.getTime() > currentDate.getTime());
+  }, [selectedDate]);
+
   const value = {
     getClients,
     isGettingClients,
@@ -163,6 +174,7 @@ export function ClientContextProvider(props) {
     setSelectedDate,
     getSelectedDate,
     isSelectedDateToday,
+    isSelectedDateAfterToday,
   };
 
   return <ClientContext.Provider value={value} {...props} />;

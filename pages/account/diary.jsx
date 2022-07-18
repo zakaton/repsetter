@@ -66,6 +66,7 @@ export default function Diary() {
     amITheClient,
     selectedClientId,
     getSelectedDate,
+    isSelectedDateAfterToday,
   } = useClient();
 
   useEffect(() => {
@@ -889,7 +890,7 @@ export default function Diary() {
           </div>
           <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && !pictureUrl && (
+              {amITheClient && !pictureUrl && !isSelectedDateAfterToday && (
                 <button
                   type="button"
                   onClick={() => {
@@ -900,7 +901,7 @@ export default function Diary() {
                     "rounded-md"
                   )}
                 >
-                  <span className="sr-only">Add Weight</span>
+                  <span className="sr-only">Add Picture</span>
                   <PlusIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
@@ -971,7 +972,8 @@ export default function Diary() {
                       }}
                       className={classNames(
                         "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                        "rounded-l-md"
+                        "rounded-l-md",
+                        isSelectedDateAfterToday && "invisible"
                       )}
                     >
                       <span className="sr-only">Add Weight</span>
@@ -985,7 +987,8 @@ export default function Diary() {
                     "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
                     !weights?.some((weight) => weight.time == null)
                       ? "rounded-r-md"
-                      : "rounded-md"
+                      : "rounded-md",
+                    isSelectedDateAfterToday && "invisible"
                   )}
                 >
                   <span className="sr-only">Toggle Weight</span>
@@ -1147,7 +1150,7 @@ export default function Diary() {
                 onClick={() => setShowAddExerciseModal(true)}
                 className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                <span className="sr-only">Add</span>
+                <span className="sr-only">Add Exercise</span>
                 <PlusIcon className="h-5 w-5" aria-hidden="true" />
               </button>
               <button
