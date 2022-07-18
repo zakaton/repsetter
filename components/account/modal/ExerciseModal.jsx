@@ -11,6 +11,7 @@ import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
 import YouTube from "react-youtube";
+import { timeToDate } from "../../../utils/exercise-utils";
 
 export default function ExerciseModal(props) {
   const {
@@ -56,6 +57,9 @@ export default function ExerciseModal(props) {
   const [numberOfSetsPerformed, setNumberOfSetsPerformed] = useState(0);
   const [isSetsPerformedEmptyString, setIsSetsPerformedEmptyString] =
     useState(false);
+
+  const [timePerformed, setTimePerformed] = useState();
+  const [includeTimePerformed, setIncludeTimePerformed] = useState(false);
 
   const [sameRepsForEachSet, setSameRepsForEachSet] = useState(true);
   const [numberOfReps, setNumberOfReps] = useState([10]);
@@ -144,6 +148,9 @@ export default function ExerciseModal(props) {
     setIsUpdatingExercise(false);
     setDidUpdateExercise(false);
     setSelectedExercise?.(null);
+
+    setIncludeTimePerformed(false);
+    setTimePerformed();
   };
 
   useEffect(() => {
@@ -203,6 +210,11 @@ export default function ExerciseModal(props) {
         setWeightPerformedKilograms(weightPerformed);
       } else {
         setWeightPerformedPounds(weightPerformed);
+      }
+
+      if (selectedExercise.time) {
+        setTimePerformed(selectedExercise.time);
+        setIncludeTimePerformed(true);
       }
     }
   }, [open, selectedExercise]);
@@ -337,6 +349,8 @@ export default function ExerciseModal(props) {
 
               difficulty,
               video,
+
+              time: includeTimePerformed ? timePerformed : null,
             };
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
@@ -379,6 +393,7 @@ export default function ExerciseModal(props) {
               client_email: amITheClient
                 ? user.email
                 : selectedClient.client_email,
+              time: includeTimePerformed ? timePerformed : null,
             };
             if (!amITheClient) {
               Object.assign(createExerciseData, {
@@ -431,6 +446,12 @@ export default function ExerciseModal(props) {
               this exercise was done {daysSincePreviousExercise} day
               {daysSincePreviousExercise > 1 && "s"} ago on{" "}
               {previousExercise.date}
+              {previousExercise.time
+                ? ` at ${timeToDate(previousExercise.time).toLocaleTimeString(
+                    [],
+                    { timeStyle: "short" }
+                  )}`
+                : ""}
             </p>
           )}
         </div>
@@ -897,7 +918,6 @@ export default function ExerciseModal(props) {
                 </React.Fragment>
               )
           )}
-
         {selectedExercise && (
           <div className="col-start-1">
             <label
@@ -928,6 +948,57 @@ export default function ExerciseModal(props) {
                   /{numberOfSets}
                 </span>
               </div>
+            </div>
+          </div>
+        )}
+        {selectedExercise && (
+          <div className="relative flex self-center">
+            <div className="flex h-5 items-center">
+              <input
+                id="includeTimePerformed"
+                name="includeTimePerformed"
+                type="checkbox"
+                checked={includeTimePerformed}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setTimePerformed(new Date().toTimeString().split(" ")[0]);
+                  }
+                  setIncludeTimePerformed(e.target.checked);
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label
+                htmlFor="includeTimePerformed"
+                className="font-medium text-gray-700"
+              >
+                Include Time
+              </label>
+            </div>
+          </div>
+        )}
+        {selectedExercise && includeTimePerformed && (
+          <div>
+            <label
+              htmlFor="timePerformed"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Time Performed
+            </label>
+            <div className="relative mt-1 rounded-md shadow-sm">
+              <input
+                required={includeTimePerformed}
+                type="time"
+                step="60"
+                value={timePerformed?.split(":").slice(0, 2).join(":") || ""}
+                onInput={(e) => {
+                  setTimePerformed(e.target.value);
+                }}
+                name="timePerformed"
+                id="timePerformed"
+                className="hide-arrows block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              />
             </div>
           </div>
         )}

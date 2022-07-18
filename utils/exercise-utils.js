@@ -14,3 +14,11 @@ const kilogramToPoundRatio = 2.2046;
 export const kilogramsToPounds = (kilograms) =>
   kilograms * kilogramToPoundRatio;
 export const poundsToKilograms = (pounds) => pounds / kilogramToPoundRatio;
+
+export const timeToDate = (time) => {
+  const [hours, minutes, seconds] = time.split(":");
+  console.log("timeToDate", hours, minutes);
+  const date = new Date();
+  date.setHours(hours, minutes, seconds);
+  return date;
+};

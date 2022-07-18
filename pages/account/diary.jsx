@@ -24,6 +24,7 @@ import {
 import {
   kilogramsToPounds,
   poundsToKilograms,
+  timeToDate,
 } from "../../utils/exercise-utils";
 import { dateToString } from "../../utils/picture-utils";
 
@@ -1223,6 +1224,16 @@ export default function Diary() {
                   {exercise.type.name}
                 </dd>
               </div>
+              {exercise.time && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Time</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {timeToDate(exercise.time).toLocaleTimeString([], {
+                      timeStyle: "short",
+                    })}
+                  </dd>
+                </div>
+              )}
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
                   Muscles Used

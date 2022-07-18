@@ -8,7 +8,7 @@ import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseMo
 import Table from "../../components/Table";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import { useClient } from "../../context/client-context";
-import { muscles, muscleGroups } from "../../utils/exercise-utils";
+import { muscles, muscleGroups, timeToDate } from "../../utils/exercise-utils";
 import LazyVideo from "../../components/LazyVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
@@ -164,6 +164,12 @@ export default function Exercises() {
           {
             title: "date",
             value: exercise.date,
+          },
+          exercise.time && {
+            title: "time",
+            value: timeToDate(exercise.time).toLocaleTimeString([], {
+              timeStyle: "short",
+            }),
           },
           !selectedExerciseType &&
             exercise.type.id in exerciseVideos && {
