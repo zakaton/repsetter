@@ -1,10 +1,11 @@
-import { useEffect, useState, createContext, useContext } from 'react';
+import { useEffect, useState, createContext, useContext } from "react";
+import { useRouter } from "next/router";
 import {
   supabase,
   getUserProfile,
   supabaseAuthHeader,
   isUserAdmin,
-} from '../utils/supabase';
+} from "../utils/supabase";
 export const UserContext = createContext();
 
 export function UserContextProvider(props) {
@@ -51,32 +52,34 @@ export function UserContextProvider(props) {
     }
     setIsLoading(false);
   };
-  
+
   useEffect(() => {
     const session = supabase.auth.session();
     setSession(session);
-    console.log(session)
-    
+    console.log("session", session);
+
     updateUserProfile();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log(event, session);
 
+        // FILL - refresh if session is
+
         setSession(session);
         switch (event) {
-          case 'SIGNED_IN':
+          case "SIGNED_IN":
             await updateUserProfile();
             break;
-          case 'SIGNED_OUT':
+          case "SIGNED_OUT":
             setUser(null);
             break;
-          case 'TOKEN_REFRESHED':
+          case "TOKEN_REFRESHED":
             await updateUserProfile();
             break;
-          case 'USER_UPDATED':
+          case "USER_UPDATED":
             break;
-          case 'USER_DELETED':
+          case "USER_DELETED":
             setUser(null);
             break;
           default:
@@ -91,6 +94,18 @@ export function UserContextProvider(props) {
     };
   }, []);
 
+  const router = useRouter();
+  useEffect(() => {
+    if (session) {
+      const { expires_at } = session;
+      const expirationDate = new Date(expires_at * 1000);
+      const currentTime = new Date();
+      if (expirationDate.getTime() < currentTime.getTime()) {
+        router.reload();
+      }
+    }
+  }, [session]);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -99,20 +114,20 @@ export function UserContextProvider(props) {
   // eslint-disable-next-line consistent-return
   useEffect(() => {
     if (user) {
-      console.log('subscribing to user updates');
+      console.log("subscribing to user updates");
       const subscription = supabase
         .from(`profile:id=eq.${user.id}`)
-        .on('UPDATE', (payload) => {
-          console.log('updated profile');
+        .on("UPDATE", (payload) => {
+          console.log("updated profile");
           setUser({ ...user, ...payload.new });
         })
-        .on('DELETE', () => {
-          console.log('deleted account');
+        .on("DELETE", () => {
+          console.log("deleted account");
           signOut();
         })
         .subscribe();
       return () => {
-        console.log('unsubscribing to user updates');
+        console.log("unsubscribing to user updates");
         supabase.removeSubscription(subscription);
       };
     }
@@ -125,7 +140,7 @@ export function UserContextProvider(props) {
   }, [user]);
 
   const deleteAccount = async () => {
-    await fetchWithAccessToken('/api/account/delete-account');
+    await fetchWithAccessToken("/api/account/delete-account");
     signOut();
     setDidDeleteAccount(true);
   };

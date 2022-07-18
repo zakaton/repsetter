@@ -75,6 +75,7 @@ export default function Diary() {
     }
   }, []);
 
+  // FIX
   window.s = supabase;
   window.u = user;
 
