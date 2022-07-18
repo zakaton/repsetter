@@ -318,7 +318,7 @@ export default function Progress() {
 
     if (selectedClient) {
       newBaseFilter.client = selectedClient.client;
-      newBaseFilter.coach = user.id;
+      //newBaseFilter.coach = user.id;
     } else {
       newBaseFilter.client = user.id;
     }
