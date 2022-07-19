@@ -271,13 +271,20 @@ const graphTypes = {
           }
         }
 
-        // TODO - use first weight or average it?
         const date = dateFromDateAndTime(weight.date, weight.time);
         let datum = data.find((_data) => _data._date === weight.date);
         if (datum) {
           datum.sum += weightValue;
           datum.numberOfWeights += 1;
           datum.y = datum.sum / datum.numberOfWeights;
+          if (weightValue > datum.max) {
+            datum.max = weightValue;
+            datum.maxTime = date.toLocaleTimeString([], { timeStyle: "short" });
+          }
+          if (weightValue < datum.min) {
+            datum.min = weightValue;
+            datum.minTime = date.toLocaleTimeString([], { timeStyle: "short" });
+          }
         } else {
           datum = {
             x: date,
@@ -287,6 +294,10 @@ const graphTypes = {
             _date: weight.date,
             suffix: showKilograms ? "kg" : "lbs",
             toFixed: 1,
+            max: weightValue,
+            maxTime: date.toLocaleTimeString([], { timeStyle: "short" }),
+            min: weightValue,
+            minTime: date.toLocaleTimeString([], { timeStyle: "short" }),
             //includeTime: weight.time,
           };
           data.push(datum);
@@ -593,6 +604,20 @@ export default function Progress() {
                 value += ` ${data.suffix}`;
               }
               return `${label}: ${value}`;
+            },
+            footer: function (context) {
+              console.log("footer", context);
+              const { dataset, raw } = context?.[0];
+              if (dataset.label == "Bodyweight") {
+                const { min, max, suffix, minTime, maxTime } = raw;
+                if (min != max) {
+                  return `min: ${min.toFixed(
+                    1
+                  )} ${suffix} @${minTime}\nmax: ${max.toFixed(
+                    1
+                  )} ${suffix} @${maxTime}`;
+                }
+              }
             },
           },
         },
