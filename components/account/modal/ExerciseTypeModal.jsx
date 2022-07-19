@@ -560,6 +560,7 @@ export default function ExerciseTypeModal(props) {
                     muted={true}
                     playsInline={true}
                     autoPlay={true}
+                    controls={false}
                     onSuspend={(e) => {
                       document.addEventListener(
                         "click",
