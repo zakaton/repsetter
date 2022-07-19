@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import LazyVideo from "./LazyVideo";
 import { useExerciseVideos } from "../context/exercise-videos-context";
 import { isMobile } from "react-device-detect";
@@ -25,6 +25,17 @@ export default function ExerciseTypeVideo(
 
   const [showVideo, setShowVideo] = useState(isMobile);
 
+  const videoRef = useRef(null);
+  useEffect(() => {
+    const { current: video } = videoRef;
+    if (video) {
+      if (showVideo) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    }
+  }, [showVideo]);
   return (
     <div
       onMouseEnter={(e) => setShowVideo(true)}
@@ -44,6 +55,7 @@ export default function ExerciseTypeVideo(
         className={classNames("aspect-[4/3]", showVideo ? "" : "hidden")}
         playsInline={true}
         controls={false}
+        ref={videoRef}
       ></LazyVideo>
       <img
         src={exerciseVideos?.[exerciseTypeId].thumbnailUrl}
