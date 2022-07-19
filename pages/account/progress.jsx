@@ -50,6 +50,7 @@ const graphTypeOrder = [
   "number of sets",
   "number of reps",
   "difficulty",
+  "exercise time",
   "bodyweight",
 ];
 const dateRangeFilterType = {
@@ -106,6 +107,11 @@ const filterTypes = [
       {
         value: "difficulty",
         label: "Difficulty",
+        requiresExercise: true,
+      },
+      {
+        value: "exercise time",
+        label: "Exercise Time",
         requiresExercise: true,
       },
       {
@@ -252,6 +258,28 @@ const graphTypes = {
       });
     },
     yAxisID: "y3",
+  },
+  "exercise time": {
+    label: "Exercise Time",
+    type: "bar",
+    borderColor: "rgb(250, 10, 21)",
+    backgroundColor: "rgba(250, 10, 21, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        const date = dateFromDateAndTime(exercise.date, exercise.time);
+        console.log(
+          date.getHours(),
+          date.getMinutes(),
+          date.getHours() / 24 + date.getMinutes() / (60 * 24)
+        );
+        return {
+          x: date,
+          y: date.getHours() / 24 + date.getMinutes() / (60 * 24),
+          label: date.toLocaleTimeString([], { timeStyle: "short" }),
+        };
+      });
+    },
+    yAxisID: "y5",
   },
   bodyweight: {
     label: "Bodyweight",
@@ -582,6 +610,12 @@ export default function Progress() {
           },
           beginAtZero: true,
         },
+        y5: {
+          type: "linear",
+          display: false,
+          min: 0,
+          max: 1,
+        },
       },
       responsive: true,
       animation: true,
@@ -618,6 +652,9 @@ export default function Progress() {
               }
               if ("suffix" in data) {
                 value += ` ${data.suffix}`;
+              }
+              if ("label" in data) {
+                value = data.label;
               }
               return `${label}: ${value}`;
             },
