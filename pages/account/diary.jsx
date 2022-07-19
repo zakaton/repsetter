@@ -12,7 +12,7 @@ import { supabase, dateFromDateAndTime } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
 import { useClient } from "../../context/client-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
-import LazyVideo from "../../components/LazyVideo";
+import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import YouTube from "react-youtube";
 import {
   PaperClipIcon,
@@ -1214,21 +1214,11 @@ export default function Diary() {
               }
             >
               <div className="sm:col-span-1">
-                <LazyVideo
-                  onSuspend={(e) => {
-                    document.addEventListener("click", () => e.target.play(), {
-                      once: true,
-                    });
-                  }}
+                <ExerciseTypeVideo
                   width="100%"
                   height="100%"
-                  src={exerciseVideos[exercise.type.id]?.url}
-                  poster={exerciseVideos[exercise.type.id]?.thumbnailUrl}
-                  muted={true}
-                  playsInline={true}
-                  autoPlay={true}
-                  loop={true}
-                ></LazyVideo>
+                  exerciseTypeId={exercise.type.id}
+                ></ExerciseTypeVideo>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Name</dt>

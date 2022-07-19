@@ -9,7 +9,7 @@ import Table from "../../components/Table";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import { useClient } from "../../context/client-context";
 import { muscles, muscleGroups, timeToDate } from "../../utils/exercise-utils";
-import LazyVideo from "../../components/LazyVideo";
+import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
@@ -176,20 +176,10 @@ export default function Exercises() {
           !selectedExerciseType &&
             exercise.type.id in exerciseVideos && {
               jsx: (
-                <LazyVideo
-                  onSuspend={(e) => {
-                    document.addEventListener("click", () => e.target.play(), {
-                      once: true,
-                    });
-                  }}
+                <ExerciseTypeVideo
                   width="100px"
-                  src={exerciseVideos[exercise.type.id].url}
-                  poster={exerciseVideos[exercise.type.id].thumbnailUrl}
-                  muted={true}
-                  playsInline={true}
-                  autoPlay={true}
-                  loop={true}
-                ></LazyVideo>
+                  exerciseTypeId={exercise.type.id}
+                ></ExerciseTypeVideo>
               ),
             },
           {

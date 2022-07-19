@@ -7,12 +7,12 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const keysToDelete = [];
+const keysToDelete = ["width", "height", "play"];
 
 export default function ExerciseTypeVideo(
-  props = { exerciseTypeId: undefined }
+  props = { exerciseTypeId: undefined, play: null }
 ) {
-  const { exerciseTypeId } = props;
+  const { exerciseTypeId, play, width, height } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
 
@@ -36,6 +36,13 @@ export default function ExerciseTypeVideo(
       }
     }
   }, [showVideo]);
+
+  useEffect(() => {
+    if (play !== null) {
+      setShowVideo(play);
+    }
+  }, [play]);
+
   return (
     <div
       onMouseEnter={(e) => setShowVideo(true)}
@@ -47,6 +54,8 @@ export default function ExerciseTypeVideo(
             once: true,
           });
         }}
+        width={width}
+        height={height}
         src={exerciseVideos?.[exerciseTypeId].url}
         poster={exerciseVideos?.[exerciseTypeId].thumbnailUrl}
         autoPlay={true}
@@ -58,6 +67,8 @@ export default function ExerciseTypeVideo(
         ref={videoRef}
       ></LazyVideo>
       <img
+        width={width}
+        height={height}
         src={exerciseVideos?.[exerciseTypeId].thumbnailUrl}
         className={classNames("aspect-[4/3]", showVideo ? "hidden" : "")}
       ></img>

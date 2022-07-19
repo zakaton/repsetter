@@ -3,7 +3,7 @@ import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Combobox } from "@headlessui/react";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
-import LazyVideo from "../../LazyVideo";
+import ExerciseTypeVideo from "../../ExerciseTypeVideo";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -138,25 +138,12 @@ export default function ExerciseTypesSelect({
               >
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
-                    <LazyVideo
+                    <ExerciseTypeVideo
+                      play={active}
+                      exerciseTypeId={exerciseType.id}
                       width="100"
                       height="75"
-                      autoPlay={true}
-                      muted={true}
-                      loop={true}
-                      playsInline={true}
-                      src={exerciseVideos?.[exerciseType.id]?.url}
-                      poster={exerciseVideos?.[exerciseType.id]?.thumbnailUrl}
-                      onSuspend={(e) => {
-                        document.addEventListener(
-                          "click",
-                          () => e.target.play(),
-                          {
-                            once: true,
-                          }
-                        );
-                      }}
-                    ></LazyVideo>
+                    ></ExerciseTypeVideo>
 
                     <div className="flex flex-col gap-1">
                       <span
