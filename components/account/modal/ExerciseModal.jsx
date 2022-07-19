@@ -494,143 +494,144 @@ export default function ExerciseModal(props) {
           </div>
         )}
 
-        {previousExercise &&
-          previousExercise.number_of_sets_performed === null && (
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Sets</dt>
-              <dd className="mt-1 break-words text-sm text-gray-900">
-                {previousExercise.number_of_sets_assigned}
-              </dd>
-            </div>
-          )}
-        {previousExercise &&
-          previousExercise.number_of_sets_performed !== null && (
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Sets</dt>
-              <dd className="mt-1 break-words text-sm text-gray-900">
-                {previousExercise.number_of_sets_performed}/
-                {previousExercise.number_of_sets_assigned}
-              </dd>
-            </div>
-          )}
-        {previousExercise &&
-          previousExercise.number_of_reps_performed === null && (
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Reps</dt>
-              <dd className="mt-1 break-words text-sm text-gray-900">
-                {previousExercise.number_of_reps_assigned
-                  .map((reps) => (reps == 0 ? "amrap" : reps))
-                  .join(", ")}
-              </dd>
-            </div>
-          )}
-        {previousExercise &&
-          previousExercise.number_of_reps_performed !== null && (
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Reps</dt>
-              <dd className="mt-1 break-words text-sm text-gray-900">
-                {previousExercise.number_of_reps_performed
-                  .map(
-                    (numberOfReps, index) =>
-                      `${numberOfReps}/${
-                        previousExercise.number_of_reps_assigned[index] ||
-                        previousExercise.number_of_reps_assigned[0]
-                      }`
-                  )
-                  .join(", ")}
-              </dd>
-            </div>
-          )}
-        {previousExercise &&
-          previousExercise.weight_assigned.some((weight) => weight > 0) &&
-          previousExercise.weight_performed === null && (
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">
-                Weight ({previousExercise.is_weight_in_kilograms ? "kg" : "lbs"}
+        {previousExercise && (
+          <>
+            {previousExercise.number_of_sets_performed === null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.number_of_sets_assigned}
+                </dd>
+              </div>
+            )}
+            {previousExercise.number_of_sets_performed !== null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.number_of_sets_performed}/
+                  {previousExercise.number_of_sets_assigned}
+                </dd>
+              </div>
+            )}
+            {previousExercise.number_of_reps_performed === null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.number_of_reps_assigned
+                    .map((reps) => (reps == 0 ? "amrap" : reps))
+                    .join(", ")}
+                </dd>
+              </div>
+            )}
+
+            {previousExercise.number_of_reps_performed !== null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.number_of_reps_performed
+                    .map(
+                      (numberOfReps, index) =>
+                        `${numberOfReps}/${
+                          previousExercise.number_of_reps_assigned[index] ||
+                          previousExercise.number_of_reps_assigned[0]
+                        }`
+                    )
+                    .join(", ")}
+                </dd>
+              </div>
+            )}
+            {previousExercise.weight_assigned.some((weight) => weight > 0) &&
+              previousExercise.weight_performed === null && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Weight (
+                    {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                  </dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {previousExercise.weight_assigned.join(", ")}
+                  </dd>
+                </div>
+              )}
+            {previousExercise.weight_assigned.some((weight) => weight > 0) &&
+              previousExercise.weight_performed !== null && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Weight (
+                    {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                  </dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {previousExercise.number_of_reps_performed
+                      .map(
+                        (weight, index) =>
+                          `${weight}/${
+                            previousExercise.weight_assigned[index] ||
+                            previousExercise.weight_assigned[0]
+                          }`
+                      )
+                      .join(", ")}
+                  </dd>
+                </div>
+              )}
+            {previousExercise.difficulty !== null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Difficulty
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.difficulty
+                    .map((value) => `${value}/10`)
+                    .join(", ")}
+                </dd>
+              </div>
+            )}
+            {previousVideo?.map(
+              (video, index) =>
+                video && (
+                  <React.Fragment key={index}>
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Set #{index + 1}
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        <YouTube
+                          videoId={video.videoId}
+                          className="aspect-[16/9] w-full"
+                          iframeClassName="aspect-[16/9] w-full"
+                          opts={{
+                            height: "100%",
+                            width: "100%",
+                            playerVars: {
+                              autoplay: 1,
+                              loop: 1,
+                              playsinline: 1,
+                              modestbranding: 1,
+                              controls: 1,
+                              enablejsapi: 1,
+                              start: video.start || 0,
+                              end: video.end,
+                            },
+                          }}
+                          onReady={(e) => {
+                            e.target.mute();
+                            console.log("player", e.target);
+                            console.log(video);
+                            const newVideoPlayer = previousVideoPlayer;
+                            newVideoPlayer[index] = e.target;
+                            setPreviousVideoPlayer(newVideoPlayer);
+                          }}
+                          onEnd={(e) => {
+                            e.target.seekTo(video.start || 0);
+                            e.target.playVideo();
+                          }}
+                        ></YouTube>
+                      </dd>
+                    </div>
+                  </React.Fragment>
                 )
-              </dt>
-              <dd className="mt-1 break-words text-sm text-gray-900">
-                {previousExercise.weight_assigned.join(", ")}
-              </dd>
-            </div>
-          )}
-        {previousExercise &&
-          previousExercise.weight_assigned.some((weight) => weight > 0) &&
-          previousExercise.weight_performed !== null && (
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">
-                Weight ({previousExercise.is_weight_in_kilograms ? "kg" : "lbs"}
-                )
-              </dt>
-              <dd className="mt-1 break-words text-sm text-gray-900">
-                {previousExercise.number_of_reps_performed
-                  .map(
-                    (weight, index) =>
-                      `${weight}/${
-                        previousExercise.weight_assigned[index] ||
-                        previousExercise.weight_assigned[0]
-                      }`
-                  )
-                  .join(", ")}
-              </dd>
-            </div>
-          )}
-        {previousExercise && previousExercise.difficulty !== null && (
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Difficulty</dt>
-            <dd className="mt-1 break-words text-sm text-gray-900">
-              {previousExercise.difficulty
-                .map((value) => `${value}/10`)
-                .join(", ")}
-            </dd>
-          </div>
+            )}
+          </>
         )}
-        {previousExercise &&
-          previousVideo?.map(
-            (video, index) =>
-              video && (
-                <React.Fragment key={index}>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Set #{index + 1}
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      <YouTube
-                        videoId={video.videoId}
-                        className="aspect-[16/9] w-full"
-                        iframeClassName="aspect-[16/9] w-full"
-                        opts={{
-                          height: "100%",
-                          width: "100%",
-                          playerVars: {
-                            autoplay: 1,
-                            loop: 1,
-                            playsinline: 1,
-                            modestbranding: 1,
-                            controls: 1,
-                            enablejsapi: 1,
-                            start: video.start || 0,
-                            end: video.end,
-                          },
-                        }}
-                        onReady={(e) => {
-                          e.target.mute();
-                          console.log("player", e.target);
-                          console.log(video);
-                          const newVideoPlayer = previousVideoPlayer;
-                          newVideoPlayer[index] = e.target;
-                          setPreviousVideoPlayer(newVideoPlayer);
-                        }}
-                        onEnd={(e) => {
-                          e.target.seekTo(video.start || 0);
-                          e.target.playVideo();
-                        }}
-                      ></YouTube>
-                    </dd>
-                  </div>
-                </React.Fragment>
-              )
-          )}
+
         {selectedExerciseType && (
           <div className="relative w-full sm:col-span-3">
             <div
