@@ -265,19 +265,18 @@ const graphTypes = {
     borderColor: "rgb(250, 10, 21)",
     backgroundColor: "rgba(250, 10, 21, 0.5)",
     getData: ({ exercises }) => {
-      return exercises?.map((exercise) => {
-        const date = dateFromDateAndTime(exercise.date, exercise.time);
-        console.log(
-          date.getHours(),
-          date.getMinutes(),
-          date.getHours() / 24 + date.getMinutes() / (60 * 24)
-        );
-        return {
-          x: date,
-          y: date.getHours() / 24 + date.getMinutes() / (60 * 24),
-          label: date.toLocaleTimeString([], { timeStyle: "short" }),
-        };
-      });
+      return exercises
+        ?.filter((exercise) => exercise.time != null)
+        .map((exercise) => {
+          const date = dateFromDateAndTime(exercise.date, exercise.time);
+          const timeInterpolation =
+            date.getHours() / 24 + date.getMinutes() / (60 * 24);
+          return {
+            x: date,
+            y: 1 - timeInterpolation,
+            label: date.toLocaleTimeString([], { timeStyle: "short" }),
+          };
+        });
     },
     yAxisID: "y5",
   },
