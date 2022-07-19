@@ -5,28 +5,12 @@ import lazyloadConfig from "../utils/lazyload-config";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
+const keysToDelete = ["srcset", "sizes", "className", "src"];
+export default function LazyVideo(props = {}) {
+  const { className, src, srcset, sizes } = props;
+  const propsSubset = Object.assign({}, props);
+  keysToDelete.forEach((key) => delete propsSubset[key]);
 
-export default function LazyVideo({
-  alt,
-  src,
-  srcset,
-  sizes,
-  width,
-  height,
-  playsInline,
-  autoPlay,
-  muted,
-  loop,
-  controls,
-  className,
-
-  onDragOver,
-  onDrop,
-  onSuspend,
-
-  onLoadedMetadata,
-  poster,
-}) {
   useEffect(() => {
     if (!document.lazyLoadInstance) {
       document.lazyLoadInstance = new LazyLoad(lazyloadConfig);
@@ -36,23 +20,11 @@ export default function LazyVideo({
 
   return (
     <video
-      alt={alt}
-      className={classNames(className, "lazy")}
+      {...propsSubset}
+      className={classNames(className || "", "lazy")}
       data-src={src}
       data-srcset={srcset}
       data-sizes={sizes}
-      width={width}
-      height={height}
-      playsInline={playsInline}
-      autoPlay={autoPlay}
-      muted={muted}
-      loop={loop}
-      controls={controls}
-      onSuspend={onSuspend}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onLoadedMetadata={onLoadedMetadata}
-      poster={poster}
     />
   );
 }

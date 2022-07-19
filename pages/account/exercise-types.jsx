@@ -9,6 +9,7 @@ import { useExerciseVideos } from "../../context/exercise-videos-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import LazyVideo from "../../components/LazyVideo";
 import MyLink from "../../components/MyLink";
+import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 
 const filterTypes = [
   ...muscleGroups.map((muscleGroup) => ({
@@ -114,21 +115,7 @@ export default function ExerciseTypes() {
           },
           result.id in exerciseVideos && {
             jsx: (
-              <LazyVideo
-                onSuspend={(e) => {
-                  document.addEventListener("click", () => e.target.play(), {
-                    once: true,
-                  });
-                }}
-                src={exerciseVideos[result.id].url}
-                poster={exerciseVideos[result.id].thumbnailUrl}
-                autoPlay={true}
-                muted={true}
-                loop={true}
-                className={"aspect-[4/3]"}
-                playsInline={true}
-                controls={false}
-              ></LazyVideo>
+              <ExerciseTypeVideo exerciseTypeId={result.id}></ExerciseTypeVideo>
             ),
           },
           isAdmin && {
