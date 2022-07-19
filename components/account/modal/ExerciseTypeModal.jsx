@@ -559,6 +559,7 @@ export default function ExerciseTypeModal(props) {
                     crossOrigin="anonymous"
                     muted={true}
                     playsInline={true}
+                    autoPlay={true}
                     onSuspend={(e) => {
                       document.addEventListener(
                         "click",
