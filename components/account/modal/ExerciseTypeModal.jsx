@@ -557,6 +557,17 @@ export default function ExerciseTypeModal(props) {
                   </label>
                   <video
                     crossOrigin="anonymous"
+                    muted={true}
+                    playsInline={true}
+                    onSuspend={(e) => {
+                      document.addEventListener(
+                        "click",
+                        () => e.target.play(),
+                        {
+                          once: true,
+                        }
+                      );
+                    }}
                     id="thumbnailVideo"
                     className="aspect-[4/3] w-full"
                     src={
