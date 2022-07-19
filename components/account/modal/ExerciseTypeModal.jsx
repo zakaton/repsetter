@@ -561,6 +561,7 @@ export default function ExerciseTypeModal(props) {
                     playsInline={true}
                     autoPlay={true}
                     controls={false}
+                    onPlay={(e) => e.target.pause()}
                     onSuspend={(e) => {
                       document.addEventListener(
                         "click",
