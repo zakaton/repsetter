@@ -271,9 +271,10 @@ const graphTypes = {
           }
         }
 
+        const showIndividualWeights = filters["date-range"] == "past week";
         const date = dateFromDateAndTime(weight.date, weight.time);
         let datum = data.find((_data) => _data._date === weight.date);
-        if (datum) {
+        if (datum && !showIndividualWeights) {
           datum.sum += weightValue;
           datum.numberOfWeights += 1;
           datum.y = datum.sum / datum.numberOfWeights;
@@ -298,7 +299,7 @@ const graphTypes = {
             maxTime: date.toLocaleTimeString([], { timeStyle: "short" }),
             min: weightValue,
             minTime: date.toLocaleTimeString([], { timeStyle: "short" }),
-            //includeTime: weight.time,
+            includeTime: showIndividualWeights,
           };
           data.push(datum);
         }
@@ -606,7 +607,6 @@ export default function Progress() {
               return `${label}: ${value}`;
             },
             footer: function (context) {
-              console.log("footer", context);
               const { dataset, raw } = context?.[0];
               if (dataset.label == "Bodyweight") {
                 const { min, max, suffix, minTime, maxTime } = raw;
