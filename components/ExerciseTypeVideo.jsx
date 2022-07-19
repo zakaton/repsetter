@@ -56,8 +56,8 @@ export default function ExerciseTypeVideo(
         }}
         width={width}
         height={height}
-        src={exerciseVideos?.[exerciseTypeId].url}
-        poster={exerciseVideos?.[exerciseTypeId].thumbnailUrl}
+        src={exerciseVideos?.[exerciseTypeId]?.url}
+        poster={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
         autoPlay={true}
         muted={true}
         loop={true}
@@ -69,7 +69,7 @@ export default function ExerciseTypeVideo(
       <img
         width={width}
         height={height}
-        src={exerciseVideos?.[exerciseTypeId].thumbnailUrl}
+        src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
         className={classNames("aspect-[4/3]", showVideo ? "hidden" : "")}
       ></img>
     </div>
