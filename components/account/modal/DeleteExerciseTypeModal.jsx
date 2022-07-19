@@ -33,6 +33,17 @@ export default function DeleteExerciseTypeModal(props) {
           onClick={async () => {
             console.log("DELETING", selectedExerciseType);
             setIsDeleting(true);
+
+            const { data: deleteExercisesResult, error: deleteExercisesError } =
+              await supabase
+                .from("exercise")
+                .delete()
+                .match({ type: selectedExerciseType.id });
+            console.log("deleteExercisesResult", deleteExercisesResult);
+            if (deleteExercisesError) {
+              console.error(deleteExercisesError);
+            }
+
             const {
               data: deleteExerciseTypeResult,
               error: deleteExerciseTypeError,
