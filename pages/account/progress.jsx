@@ -25,7 +25,7 @@ import {
 import { Chart, getElementAtEvent } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { supabase, dateFromDateAndTime } from "../../utils/supabase";
-
+import { weightEventColors } from "../../utils/weight-utils";
 import {
   poundsToKilograms,
   kilogramsToPounds,
@@ -300,12 +300,23 @@ const graphTypes = {
             min: weightValue,
             minTime: date.toLocaleTimeString([], { timeStyle: "short" }),
             includeTime: showIndividualWeights,
+            event: showIndividualWeights ? weight.event : null,
           };
           data.push(datum);
         }
       });
 
       return data;
+    },
+    segment: {
+      borderColor: (context) => {
+        const event = context?.p1?.raw?.event;
+        return weightEventColors[event || "none"];
+      },
+    },
+    pointBackgroundColor: (context) => {
+      const event = context?.raw?.event;
+      return weightEventColors[event || "none"];
     },
     yAxisID: "y4",
   },
@@ -495,6 +506,8 @@ export default function Progress() {
               borderColor,
               backgroundColor,
               yAxisID,
+              segment,
+              pointBackgroundColor,
             } = graphTypes[filterType];
             return {
               type,
@@ -507,6 +520,8 @@ export default function Progress() {
               barThickness: 6,
               maxBarThickness: 10,
               minBarLength: 2,
+              segment,
+              pointBackgroundColor,
             };
           }) || [],
     };
@@ -609,8 +624,13 @@ export default function Progress() {
             footer: function (context) {
               const { dataset, raw } = context?.[0];
               if (dataset.label == "Bodyweight") {
-                const { min, max, suffix, minTime, maxTime } = raw;
-                if (min != max) {
+                const { min, max, suffix, minTime, maxTime, event } = raw;
+                let label = "";
+                if (event) {
+                  if (event?.length > 0 && event !== "none") {
+                    return `${event}`;
+                  }
+                } else if (min != max) {
                   return `min: ${min.toFixed(
                     1
                   )} ${suffix} @${minTime}\nmax: ${max.toFixed(
