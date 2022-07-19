@@ -1,14 +1,53 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
 import DeleteAccountModal from "../../components/account/modal/DeleteAccountModal";
+import CoachPictureModal from "../../components/account/modal/CoachPictureModal";
 import MyLink from "../../components/MyLink";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
+import Notification from "../../components/Notification";
+import { supabase } from "../../utils/supabase";
+import Image from "next/image";
 
 export default function AccountGeneral() {
   const { user, isLoading, stripeLinks } = useUser();
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+
+  const [showCoachPictureModal, setShowCoachPictureModal] = useState(false);
+  const [showCoachPictureNotification, setShowCoachPictureNotification] =
+    useState(false);
+  const [coachPictureStatus, setCoachPictureStatus] = useState();
+
+  const [isGettingCoachPicture, setIsGettingCoachPicture] = useState(false);
+  const [coachPictureUrl, setCoachPictureUrl] = useState();
+  const getCoachPicture = async () => {
+    if (isGettingCoachPicture) {
+      return;
+    }
+    console.log("getting coach picture...");
+    setIsGettingCoachPicture(true);
+    const { publicURL, error } = await supabase.storage
+      .from("coach-picture")
+      .getPublicUrl(`${user.id}.jpg`);
+    if (error) {
+      console.error(error);
+    } else {
+      setCoachPictureUrl(publicURL);
+    }
+    setIsGettingCoachPicture(false);
+  };
+  useEffect(() => {
+    if (user?.can_coach && !coachPictureUrl) {
+      getCoachPicture();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (coachPictureStatus?.type === "succeeded") {
+      getCoachPicture();
+    }
+  }, [coachPictureStatus]);
 
   return (
     <>
@@ -16,6 +55,19 @@ export default function AccountGeneral() {
         open={showDeleteAccount}
         setOpen={setShowDeleteAccount}
       />
+
+      <CoachPictureModal
+        open={showCoachPictureModal}
+        setOpen={setShowCoachPictureModal}
+        setResultStatus={setCoachPictureStatus}
+        setShowResultNotification={setShowCoachPictureNotification}
+      />
+      <Notification
+        open={showCoachPictureNotification}
+        setOpen={setShowCoachPictureNotification}
+        status={coachPictureStatus}
+      />
+
       <div className="space-y-6 bg-white px-4 pb-2 pt-4 sm:px-6">
         <div>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -75,6 +127,31 @@ export default function AccountGeneral() {
                   )}
                 </dd>
               </div>
+              {user.can_coach && (
+                <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Coach Picture
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    {coachPictureUrl && (
+                      <Image
+                        alt="coach picture"
+                        src={coachPictureUrl}
+                        width={200}
+                        height={200}
+                      />
+                    )}
+                    <br></br>
+                    <button
+                      type="button"
+                      onClick={() => setShowCoachPictureModal(true)}
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-1 px-2 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      {coachPictureUrl ? "Update" : "Set"} Picture
+                    </button>
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
         )}

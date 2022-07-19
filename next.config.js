@@ -4,7 +4,7 @@ const withPWA = require("next-pwa");
 const nextConfig = withPWA({
   reactStrictMode: false,
   images: {
-    domains: ["tailwindui.com"],
+    domains: ["tailwindui.com", process.env.NEXT_PUBLIC_SUPABASE_HOSTNAME],
   },
   pwa: {
     dest: "public",
