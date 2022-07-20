@@ -85,10 +85,18 @@ export default async function handler(req, res) {
   if (listPicturesError) {
     console.error(listPicturesError);
   } else {
+    console.log("picturesList", picturesList);
+
     const product = await stripe.products.retrieve(profile.product_id);
     console.log("product", product);
 
-    if (picturesList.length != product.images.length - 1) {
+    let shouldUpdateImages = picturesList.length != product.images.length - 1;
+    if (!shouldUpdateImages && picturesList.length > 0) {
+      shouldUpdateImages =
+        new Date(picturesList[0].updated_at).getTime() > product.updated * 1000;
+    }
+
+    if (shouldUpdateImages) {
       let images = ["https://www.repsetter.com/images/logo.png"];
       if (picturesList.length > 0) {
         const { publicURL, error } = await supabase.storage
