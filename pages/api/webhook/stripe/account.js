@@ -52,7 +52,7 @@ export default async function handler(req, res) {
                 name: `Coaching by ${profile.email}`,
                 default_price_data: { currency: "usd", unit_amount: 0 },
                 images: [
-                  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/coach-picture/${profile.id}.jpg`,
+                  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/coach-picture/${profile.id}/coach-picture.jpg`,
                   "https://www.repsetter.com/images/logo.png",
                 ],
               });

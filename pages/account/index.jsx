@@ -8,7 +8,6 @@ import MyLink from "../../components/MyLink";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import Notification from "../../components/Notification";
 import { supabase } from "../../utils/supabase";
-import Image from "next/image";
 
 export default function AccountGeneral() {
   const { user, isLoading, stripeLinks } = useUser();
@@ -27,13 +26,25 @@ export default function AccountGeneral() {
     }
     console.log("getting coach picture...");
     setIsGettingCoachPicture(true);
-    const { publicURL, error } = await supabase.storage
-      .from("coach-picture")
-      .getPublicUrl(`${user.id}.jpg`);
-    if (error) {
-      console.error(error);
+    const { data: picturesList, error: listPicturesError } =
+      await supabase.storage
+        .from("coach-picture")
+        .list("", { limit: 1, search: user.id });
+    if (listPicturesError) {
+      console.error(listPicturesError);
     } else {
-      setCoachPictureUrl(publicURL);
+      console.log("picturesList", picturesList);
+    }
+    if (picturesList.length > 0) {
+      const { publicURL, error } = await supabase.storage
+        .from("coach-picture")
+        .getPublicUrl(`${user.id}/coach-picture.jpg`);
+      console.log("publicURL", publicURL);
+      if (error) {
+        console.error(error);
+      } else {
+        setCoachPictureUrl(publicURL);
+      }
     }
     setIsGettingCoachPicture(false);
   };
@@ -134,14 +145,15 @@ export default function AccountGeneral() {
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                     {coachPictureUrl && (
-                      <Image
-                        alt="coach picture"
-                        src={coachPictureUrl}
-                        width={200}
-                        height={200}
-                      />
+                      <>
+                        <img
+                          alt="coach picture"
+                          src={coachPictureUrl}
+                          width={200}
+                        />
+                        <br></br>
+                      </>
                     )}
-                    <br></br>
                     <button
                       type="button"
                       onClick={() => setShowCoachPictureModal(true)}

@@ -45,9 +45,9 @@ export default function CoachPictureModal(props) {
   const onPictureFile = async (file) => {
     console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
-      size: 100,
+      size: 40,
       type: "image/jpeg",
-      width: 500,
+      width: 400,
       // FIX
     });
     console.log("compressedFile", compressedFile);
@@ -73,16 +73,31 @@ export default function CoachPictureModal(props) {
       return;
     }
     setIsGettingPictureUrl(true);
-    const { publicURL, error } = await supabase.storage
-      .from("coach-picture")
-      .getPublicUrl(`${user.id}.jpg`);
-    if (error) {
-      console.error(error);
+
+    const { data: picturesList, error: listPicturesError } =
+      await supabase.storage
+        .from("coach-picture")
+        .list("", { limit: 1, search: user.id });
+    if (listPicturesError) {
+      console.error(listPicturesError);
     } else {
-      console.log(publicURL);
-      setPictureUrl(publicURL);
-      setDoesPictureExist(true);
+      console.log("picturesList", picturesList);
     }
+    if (picturesList.length > 0) {
+      const { publicURL, error } = await supabase.storage
+        .from("coach-picture")
+        .getPublicUrl(`${user.id}/coach-picture.jpg`);
+      console.log("publicURL", publicURL);
+      if (error) {
+        console.error(error);
+      } else {
+        setPictureUrl(publicURL);
+        setDoesPictureExist(true);
+      }
+    } else {
+      setDoesPictureExist(false);
+    }
+
     setIsGettingPictureUrl(false);
   };
   useEffect(() => {
@@ -135,7 +150,7 @@ export default function CoachPictureModal(props) {
           if (pictureFile) {
             const { data, error } = await supabase.storage
               .from("coach-picture")
-              .upload(`${user.id}.jpg`, pictureFile, {
+              .upload(`${user.id}/coach-picture.jpg`, pictureFile, {
                 cacheControl: "3600",
                 upsert: true,
               });
@@ -145,7 +160,7 @@ export default function CoachPictureModal(props) {
             console.log("remove picture");
             const { data, error } = await supabase.storage
               .from("coach-picture")
-              .remove([`${user.id}.jpg`]);
+              .remove([`${user.id}/coach-picture.jpg`]);
 
             uploadPictureData = data;
             uploadPictureError = error;
@@ -232,7 +247,7 @@ export default function CoachPictureModal(props) {
                 </svg>
                 <div className="flex text-sm text-gray-600">
                   <label
-                    htmlFor="picture-upload"
+                    htmlFor="coach-picture-upload"
                     className={classNames(
                       "relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500",
                       isDraggingOver ? "bg-slate-100" : ""
@@ -240,8 +255,8 @@ export default function CoachPictureModal(props) {
                   >
                     <span>Upload Picture</span>
                     <input
-                      id="picture-upload"
-                      name="picture-upload"
+                      id="coach-picture-upload"
+                      name="coach-picture-upload"
                       type="file"
                       className="sr-only"
                       accept="image/*"
