@@ -91,7 +91,7 @@ export default function CoachPictureModal(props) {
       if (error) {
         console.error(error);
       } else {
-        setPictureUrl(publicURL);
+        setPictureUrl(`${publicURL}?t=${picturesList[0].updated_at}`);
         setDoesPictureExist(true);
       }
     } else {
@@ -149,23 +149,20 @@ export default function CoachPictureModal(props) {
           let uploadPictureData, uploadPictureError;
           if (pictureFile) {
             if (doesPictureExist) {
+              console.log("update picture");
               const { data, error } = await supabase.storage
                 .from("coach-picture")
-                .update(
-                  `${user.id}/coach-picture.jpg?t=${new Date().getTime()}`,
-                  pictureFile,
-                  {
-                    cacheControl: "3600",
-                    upsert: true,
-                  }
-                );
+                .update(`${user.id}/coach-picture.jpg}`, pictureFile, {
+                  upsert: true,
+                  contentType: "image/jpg",
+                });
               uploadPictureData = data;
               uploadPictureError = error;
             } else {
+              console.log("upload picture");
               const { data, error } = await supabase.storage
                 .from("coach-picture")
                 .upload(`${user.id}/coach-picture.jpg`, pictureFile, {
-                  cacheControl: "3600",
                   upsert: true,
                   contentType: "image/jpg",
                 });

@@ -3,18 +3,35 @@ import { supabase } from "../utils/supabase";
 
 export const ExerciseVideosContext = createContext();
 
+const generateUrlSuffix = (object) => {
+  return object ? `?t=${new Date(object.updated_at).getTime()}` : "";
+};
+
 export function ExerciseVideoContextProvider(props) {
   const [exerciseVideos, setExerciseVideos] = useState({});
 
-  const getExerciseVideo = async (id) => {
+  const getExerciseVideo = async (id, refresh = false) => {
     console.log("requesting video and poster", id);
-    if (!exerciseVideos[id]) {
+
+    if (!exerciseVideos[id] || refresh) {
+      const { data: list, error: listError } = await supabase.storage
+        .from("exercise")
+        .list(id);
+      if (listError) {
+        console.error(listError);
+      }
+
+      const videoDetails = list?.find(({ name }) => name.startsWith("video"));
+      const imageDetails = list?.find(({ name }) => name.startsWith("image"));
+
       const { publicURL: url, error: getVideoUrlError } = await supabase.storage
         .from("exercise")
-        .getPublicUrl(`${id}.mp4`);
+        .getPublicUrl(`${id}/video.mp4${generateUrlSuffix(videoDetails)}`);
 
       const { publicURL: thumbnailUrl, error: getVideoPosterError } =
-        await supabase.storage.from("exercise").getPublicUrl(`${id}.jpg`);
+        await supabase.storage
+          .from("exercise")
+          .getPublicUrl(`${id}/image.jpg${generateUrlSuffix(imageDetails)}`);
 
       if (getVideoUrlError || getVideoPosterError) {
         console.error(getVideoUrlError || getVideoPosterError);

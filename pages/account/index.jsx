@@ -43,7 +43,7 @@ export default function AccountGeneral() {
       if (error) {
         console.error(error);
       } else {
-        setCoachPictureUrl(publicURL);
+        setCoachPictureUrl(`${publicURL}?t=${picturesList[0].updated_at}`);
       }
     } else {
       setCoachPictureUrl();
@@ -152,8 +152,8 @@ export default function AccountGeneral() {
                           alt="coach picture"
                           src={coachPictureUrl}
                           width={200}
+                          className={"mb-2"}
                         />
-                        <br></br>
                       </>
                     )}
                     <button

@@ -75,6 +75,12 @@ export default function ExerciseTypes() {
     }
   }, [showEditExerciseTypeModal, isAnyModalOpen]);
 
+  useEffect(() => {
+    if (editExerciseTypeStatus?.type === "succeeded") {
+      getExerciseVideo(editExerciseTypeStatus.exerciseTypeId, true);
+    }
+  }, [editExerciseTypeStatus]);
+
   return (
     <>
       <ExerciseTypeModal

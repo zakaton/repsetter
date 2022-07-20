@@ -209,7 +209,7 @@ export default function ExerciseTypeModal(props) {
               console.log("updating image file", imageFile);
               const { data, error } = await supabase.storage
                 .from("exercise")
-                .update(`${selectedExerciseType.id}.jpg`, imageFile);
+                .update(`${selectedExerciseType.id}/image.jpg`, imageFile);
               replaceImageError = error;
               if (replaceImageError) {
                 console.error(replaceImageError);
@@ -225,6 +225,7 @@ export default function ExerciseTypeModal(props) {
               status = {
                 type: "succeeded",
                 title: "Successfully updated Exercise Type",
+                exerciseTypeId: selectedExerciseType.id,
               };
             } else {
               status = {
@@ -264,7 +265,7 @@ export default function ExerciseTypeModal(props) {
             const { data: uploadedVideo, error: uploadVideoError } =
               await supabase.storage
                 .from("exercise")
-                .upload(`${createdExerciseType.id}.mp4`, videoFile, {
+                .upload(`${createdExerciseType.id}/video.mp4`, videoFile, {
                   contentType: "video/mp4",
                 });
             if (uploadVideoError) {
@@ -276,7 +277,7 @@ export default function ExerciseTypeModal(props) {
             const { data: uploadedImage, error: uploadImageError } =
               await supabase.storage
                 .from("exercise")
-                .upload(`${createdExerciseType.id}.jpg`, imageFile, {
+                .upload(`${createdExerciseType.id}/image.jpg`, imageFile, {
                   contentType: "image/jpg",
                 });
             if (uploadImageError) {
