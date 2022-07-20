@@ -156,7 +156,7 @@ export default function CoachPictureModal(props) {
               });
             uploadPictureData = data;
             uploadPictureError = error;
-          } else {
+          } else if (!pictureUrl) {
             console.log("remove picture");
             const { data, error } = await supabase.storage
               .from("coach-picture")

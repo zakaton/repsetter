@@ -10,6 +10,10 @@ import QRCodeModal from "../QRCodeModal";
 import { ClipboardListIcon } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function Subscription({ subscriptionId, setCoachEmail }) {
   const [isGettingSubscription, setIsGettingSubscription] = useState(true);
   const [subscription, setSubscription] = useState(null);
@@ -195,7 +199,14 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                   </h1>
                 </div>
                 <div className="mx-auto max-w-prose text-lg">
-                  <div className="prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500 sm:grid sm:grid-cols-2 sm:items-center sm:gap-4">
+                  <div
+                    className={classNames(
+                      "prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500",
+                      coachPictureUrl
+                        ? "sm:grid sm:grid-cols-2 sm:items-center sm:gap-4"
+                        : ""
+                    )}
+                  >
                     {
                       <p className="sm:col-start-2 sm:row-start-1">
                         You have been invited by {subscription.coach_email} to
