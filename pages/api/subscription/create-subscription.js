@@ -87,30 +87,42 @@ export default async function handler(req, res) {
   } else {
     console.log("picturesList", picturesList);
 
+    let pictureUrl;
+    if (picturesList.length > 0) {
+      const { publicURL, error: getPictureUrlError } = await supabase.storage
+        .from("coach-picture")
+        .getPublicUrl(
+          `${profile.id}/image.jpg?t=${new Date(
+            picturesList[0].updated_at
+          ).getTime()}`
+        );
+      if (getPictureUrlError) {
+        console.error(getPictureUrlError);
+      } else {
+        pictureUrl = publicURL;
+      }
+    }
+
     const product = await stripe.products.retrieve(profile.product_id);
     console.log("product", product);
 
-    let shouldUpdateImages = picturesList.length != product.images.length - 1;
-    if (!shouldUpdateImages && picturesList.length > 0) {
-      shouldUpdateImages =
-        new Date(picturesList[0].updated_at).getTime() > product.updated * 1000;
+    let shouldUpdateImages = false;
+    if (product.images.length === 1 && pictureUrl) {
+      shouldUpdateImages = true;
+    }
+    if (
+      product.images.length > 1 &&
+      (!pictureUrl || !product.images.includes(pictureUrl))
+    ) {
+      shouldUpdateImages = true;
     }
 
     if (shouldUpdateImages) {
       let images = ["https://www.repsetter.com/images/logo.png"];
-      if (picturesList.length > 0) {
-        const { publicURL, error } = await supabase.storage
-          .from("coach-picture")
-          .getPublicUrl(`${profile.id}/coach-picture.jpg`);
-        if (error) {
-          console.error(error);
-        } else {
-          images.unshift(publicURL);
-        }
+      if (pictureUrl) {
+        images.unshift(pictureUrl);
       }
-
       console.log("new images", images);
-
       await stripe.products.update(product.id, { images });
     }
   }

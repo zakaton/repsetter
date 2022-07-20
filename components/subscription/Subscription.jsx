@@ -9,6 +9,7 @@ import Notification from "../Notification";
 import QRCodeModal from "../QRCodeModal";
 import { ClipboardListIcon } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
+import { useCoachPictures } from "../../context/coach-picture-context";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -18,6 +19,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
   const [isGettingSubscription, setIsGettingSubscription] = useState(true);
   const [subscription, setSubscription] = useState(null);
   const { user, isAdmin, isLoading, session } = useUser();
+  const { coachPictures, getCoachPicture } = useCoachPictures();
 
   const [isMySubscription, setIsMySubscription] = useState(null);
   useEffect(() => {
@@ -119,41 +121,13 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
     !isGettingExistingSubscription &&
     !existingSubscription;
 
-  const [isGettingCoachPicture, setIsGettingCoachPicture] = useState(false);
-  const [coachPictureUrl, setCoachPictureUrl] = useState();
-  const getCoachPicture = async () => {
-    if (isGettingCoachPicture) {
-      return;
-    }
-    console.log("getting coach picture...");
-    setIsGettingCoachPicture(true);
-    const { data: picturesList, error: listPicturesError } =
-      await supabase.storage
-        .from("coach-picture")
-        .list(subscription.coach, { limit: 1, search: "coach-picture" });
-    if (listPicturesError) {
-      console.error(listPicturesError);
-    } else {
-      console.log("picturesList", picturesList);
-    }
-    if (picturesList.length > 0) {
-      const { publicURL, error } = await supabase.storage
-        .from("coach-picture")
-        .getPublicUrl(`${subscription.coach}/coach-picture.jpg`);
-      console.log("publicURL", publicURL);
-      if (error) {
-        console.error(error);
-      } else {
-        setCoachPictureUrl(publicURL);
-      }
-    }
-    setIsGettingCoachPicture(false);
-  };
   useEffect(() => {
-    if (subscription?.coach && !coachPictureUrl) {
-      getCoachPicture();
+    if (subscription?.coach && !coachPictures[subscription?.coach]) {
+      getCoachPicture(subscription.coach);
     }
   }, [subscription]);
+
+  const coachPicture = coachPictures[subscription?.coach]?.url;
 
   return (
     <>
@@ -202,7 +176,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                   <div
                     className={classNames(
                       "prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500",
-                      coachPictureUrl
+                      coachPicture
                         ? "sm:grid sm:grid-cols-2 sm:items-center sm:gap-4"
                         : ""
                     )}
@@ -215,10 +189,10 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                         per month.
                       </p>
                     }
-                    {coachPictureUrl && (
+                    {coachPicture && (
                       <img
                         alt="coach picture"
-                        src={coachPictureUrl}
+                        src={coachPicture}
                         width={250}
                         className="m-auto mt-2 sm:col-start-1"
                       />

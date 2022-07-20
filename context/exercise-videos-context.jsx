@@ -1,11 +1,7 @@
 import { useState, createContext, useContext } from "react";
-import { supabase } from "../utils/supabase";
+import { supabase, generateUrlSuffix } from "../utils/supabase";
 
 export const ExerciseVideosContext = createContext();
-
-const generateUrlSuffix = (object) => {
-  return object ? `?t=${new Date(object.updated_at).getTime()}` : "";
-};
 
 export function ExerciseVideoContextProvider(props) {
   const [exerciseVideos, setExerciseVideos] = useState({});

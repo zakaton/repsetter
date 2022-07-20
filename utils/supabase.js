@@ -59,3 +59,7 @@ export const dateFromDateAndTime = (date, time) => {
 
   return fullDate;
 };
+
+export const generateUrlSuffix = (object) => {
+  return object ? `?t=${new Date(object.updated_at).getTime()}` : "";
+};

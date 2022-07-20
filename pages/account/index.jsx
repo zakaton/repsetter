@@ -7,58 +7,28 @@ import CoachPictureModal from "../../components/account/modal/CoachPictureModal"
 import MyLink from "../../components/MyLink";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import Notification from "../../components/Notification";
-import { supabase } from "../../utils/supabase";
+import { useCoachPictures } from "../../context/coach-picture-context";
 
 export default function AccountGeneral() {
   const { user, isLoading, stripeLinks } = useUser();
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+
+  const { coachPictures, getCoachPicture } = useCoachPictures();
 
   const [showCoachPictureModal, setShowCoachPictureModal] = useState(false);
   const [showCoachPictureNotification, setShowCoachPictureNotification] =
     useState(false);
   const [coachPictureStatus, setCoachPictureStatus] = useState();
 
-  const [isGettingCoachPicture, setIsGettingCoachPicture] = useState(false);
-  const [coachPictureUrl, setCoachPictureUrl] = useState();
-  const getCoachPicture = async () => {
-    if (isGettingCoachPicture) {
-      return;
-    }
-    console.log("getting coach picture...");
-    setIsGettingCoachPicture(true);
-    const { data: picturesList, error: listPicturesError } =
-      await supabase.storage
-        .from("coach-picture")
-        .list(user.id, { limit: 1, search: "coach-picture" });
-    if (listPicturesError) {
-      console.error(listPicturesError);
-    } else {
-      console.log("picturesList", picturesList);
-    }
-    if (picturesList.length > 0) {
-      const { publicURL, error } = await supabase.storage
-        .from("coach-picture")
-        .getPublicUrl(`${user.id}/coach-picture.jpg`);
-      console.log("publicURL", publicURL);
-      if (error) {
-        console.error(error);
-      } else {
-        setCoachPictureUrl(`${publicURL}?t=${picturesList[0].updated_at}`);
-      }
-    } else {
-      setCoachPictureUrl();
-    }
-    setIsGettingCoachPicture(false);
-  };
   useEffect(() => {
-    if (user?.can_coach && !coachPictureUrl) {
-      getCoachPicture();
+    if (!isLoading && user?.can_coach && !coachPictures[user.id]) {
+      getCoachPicture(user.id);
     }
-  }, [user]);
+  }, [isLoading, user]);
 
   useEffect(() => {
     if (coachPictureStatus?.type === "succeeded") {
-      getCoachPicture();
+      getCoachPicture(user.id, true);
     }
   }, [coachPictureStatus]);
 
@@ -146,11 +116,11 @@ export default function AccountGeneral() {
                     Coach Picture
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    {coachPictureUrl && (
+                    {coachPictures?.[user?.id]?.url && (
                       <>
                         <img
                           alt="coach picture"
-                          src={coachPictureUrl}
+                          src={coachPictures[user.id].url}
                           width={200}
                           className={"mb-2"}
                         />
@@ -161,7 +131,7 @@ export default function AccountGeneral() {
                       onClick={() => setShowCoachPictureModal(true)}
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-1 px-2 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                      {coachPictureUrl ? "Update" : "Set"} Picture
+                      {coachPictures?.[user?.id] ? "Update" : "Set"} Picture
                     </button>
                   </dd>
                 </div>

@@ -5,6 +5,7 @@ import { CameraIcon } from "@heroicons/react/outline";
 import { supabase } from "../../../utils/supabase";
 import { useUser } from "../../../context/user-context";
 import { compressAccurately } from "image-conversion";
+import { useCoachPictures } from "../../../context/coach-picture-context";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -40,8 +41,6 @@ export default function CoachPictureModal(props) {
   const [pictureUrl, setPictureUrl] = useState();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
-  const [doesPictureExist, setDoesPictureExist] = useState(false);
-
   const onPictureFile = async (file) => {
     console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
@@ -54,12 +53,10 @@ export default function CoachPictureModal(props) {
     setPictureFile(compressedFile);
     setPictureUrl(URL.createObjectURL(compressedFile));
   };
-  window.s = supabase;
 
   const resetUI = () => {
     setPictureUrl("");
     setPictureFile("");
-    setDoesPictureExist(false);
   };
   useEffect(() => {
     if (!open) {
@@ -67,44 +64,23 @@ export default function CoachPictureModal(props) {
     }
   }, [open]);
 
-  const [isGettingPictureUrl, setIsGettingPictureUrl] = useState(false);
-  const getExistingPicture = async () => {
-    if (isGettingPictureUrl) {
-      return;
-    }
-    setIsGettingPictureUrl(true);
-
-    const { data: picturesList, error: listPicturesError } =
-      await supabase.storage
-        .from("coach-picture")
-        .list(user.id, { limit: 1, search: "coach-picture" });
-    if (listPicturesError) {
-      console.error(listPicturesError);
-    } else {
-      console.log("picturesList", picturesList);
-    }
-    if (picturesList.length > 0) {
-      const { publicURL, error } = await supabase.storage
-        .from("coach-picture")
-        .getPublicUrl(`${user.id}/coach-picture.jpg`);
-      console.log("publicURL", publicURL);
-      if (error) {
-        console.error(error);
-      } else {
-        setPictureUrl(`${publicURL}?t=${picturesList[0].updated_at}`);
-        setDoesPictureExist(true);
-      }
-    } else {
-      setDoesPictureExist(false);
-    }
-
-    setIsGettingPictureUrl(false);
-  };
+  const { coachPictures, getCoachPicture } = useCoachPictures();
   useEffect(() => {
     if (open) {
-      getExistingPicture();
+      getCoachPicture(user.id);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      const coachPicture = coachPictures?.[user?.id]?.url;
+      if (coachPicture) {
+        setPictureUrl(coachPicture);
+      }
+    }
+  }, [open && coachPictures]);
+
+  const doesPictureExist = coachPictures?.[user?.id]?.url;
 
   return (
     <Modal
@@ -152,7 +128,7 @@ export default function CoachPictureModal(props) {
               console.log("update picture");
               const { data, error } = await supabase.storage
                 .from("coach-picture")
-                .update(`${user.id}/coach-picture.jpg}`, pictureFile, {
+                .update(`${user.id}/image.jpg`, pictureFile, {
                   upsert: true,
                   contentType: "image/jpg",
                 });
@@ -162,7 +138,7 @@ export default function CoachPictureModal(props) {
               console.log("upload picture");
               const { data, error } = await supabase.storage
                 .from("coach-picture")
-                .upload(`${user.id}/coach-picture.jpg`, pictureFile, {
+                .upload(`${user.id}/image.jpg`, pictureFile, {
                   upsert: true,
                   contentType: "image/jpg",
                 });
@@ -173,7 +149,7 @@ export default function CoachPictureModal(props) {
             console.log("remove picture");
             const { data, error } = await supabase.storage
               .from("coach-picture")
-              .remove([`${user.id}/coach-picture.jpg`]);
+              .remove([`${user.id}/image.jpg`]);
 
             uploadPictureData = data;
             uploadPictureError = error;
@@ -209,7 +185,7 @@ export default function CoachPictureModal(props) {
         }}
       >
         <div>
-          {!pictureUrl && !isGettingPictureUrl && (
+          {!pictureUrl && (
             <div
               id="pictureUploadContainer"
               onDragOver={(e) => {

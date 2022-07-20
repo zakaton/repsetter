@@ -5,6 +5,7 @@ import { ClientContextProvider } from "../context/client-context";
 import { ExerciseVideoContextProvider } from "../context/exercise-videos-context";
 import { SelectedExerciseTypeContextProvider } from "../context/selected-exercise-context";
 import { ProgressContextProvider } from "../context/progress-context";
+import { CoachPicturesContextProvider } from "../context/coach-picture-context";
 import Layout from "../components/layouts/Layout";
 
 function MyApp({ Component, pageProps }) {
@@ -16,7 +17,9 @@ function MyApp({ Component, pageProps }) {
           <ClientContextProvider>
             <SelectedExerciseTypeContextProvider>
               <ProgressContextProvider>
-                <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+                <CoachPicturesContextProvider>
+                  <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+                </CoachPicturesContextProvider>
               </ProgressContextProvider>
             </SelectedExerciseTypeContextProvider>
           </ClientContextProvider>
