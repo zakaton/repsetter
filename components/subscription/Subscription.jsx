@@ -115,6 +115,42 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
     !isGettingExistingSubscription &&
     !existingSubscription;
 
+  const [isGettingCoachPicture, setIsGettingCoachPicture] = useState(false);
+  const [coachPictureUrl, setCoachPictureUrl] = useState();
+  const getCoachPicture = async () => {
+    if (isGettingCoachPicture) {
+      return;
+    }
+    console.log("getting coach picture...");
+    setIsGettingCoachPicture(true);
+    const { data: picturesList, error: listPicturesError } =
+      await supabase.storage
+        .from("coach-picture")
+        .list(subscription.coach, { limit: 1, search: "coach-picture" });
+    if (listPicturesError) {
+      console.error(listPicturesError);
+    } else {
+      console.log("picturesList", picturesList);
+    }
+    if (picturesList.length > 0) {
+      const { publicURL, error } = await supabase.storage
+        .from("coach-picture")
+        .getPublicUrl(`${subscription.coach}/coach-picture.jpg`);
+      console.log("publicURL", publicURL);
+      if (error) {
+        console.error(error);
+      } else {
+        setCoachPictureUrl(publicURL);
+      }
+    }
+    setIsGettingCoachPicture(false);
+  };
+  useEffect(() => {
+    if (subscription?.coach && !coachPictureUrl) {
+      getCoachPicture();
+    }
+  }, [subscription]);
+
   return (
     <>
       <DeleteSubscriptionModal
@@ -159,15 +195,23 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                   </h1>
                 </div>
                 <div className="mx-auto max-w-prose text-lg">
-                  <div className="prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500">
+                  <div className="prose prose-lg prose-blue mx-auto mt-4 text-xl text-gray-500 sm:grid sm:grid-cols-2 sm:items-center sm:gap-4">
                     {
-                      <p>
+                      <p className="sm:col-start-2 sm:row-start-1">
                         You have been invited by {subscription.coach_email} to
                         be coached for{" "}
                         <span>{formatDollars(subscription.price, false)}</span>{" "}
                         per month.
                       </p>
                     }
+                    {coachPictureUrl && (
+                      <img
+                        alt="coach picture"
+                        src={coachPictureUrl}
+                        width={250}
+                        className="m-auto mt-2 sm:col-start-1"
+                      />
+                    )}
                     {!isLoading && !user && (
                       <p>
                         <MyLink
