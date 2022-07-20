@@ -147,6 +147,22 @@ export default async function handler(req, res) {
     console.error(removePicturesError);
   }
 
+  const { data: coachPicturesList, error: listCoachPicturesError } =
+    await supabase.storage.from("coach-picture").list(`${profile.id}`);
+  if (listCoachPicturesError) {
+    console.error(listCoachPicturesError);
+  } else {
+    console.log("coachPicturesList", coachPicturesList);
+  }
+  const coachPicturesToRemove = picturesList.map(
+    (picture) => `${profile.id}/${picture.name}`
+  );
+  const { data: removedCoachPictures, error: removeCoachPicturesError } =
+    await supabase.storage.from("coach-picture").remove(coachPicturesToRemove);
+  if (removeCoachPicturesError) {
+    console.error(removeCoachPicturesError);
+  }
+
   try {
     await stripe.customers.del(profile.stripe_customer);
   } catch (error) {

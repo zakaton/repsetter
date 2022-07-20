@@ -45,6 +45,8 @@ export default function AccountGeneral() {
       } else {
         setCoachPictureUrl(publicURL);
       }
+    } else {
+      setCoachPictureUrl();
     }
     setIsGettingCoachPicture(false);
   };

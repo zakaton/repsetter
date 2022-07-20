@@ -45,7 +45,7 @@ export default function CoachPictureModal(props) {
   const onPictureFile = async (file) => {
     console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
-      size: 45,
+      size: 49,
       type: "image/jpeg",
       width: 500,
       // FIX
@@ -148,14 +148,30 @@ export default function CoachPictureModal(props) {
 
           let uploadPictureData, uploadPictureError;
           if (pictureFile) {
-            const { data, error } = await supabase.storage
-              .from("coach-picture")
-              .upload(`${user.id}/coach-picture.jpg`, pictureFile, {
-                cacheControl: "3600",
-                upsert: true,
-              });
-            uploadPictureData = data;
-            uploadPictureError = error;
+            if (doesPictureExist) {
+              const { data, error } = await supabase.storage
+                .from("coach-picture")
+                .update(
+                  `${user.id}/coach-picture.jpg?t=${new Date().getTime()}`,
+                  pictureFile,
+                  {
+                    cacheControl: "3600",
+                    upsert: true,
+                  }
+                );
+              uploadPictureData = data;
+              uploadPictureError = error;
+            } else {
+              const { data, error } = await supabase.storage
+                .from("coach-picture")
+                .upload(`${user.id}/coach-picture.jpg`, pictureFile, {
+                  cacheControl: "3600",
+                  upsert: true,
+                  contentType: "image/jpg",
+                });
+              uploadPictureData = data;
+              uploadPictureError = error;
+            }
           } else if (!pictureUrl) {
             console.log("remove picture");
             const { data, error } = await supabase.storage

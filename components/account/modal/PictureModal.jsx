@@ -144,6 +144,7 @@ export default function PictureModal(props) {
                 {
                   cacheControl: "3600",
                   upsert: true,
+                  contentType: "image/jpg",
                 }
               );
             uploadPictureData = data;

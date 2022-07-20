@@ -264,7 +264,9 @@ export default function ExerciseTypeModal(props) {
             const { data: uploadedVideo, error: uploadVideoError } =
               await supabase.storage
                 .from("exercise")
-                .upload(`${createdExerciseType.id}.mp4`, videoFile);
+                .upload(`${createdExerciseType.id}.mp4`, videoFile, {
+                  contentType: "video/mp4",
+                });
             if (uploadVideoError) {
               console.error(uploadVideoError);
             }
@@ -274,7 +276,9 @@ export default function ExerciseTypeModal(props) {
             const { data: uploadedImage, error: uploadImageError } =
               await supabase.storage
                 .from("exercise")
-                .upload(`${createdExerciseType.id}.jpg`, imageFile);
+                .upload(`${createdExerciseType.id}.jpg`, imageFile, {
+                  contentType: "image/jpg",
+                });
             if (uploadImageError) {
               console.error(uploadImageError);
             }
