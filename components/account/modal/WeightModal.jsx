@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ScaleIcon } from "@heroicons/react/outline";
-import { supabase } from "../../../utils/supabase";
+import { supabase, dateFromDateAndTime } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import {
@@ -100,13 +100,31 @@ export default function WeightModal(props) {
     }
   }, [isUsingKilograms]);
 
+  let lastWeightBeforeTodayString = "";
+  if (lastWeightBeforeToday) {
+    lastWeightBeforeTodayString += ` (Last weight was ${lastWeightBeforeToday.weight.toFixed(
+      2
+    )} ${lastWeightBeforeToday.is_weight_in_kilograms ? "kg" : "lbs"} on `;
+    const date = dateFromDateAndTime(
+      lastWeightBeforeToday.date,
+      lastWeightBeforeToday.time
+    );
+    lastWeightBeforeTodayString += date.toDateString();
+    if (lastWeightBeforeToday.time) {
+      lastWeightBeforeTodayString += `at ${date.toLocaleTimeString([], {
+        timeStyle: "short",
+      })}`;
+    }
+    lastWeightBeforeTodayString += ")";
+  }
+
   return (
     <Modal
       {...props}
       title={selectedWeight ? "Update Bodyweight" : "Add Bodyweight"}
       message={`${
         selectedWeight ? "Update" : "Add"
-      } today's bodyweight, and optionally the time of day`}
+      } today's bodyweight, and optionally the time of day.${lastWeightBeforeTodayString}`}
       Icon={ScaleIcon}
       Button={
         <button
