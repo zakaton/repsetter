@@ -45,7 +45,7 @@ export default function CoachPictureModal(props) {
   const onPictureFile = async (file) => {
     console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
-      size: 40,
+      size: 45,
       type: "image/jpeg",
       width: 500,
       // FIX
