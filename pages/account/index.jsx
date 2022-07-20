@@ -29,7 +29,7 @@ export default function AccountGeneral() {
     const { data: picturesList, error: listPicturesError } =
       await supabase.storage
         .from("coach-picture")
-        .list("", { limit: 1, search: user.id });
+        .list(user.id, { limit: 1, search: "coach-picture" });
     if (listPicturesError) {
       console.error(listPicturesError);
     } else {

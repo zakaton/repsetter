@@ -77,6 +77,36 @@ export default async function handler(req, res) {
   let priceObject;
 
   const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+  const { data: picturesList, error: listPicturesError } =
+    await supabase.storage
+      .from("coach-picture")
+      .list(profile.id, { limit: 1, search: "coach-picture" });
+  if (listPicturesError) {
+    console.error(listPicturesError);
+  } else {
+    const product = await stripe.products.retrieve(profile.product_id);
+    console.log("product", product);
+
+    if (picturesList.length != product.images.length - 1) {
+      let images = ["https://www.repsetter.com/images/logo.png"];
+      if (picturesList.length > 0) {
+        const { publicURL, error } = await supabase.storage
+          .from("coach-picture")
+          .getPublicUrl(`${profile.id}/coach-picture.jpg`);
+        if (error) {
+          console.error(error);
+        } else {
+          images.unshift(publicURL);
+        }
+      }
+
+      console.log("new images", images);
+
+      await stripe.products.update(product.id, { images });
+    }
+  }
+
   priceObject = await stripe.prices.create({
     unit_amount: subscriptionPrice * 100,
     currency: "usd",
