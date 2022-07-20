@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ClipboardCheckIcon, RefreshIcon } from "@heroicons/react/outline";
-import { supabase } from "../../../utils/supabase";
+import { supabase, timeToDate, dateToString } from "../../../utils/supabase";
 import {
   poundsToKilograms,
   kilogramsToPounds,
@@ -11,9 +11,7 @@ import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
 import YouTube from "react-youtube";
-import { timeToDate } from "../../../utils/exercise-utils";
 import MyLink from "../../MyLink";
-import { stringToDate } from "../../../utils/picture-utils";
 
 export default function ExerciseModal(props) {
   const {

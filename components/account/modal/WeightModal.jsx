@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ScaleIcon } from "@heroicons/react/outline";
-import { supabase, dateFromDateAndTime } from "../../../utils/supabase";
+import {
+  supabase,
+  dateFromDateAndTime,
+  timeToDate,
+} from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import {
@@ -102,16 +106,16 @@ export default function WeightModal(props) {
 
   let lastWeightBeforeTodayString = "";
   if (lastWeightBeforeToday) {
-    lastWeightBeforeTodayString += ` (Last weight was ${lastWeightBeforeToday.weight.toFixed(
-      2
-    )} ${lastWeightBeforeToday.is_weight_in_kilograms ? "kg" : "lbs"} on `;
+    lastWeightBeforeTodayString += ` (Last weight was ${
+      lastWeightBeforeToday.weight
+    } ${lastWeightBeforeToday.is_weight_in_kilograms ? "kg" : "lbs"} on `;
     const date = dateFromDateAndTime(
       lastWeightBeforeToday.date,
       lastWeightBeforeToday.time
     );
     lastWeightBeforeTodayString += date.toDateString();
     if (lastWeightBeforeToday.time) {
-      lastWeightBeforeTodayString += `at ${date.toLocaleTimeString([], {
+      lastWeightBeforeTodayString += ` at ${date.toLocaleTimeString([], {
         timeStyle: "short",
       })}`;
     }

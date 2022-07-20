@@ -2,11 +2,10 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { CameraIcon } from "@heroicons/react/outline";
-import { supabase } from "../../../utils/supabase";
+import { supabase, dateToString } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import { compressAccurately } from "image-conversion";
-import { dateToString } from "../../../utils/picture-utils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

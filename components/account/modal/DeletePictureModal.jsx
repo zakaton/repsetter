@@ -1,10 +1,9 @@
 /* eslint-disable react/destructuring-assignment */
 import { useState, useEffect } from "react";
 import Modal from "../../Modal";
-import { supabase } from "../../../utils/supabase";
+import { supabase, dateToString } from "../../../utils/supabase";
 import { useUser } from "../../../context/user-context";
 import { useClient } from "../../../context/client-context";
-import { dateToString } from "../../../utils/picture-utils";
 
 export default function DeletePictureModal(props) {
   const {

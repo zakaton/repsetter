@@ -8,13 +8,13 @@ import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseMo
 import Table from "../../components/Table";
 import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
 import { useClient } from "../../context/client-context";
-import { muscles, muscleGroups, timeToDate } from "../../utils/exercise-utils";
+import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import MyLink from "../../components/MyLink";
-import { stringToDate } from "../../utils/picture-utils";
+import { timeToDate, stringToDate, dateToString } from "../../utils/supabase";
 
 const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
   name: `Muscles (${muscleGroup})`,

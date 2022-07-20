@@ -8,7 +8,12 @@ import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal"
 import PictureModal from "../../components/account/modal/PictureModal";
 import DeletePictureModal from "../../components/account/modal/DeletePictureModal";
 import Notification from "../../components/Notification";
-import { supabase, dateFromDateAndTime } from "../../utils/supabase";
+import {
+  supabase,
+  dateFromDateAndTime,
+  timeToDate,
+  dateToString,
+} from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
 import { useClient } from "../../context/client-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
@@ -24,9 +29,7 @@ import {
 import {
   kilogramsToPounds,
   poundsToKilograms,
-  timeToDate,
 } from "../../utils/exercise-utils";
-import { dateToString } from "../../utils/picture-utils";
 
 import {
   Chart as ChartJS,

@@ -4,8 +4,7 @@ import { useClient } from "../../context/client-context";
 import Head from "next/head";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import Pagination from "../../components/Pagination";
-import { supabase } from "../../utils/supabase";
-import { stringToDate } from "../../utils/picture-utils";
+import { supabase, dateToString } from "../../utils/supabase";
 import MyLink from "../../components/MyLink";
 
 const numberOfPicturesPerPage = 10;
