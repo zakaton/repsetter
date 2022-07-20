@@ -51,10 +51,7 @@ export default async function handler(req, res) {
               const product = await stripe.products.create({
                 name: `Coaching by ${profile.email}`,
                 default_price_data: { currency: "usd", unit_amount: 0 },
-                images: [
-                  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/coach-picture/${profile.id}/coach-picture.jpg`,
-                  "https://www.repsetter.com/images/logo.png",
-                ],
+                images: ["https://www.repsetter.com/images/logo.png"],
               });
               updates.product_id = product.id;
               updates.default_price_id = product.default_price;
