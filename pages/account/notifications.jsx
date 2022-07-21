@@ -64,14 +64,11 @@ export default function Notifications() {
 
           <fieldset>
             <legend className="text-base font-medium text-gray-900">
-              By Email
+              For Clients
             </legend>
             <div className="mt-4 space-y-4">
               {notificationTypes
-                .filter(
-                  (notificationType) =>
-                    !notificationType.isCoach || user.can_coach
-                )
+                .filter((notificationType) => !notificationType.isCoach)
                 .map((notificationType) => (
                   <div
                     key={notificationType.value}
@@ -103,6 +100,46 @@ export default function Notifications() {
                 ))}
             </div>
           </fieldset>
+          {user.can_coach && (
+            <fieldset>
+              <legend className="text-base font-medium text-gray-900">
+                For Coaches
+              </legend>
+              <div className="mt-4 space-y-4">
+                {notificationTypes
+                  .filter((notificationType) => notificationType.isCoach)
+                  .map((notificationType) => (
+                    <div
+                      key={notificationType.value}
+                      className="flex items-start"
+                    >
+                      <div className="flex h-5 items-center">
+                        <input
+                          id={notificationType.value}
+                          name={notificationType.value}
+                          type="checkbox"
+                          defaultChecked={user?.notifications?.includes(
+                            notificationType.value
+                          )}
+                          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label
+                          htmlFor={notificationType.value}
+                          className="font-medium text-gray-700"
+                        >
+                          {notificationType.title}
+                        </label>
+                        <p className="text-gray-500">
+                          {notificationType.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </fieldset>
+          )}
         </div>
         <div className="flex items-end justify-end gap-2 bg-gray-50 px-4 py-3 text-right text-xs sm:px-6 sm:text-sm">
           <button
