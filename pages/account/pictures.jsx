@@ -86,6 +86,10 @@ export default function Photos() {
     } else {
       picturesList = picturesList.filter((item) => item.name?.endsWith(".jpg"));
       console.log("picturesList", picturesList);
+      picturesList.forEach((picture) => {
+        const [dateString, type] = picture.name.split(".")[0].split("_");
+        Object.assign(picture, { type, dateString });
+      });
       setPicturesList(picturesList);
     }
 
@@ -105,13 +109,20 @@ export default function Photos() {
     if (isGettingPictures) {
       return;
     }
-    if (picturesList?.length == 0) {
+
+    const filteredPicturesList =
+      containsFilters?.type?.length > 0
+        ? picturesList.filter((picture) =>
+            containsFilters.type.includes(picture.type)
+          )
+        : picturesList;
+
+    if (filteredPicturesList?.length == 0) {
       setPictures([]);
       return;
     }
-
     setIsGettingPictures(true);
-    const signedUrls = picturesList
+    const signedUrls = filteredPicturesList
       .slice(
         pageIndex * numberOfPicturesPerPage,
         (pageIndex + 1) * numberOfPicturesPerPage
@@ -151,7 +162,7 @@ export default function Photos() {
     if (picturesList) {
       getPicturesList();
     }
-  }, [filters, containsFilters]);
+  }, [filters, containsFilters, order]);
 
   const [weights, setWeights] = useState();
   const [isGettingWeights, setIsGettingWeights] = useState(false);
@@ -239,7 +250,7 @@ export default function Photos() {
         {pictures?.length > 0 && (
           <ul
             role="list"
-            className="grid grid-cols-2 gap-x-4 gap-y-8 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+            className="grid grid-cols-2 gap-x-4 gap-y-8 border-t border-gray-200 pt-4 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
           >
             {pictures?.map((picture) => {
               const weight = weights?.find(
