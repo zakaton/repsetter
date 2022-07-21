@@ -4,10 +4,13 @@ import { useClient } from "../../context/client-context";
 import Head from "next/head";
 import ClientsSelect from "../../components/account/ClientsSelect";
 import Pagination from "../../components/Pagination";
-import { supabase, dateToString } from "../../utils/supabase";
+import { supabase } from "../../utils/supabase";
 import MyLink from "../../components/MyLink";
 
 const numberOfPicturesPerPage = 10;
+
+const capitalizeFirstLetter = (string) =>
+  string[0].toUpperCase() + string.slice(1).toLowerCase();
 
 export default function Photos() {
   const { selectedClientId, selectedClient, setSelectedDate } = useClient();

@@ -69,6 +69,7 @@ export function PicturesContextProvider(props) {
         const newPictures = {
           ...pictures,
         };
+        // FIX - how to omit pics?
         pictureUrls.forEach(({ path, signedURL }) => {
           const [id, name] = path.split("/");
           const [dateString, type] = name.split(".")[0].split("_");
@@ -80,7 +81,6 @@ export function PicturesContextProvider(props) {
           if (picture) {
             newPictures[id][dateString][type] +=
               "&" + generateUrlSuffix(picture);
-            console.log("FUCK", newPictures[id][dateString][type]);
           }
         });
         console.log("newPictures", newPictures);

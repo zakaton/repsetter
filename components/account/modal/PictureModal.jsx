@@ -19,6 +19,8 @@ export default function PictureModal(props) {
     setOpen,
     setResultStatus: setPictureStatus,
     setShowResultNotification: setShowPictureNotification,
+    pictureType,
+    setPictureType,
   } = props;
 
   const { selectedDate } = useClient();
@@ -43,8 +45,6 @@ export default function PictureModal(props) {
   const [pictureFile, setPictureFile] = useState();
   const [pictureUrl, setPictureUrl] = useState();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-
-  const [pictureType, setPictureType] = useState(pictureTypes[0]);
 
   const [doesPictureExist, setDoesPictureExist] = useState(false);
 
@@ -85,6 +85,7 @@ export default function PictureModal(props) {
       const picture =
         pictures?.[user?.id]?.[dateToString(selectedDate)]?.[pictureType];
       setPictureUrl(picture);
+      setDoesPictureExist(Boolean(picture));
     }
   }, [open, pictures, pictureType]);
 
@@ -135,38 +136,53 @@ export default function PictureModal(props) {
           )}_${pictureType}.jpg`;
 
           let uploadPictureData, uploadPictureError;
+          let actionString;
           if (pictureFile) {
-            const { data, error } = await supabase.storage
-              .from("picture")
-              .upload(picturePath, pictureFile, {
-                upsert: true,
-                contentType: "image/jpg",
-              });
-            uploadPictureData = data;
-            uploadPictureError = error;
-          } else {
+            if (doesPictureExist) {
+              console.log("update picture");
+              const { data, error } = await supabase.storage
+                .from("picture")
+                .update(picturePath, pictureFile, {
+                  upsert: true,
+                  contentType: "image/jpg",
+                });
+              uploadPictureData = data;
+              uploadPictureError = error;
+              actionString = "Update";
+            } else {
+              console.log("upload picture");
+              const { data, error } = await supabase.storage
+                .from("picture")
+                .upload(picturePath, pictureFile, {
+                  upsert: true,
+                  contentType: "image/jpg",
+                });
+              uploadPictureData = data;
+              uploadPictureError = error;
+              actionString = "Upload";
+            }
+          } else if (!pictureUrl) {
             const { data, error } = await supabase.storage
               .from("picture")
               .remove([picturePath]);
 
             uploadPictureData = data;
             uploadPictureError = error;
+            actionString = "Remove";
           }
 
           console.log("uploadPictureData", uploadPictureData);
           if (uploadPictureError) {
             status = {
               type: "failed",
-              title: `Failed to ${
-                doesPictureExist ? "Update" : "Upload"
-              } Picture`,
+              title: `Failed to ${actionString} Picture`,
               message: uploadPictureError.message,
             };
           } else {
             status = {
               type: "succeeded",
               title: `Successfully ${
-                doesPictureExist ? "Updated" : "Uploaded"
+                actionString + (actionString.endsWith("e") ? "d" : "")
               } Picture`,
             };
           }
@@ -286,6 +302,7 @@ export default function PictureModal(props) {
               <img
                 src={pictureUrl}
                 alt="progress picture"
+                className="m-auto"
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

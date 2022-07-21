@@ -15,6 +15,7 @@ import {
   dateToString,
 } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
+import { usePictures } from "../../context/picture-context";
 import { useClient } from "../../context/client-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
@@ -24,7 +25,6 @@ import {
   PlusIcon,
   ClipboardIcon,
   PencilIcon,
-  TrashIcon,
 } from "@heroicons/react/outline";
 import {
   kilogramsToPounds,
@@ -45,6 +45,7 @@ import {
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { weightEventColors } from "../../utils/weight-utils";
+import { pictureTypes } from "../../utils/picture-utils";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -55,6 +56,9 @@ ChartJS.register(
   TimeScale,
   Legend
 );
+
+const capitalizeFirstLetter = (string) =>
+  string[0].toUpperCase() + string.slice(1).toLowerCase();
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -673,58 +677,45 @@ export default function Diary() {
     }
   }, [weights, lastWeightBeforeToday, firstWeightAfterToday, isUsingKilograms]);
 
-  // REPLACE
-  const [gotPictureForUserId, setGotPictureForUserId] = useState();
-  const [gotPictureForDate, setGotPictureForDate] = useState();
-  const [pictureUrl, setPictureUrl] = useState();
-  const getPicture = async () => {
-    const { signedURL, error } = await supabase.storage
-      .from("picture")
-      .createSignedUrl(
-        `${selectedClientId}/${dateToString(selectedDate)}.jpg`,
-        60
-      );
-    if (error) {
-      console.error(error);
-      setPictureUrl();
-    } else {
-      setPictureUrl(signedURL);
-      setGotPictureForDate(selectedDate);
-      setGotPictureForUserId(selectedClientId);
-    }
-    console.log(error, signedURL);
-  };
-
+  const { pictures, getPicture } = usePictures();
+  const [pictureType, setPictureType] = useState(pictureTypes[0]);
   useEffect(() => {
     if (!selectedDate) {
       return;
     }
 
-    if (!pictureUrl) {
-      getPicture();
-    } else if (
-      gotPictureForUserId != selectedClientId ||
-      selectedDate != gotPictureForDate
+    getPicture(selectedClientId, { date: selectedDate });
+
+    if (
+      selectedDate != gotPictureDatesForDate &&
+      selectedClientId != gotPictureDatesForClientId
     ) {
-      getPicture(true);
       getPictureDates();
     }
-  }, [pictureUrl, selectedClientId, selectedDate]);
+  }, [selectedClientId, selectedDate]);
 
   useEffect(() => {
     if (pictureStatus?.type === "succeeded") {
-      getPicture();
+      getPicture(selectedClientId, { date: selectedDate }, true);
       getPictureDates();
     }
   }, [pictureStatus]);
   useEffect(() => {
     if (deletePictureStatus?.type === "succeeded") {
-      getPicture();
+      getPicture(selectedClientId, { date: selectedDate }, true);
       getPictureDates();
     }
   }, [deletePictureStatus]);
 
+  const userPictures =
+    (selectedDate &&
+      pictures?.[selectedClientId]?.[dateToString(selectedDate)]) ||
+    {};
+
   const [pictureDates, setPictureDates] = useState();
+  const [gotPictureDatesForDate, setGotPictureDatesForDate] = useState();
+  const [gotPictureDatesForClientId, setGotPictureDatesForClientId] =
+    useState();
   const getPictureDates = async () => {
     const newPictureDates = [];
     const previousMonth = new Date(selectedDate);
@@ -743,7 +734,7 @@ export default function Diary() {
       searches.map(async (search) => {
         const { data: monthPictureDates, error: monthPictureDatesError } =
           await supabase.storage.from("picture").list(selectedClientId, {
-            limit: 31,
+            limit: 31 * pictureTypes.length,
             sortBy: { column: "name", order: "asc" },
             search,
           });
@@ -751,9 +742,12 @@ export default function Diary() {
           console.error(monthPictureDatesError);
         } else {
           console.log("monthPictureDates", search, monthPictureDates);
-          monthPictureDates.forEach(({ name }) =>
-            newPictureDates.push({ date: name.split(".")[0] })
-          );
+          monthPictureDates.forEach(({ name }) => {
+            const dateString = name.split("_")[0];
+            if (!newPictureDates.find(({ date }) => date === dateString)) {
+              newPictureDates.push({ date: dateString });
+            }
+          });
         }
       })
     );
@@ -866,6 +860,8 @@ export default function Diary() {
         setOpen={setShowPictureModal}
         setResultStatus={setPictureStatus}
         setShowResultNotification={setShowPictureNotification}
+        pictureType={pictureType}
+        setPictureType={setPictureType}
       />
       <Notification
         open={showPictureNotification}
@@ -906,7 +902,7 @@ export default function Diary() {
           </div>
           <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && !pictureUrl && !isSelectedDateAfterToday && (
+              {amITheClient && !isSelectedDateAfterToday && (
                 <button
                   type="button"
                   onClick={() => {
@@ -917,52 +913,54 @@ export default function Diary() {
                     "rounded-md"
                   )}
                 >
-                  <span className="sr-only">Add Picture</span>
-                  <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                </button>
-              )}
-              {amITheClient && pictureUrl && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPictureModal(true);
-                  }}
-                  className={classNames(
-                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                    "rounded-l-md"
+                  {Object.keys(userPictures).length > 0 ? (
+                    <>
+                      <span className="sr-only">Edit Picture</span>
+                      <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                    </>
+                  ) : (
+                    <>
+                      <span className="sr-only">Add Picture</span>
+                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                    </>
                   )}
-                >
-                  <span className="sr-only">Edit Picture</span>
-                  <PencilIcon className="h-5 w-5" aria-hidden="true" />
-                </button>
-              )}
-              {amITheClient && pictureUrl && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowDeletePictureModal(true);
-                  }}
-                  className={classNames(
-                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                    "rounded-r-md"
-                  )}
-                >
-                  <span className="sr-only">Delete Picture</span>
-                  <TrashIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
             </span>
           </div>
         </div>
-        {pictureUrl && (
-          <div className="mt-4 mb-2">
-            <img
-              src={pictureUrl}
-              className="m-auto"
-              alt="progress picture"
-            ></img>
-          </div>
-        )}
+        <ul
+          role="list"
+          className="grid grid-cols-1 gap-x-4 gap-y-8 pt-4 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+        >
+          {pictureTypes
+            .filter((type) => type in userPictures)
+            .map((type) => (
+              <li className="relative" key={type}>
+                <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                  <img
+                    src={userPictures[type]}
+                    alt={`${type} progress picture`}
+                    height={200}
+                    className="pointer-events-none focus:outline-none group-hover:opacity-75"
+                  ></img>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPictureType(type);
+                      setShowPictureModal(true);
+                    }}
+                    className="absolute inset-0 focus:outline-none"
+                  >
+                    <span className="sr-only">Edit</span>
+                  </button>
+                </div>
+                <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
+                  {capitalizeFirstLetter(type)}
+                </p>
+              </li>
+            ))}
+        </ul>
         {(amITheClient || weights?.length > 0) && (
           <div className="relative pt-2">
             <div
