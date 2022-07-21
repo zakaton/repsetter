@@ -1,11 +1,5 @@
 import { useState, createContext, useContext } from "react";
-import { pictureTypes } from "../utils/picture-utils";
-import {
-  supabase,
-  generateUrlSuffix,
-  dateToString,
-  stringToDate,
-} from "../utils/supabase";
+import { supabase, generateUrlSuffix, dateToString } from "../utils/supabase";
 
 export const PicturesContext = createContext();
 
@@ -16,7 +10,9 @@ export function PicturesContextProvider(props) {
     console.log("requesting picture", userId, config);
 
     let { date } = config;
-    const { options, types = pictureTypes } = config;
+    const dateString = date ? dateToString(date) : "";
+
+    const { options } = config;
 
     let picturesList = [];
     if (options) {
@@ -31,7 +27,7 @@ export function PicturesContextProvider(props) {
     } else if (date) {
       const { data: list, error: listError } = await supabase.storage
         .from("picture")
-        .list(userId, { search: dateToString(date) });
+        .list(userId, { search: dateString });
       if (listError) {
         console.error(listError);
       } else {
@@ -45,15 +41,25 @@ export function PicturesContextProvider(props) {
       picture.type = type;
     });
     console.log("picturesList", picturesList, pictures);
-    console.log(types);
-    picturesList = picturesList
-      .filter((picture) => types.includes(picture.type))
-      .filter(
-        (picture) =>
-          refresh || !pictures[userId]?.[picture.dateString]?.[picture.type]
-      );
+    picturesList = picturesList.filter(
+      (picture) =>
+        refresh || !pictures[userId]?.[picture.dateString]?.[picture.type]
+    );
 
     console.log("picturesList", picturesList);
+
+    const newPictures = {
+      ...pictures,
+    };
+
+    if (refresh) {
+      if (dateString) {
+        types.forEach((type) => {
+          delete newPictures[userId]?.[dateString]?.[type];
+        });
+      } else {
+      }
+    }
 
     if (picturesList.length > 0) {
       const picturePaths = picturesList.map(
@@ -66,10 +72,7 @@ export function PicturesContextProvider(props) {
         console.error(error);
       } else {
         console.log("pictureUrls", pictureUrls);
-        const newPictures = {
-          ...pictures,
-        };
-        // FIX - how to omit pics?
+
         pictureUrls.forEach(({ path, signedURL }) => {
           const [id, name] = path.split("/");
           const [dateString, type] = name.split(".")[0].split("_");
@@ -86,6 +89,9 @@ export function PicturesContextProvider(props) {
         console.log("newPictures", newPictures);
         setPictures(newPictures);
       }
+    } else {
+      console.log("newPictures", newPictures);
+      setPictures(newPictures);
     }
   };
 

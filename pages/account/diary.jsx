@@ -929,38 +929,41 @@ export default function Diary() {
             </span>
           </div>
         </div>
-        <ul
-          role="list"
-          className="grid grid-cols-1 gap-x-4 gap-y-8 pt-4 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
-        >
-          {pictureTypes
-            .filter((type) => type in userPictures)
-            .map((type) => (
-              <li className="relative" key={type}>
-                <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                  <img
-                    src={userPictures[type]}
-                    alt={`${type} progress picture`}
-                    height={200}
-                    className="pointer-events-none focus:outline-none group-hover:opacity-75"
-                  ></img>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPictureType(type);
-                      setShowPictureModal(true);
-                    }}
-                    className="absolute inset-0 focus:outline-none"
-                  >
-                    <span className="sr-only">Edit</span>
-                  </button>
-                </div>
-                <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
-                  {capitalizeFirstLetter(type)}
-                </p>
-              </li>
-            ))}
-        </ul>
+        {Object.keys(userPictures).length > 0 && (
+          <ul
+            role="list"
+            className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+          >
+            {pictureTypes
+              .filter((type) => type in userPictures)
+              .map((type) => (
+                <li className="relative" key={type}>
+                  <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                    <img
+                      src={userPictures[type]}
+                      alt={`${type} progress picture`}
+                      height={200}
+                      className="pointer-events-none focus:outline-none group-hover:opacity-75"
+                    ></img>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPictureType(type);
+                        setShowPictureModal(true);
+                      }}
+                      className="absolute inset-0 focus:outline-none"
+                    >
+                      <span className="sr-only">Edit</span>
+                    </button>
+                  </div>
+                  <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
+                    {capitalizeFirstLetter(type)}
+                  </p>
+                </li>
+              ))}
+          </ul>
+        )}
+
         {(amITheClient || weights?.length > 0) && (
           <div className="relative pt-2">
             <div
