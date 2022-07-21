@@ -6,6 +6,8 @@ import { supabase, dateToString } from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import { compressAccurately } from "image-conversion";
+import { pictureTypes } from "../../../utils/picture-utils";
+import { usePictures } from "../../../context/picture-context";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -42,12 +44,14 @@ export default function PictureModal(props) {
   const [pictureUrl, setPictureUrl] = useState();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
+  const [pictureType, setPictureType] = useState(pictureTypes[0]);
+
   const [doesPictureExist, setDoesPictureExist] = useState(false);
 
   const onPictureFile = async (file) => {
     console.log("onPictureFile", file);
     const compressedFile = await compressAccurately(file, {
-      size: 50,
+      size: 30,
       type: "image/jpeg",
       width: 300,
       // FIX
@@ -61,6 +65,7 @@ export default function PictureModal(props) {
     setPictureUrl("");
     setPictureFile("");
     setDoesPictureExist(false);
+    setPictureType(pictureTypes[0]);
   };
   useEffect(() => {
     if (!open) {
@@ -68,28 +73,20 @@ export default function PictureModal(props) {
     }
   }, [open]);
 
-  const [isGettingPictureUrl, setIsGettingPictureUrl] = useState(false);
-  const getExistingPicture = async () => {
-    if (isGettingPictureUrl) {
-      return;
+  const { pictures, getPicture } = usePictures();
+  useEffect(() => {
+    if (open && pictureType && selectedDate) {
+      getPicture(user.id, { date: selectedDate, types: [pictureType] });
     }
-    setIsGettingPictureUrl(true);
-    const { signedURL, error } = await supabase.storage
-      .from("picture")
-      .createSignedUrl(`${user.id}/${dateToString(selectedDate)}.jpg`, 60);
-    if (error) {
-      console.error(error);
-    } else {
-      setPictureUrl(signedURL);
-      setDoesPictureExist(true);
-    }
-    setIsGettingPictureUrl(false);
-  };
+  }, [open, pictureType, selectedDate]);
+
   useEffect(() => {
     if (open) {
-      getExistingPicture();
+      const picture =
+        pictures?.[user?.id]?.[dateToString(selectedDate)]?.[pictureType];
+      setPictureUrl(picture);
     }
-  }, [open]);
+  }, [open, pictures, pictureType]);
 
   return (
     <Modal
@@ -133,25 +130,24 @@ export default function PictureModal(props) {
             setIsAddingPicture(true);
           }
 
+          const picturePath = `${user.id}/${dateToString(
+            selectedDate
+          )}_${pictureType}.jpg`;
+
           let uploadPictureData, uploadPictureError;
           if (pictureFile) {
             const { data, error } = await supabase.storage
               .from("picture")
-              .upload(
-                `${user.id}/${dateToString(selectedDate)}.jpg`,
-                pictureFile,
-                {
-                  cacheControl: "3600",
-                  upsert: true,
-                  contentType: "image/jpg",
-                }
-              );
+              .upload(picturePath, pictureFile, {
+                upsert: true,
+                contentType: "image/jpg",
+              });
             uploadPictureData = data;
             uploadPictureError = error;
           } else {
             const { data, error } = await supabase.storage
               .from("picture")
-              .remove([`${user.id}/${dateToString(selectedDate)}.jpg`]);
+              .remove([picturePath]);
 
             uploadPictureData = data;
             uploadPictureError = error;
@@ -187,7 +183,29 @@ export default function PictureModal(props) {
         }}
       >
         <div>
-          {!pictureUrl && !isGettingPictureUrl && (
+          <div className="col-span-1 mb-3">
+            <label
+              htmlFor="event"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Picture Type
+            </label>
+            <select
+              id="event"
+              name="event"
+              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              value={pictureType || ""}
+              onInput={(e) => {
+                setPictureType(e.target.value);
+              }}
+            >
+              {pictureTypes.map((type) => (
+                <option key={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          {!pictureUrl && (
             <div
               id="pictureUploadContainer"
               onDragOver={(e) => {

@@ -673,6 +673,7 @@ export default function Diary() {
     }
   }, [weights, lastWeightBeforeToday, firstWeightAfterToday, isUsingKilograms]);
 
+  // REPLACE
   const [gotPictureForUserId, setGotPictureForUserId] = useState();
   const [gotPictureForDate, setGotPictureForDate] = useState();
   const [pictureUrl, setPictureUrl] = useState();

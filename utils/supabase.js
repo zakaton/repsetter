@@ -61,7 +61,7 @@ export const dateFromDateAndTime = (date, time) => {
 };
 
 export const generateUrlSuffix = (object) => {
-  return object ? `?t=${new Date(object.updated_at).getTime()}` : "";
+  return object ? `t=${new Date(object.updated_at).getTime()}` : "";
 };
 
 export const timeToDate = (time) => {

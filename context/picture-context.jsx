@@ -1,52 +1,91 @@
 import { useState, createContext, useContext } from "react";
-import { supabase, generateUrlSuffix } from "../utils/supabase";
+import { pictureTypes } from "../utils/picture-utils";
+import {
+  supabase,
+  generateUrlSuffix,
+  dateToString,
+  stringToDate,
+} from "../utils/supabase";
 
 export const PicturesContext = createContext();
 
 export function PicturesContextProvider(props) {
-  const [pictures, setPictures] = useState({});
+  const [pictures, setPictures] = useState({}); // {userId: {date: {type: url}}}
 
-  const getPicture = async (id, dates, refresh = false) => {
-    console.log("requesting picture", id);
+  const getPicture = async (userId, config, refresh = false) => {
+    console.log("requesting picture", userId, config);
 
-    if (!pictures[id] || refresh) {
+    let { date } = config;
+    const { options, types = pictureTypes } = config;
+
+    let picturesList = [];
+    if (options) {
       const { data: list, error: listError } = await supabase.storage
         .from("picture")
-        .list(id);
+        .list(userId, options);
       if (listError) {
         console.error(listError);
-      }
-
-      const imageDetails = list?.find(({ name }) => name.startsWith("image"));
-
-      if (imageDetails) {
-        const { publicURL: PictureUrl, error: getPictureError } =
-          await supabase.storage
-            .from("picture")
-            .getPublicUrl(`${id}/image.jpg${generateUrlSuffix(imageDetails)}`);
-
-        if (getPictureError) {
-          console.error(getPictureError);
-        } else {
-          const newPictures = {
-            ...pictures,
-            [id]: {
-              url: PictureUrl,
-            },
-          };
-          console.log("newPictures", newPictures);
-          setPictures(newPictures);
-        }
       } else {
+        picturesList = list;
+      }
+    } else if (date) {
+      const { data: list, error: listError } = await supabase.storage
+        .from("picture")
+        .list(userId, { search: dateToString(date) });
+      if (listError) {
+        console.error(listError);
+      } else {
+        picturesList = list;
+      }
+    }
+
+    picturesList.forEach((picture) => {
+      const [dateString, type] = picture.name.split(".")[0].split("_");
+      picture.dateString = dateString;
+      picture.type = type;
+    });
+    console.log("picturesList", picturesList, pictures);
+    console.log(types);
+    picturesList = picturesList
+      .filter((picture) => types.includes(picture.type))
+      .filter(
+        (picture) =>
+          refresh || !pictures[userId]?.[picture.dateString]?.[picture.type]
+      );
+
+    console.log("picturesList", picturesList);
+
+    if (picturesList.length > 0) {
+      const picturePaths = picturesList.map(
+        (picture) => `${userId}/${picture.name}`
+      );
+      const { data: pictureUrls, error } = await supabase.storage
+        .from("picture")
+        .createSignedUrls(picturePaths, 60);
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("pictureUrls", pictureUrls);
         const newPictures = {
           ...pictures,
-          [id]: {},
         };
+        pictureUrls.forEach(({ path, signedURL }) => {
+          const [id, name] = path.split("/");
+          const [dateString, type] = name.split(".")[0].split("_");
+          newPictures[id] = newPictures[id] || {};
+          newPictures[id][dateString] = newPictures[id][dateString] || {};
+          newPictures[id][dateString][type] = signedURL;
+
+          const picture = picturesList.find((picture) => picture.name == name);
+          if (picture) {
+            newPictures[id][dateString][type] +=
+              "&" + generateUrlSuffix(picture);
+            console.log("FUCK", newPictures[id][dateString][type]);
+          }
+        });
         console.log("newPictures", newPictures);
         setPictures(newPictures);
       }
-    } else {
-      console.log(" picture cache hit");
     }
   };
 
