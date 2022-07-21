@@ -82,10 +82,6 @@ export default function Diary() {
     }
   }, []);
 
-  // FIX
-  window.s = supabase;
-  window.u = user;
-
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
   const [showAddExerciseNotification, setShowAddExerciseNotification] =
     useState(false);

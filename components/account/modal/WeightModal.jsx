@@ -34,6 +34,7 @@ export default function WeightModal(props) {
 
       setIsAddingWeight(false);
       setIsUpdatingWeight(false);
+      setPreviousIsUsingKilograms(null);
     }
   }, [open]);
 
@@ -57,8 +58,8 @@ export default function WeightModal(props) {
           setIsUsingKilograms(latestWeightToday.is_weight_in_kilograms);
           setIsWeightEmptyString(false);
         } else if (lastWeightBeforeToday) {
-          setWeight(lastWeightBeforeToday.weight);
           setIsUsingKilograms(lastWeightBeforeToday.is_weight_in_kilograms);
+          setWeight(lastWeightBeforeToday.weight);
           setIsWeightEmptyString(false);
         } else {
           setWeight(0);
@@ -86,6 +87,11 @@ export default function WeightModal(props) {
   const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
     useState(null);
   useEffect(() => {
+    if (!open) {
+      return;
+    }
+    console.log("previousIsUsingKilograms", previousIsUsingKilograms);
+    console.log("isUsingKilograms", isUsingKilograms);
     if (previousIsUsingKilograms === null) {
       setPreviousIsUsingKilograms(isUsingKilograms);
       return;

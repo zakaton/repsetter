@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { supabase } from "../utils/supabase";
 import { useUser } from "../context/user-context";
 import Notification from "./Notification";
@@ -36,7 +35,6 @@ export default function Table({
   modalListener,
   className,
 }) {
-  const router = useRouter();
   const { isLoading, user } = useUser();
   const { selectedClient } = useClient();
 
