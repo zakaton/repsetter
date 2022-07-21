@@ -22,12 +22,12 @@ export function ExerciseVideoContextProvider(props) {
 
       const { publicURL: url, error: getVideoUrlError } = await supabase.storage
         .from("exercise")
-        .getPublicUrl(`${id}/video.mp4&${generateUrlSuffix(videoDetails)}`);
+        .getPublicUrl(`${id}/video.mp4?${generateUrlSuffix(videoDetails)}`);
 
       const { publicURL: thumbnailUrl, error: getVideoPosterError } =
         await supabase.storage
           .from("exercise")
-          .getPublicUrl(`${id}/image.jpg&${generateUrlSuffix(imageDetails)}`);
+          .getPublicUrl(`${id}/image.jpg?${generateUrlSuffix(imageDetails)}`);
 
       if (getVideoUrlError || getVideoPosterError) {
         console.error(getVideoUrlError || getVideoPosterError);

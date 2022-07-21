@@ -23,7 +23,7 @@ export function CoachPicturesContextProvider(props) {
         const { publicURL: coachPictureUrl, error: getCoachPictureError } =
           await supabase.storage
             .from("coach-picture")
-            .getPublicUrl(`${id}/image.jpg&${generateUrlSuffix(imageDetails)}`);
+            .getPublicUrl(`${id}/image.jpg?${generateUrlSuffix(imageDetails)}`);
 
         if (getCoachPictureError) {
           console.error(getCoachPictureError);
