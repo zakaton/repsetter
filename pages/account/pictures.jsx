@@ -125,7 +125,7 @@ export default function Photos() {
     } else {
       console.log("pictures", pictures);
       pictures.forEach((picture) => {
-        const [id, name] = picture.path.split("/");
+        const [userId, name] = picture.path.split("/");
         const [dateString, type] = name.split(".")[0].split("_");
         const date = stringToDate(dateString);
         const details = picturesList.find((details) => details.name === name);
@@ -133,6 +133,7 @@ export default function Photos() {
           date,
           dateString,
           suffix: generateUrlSuffix(details),
+          type,
         });
       });
       setPictures(pictures);
@@ -147,7 +148,9 @@ export default function Photos() {
   }, [picturesList, pageIndex]);
 
   useEffect(() => {
-    getPicturesList();
+    if (picturesList) {
+      getPicturesList();
+    }
   }, [filters, containsFilters]);
 
   const [weights, setWeights] = useState();
@@ -263,7 +266,8 @@ export default function Photos() {
                     </MyLink>
                   </div>
                   <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                    {picture.date.toDateString()}
+                    {picture.date.toDateString()} (
+                    {capitalizeFirstLetter(picture.type)})
                   </p>
                   {weight && (
                     <p className="pointer-events-none block text-sm font-medium text-gray-500">
