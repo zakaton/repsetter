@@ -258,7 +258,7 @@ export default function Photos() {
               );
               return (
                 <li key={picture.path} className="relative">
-                  <div className="group block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                  <div className="group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                     <MyLink
                       onClick={() => {
                         setSelectedDate(picture.date);
@@ -276,12 +276,12 @@ export default function Photos() {
                       />
                     </MyLink>
                   </div>
-                  <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+                  <p className="pointer-events-none mt-2 block truncate text-center text-sm font-medium text-gray-900">
                     {picture.date.toDateString()} (
                     {capitalizeFirstLetter(picture.type)})
                   </p>
                   {weight && (
-                    <p className="pointer-events-none block text-sm font-medium text-gray-500">
+                    <p className="pointer-events-none block text-center text-sm font-medium text-gray-500">
                       {weight.weight}{" "}
                       {weight.is_weight_in_kilograms ? "kg" : "lbs"}
                     </p>
