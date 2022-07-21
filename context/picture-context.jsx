@@ -1,4 +1,5 @@
 import { useState, createContext, useContext } from "react";
+import { pictureTypes } from "../utils/picture-utils";
 import { supabase, generateUrlSuffix, dateToString } from "../utils/supabase";
 
 export const PicturesContext = createContext();
@@ -12,7 +13,7 @@ export function PicturesContextProvider(props) {
     let { date } = config;
     const dateString = date ? dateToString(date) : "";
 
-    const { options } = config;
+    const { options, types = pictureTypes } = config;
 
     let picturesList = [];
     if (options) {
@@ -41,10 +42,13 @@ export function PicturesContextProvider(props) {
       picture.type = type;
     });
     console.log("picturesList", picturesList, pictures);
-    picturesList = picturesList.filter(
-      (picture) =>
-        refresh || !pictures[userId]?.[picture.dateString]?.[picture.type]
-    );
+    console.log(types);
+    picturesList = picturesList
+      .filter((picture) => types.includes(picture.type))
+      .filter(
+        (picture) =>
+          refresh || !pictures[userId]?.[picture.dateString]?.[picture.type]
+      );
 
     console.log("picturesList", picturesList);
 
