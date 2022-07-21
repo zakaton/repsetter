@@ -47,11 +47,11 @@ ChartJS.register(
 const defaultDateRange = "past month";
 const graphTypeOrder = [
   "top set",
+  "bodyweight",
   "number of sets",
   "number of reps",
   "difficulty",
   "exercise time",
-  "bodyweight",
 ];
 const dateRangeFilterType = {
   name: "Date Range",
@@ -557,6 +557,28 @@ export default function Progress() {
 
     const isWeightInKgs = (filters["weight-unit"] || "kg") === "kg";
     const isBodyweightInKgs = (filters["bodyweight-unit"] || "lbs") === "kg";
+    let numberOfAvailableTypes = 2;
+    if (containsFilters.type?.includes("top set")) {
+      numberOfAvailableTypes -= 1;
+    }
+    if (containsFilters.type?.includes("bodyweight")) {
+      numberOfAvailableTypes -= 1;
+    }
+    const typesToDisplay = graphTypeOrder
+      .slice(2)
+      .filter((type) => containsFilters.type?.includes(type))
+      .slice(0, numberOfAvailableTypes);
+    console.log("typesToDisplay", typesToDisplay);
+
+    const getPosition = (type) =>
+      typesToDisplay.indexOf(type) === 0 &&
+      (typesToDisplay.length === 2 || numberOfAvailableTypes == 2)
+        ? "left"
+        : "right";
+    const getGridDrawOnChartArea = (type) =>
+      typesToDisplay.indexOf(type) === 0 &&
+      (typesToDisplay.length === 2 || numberOfAvailableTypes == 2);
+
     const newChartOptions = {
       scales: {
         x: {
@@ -583,16 +605,40 @@ export default function Progress() {
         },
         y1: {
           type: "linear",
-          display: false,
+          display: typesToDisplay.includes("number of sets"),
           beginAtZero: true,
+          position: getPosition("number of sets"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("number of sets"),
+          },
+          title: {
+            display: true,
+            text: `Number of Sets`,
+          },
         },
         y2: {
           type: "linear",
-          display: false,
+          display: typesToDisplay.includes("number of reps"),
+          position: getPosition("number of reps"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("number of reps"),
+          },
+          title: {
+            display: true,
+            text: `Number of Reps`,
+          },
         },
         y3: {
           type: "linear",
-          display: false,
+          display: typesToDisplay.includes("difficulty"),
+          position: getPosition("difficulty"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("difficulty"),
+          },
+          title: {
+            display: true,
+            text: `Difficulty`,
+          },
         },
         y4: {
           type: "linear",
@@ -601,7 +647,7 @@ export default function Progress() {
             ? "right"
             : "left",
           title: {
-            display: containsFilters.type?.includes("bodyweight"),
+            display: true,
             text: `Bodyweight (${isBodyweightInKgs ? "kg" : "lbs"})`,
           },
           grid: {
@@ -611,9 +657,17 @@ export default function Progress() {
         },
         y5: {
           type: "linear",
-          display: false,
+          display: typesToDisplay.includes("exercise time"),
           min: 0,
           max: 1,
+          position: getPosition("exercise time"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("exercise time"),
+          },
+          title: {
+            display: true,
+            text: `Exercise Time`,
+          },
         },
       },
       responsive: true,
