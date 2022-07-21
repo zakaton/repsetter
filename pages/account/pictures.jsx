@@ -294,7 +294,7 @@ export default function Photos() {
         {pictures && (
           <Pagination
             name={"picture"}
-            numberOfResults={pictures.length}
+            numberOfResults={picturesList.length}
             numberOfResultsPerPage={numberOfPicturesPerPage}
             pageIndex={pageIndex}
             setPageIndex={setPageIndex}
