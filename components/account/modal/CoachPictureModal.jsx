@@ -123,6 +123,7 @@ export default function CoachPictureModal(props) {
           }
 
           let uploadPictureData, uploadPictureError;
+          let actionString;
           if (pictureFile) {
             if (doesPictureExist) {
               console.log("update picture");
@@ -134,6 +135,7 @@ export default function CoachPictureModal(props) {
                 });
               uploadPictureData = data;
               uploadPictureError = error;
+              actionString = "Update";
             } else {
               console.log("upload picture");
               const { data, error } = await supabase.storage
@@ -144,6 +146,7 @@ export default function CoachPictureModal(props) {
                 });
               uploadPictureData = data;
               uploadPictureError = error;
+              actionString = "Upload";
             }
           } else if (!pictureUrl) {
             console.log("remove picture");
@@ -153,22 +156,21 @@ export default function CoachPictureModal(props) {
 
             uploadPictureData = data;
             uploadPictureError = error;
+            actionString = "Remove";
           }
 
           console.log("uploadPictureData", uploadPictureData);
           if (uploadPictureError) {
             status = {
               type: "failed",
-              title: `Failed to ${
-                doesPictureExist ? "Update" : "Upload"
-              } Picture`,
+              title: `Failed to ${actionString} Picture`,
               message: uploadPictureError.message,
             };
           } else {
             status = {
               type: "succeeded",
               title: `Successfully ${
-                doesPictureExist ? "Updated" : "Uploaded"
+                actionString + (actionString.endsWith("e") ? "d" : "")
               } Picture`,
             };
           }

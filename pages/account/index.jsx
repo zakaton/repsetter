@@ -131,7 +131,8 @@ export default function AccountGeneral() {
                       onClick={() => setShowCoachPictureModal(true)}
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-1 px-2 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                      {coachPictures?.[user?.id] ? "Update" : "Set"} Picture
+                      {coachPictures?.[user?.id]?.url ? "Update" : "Add"}{" "}
+                      Picture
                     </button>
                   </dd>
                 </div>
