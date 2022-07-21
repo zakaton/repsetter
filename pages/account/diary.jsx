@@ -928,7 +928,7 @@ export default function Diary() {
         {Object.keys(userPictures).length > 0 && (
           <ul
             role="list"
-            className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+            className="mt-4 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
           >
             {pictureTypes
               .filter((type) => type in userPictures)

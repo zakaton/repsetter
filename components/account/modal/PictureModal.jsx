@@ -13,6 +13,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+const capitalizeFirstLetter = (string) =>
+  string[0].toUpperCase() + string.slice(1).toLowerCase();
+
 export default function PictureModal(props) {
   const {
     open,
@@ -216,7 +219,9 @@ export default function PictureModal(props) {
               }}
             >
               {pictureTypes.map((type) => (
-                <option key={type}>{type}</option>
+                <option key={type} value={type}>
+                  {capitalizeFirstLetter(type)}
+                </option>
               ))}
             </select>
           </div>
