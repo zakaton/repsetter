@@ -61,10 +61,7 @@ export default function ExerciseTypeVideo(
         autoPlay={true}
         muted={true}
         loop={true}
-        className={classNames(
-          "aspect-[4/3]",
-          showVideo || isMobile ? "" : "hidden"
-        )}
+        className={classNames("aspect-[4/3]", showVideo ? "" : "hidden")}
         playsInline={true}
         controls={false}
         ref={videoRef}
@@ -73,10 +70,7 @@ export default function ExerciseTypeVideo(
         width={width}
         height={height}
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
-        className={classNames(
-          "aspect-[4/3]",
-          showVideo || isMobile ? "hidden" : ""
-        )}
+        className={classNames("aspect-[4/3]", showVideo ? "hidden" : "")}
       ></img>
     </div>
   );
