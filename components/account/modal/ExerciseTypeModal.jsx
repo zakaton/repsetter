@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { PencilAltIcon } from "@heroicons/react/outline";
-import { muscles, muscleGroups } from "../../../utils/exercise-utils";
+import { muscles, muscleGroups, features } from "../../../utils/exercise-utils";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
 import { compressAccurately } from "image-conversion";
@@ -14,7 +14,7 @@ function classNames(...classes) {
 const videoFileSizeLimit = 60 * 1024;
 
 const areArraysTheSame = (a, b) =>
-  a.length === b.length && a.every((value, index) => value === b[index]);
+  a?.length === b?.length && a?.every((value, index) => value === b?.[index]);
 
 export default function ExerciseTypeModal(props) {
   const {
@@ -46,6 +46,7 @@ export default function ExerciseTypeModal(props) {
   const resetUI = () => {
     setExerciseTypeName("");
     setSelectedMuscles([]);
+    setSelectedFeatures([]);
     setVideoUrl("");
     setVideoFile("");
     setSelectedExerciseType?.();
@@ -72,6 +73,7 @@ export default function ExerciseTypeModal(props) {
   const [videoFile, setVideoFile] = useState();
 
   const [selectedMuscles, setSelectedMuscles] = useState([]);
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
 
   useEffect(() => {
     if (selectedExerciseType) {
@@ -79,6 +81,11 @@ export default function ExerciseTypeModal(props) {
       setSelectedMuscles(
         muscles.filter((muscle) =>
           selectedExerciseType?.muscles?.includes(muscle.name)
+        )
+      );
+      setSelectedFeatures(
+        features.filter((feature) =>
+          selectedExerciseType?.features?.includes(feature)
         )
       );
       getExerciseVideo(selectedExerciseType.id);
@@ -176,7 +183,8 @@ export default function ExerciseTypeModal(props) {
               !areArraysTheSame(
                 selectedExerciseType.muscles,
                 flattenedSelectedMuscles
-              )
+              ) ||
+              !areArraysTheSame(selectedExerciseType.features, selectedFeatures)
             ) {
               console.log("updating exercise row");
               const { data: updateExerciseType, error } = await supabase
@@ -184,6 +192,7 @@ export default function ExerciseTypeModal(props) {
                 .update({
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
+                  features: selectedFeatures,
                 })
                 .match({ id: selectedExerciseType.id });
               updateExerciseError = error;
@@ -254,6 +263,7 @@ export default function ExerciseTypeModal(props) {
                 {
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
+                  features: selectedFeatures,
                 },
               ]);
             if (createdExerciseError) {
@@ -358,7 +368,7 @@ export default function ExerciseTypeModal(props) {
               const muscle = muscles.find(
                 (muscle) => muscle.name === e.target.value
               );
-              if (muscle) {
+              if (muscle && !selectedMuscles.includes(muscle)) {
                 setSelectedMuscles(selectedMuscles.concat(muscle));
                 e.target.setCustomValidity("");
               }
@@ -417,6 +427,71 @@ export default function ExerciseTypeModal(props) {
             ))}
           </div>
         </div>
+
+        <div className="my-4">
+          <label
+            htmlFor="features"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Features
+          </label>
+          <select
+            id="features"
+            name="features"
+            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+            value={""}
+            onInput={(e) => {
+              const feature = e.target.value;
+              if (!selectedFeatures.includes(feature)) {
+                setSelectedFeatures(selectedFeatures.concat(feature));
+                e.target.setCustomValidity("");
+              }
+            }}
+          >
+            <option value="">Select feature</option>
+            {features
+              .filter((feature) => !selectedFeatures.includes(feature))
+              .map((feature) => (
+                <option key={feature}>{feature}</option>
+              ))}
+          </select>
+          <div className="mt-2">
+            {selectedFeatures.map((feature) => (
+              <span
+                key={feature}
+                className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
+              >
+                <span>{feature}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFeatures(
+                      selectedFeatures.filter(
+                        (_feature) => _feature !== feature
+                      )
+                    );
+                  }}
+                  className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
+                >
+                  <span className="sr-only">Remove filter for {feature}</span>
+                  <svg
+                    className="h-2 w-2"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 8 8"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeWidth="1.5"
+                      d="M1 1l6 6m0-6L1 7"
+                    />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Video

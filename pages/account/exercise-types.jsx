@@ -115,14 +115,18 @@ export default function ExerciseTypes() {
             title: "name",
             value: result.name,
           },
-          result.muscles && {
-            title: "muscles",
-            value: result.muscles.join(", "),
-          },
           result.id in exerciseVideos && {
             jsx: (
               <ExerciseTypeVideo exerciseTypeId={result.id}></ExerciseTypeVideo>
             ),
+          },
+          result.muscles && {
+            title: "muscles",
+            value: result.muscles.join(", "),
+          },
+          result.features && {
+            title: "features",
+            value: result.features.join(", "),
           },
           isAdmin && {
             jsx: (

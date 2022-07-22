@@ -10,6 +10,8 @@ muscles.forEach((muscle, index) => {
   muscle.index = index;
 });
 
+export const features = ["reps", "weight", "speed", "level"];
+
 const kilogramToPoundRatio = 2.2046;
 export const kilogramsToPounds = (kilograms) =>
   kilograms * kilogramToPoundRatio;
