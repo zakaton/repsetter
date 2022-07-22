@@ -97,7 +97,7 @@ export default function Home() {
 
           <div className="relative -mx-4 mt-10 lg:mt-0" aria-hidden="true">
             <img
-              className="relative mx-auto"
+              className="relative mx-auto overflow-hidden rounded-md"
               width={490}
               src="https://tailwindui.com/img/features/feature-example-1.png"
               alt=""

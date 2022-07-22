@@ -194,7 +194,7 @@ export default function Subscription({ subscriptionId, setCoachEmail }) {
                         alt="coach picture"
                         src={coachPicture}
                         width={250}
-                        className="m-auto mt-2 sm:col-start-1"
+                        className="m-auto mt-2 overflow-hidden rounded-md sm:col-start-1"
                       />
                     )}
                     {!isLoading && !user && (

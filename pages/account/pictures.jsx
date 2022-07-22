@@ -258,7 +258,7 @@ export default function Photos() {
               );
               return (
                 <li key={picture.path} className="relative flex flex-col">
-                  <div className="group m-auto block w-fit overflow-hidden bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                  <div className="group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                     <MyLink
                       onClick={() => {
                         setSelectedDate(picture.date);

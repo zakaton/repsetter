@@ -954,23 +954,37 @@ export default function Diary() {
               .filter((type) => type in userPictures)
               .map((type) => (
                 <li className="relative flex flex-col" key={type}>
-                  <div className="group m-auto block w-fit overflow-hidden bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                  <div
+                    className={classNames(
+                      "group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100",
+                      amITheClient
+                        ? "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+                        : ""
+                    )}
+                  >
                     <img
                       src={userPictures[type]}
                       alt={`${type} progress picture`}
                       height={200}
-                      className="pointer-events-none focus:outline-none group-hover:opacity-75"
+                      className={classNames(
+                        "pointer-events-none",
+                        amITheClient
+                          ? "focus:outline-none group-hover:opacity-75"
+                          : ""
+                      )}
                     ></img>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPictureType(type);
-                        setShowPictureModal(true);
-                      }}
-                      className="absolute inset-0 focus:outline-none"
-                    >
-                      <span className="sr-only">Edit</span>
-                    </button>
+                    {amITheClient && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPictureType(type);
+                          setShowPictureModal(true);
+                        }}
+                        className="absolute inset-0 focus:outline-none"
+                      >
+                        <span className="sr-only">Edit</span>
+                      </button>
+                    )}
                   </div>
                   <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
                     {capitalizeFirstLetter(type)}
