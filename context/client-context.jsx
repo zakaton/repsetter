@@ -27,7 +27,7 @@ export function ClientContextProvider(props) {
       const { data: clients } = await supabase
         .from("subscription")
         .select("*")
-        .match({ coach: user.id });
+        .match({ coach: user.id, redeemed: true });
       console.log("fetched clients", clients);
       setClients(clients);
       setIsGettingClients(false);
