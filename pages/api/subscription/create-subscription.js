@@ -81,7 +81,7 @@ export default async function handler(req, res) {
   const { data: picturesList, error: listPicturesError } =
     await supabase.storage
       .from("coach-picture")
-      .list(profile.id, { limit: 1, search: "coach-picture" });
+      .list(profile.id, { limit: 1, search: "image" });
   if (listPicturesError) {
     console.error(listPicturesError);
   } else {

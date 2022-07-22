@@ -17,6 +17,8 @@ export function CoachPicturesContextProvider(props) {
         console.error(listError);
       }
 
+      console.log("coachesList", list);
+
       const imageDetails = list?.find(({ name }) => name.startsWith("image"));
 
       if (imageDetails) {
