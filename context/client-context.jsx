@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useContext } from "react";
 import { useUser } from "./user-context";
-import { supabase } from "../utils/supabase";
+import { isUserAdmin, supabase } from "../utils/supabase";
 import { useRouter } from "next/router";
 
 export const ClientContext = createContext();
@@ -14,7 +14,7 @@ const pathnamesForQuery = [
 ].map((pathname) => "/account/" + pathname);
 
 export function ClientContextProvider(props) {
-  const { user, isLoading } = useUser();
+  const { user, isLoading, isAdmin } = useUser();
 
   const [clients, setClients] = useState();
   const [selectedClient, setSelectedClient] = useState();
@@ -77,6 +77,25 @@ export function ClientContextProvider(props) {
   const router = useRouter();
 
   const [initialClientEmail, setInitialClientEmail] = useState();
+  const getUserProfile = async () => {
+    console.log("getUserProfile", initialClientEmail);
+    const { data: profile, error } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("email", initialClientEmail)
+      .maybeSingle();
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("getUserProfileResult", profile);
+      if (profile) {
+        setSelectedClient({
+          client_email: profile.email,
+          client: profile.id,
+        });
+      }
+    }
+  };
   useEffect(() => {
     if (clients && initialClientEmail) {
       const selectedClient = clients.find(
@@ -84,6 +103,9 @@ export function ClientContextProvider(props) {
       );
       if (selectedClient) {
         setSelectedClient(selectedClient);
+      } else if (isAdmin) {
+        console.log("getting user outside of clients", initialClientEmail);
+        getUserProfile();
       }
     }
   }, [clients, initialClientEmail]);
