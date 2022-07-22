@@ -953,7 +953,7 @@ export default function Diary() {
             {pictureTypes
               .filter((type) => type in userPictures)
               .map((type) => (
-                <li className="relative" key={type}>
+                <li className="relative flex flex-col" key={type}>
                   <div className="group m-auto block w-fit overflow-hidden bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                     <img
                       src={userPictures[type]}

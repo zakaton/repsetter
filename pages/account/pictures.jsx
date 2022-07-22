@@ -257,7 +257,7 @@ export default function Photos() {
                 (weight) => weight.date === picture.dateString
               );
               return (
-                <li key={picture.path} className="relative">
+                <li key={picture.path} className="relative flex flex-col">
                   <div className="group m-auto block w-fit overflow-hidden bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                     <MyLink
                       onClick={() => {
