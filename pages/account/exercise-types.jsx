@@ -58,9 +58,7 @@ export default function ExerciseTypes() {
   const [results, setResults] = useState();
   useEffect(() => {
     if (results) {
-      results.forEach((result) => {
-        getExerciseVideo(result.id);
-      });
+      getExerciseVideo(results.map(({ id }) => id));
     }
   }, [results]);
 
@@ -120,11 +118,11 @@ export default function ExerciseTypes() {
               <ExerciseTypeVideo exerciseTypeId={result.id}></ExerciseTypeVideo>
             ),
           },
-          result.muscles && {
+          result.muscles?.length > 0 && {
             title: "muscles",
             value: result.muscles.join(", "),
           },
-          result.features && {
+          result.features?.length > 0 && {
             title: "features",
             value: result.features.join(", "),
           },
