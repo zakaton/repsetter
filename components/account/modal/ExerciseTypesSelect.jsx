@@ -140,7 +140,7 @@ export default function ExerciseTypesSelect({
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
                     <ExerciseTypeVideo
-                      play={active}
+                      play={active || isMobile}
                       exerciseTypeId={exerciseType.id}
                       width="100"
                       height="75"
