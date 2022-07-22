@@ -166,7 +166,7 @@ export default function Diary() {
     if (exercises) {
       console.log(`subscribing to exercise updates`);
       const subscription = supabase
-        .from(`exercise:date=eq.${dateToString(selectedDate)}`)
+        .from(`exercise:client=eq.${selectedClientId}`)
         .on("INSERT", (payload) => {
           console.log(`new exercise`, payload);
           getExercises(true);
@@ -477,7 +477,7 @@ export default function Diary() {
     if (weights) {
       console.log(`subscribing to weight updates`);
       const subscription = supabase
-        .from(`weight:date=eq.${dateToString(selectedDate)}`)
+        .from(`weight:client=eq.${selectedClientId}`)
         .on("INSERT", (payload) => {
           console.log(`new weight`, payload);
           getWeights(true);
