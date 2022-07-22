@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import LazyVideo from "./LazyVideo";
 import { useExerciseVideos } from "../context/exercise-videos-context";
-import { isMobile } from "react-device-detect";
+import { isMobile, isDesktop } from "react-device-detect";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -45,8 +45,16 @@ export default function ExerciseTypeVideo(
 
   return (
     <div
-      onMouseEnter={(e) => setShowVideo(true)}
-      onMouseLeave={(e) => setShowVideo(false)}
+      onMouseEnter={(e) => {
+        if (isDesktop) {
+          setShowVideo(true);
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (isDesktop) {
+          setShowVideo(false);
+        }
+      }}
     >
       <LazyVideo
         onSuspend={(e) => {
