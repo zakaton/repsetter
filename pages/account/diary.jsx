@@ -166,7 +166,7 @@ export default function Diary() {
     if (exercises) {
       console.log(`subscribing to exercise updates`);
       const subscription = supabase
-        .from(`exercise:date=eq.${selectedDate.toDateString()}`)
+        .from(`exercise:date=eq.${dateToString(selectedDate)}`)
         .on("INSERT", (payload) => {
           console.log(`new exercise`, payload);
           getExercises(true);
@@ -372,6 +372,13 @@ export default function Diary() {
   const [lastWeightBeforeToday, setLastWeightBeforeToday] = useState();
   const [firstWeightAfterToday, setFirstWeightAfterToday] = useState();
   const getWeights = async (refresh) => {
+    console.log(
+      "getWeights",
+      weights,
+      refresh,
+      selectedClientId,
+      isGettingWeights
+    );
     if (weights && !refresh) {
       return;
     }
@@ -444,6 +451,7 @@ export default function Diary() {
         setFirstWeightAfterToday(firstWeightAfterToday);
       }
     }
+    console.log("done getting weights");
     setIsGettingWeights(false);
   };
 
@@ -469,7 +477,7 @@ export default function Diary() {
     if (weights) {
       console.log(`subscribing to weight updates`);
       const subscription = supabase
-        .from(`weight:date=eq.${selectedDate.toDateString()}`)
+        .from(`weight:date=eq.${dateToString(selectedDate)}`)
         .on("INSERT", (payload) => {
           console.log(`new weight`, payload);
           getWeights(true);
@@ -495,6 +503,19 @@ export default function Diary() {
       };
     }
   }, [weights]);
+
+  useEffect(() => {
+    if (weightStatus?.type === "succeeded") {
+      getWeights(true);
+      getWeightDates();
+    }
+  }, [weightStatus]);
+  useEffect(() => {
+    if (deleteWeightStatus?.type === "succeeded") {
+      getWeights(true);
+      getWeightDates();
+    }
+  }, [deleteWeightStatus]);
 
   const [isUsingKilograms, setIsUsingKilograms] = useState(false);
 
