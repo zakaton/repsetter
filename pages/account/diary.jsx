@@ -898,30 +898,29 @@ export default function Diary() {
           </div>
           <div className="relative flex justify-end sm:justify-center">
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && !isSelectedDateAfterToday && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPictureModal(true);
-                  }}
-                  className={classNames(
-                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                    "rounded-md"
-                  )}
-                >
-                  {Object.keys(userPictures).length > 0 ? (
-                    <>
-                      <span className="sr-only">Edit Picture</span>
-                      <PencilIcon className="h-5 w-5" aria-hidden="true" />
-                    </>
-                  ) : (
-                    <>
-                      <span className="sr-only">Add Picture</span>
-                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                    </>
-                  )}
-                </button>
-              )}
+              {amITheClient &&
+                !isSelectedDateAfterToday &&
+                userPictures &&
+                Object.keys(userPictures).length < pictureTypes.length && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const existingTypes = Object.keys(userPictures);
+                      const newPictureType = pictureTypes.find(
+                        (type) => !existingTypes.includes(type)
+                      );
+                      setPictureType(newPictureType);
+                      setShowPictureModal(true);
+                    }}
+                    className={classNames(
+                      "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                      "rounded-md"
+                    )}
+                  >
+                    <span className="sr-only">Add Picture</span>
+                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                )}
             </span>
           </div>
         </div>
