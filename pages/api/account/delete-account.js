@@ -61,7 +61,7 @@ export default async function handler(req, res) {
   }
 
   const profile = await getUserProfile(userToDelete, supabase);
-
+  console.log("profileToDelete", profile);
   const { data: coachingSubscriptions } = await supabase
     .from("subscription")
     .select("*, client(*)")
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
   await Promise.all(
     coachingSubscriptions.map(async (coachingSubscription) => {
       const { client } = coachingSubscription;
-      const coaches = client.coaches || [];
+      const coaches = client?.coaches || [];
       if (coaches.includes(profile.id)) {
         coaches.splice(coaches.indexOf(profile.id), 1);
         console.log("updated coaches", coaches, "for client", client);
