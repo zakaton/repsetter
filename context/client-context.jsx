@@ -89,10 +89,13 @@ export function ClientContextProvider(props) {
     } else {
       console.log("getUserProfileResult", profile);
       if (profile) {
-        setSelectedClient({
+        const newClient = {
           client_email: profile.email,
           client: profile.id,
-        });
+        };
+        const newClients = [...clients, newClient];
+        setClients(newClients);
+        setSelectedClient(newClient);
       }
     }
   };
