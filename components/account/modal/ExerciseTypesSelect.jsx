@@ -162,13 +162,8 @@ export default function ExerciseTypesSelect({
                         )}
                       >
                         ({exerciseType.muscles.slice(0, -1).join(", ")}
-                        {exerciseType.muscles.length > 1
-                          ? " and " +
-                            exerciseType.muscles[
-                              exerciseType.muscles.length - 1
-                            ]
-                          : ""}
-                        )
+                        {exerciseType.muscles.length > 1 ? " and " : ""}
+                        {exerciseType.muscles[exerciseType.muscles.length - 1]})
                       </span>
                     </div>
 
