@@ -4,6 +4,7 @@ import { Combobox } from "@headlessui/react";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
 import ExerciseTypeVideo from "../../ExerciseTypeVideo";
+import { isMobile } from "react-device-detect";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -139,7 +140,7 @@ export default function ExerciseTypesSelect({
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
                     <ExerciseTypeVideo
-                      play={active}
+                      play={active || isMobile}
                       exerciseTypeId={exerciseType.id}
                       width="100"
                       height="75"
