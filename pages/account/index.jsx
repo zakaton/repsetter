@@ -117,7 +117,7 @@ export default function AccountGeneral() {
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                     {coachPictures?.[user?.id]?.url && (
-                      <div className="group relative mb-3 block w-fit overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                      <div className="group relative mb-3 block w-fit overflow-hidden bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                         <img
                           alt="coach picture"
                           src={coachPictures[user.id].url}

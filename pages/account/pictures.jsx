@@ -276,7 +276,7 @@ export default function Photos() {
                       />
                     </MyLink>
                   </div>
-                  <p className="pointer-events-none mt-2 block truncate text-center text-sm font-medium text-gray-900">
+                  <p className="pointer-events-none mt-2 block text-center text-sm font-medium text-gray-900">
                     {picture.date.toDateString()} (
                     {capitalizeFirstLetter(picture.type)})
                   </p>
