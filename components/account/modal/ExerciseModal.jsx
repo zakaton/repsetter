@@ -558,7 +558,7 @@ export default function ExerciseModal(props) {
                     {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"})
                   </dt>
                   <dd className="mt-1 break-words text-sm text-gray-900">
-                    {previousExercise.number_of_reps_performed
+                    {previousExercise.weight_performed
                       .map(
                         (weight, index) =>
                           `${weight}/${

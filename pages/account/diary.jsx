@@ -194,6 +194,19 @@ export default function Diary() {
   }, [exercises]);
 
   useEffect(() => {
+    if (addExerciseStatus?.type === "succeeded") {
+      getExercises(true);
+      getExerciseDates();
+    }
+  }, [addExerciseStatus]);
+  useEffect(() => {
+    if (deleteExerciseStatus?.type === "succeeded") {
+      getExercises(true);
+      getExerciseDates();
+    }
+  }, [deleteExerciseStatus]);
+
+  useEffect(() => {
     if (exercises) {
       exercises.forEach((exercise) => getExerciseVideo(exercise.type.id));
     }
