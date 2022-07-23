@@ -151,11 +151,16 @@ export default function Bodyweight() {
                 timeStyle: "short",
               }),
             },
+            {
+              title: "weight",
+              value: `${weight.weight} (${
+                weight.is_weight_in_kilograms ? "kg" : "lbs"
+              })`,
+            },
             weight.event && {
               title: "event",
               value: weight.event,
             },
-            ...pictureItems,
             {
               jsx: (
                 <button
@@ -169,6 +174,7 @@ export default function Bodyweight() {
                 </button>
               ),
             },
+            ...pictureItems,
             {
               jsx: (
                 <MyLink
