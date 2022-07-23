@@ -61,6 +61,8 @@ export default function ExerciseModal(props) {
 
   const [selectedExerciseType, setSelectedExerciseType] = useState(null);
   const [numberOfSets, setNumberOfSets] = useState(3);
+  const [isNumberOfSetsEmptyString, setIsNumberOfSetsEmptyString] =
+    useState(false);
   const [numberOfSetsPerformed, setNumberOfSetsPerformed] = useState(0);
   const [isSetsPerformedEmptyString, setIsSetsPerformedEmptyString] =
     useState(false);
@@ -70,6 +72,9 @@ export default function ExerciseModal(props) {
 
   const [sameRepsForEachSet, setSameRepsForEachSet] = useState(true);
   const [numberOfReps, setNumberOfReps] = useState([10]);
+  const [isNumberOfRepsEmptyString, setIsNumberOfRepsEmptyString] = useState(
+    []
+  );
   const [numberOfRepsPerformed, setNumberOfRepsPerformed] = useState(0);
   const [isRepsPerformedEmptyString, setIsRepsPerformedEmptyString] = useState(
     []
@@ -145,12 +150,20 @@ export default function ExerciseModal(props) {
     setIsAddingExercise(false);
     setDidAddExercise(false);
     setSelectedExerciseType(null);
+
     setNumberOfSets(3);
+    setIsNumberOfSetsEmptyString(false);
+
     setNumberOfReps([10]);
-    setWeight([0]);
-    setIsWeightInputEmptyString([]);
     setSameRepsForEachSet(true);
+    setIsNumberOfRepsEmptyString([]);
+
+    setWeight([0]);
     setSameWeightForEachSet(true);
+    setIsWeightInputEmptyString([]);
+
+    setRestDuration([0]);
+    setIsRestDurationEmptyString([]);
 
     setIsUpdatingExercise(false);
     setDidUpdateExercise(false);
@@ -276,6 +289,16 @@ export default function ExerciseModal(props) {
     }
   }, [previousExercise]);
 
+  const [includeRestDuration, setIncludeRestDuration] = useState(false);
+  const [restDuration, setRestDuration] = useState([0]);
+  const [isRestDurationEmptyString, setIsRestDurationEmptyString] = useState(
+    []
+  );
+  const [sameRestDurationForEachSet, setSameRestDurationForEachSet] =
+    useState(false);
+
+  const [setDuration, setSetDuration] = useState([]);
+
   useEffect(() => {
     if (previousExercise) {
       setNumberOfSets(previousExercise.number_of_sets_assigned);
@@ -359,6 +382,11 @@ export default function ExerciseModal(props) {
               video,
 
               time: includeTimePerformed ? timePerformed : null,
+
+              rest_duration: includeRestDuration ? restDuration : null,
+              set_duration: selectedExerciseType.features?.includes("duration")
+                ? setDuration
+                : null,
             };
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
@@ -402,6 +430,11 @@ export default function ExerciseModal(props) {
                 ? user.email
                 : selectedClient.client_email,
               time: includeTimePerformed ? timePerformed : null,
+
+              rest_duration: includeRestDuration ? restDuration : null,
+              set_duration: selectedExerciseType.features?.includes("duration")
+                ? setDuration
+                : null,
             };
             if (!amITheClient) {
               Object.assign(createExerciseData, {
@@ -660,7 +693,7 @@ export default function ExerciseModal(props) {
             <div>
               <label
                 htmlFor="sets"
-                className="block text-sm font-medium text-gray-700"
+                className="block select-none text-sm font-medium text-gray-700"
               >
                 Sets
               </label>
@@ -671,23 +704,35 @@ export default function ExerciseModal(props) {
                   inputMode="numeric"
                   min="1"
                   max="10"
-                  value={numberOfSets}
+                  placeholder={0}
+                  value={isNumberOfSetsEmptyString ? "" : numberOfSets}
                   onInput={(e) => {
+                    setIsNumberOfSetsEmptyString(e.target.value === "");
+
                     const newNumberOfSets = Number(e.target.value);
                     if (sameRepsForEachSet) {
                       setNumberOfReps([numberOfReps[0]]);
+                    } else {
+                      setNumberOfReps(
+                        new Array(newNumberOfSets).fill(numberOfReps[0])
+                      );
+                      setIsNumberOfRepsEmptyString(
+                        new Array(newNumberOfSets).fill(
+                          isNumberOfRepsEmptyString[0]
+                        )
+                      );
+                    }
+
+                    if (sameWeightForEachSet) {
+                      setIsWeightInputEmptyString([
+                        isWeightInputEmptyString[0],
+                      ]);
                       setWeight(
                         isUsingKilograms
                           ? [weightKilograms[0]]
                           : [weightPounds[0]]
                       );
-                      setIsWeightInputEmptyString([
-                        isWeightInputEmptyString[0],
-                      ]);
                     } else {
-                      setNumberOfReps(
-                        new Array(newNumberOfSets).fill(numberOfReps[0])
-                      );
                       setWeight(
                         isUsingKilograms
                           ? new Array(newNumberOfSets).fill(weightKilograms[0])
@@ -699,6 +744,20 @@ export default function ExerciseModal(props) {
                         )
                       );
                     }
+
+                    if (sameRestDurationForEachSet) {
+                      setRestDuration([restDuration[0]]);
+                    } else {
+                      setRestDuration(
+                        new Array(newNumberOfSets).fill(restDuration[0])
+                      );
+                      setIsRestDurationEmptyString(
+                        new Array(newNumberOfSets).fill(
+                          isRestDurationEmptyString[0]
+                        )
+                      );
+                    }
+
                     setNumberOfSets(newNumberOfSets);
                   }}
                   name="sets"
@@ -731,7 +790,7 @@ export default function ExerciseModal(props) {
               <div className="ml-3 text-sm">
                 <label
                   htmlFor="sameRepsForEachSet"
-                  className="font-medium text-gray-700"
+                  className="select-none font-medium text-gray-700"
                 >
                   Same Reps for Each Set
                 </label>
@@ -775,18 +834,75 @@ export default function ExerciseModal(props) {
               <div className="ml-3 text-sm">
                 <label
                   htmlFor="sameWeightForEachSet"
-                  className="font-medium text-gray-700"
+                  className="select-none font-medium text-gray-700"
                 >
                   Same Weight for Each Set
                 </label>
               </div>
             </div>
 
+            <div className="relative flex self-center">
+              <div className="flex h-5 items-center">
+                <input
+                  id="includeRestDuration"
+                  name="includeRestDuration"
+                  type="checkbox"
+                  checked={includeRestDuration}
+                  onChange={(e) => {
+                    setIncludeRestDuration(e.target.checked);
+                  }}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label
+                  htmlFor="includeRestDuration"
+                  className="select-none font-medium text-gray-700"
+                >
+                  Include Rest Time
+                </label>
+              </div>
+            </div>
+            {includeRestDuration && (
+              <div className="relative flex self-center">
+                <div className="flex h-5 items-center">
+                  <input
+                    id="sameRestDurationForEachSet"
+                    name="sameRestDurationForEachSet"
+                    type="checkbox"
+                    checked={sameRestDurationForEachSet}
+                    onChange={(e) => {
+                      const newSameRestDurationForEachSet = e.target.checked;
+                      if (newSameRestDurationForEachSet) {
+                        setRestDuration([restDuration[0]]);
+                      } else {
+                        setRestDuration(
+                          new Array(numberOfSets).fill(restDuration[0])
+                        );
+                      }
+                      setSameRestDurationForEachSet(
+                        newSameRestDurationForEachSet
+                      );
+                    }}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label
+                    htmlFor="sameRestDurationForEachSet"
+                    className="select-none font-medium text-gray-700"
+                  >
+                    Same Rest Duration for Each Set
+                  </label>
+                </div>
+              </div>
+            )}
+
             {sameRepsForEachSet && (
-              <div className="">
+              <div className="col-start-1">
                 <label
                   htmlFor="reps"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block select-none text-sm font-medium text-gray-700"
                 >
                   Reps
                 </label>
@@ -797,8 +913,12 @@ export default function ExerciseModal(props) {
                     inputMode="numeric"
                     min="0"
                     max="20"
-                    value={numberOfReps[0]}
-                    onInput={(e) => setNumberOfReps([Number(e.target.value)])}
+                    value={isNumberOfRepsEmptyString[0] ? "" : numberOfReps[0]}
+                    placeholder={0}
+                    onInput={(e) => {
+                      setIsNumberOfRepsEmptyString([e.target.value === ""]);
+                      setNumberOfReps([Number(e.target.value)]);
+                    }}
                     name="reps"
                     id="reps"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -809,10 +929,10 @@ export default function ExerciseModal(props) {
             )}
             {!sameRepsForEachSet &&
               new Array(numberOfSets).fill(1).map((_, index) => (
-                <div className="" key={index}>
+                <div className={index === 0 ? "col-start-1" : ""} key={index}>
                   <label
                     htmlFor={`reps-${index}`}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block select-none text-sm font-medium text-gray-700"
                   >
                     Reps #{index + 1}
                   </label>
@@ -823,8 +943,21 @@ export default function ExerciseModal(props) {
                       inputMode="numeric"
                       min="0"
                       max="20"
-                      value={numberOfReps[index]}
+                      value={
+                        isNumberOfRepsEmptyString[index]
+                          ? ""
+                          : numberOfReps[index]
+                      }
+                      placeholder={0}
                       onInput={(e) => {
+                        const newIsNumberOfRepsEmptyString =
+                          isNumberOfRepsEmptyString.slice();
+                        newIsNumberOfRepsEmptyString[index] =
+                          e.target.value === "";
+                        setIsNumberOfRepsEmptyString(
+                          newIsNumberOfRepsEmptyString
+                        );
+
                         const newNumberOfReps = numberOfReps.slice();
                         newNumberOfReps[index] = Number(e.target.value);
                         setNumberOfReps(newNumberOfReps);
@@ -841,7 +974,7 @@ export default function ExerciseModal(props) {
               <div className="col-start-1">
                 <label
                   htmlFor="weight"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block select-none text-sm font-medium text-gray-700"
                 >
                   Weight
                 </label>
@@ -893,7 +1026,7 @@ export default function ExerciseModal(props) {
                 <div key={index} className={index === 0 ? "col-start-1" : ""}>
                   <label
                     htmlFor={`weight-${index}`}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block select-none text-sm font-medium text-gray-700"
                   >
                     Weight #{index + 1}
                   </label>
@@ -979,7 +1112,7 @@ export default function ExerciseModal(props) {
             <div className="col-start-1">
               <label
                 htmlFor="setsPerformed"
-                className="block text-sm font-medium text-gray-700"
+                className="block select-none text-sm font-medium text-gray-700"
               >
                 Sets
               </label>
@@ -1029,7 +1162,7 @@ export default function ExerciseModal(props) {
               <div className="ml-3 text-sm">
                 <label
                   htmlFor="includeTimePerformed"
-                  className="font-medium text-gray-700"
+                  className="select-none font-medium text-gray-700"
                 >
                   Include Time
                 </label>
@@ -1040,7 +1173,7 @@ export default function ExerciseModal(props) {
               <div>
                 <label
                   htmlFor="timePerformed"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block select-none text-sm font-medium text-gray-700"
                 >
                   Time
                 </label>
@@ -1081,7 +1214,7 @@ export default function ExerciseModal(props) {
                 <div className={index === 0 ? "col-start-1" : ""}>
                   <label
                     htmlFor={`reps-performed-${index}`}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block select-none text-sm font-medium text-gray-700"
                   >
                     Reps
                   </label>
@@ -1134,7 +1267,7 @@ export default function ExerciseModal(props) {
                 <div>
                   <label
                     htmlFor={`set-difficulty-${index}`}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block select-none text-sm font-medium text-gray-700"
                   >
                     Difficulty
                   </label>
@@ -1177,7 +1310,7 @@ export default function ExerciseModal(props) {
                 <div>
                   <label
                     htmlFor={`weight-performed-${index}`}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block select-none text-sm font-medium text-gray-700"
                   >
                     Weight
                   </label>
@@ -1246,7 +1379,7 @@ export default function ExerciseModal(props) {
                     {" "}
                     <label
                       htmlFor={`video-${index}`}
-                      className="block text-sm font-medium text-gray-700"
+                      className="block select-none text-sm font-medium text-gray-700"
                     >
                       YouTube Video
                     </label>
@@ -1294,7 +1427,7 @@ export default function ExerciseModal(props) {
                           newVideo[index] = { videoId, start: timecode };
                           setVideo(newVideo);
                         }}
-                        className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="relative -ml-px inline-flex select-none items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       >
                         <RefreshIcon
                           className="h-5 w-5 text-gray-400"
