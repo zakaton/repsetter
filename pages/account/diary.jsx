@@ -979,7 +979,6 @@ export default function Diary() {
                     <img
                       src={userPictures[type]}
                       alt={`${type} progress picture`}
-                      height={200}
                       className={classNames(
                         "pointer-events-none",
                         amITheClient

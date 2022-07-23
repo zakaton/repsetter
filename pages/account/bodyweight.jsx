@@ -87,7 +87,11 @@ export default function Bodyweight() {
 
   const { pictures, getPicture } = usePictures();
   useEffect(() => {
-    getPicture(selectedClientId);
+    if (weights && selectedClientId) {
+      getPicture(selectedClientId, {
+        date: weights.map(({ date }) => stringToDate(date)),
+      });
+    }
   }, [weights, selectedClientId]);
 
   return (
@@ -106,6 +110,9 @@ export default function Bodyweight() {
         status={editWeightStatus}
       />
       <Table
+        className={
+          "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7"
+        }
         includeClientSelect={true}
         baseFilter={baseFilter}
         numberOfResultsPerPage={10}
@@ -120,52 +127,67 @@ export default function Bodyweight() {
           selectedClient ? `${selectedClient.client_email}'s` : "your"
         } bodyweight.`}
         DeleteResultModal={amITheClient && DeleteWeightModal}
-        resultMap={(weight, index) => [
-          {
-            title: "date",
-            value: stringToDate(weight.date).toDateString(),
-          },
-          weight.time && {
-            title: "time",
-            value: timeToDate(weight.time).toLocaleTimeString([], {
-              timeStyle: "short",
-            }),
-          },
-          weight.event && {
-            title: "event",
-            value: weight.event,
-          },
-          {
-            jsx: (
-              <button
-                onClick={() => {
-                  setSelectedWeight(weight);
-                  setShowEditWeightModal(true);
-                }}
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Edit
-              </button>
-            ),
-          },
-          {
-            jsx: (
-              <MyLink
-                onClick={() => {
-                  setSelectedDate(stringToDate(weight.date));
-                }}
-                href={`/account/diary?date=${stringToDate(
-                  weight.date
-                ).toDateString()}${
-                  selectedClient ? `&client=${selectedClient.client_email}` : ""
-                }`}
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Full Diary
-              </MyLink>
-            ),
-          },
-        ]}
+        resultMap={(weight, index) => {
+          const todaysPictures = pictures?.[selectedClientId]?.[weight.date];
+          const pictureItems = todaysPictures
+            ? Object.keys(todaysPictures).map((type) => ({
+                jsx: (
+                  <>
+                    <img src={todaysPictures[type]} alt={type} width="100" />
+                  </>
+                ),
+              }))
+            : [];
+          return [
+            {
+              title: "date",
+              value: stringToDate(weight.date).toDateString(),
+            },
+            weight.time && {
+              title: "time",
+              value: timeToDate(weight.time).toLocaleTimeString([], {
+                timeStyle: "short",
+              }),
+            },
+            weight.event && {
+              title: "event",
+              value: weight.event,
+            },
+            ...pictureItems,
+            {
+              jsx: (
+                <button
+                  onClick={() => {
+                    setSelectedWeight(weight);
+                    setShowEditWeightModal(true);
+                  }}
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  Edit
+                </button>
+              ),
+            },
+            {
+              jsx: (
+                <MyLink
+                  onClick={() => {
+                    setSelectedDate(stringToDate(weight.date));
+                  }}
+                  href={`/account/diary?date=${stringToDate(
+                    weight.date
+                  ).toDateString()}${
+                    selectedClient
+                      ? `&client=${selectedClient.client_email}`
+                      : ""
+                  }`}
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  Full Diary
+                </MyLink>
+              ),
+            },
+          ];
+        }}
       />
     </>
   );
