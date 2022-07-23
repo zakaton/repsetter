@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { useUser } from "../../context/user-context";
 import Notification from "../../components/Notification";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
@@ -14,7 +13,7 @@ import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import MyLink from "../../components/MyLink";
-import { timeToDate, stringToDate, dateToString } from "../../utils/supabase";
+import { timeToDate, stringToDate } from "../../utils/supabase";
 
 const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
   name: `Muscles (${muscleGroup})`,
@@ -34,24 +33,29 @@ const orderTypes = [
   {
     label: "Date (Newest)",
     query: "date-newest",
-    value: ["date", { ascending: false }],
+    value: [
+      ["date", { ascending: false }],
+      ["time", { ascending: true }],
+    ],
     current: true,
   },
   {
     label: "Date (Oldest)",
     query: "date-oldest",
-    value: ["date", { ascending: true }],
+    value: [
+      ["date", { ascending: false }],
+      ["time", { ascending: false }],
+    ],
     current: false,
   },
 ];
 
 export default function Exercises() {
-  const router = useRouter();
-  const { isAdmin, user } = useUser();
+  const { user } = useUser();
 
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
 
-  const { selectedClient, setSelectedDate } = useClient();
+  const { selectedClient, setSelectedDate, amITheClient } = useClient();
 
   const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
   const [editExerciseStatus, setEditExerciseStatus] = useState(false);
@@ -90,7 +94,7 @@ export default function Exercises() {
 
   useEffect(() => {
     if (exercises) {
-      exercises.forEach((exercise) => getExerciseVideo(exercise.type.id));
+      getExerciseVideo(exercises.map((exercise) => exercise.type.id));
     }
   }, [exercises]);
 
@@ -161,7 +165,7 @@ export default function Exercises() {
             ? `progress doing ${selectedExerciseType.name}`
             : "exercises"
         }`}
-        DeleteResultModal={isAdmin && DeleteExerciseModal}
+        DeleteResultModal={amITheClient && DeleteExerciseModal}
         resultMap={(exercise, index) => [
           {
             title: "date",
@@ -179,6 +183,7 @@ export default function Exercises() {
                 <ExerciseTypeVideo
                   width="100px"
                   exerciseTypeId={exercise.type.id}
+                  fetchVideo={false}
                 ></ExerciseTypeVideo>
               ),
             },

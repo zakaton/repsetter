@@ -20,7 +20,7 @@ export default function ExerciseTypesSelect({
   setSelectedExerciseTypeName,
 }) {
   const [exerciseTypes, setExerciseTypes] = useState();
-  const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
+  const { getExerciseVideo } = useExerciseVideos();
   const [isFetchingExerciseTypes, setIsFetchingExerciseTypes] = useState(false);
 
   const getExerciseTypes = async (refresh) => {
@@ -44,9 +44,7 @@ export default function ExerciseTypesSelect({
 
   useEffect(() => {
     if (exerciseTypes) {
-      exerciseTypes.forEach((exerciseType) =>
-        getExerciseVideo(exerciseType.id)
-      );
+      getExerciseVideo(exerciseTypes.map(({ id }) => id));
     }
   }, [exerciseTypes]);
 
@@ -144,6 +142,7 @@ export default function ExerciseTypesSelect({
                       exerciseTypeId={exerciseType.id}
                       width="100"
                       height="75"
+                      fetchVideo={false}
                     ></ExerciseTypeVideo>
 
                     <div className="flex flex-col gap-1">

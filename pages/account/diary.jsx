@@ -110,7 +110,7 @@ export default function Diary() {
     if (!selectedClientId) {
       return;
     }
-    if (isGettingExercises) {
+    if (isGettingExercises && !refresh) {
       return;
     }
     console.log("getting exercises for date", selectedDate.toDateString());
@@ -126,6 +126,7 @@ export default function Diary() {
     const { data: exercises, error } = await supabase
       .from("exercise")
       .select("*, type(*)")
+      .order("time", { ascending: true })
       .match(matchFilters);
     if (error) {
       console.error(error);
@@ -208,7 +209,7 @@ export default function Diary() {
 
   useEffect(() => {
     if (exercises) {
-      exercises.forEach((exercise) => getExerciseVideo(exercise.type.id));
+      getExerciseVideo(exercises.map((exercise) => exercise.type.id));
     }
   }, [exercises]);
 
@@ -398,7 +399,7 @@ export default function Diary() {
     if (!selectedClientId) {
       return;
     }
-    if (isGettingWeights) {
+    if (isGettingWeights && !refresh) {
       return;
     }
     console.log("getting weights for date", selectedDate.toDateString());
@@ -1253,7 +1254,7 @@ export default function Diary() {
             key={exercise.id}
             className={classNames(
               "pt-5",
-              index === 0 ? "" : "border-gray-20 border-t"
+              index === 0 ? "pb-5" : "border-gray-20 border-t"
             )}
           >
             <dl
@@ -1266,6 +1267,7 @@ export default function Diary() {
                   width="100%"
                   height="100%"
                   exerciseTypeId={exercise.type.id}
+                  fetchVideo={false}
                 ></ExerciseTypeVideo>
               </div>
               <div className="sm:col-span-1">

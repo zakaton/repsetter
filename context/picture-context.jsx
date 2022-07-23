@@ -11,7 +11,8 @@ export function PicturesContextProvider(props) {
     console.log("requesting picture", userId, config);
 
     let { date } = config;
-    const dateString = date ? dateToString(date) : "";
+    const dates = Array.isArray(date) ? date : [date];
+    const dateStrings = dates.map((date) => dateToString(date));
 
     const { options, types = pictureTypes } = config;
 
@@ -25,15 +26,19 @@ export function PicturesContextProvider(props) {
       } else {
         picturesList = list;
       }
-    } else if (date) {
-      const { data: list, error: listError } = await supabase.storage
-        .from("picture")
-        .list(userId, { search: dateString });
-      if (listError) {
-        console.error(listError);
-      } else {
-        picturesList = list;
-      }
+    } else if (dateStrings?.length > 0) {
+      await Promise.all(
+        dateStrings.map(async (dateString) => {
+          const { data: list, error: listError } = await supabase.storage
+            .from("picture")
+            .list(userId, { search: dateString });
+          if (listError) {
+            console.error(listError);
+          } else {
+            picturesList = picturesList.concat(...list);
+          }
+        })
+      );
     }
 
     picturesList.forEach((picture) => {
@@ -57,9 +62,11 @@ export function PicturesContextProvider(props) {
     };
 
     if (refresh) {
-      if (dateString) {
-        types.forEach((type) => {
-          delete newPictures[userId]?.[dateString]?.[type];
+      if (dateStrings) {
+        dateStrings.forEach((dateString) => {
+          types.forEach((type) => {
+            delete newPictures[userId]?.[dateString]?.[type];
+          });
         });
       } else {
       }

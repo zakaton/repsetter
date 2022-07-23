@@ -60,6 +60,7 @@ export function ExerciseVideoContextProvider(props) {
         })
       );
 
+      console.log("newExerciseVideos", newExerciseVideos);
       setExerciseVideos(newExerciseVideos);
     } else {
       console.log("exercise video cache hit");

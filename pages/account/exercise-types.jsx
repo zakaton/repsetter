@@ -115,7 +115,10 @@ export default function ExerciseTypes() {
           },
           result.id in exerciseVideos && {
             jsx: (
-              <ExerciseTypeVideo exerciseTypeId={result.id}></ExerciseTypeVideo>
+              <ExerciseTypeVideo
+                exerciseTypeId={result.id}
+                fetchVideo={false}
+              ></ExerciseTypeVideo>
             ),
           },
           result.muscles?.length > 0 && {

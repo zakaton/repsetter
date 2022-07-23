@@ -148,7 +148,7 @@ export function ClientContextProvider(props) {
     });
   }, [router.isReady, selectedClient, selectedDate, router.pathname]);
 
-  const [amITheClient, setAmITheClient] = useState(false);
+  const [amITheClient, setAmITheClient] = useState(true);
   useEffect(() => {
     setAmITheClient(!selectedClient);
   }, [selectedClient]);

@@ -10,15 +10,15 @@ function classNames(...classes) {
 const keysToDelete = ["width", "height", "play"];
 
 export default function ExerciseTypeVideo(
-  props = { exerciseTypeId: undefined, play: null }
+  props = { exerciseTypeId: undefined, play: null, fetchVideo: true }
 ) {
-  const { exerciseTypeId, play, width, height } = props;
+  const { exerciseTypeId, play, width, height, fetchVideo } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
 
   const { getExerciseVideo, exerciseVideos } = useExerciseVideos();
   useEffect(() => {
-    if (exerciseTypeId) {
+    if (exerciseTypeId && fetchVideo) {
       getExerciseVideo(exerciseTypeId);
     }
   }, [exerciseTypeId]);

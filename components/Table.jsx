@@ -94,8 +94,14 @@ export default function Table({
       for (let column in containsFilters) {
         query = query.contains(column, containsFilters[column]);
       }
+      if (Array.isArray(order[0])) {
+        order.forEach((_order) => {
+          query = query.order(..._order);
+        });
+      } else {
+        query = query.order(...order);
+      }
       query = query
-        .order(...order)
         .limit(numberOfResultsPerPage)
         .range(
           pageIndex * numberOfResultsPerPage,
