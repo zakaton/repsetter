@@ -12,6 +12,7 @@ import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
 import YouTube from "react-youtube";
 import MyLink from "../../MyLink";
+import ExerciseTypeVideo from "../../ExerciseTypeVideo";
 
 export default function ExerciseModal(props) {
   const {
@@ -448,9 +449,18 @@ export default function ExerciseModal(props) {
             existingExercises={existingExercises}
             selectedExercise={selectedExercise}
           />
+
+          {selectedExerciseType && (
+            <div className="m-auto mt-4 w-fit">
+              <ExerciseTypeVideo
+                exerciseTypeId={selectedExerciseType.id}
+                width={150}
+              />
+            </div>
+          )}
           {previousExercise && (
             <p className="mt-2 text-sm text-gray-500">
-              this exercise was done {daysSincePreviousExercise} day
+              This exercise was done {daysSincePreviousExercise} day
               {daysSincePreviousExercise > 1 && "s"} ago on{" "}
               {previousExercise.date}
               {previousExercise.time
