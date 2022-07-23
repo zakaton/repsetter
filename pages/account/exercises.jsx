@@ -234,6 +234,10 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
+          exercise.rest_duration !== null && {
+            title: "rest duration (min)",
+            value: exercise.rest_duration.join(", "),
+          },
           exercise.difficulty !== null && {
             title: "difficulty",
             value: exercise.difficulty.map((value) => `${value}/10`).join(", "),

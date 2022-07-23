@@ -162,6 +162,8 @@ export default function ExerciseModal(props) {
     setSameWeightForEachSet(true);
     setIsWeightInputEmptyString([]);
 
+    setIncludeRestDuration(false);
+    setSameRestDurationForEachSet(true);
     setRestDuration([0]);
     setIsRestDurationEmptyString([]);
 
@@ -235,6 +237,15 @@ export default function ExerciseModal(props) {
       if (selectedExercise.time) {
         setTimePerformed(selectedExercise.time);
         setIncludeTimePerformed(true);
+      }
+
+      if (selectedExercise.rest_duration) {
+        setIncludeRestDuration(true);
+        setSameRestDurationForEachSet(
+          selectedExercise.rest_duration.length !==
+            selectedExercise.number_of_sets_assigned
+        );
+        setRestDuration(selectedExercise.rest_duration);
       }
     }
   }, [open, selectedExercise]);
@@ -519,24 +530,22 @@ export default function ExerciseModal(props) {
             </p>
           )}
         </div>
-        {previousExercise && (
-          <div className="relative w-full sm:col-span-3">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center">
-              <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
-                <span className="select-none">Previous Exercise</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {previousExercise && (
           <>
+            <div className="relative w-full sm:col-span-3">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center">
+                <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
+                  <span className="select-none">Previous Exercise</span>
+                </div>
+              </div>
+            </div>
             {previousExercise.number_of_sets_performed === null && (
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Sets</dt>
@@ -674,22 +683,20 @@ export default function ExerciseModal(props) {
         )}
 
         {selectedExerciseType && (
-          <div className="relative w-full sm:col-span-3">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center">
-              <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
-                <span className="select-none">Assignment</span>
+          <>
+            <div className="relative w-full sm:col-span-3">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center">
+                <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
+                  <span className="select-none">Assignment</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {selectedExerciseType && (
-          <>
             <div>
               <label
                 htmlFor="sets"
@@ -766,136 +773,141 @@ export default function ExerciseModal(props) {
                 />
               </div>
             </div>
-            <div className="relative flex self-center">
-              <div className="flex h-5 items-center">
-                <input
-                  id="sameRepsForEachSet"
-                  name="sameRepsForEachSet"
-                  type="checkbox"
-                  checked={sameRepsForEachSet}
-                  onChange={(e) => {
-                    const newSameRepsForEachSet = e.target.checked;
-                    if (newSameRepsForEachSet) {
-                      setNumberOfReps([numberOfReps[0]]);
-                    } else {
-                      setNumberOfReps(
-                        new Array(numberOfSets).fill(numberOfReps[0])
-                      );
-                    }
-                    setSameRepsForEachSet(newSameRepsForEachSet);
-                  }}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label
-                  htmlFor="sameRepsForEachSet"
-                  className="select-none font-medium text-gray-700"
-                >
-                  Same Reps for Each Set
-                </label>
-              </div>
-            </div>
-            <div className="relative flex self-center">
-              <div className="flex h-5 items-center">
-                <input
-                  id="sameWeightForEachSet"
-                  name="sameWeightForEachSet"
-                  type="checkbox"
-                  checked={sameWeightForEachSet}
-                  onChange={(e) => {
-                    const newSameWeightForEachSet = e.target.checked;
-                    if (newSameWeightForEachSet) {
-                      setWeight(
-                        isUsingKilograms
-                          ? [weightKilograms[0]]
-                          : [weightPounds[0]]
-                      );
-                      setIsWeightInputEmptyString([
-                        isWeightInputEmptyString[0],
-                      ]);
-                    } else {
-                      setWeight(
-                        isUsingKilograms
-                          ? new Array(numberOfSets).fill(weightKilograms[0])
-                          : new Array(numberOfSets).fill(weightPounds[0])
-                      );
-                      setIsWeightInputEmptyString(
-                        new Array(numberOfSets).fill(
-                          isWeightInputEmptyString[0]
-                        )
-                      );
-                    }
-                    setSameWeightForEachSet(newSameWeightForEachSet);
-                  }}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label
-                  htmlFor="sameWeightForEachSet"
-                  className="select-none font-medium text-gray-700"
-                >
-                  Same Weight for Each Set
-                </label>
-              </div>
-            </div>
+            {numberOfSets > 1 && (
+              <>
+                <div className="relative flex self-center">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id="sameRepsForEachSet"
+                      name="sameRepsForEachSet"
+                      type="checkbox"
+                      checked={sameRepsForEachSet}
+                      onChange={(e) => {
+                        const newSameRepsForEachSet = e.target.checked;
+                        if (newSameRepsForEachSet) {
+                          setNumberOfReps([numberOfReps[0]]);
+                        } else {
+                          setNumberOfReps(
+                            new Array(numberOfSets).fill(numberOfReps[0])
+                          );
+                        }
+                        setSameRepsForEachSet(newSameRepsForEachSet);
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor="sameRepsForEachSet"
+                      className="select-none font-medium text-gray-700"
+                    >
+                      Same Reps for Each Set
+                    </label>
+                  </div>
+                </div>
+                <div className="relative flex self-center">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id="sameWeightForEachSet"
+                      name="sameWeightForEachSet"
+                      type="checkbox"
+                      checked={sameWeightForEachSet}
+                      onChange={(e) => {
+                        const newSameWeightForEachSet = e.target.checked;
+                        if (newSameWeightForEachSet) {
+                          setWeight(
+                            isUsingKilograms
+                              ? [weightKilograms[0]]
+                              : [weightPounds[0]]
+                          );
+                          setIsWeightInputEmptyString([
+                            isWeightInputEmptyString[0],
+                          ]);
+                        } else {
+                          setWeight(
+                            isUsingKilograms
+                              ? new Array(numberOfSets).fill(weightKilograms[0])
+                              : new Array(numberOfSets).fill(weightPounds[0])
+                          );
+                          setIsWeightInputEmptyString(
+                            new Array(numberOfSets).fill(
+                              isWeightInputEmptyString[0]
+                            )
+                          );
+                        }
+                        setSameWeightForEachSet(newSameWeightForEachSet);
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor="sameWeightForEachSet"
+                      className="select-none font-medium text-gray-700"
+                    >
+                      Same Weight for Each Set
+                    </label>
+                  </div>
+                </div>
 
-            <div className="relative flex self-center">
-              <div className="flex h-5 items-center">
-                <input
-                  id="includeRestDuration"
-                  name="includeRestDuration"
-                  type="checkbox"
-                  checked={includeRestDuration}
-                  onChange={(e) => {
-                    setIncludeRestDuration(e.target.checked);
-                  }}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label
-                  htmlFor="includeRestDuration"
-                  className="select-none font-medium text-gray-700"
-                >
-                  Include Rest Time
-                </label>
-              </div>
-            </div>
-            {includeRestDuration && (
-              <div className="relative flex self-center">
-                <div className="flex h-5 items-center">
-                  <input
-                    id="sameRestDurationForEachSet"
-                    name="sameRestDurationForEachSet"
-                    type="checkbox"
-                    checked={sameRestDurationForEachSet}
-                    onChange={(e) => {
-                      const newSameRestDurationForEachSet = e.target.checked;
-                      if (newSameRestDurationForEachSet) {
-                        setRestDuration([restDuration[0]]);
-                      } else {
-                        setRestDuration(
-                          new Array(numberOfSets).fill(restDuration[0])
-                        );
-                      }
-                      setSameRestDurationForEachSet(
-                        newSameRestDurationForEachSet
-                      );
-                    }}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
+                <div className="relative flex self-center">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id="includeRestDuration"
+                      name="includeRestDuration"
+                      type="checkbox"
+                      checked={includeRestDuration}
+                      onChange={(e) => {
+                        setIncludeRestDuration(e.target.checked);
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor="includeRestDuration"
+                      className="select-none font-medium text-gray-700"
+                    >
+                      Include Rest Duration
+                    </label>
+                  </div>
                 </div>
-                <div className="ml-3 text-sm">
-                  <label
-                    htmlFor="sameRestDurationForEachSet"
-                    className="select-none font-medium text-gray-700"
-                  >
-                    Same Rest Duration for Each Set
-                  </label>
-                </div>
-              </div>
+                {includeRestDuration && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameRestDurationForEachSet"
+                        name="sameRestDurationForEachSet"
+                        type="checkbox"
+                        checked={sameRestDurationForEachSet}
+                        onChange={(e) => {
+                          const newSameRestDurationForEachSet =
+                            e.target.checked;
+                          if (newSameRestDurationForEachSet) {
+                            setRestDuration([restDuration[0]]);
+                          } else {
+                            setRestDuration(
+                              new Array(numberOfSets).fill(restDuration[0])
+                            );
+                          }
+                          setSameRestDurationForEachSet(
+                            newSameRestDurationForEachSet
+                          );
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameRestDurationForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Rest Duration for Each Set
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             {sameRepsForEachSet && (
@@ -970,6 +982,7 @@ export default function ExerciseModal(props) {
                   <p className="mt-2 text-sm text-gray-500">(0 for AMRAP)</p>
                 </div>
               ))}
+
             {sameWeightForEachSet && (
               <div className="col-start-1">
                 <label
@@ -1087,6 +1100,82 @@ export default function ExerciseModal(props) {
                         <option>kg</option>
                         <option>lbs</option>
                       </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            {sameRestDurationForEachSet && (
+              <div className="col-start-1">
+                <label
+                  htmlFor="restDuration"
+                  className="block select-none text-sm font-medium text-gray-700"
+                >
+                  Rest Duration
+                </label>
+                <div className="relative mt-1 rounded-md shadow-sm">
+                  <input
+                    required
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    value={isRestDurationEmptyString[0] ? "" : restDuration[0]}
+                    placeholder={0}
+                    onInput={(e) => {
+                      setIsRestDurationEmptyString([e.target.value === ""]);
+                      setRestDuration([Number(e.target.value)]);
+                    }}
+                    name="restDuration"
+                    id="restDuration"
+                    className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <span className="text-gray-500 sm:text-sm">min</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {!sameRestDurationForEachSet &&
+              new Array(numberOfSets).fill(1).map((_, index) => (
+                <div className={index === 0 ? "col-start-1" : ""} key={index}>
+                  <label
+                    htmlFor={`rest-duration-${index}`}
+                    className="block select-none text-sm font-medium text-gray-700"
+                  >
+                    Rest Duration #{index + 1}
+                  </label>
+                  <div className="relative mt-1 rounded-md shadow-sm">
+                    <input
+                      required
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      value={
+                        isRestDurationEmptyString[index]
+                          ? ""
+                          : restDuration[index]
+                      }
+                      placeholder={0}
+                      onInput={(e) => {
+                        const newIsRestDurationEmptyString =
+                          isRestDurationEmptyString.slice();
+                        newIsRestDurationEmptyString[index] =
+                          e.target.value === "";
+                        setIsRestDurationEmptyString(
+                          newIsRestDurationEmptyString
+                        );
+
+                        const newRestDuration = restDuration.slice();
+                        newRestDuration[index] = Number(e.target.value);
+                        setRestDuration(newRestDuration);
+                        console.log(newRestDuration);
+                      }}
+                      name={`rest-duration-${index}`}
+                      id={`rest-duration-${index}`}
+                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <span className="text-gray-500 sm:text-sm">min</span>
                     </div>
                   </div>
                 </div>
