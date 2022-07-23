@@ -7,7 +7,6 @@ import DeleteExerciseTypeModal from "../../components/account/modal/DeleteExerci
 import Table from "../../components/Table";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
-import LazyVideo from "../../components/LazyVideo";
 import MyLink from "../../components/MyLink";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 

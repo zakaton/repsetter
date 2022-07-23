@@ -8,7 +8,7 @@ import { weightEvents } from "../../utils/weight-utils";
 import Table from "../../components/Table";
 import { useClient } from "../../context/client-context";
 import MyLink from "../../components/MyLink";
-import { timeToDate, stringToDate } from "../../utils/supabase";
+import { timeToDate, stringToDate, supabase } from "../../utils/supabase";
 import { usePictures } from "../../context/picture-context";
 import { pictureTypes } from "../../utils/picture-utils";
 
@@ -17,21 +17,13 @@ const filterTypes = [
     name: "Weight Event",
     query: "weight-event",
     column: "event",
-    checkboxes: weightEvents.map((weightEvent) => ({
-      value: weightEvent,
-      label: weightEvent,
-      defaultChecked: false,
-    })),
-  },
-  {
-    name: "Bodyweight Unit",
-    query: "bodyweight-unit",
-    column: "bodyweight-unit",
-    requiresBodyweight: true,
-    defaultValue: "lbs",
     radios: [
-      { value: "lbs", label: "lbs", defaultChecked: true },
-      { value: "kg", label: "kg" },
+      { value: null, label: "any", defaultChecked: true },
+      ...weightEvents.map(({ name }, index) => ({
+        value: name,
+        label: name,
+        defaultChecked: false,
+      })),
     ],
   },
 ];
@@ -85,6 +77,8 @@ export default function Bodyweight() {
   }, [user, isLoading, selectedClientId]);
 
   console.log("baseFilter", baseFilter);
+
+  window.s = supabase;
 
   const { pictures, getPicture } = usePictures();
   useEffect(() => {
