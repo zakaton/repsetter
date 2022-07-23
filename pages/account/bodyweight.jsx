@@ -10,6 +10,7 @@ import { useClient } from "../../context/client-context";
 import MyLink from "../../components/MyLink";
 import { timeToDate, stringToDate } from "../../utils/supabase";
 import { usePictures } from "../../context/picture-context";
+import { pictureTypes } from "../../utils/picture-utils";
 
 const filterTypes = [
   {
@@ -130,13 +131,20 @@ export default function Bodyweight() {
         resultMap={(weight, index) => {
           const todaysPictures = pictures?.[selectedClientId]?.[weight.date];
           const pictureItems = todaysPictures
-            ? Object.keys(todaysPictures).map((type) => ({
-                jsx: (
-                  <>
-                    <img src={todaysPictures[type]} alt={type} width="100" />
-                  </>
-                ),
-              }))
+            ? pictureTypes
+                .filter((type) => type in todaysPictures)
+                .map((type) => ({
+                  jsx: (
+                    <>
+                      <img
+                        src={todaysPictures[type]}
+                        alt={type}
+                        width="100"
+                        className="overflow-hidden rounded-lg"
+                      />
+                    </>
+                  ),
+                }))
             : [];
           return [
             {
