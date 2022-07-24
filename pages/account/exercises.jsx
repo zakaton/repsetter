@@ -168,14 +168,8 @@ export default function Exercises() {
         DeleteResultModal={amITheClient && DeleteExerciseModal}
         resultMap={(exercise, index) => [
           {
-            title: "date",
-            value: stringToDate(exercise.date).toDateString(),
-          },
-          exercise.time && {
-            title: "time",
-            value: timeToDate(exercise.time).toLocaleTimeString([], {
-              timeStyle: "short",
-            }),
+            title: "name",
+            value: exercise.type.name,
           },
           !selectedExerciseType &&
             exercise.type.id in exerciseVideos && {
@@ -188,8 +182,14 @@ export default function Exercises() {
               ),
             },
           {
-            title: "name",
-            value: exercise.type.name,
+            title: "date",
+            value: stringToDate(exercise.date).toDateString(),
+          },
+          exercise.time && {
+            title: "time",
+            value: timeToDate(exercise.time).toLocaleTimeString([], {
+              timeStyle: "short",
+            }),
           },
           {
             title: "muscles",
@@ -202,7 +202,7 @@ export default function Exercises() {
                 ? exercise.number_of_sets_assigned
                 : `${exercise.number_of_sets_performed}/${exercise.number_of_sets_assigned}`,
           },
-          {
+          exercise.number_of_reps_assigned && {
             title: "reps",
             value:
               exercise.number_of_reps_performed === null
@@ -219,21 +219,24 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
-          exercise.weight_assigned.some((weight) => weight > 0) && {
-            title: `Weight (${exercise.is_weight_in_kilograms ? "kg" : "lbs"})`,
-            value:
-              exercise.weight_performed === null
-                ? exercise.weight_assigned.join(", ")
-                : exercise.weight_performed
-                    .map(
-                      (weight, index) =>
-                        `${weight}/${
-                          exercise.weight_assigned[index] ||
-                          exercise.weight_assigned[0]
-                        }`
-                    )
-                    .join(", "),
-          },
+          exercise.weight_assigned &&
+            exercise.weight_assigned.some((weight) => weight > 0) && {
+              title: `Weight (${
+                exercise.is_weight_in_kilograms ? "kg" : "lbs"
+              })`,
+              value:
+                exercise.weight_performed === null
+                  ? exercise.weight_assigned.join(", ")
+                  : exercise.weight_performed
+                      .map(
+                        (weight, index) =>
+                          `${weight}/${
+                            exercise.weight_assigned[index] ||
+                            exercise.weight_assigned[0]
+                          }`
+                      )
+                      .join(", "),
+            },
           exercise.rest_duration !== null && {
             title: "rest duration (min)",
             value: exercise.rest_duration.join(", "),
@@ -308,7 +311,7 @@ export default function Exercises() {
                 }`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                Full Diary
+                View Diary
               </MyLink>
             ),
           },

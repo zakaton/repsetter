@@ -178,16 +178,20 @@ export default function ExerciseModal(props) {
   useEffect(() => {
     if (open && selectedExercise) {
       setNumberOfSets(selectedExercise.number_of_sets_assigned);
-      setNumberOfReps(selectedExercise.number_of_reps_assigned);
-      setIsUsingKilograms(selectedExercise.is_weight_in_kilograms);
-      setWeight(selectedExercise.weight_assigned);
-
-      const sameRepsForEachSet =
-        selectedExercise.number_of_reps_assigned.length == 1;
-      setSameRepsForEachSet(sameRepsForEachSet);
-
-      const sameWeightForEachSet = selectedExercise.weight_assigned.length == 1;
-      setSameWeightForEachSet(sameWeightForEachSet);
+      if (selectedExercise.number_of_reps_assigned) {
+        setNumberOfReps(selectedExercise.number_of_reps_assigned);
+      }
+      if (selectedExercise.is_weight_in_kilograms !== null) {
+        setIsUsingKilograms(selectedExercise.is_weight_in_kilograms);
+      }
+      if (selectedExercise.weight_assigned) {
+        setWeight(selectedExercise.weight_assigned);
+      }
+      if (selectedExercise.weight_assigned !== null) {
+        const sameWeightForEachSet =
+          selectedExercise.weight_assigned?.length == 1;
+        setSameWeightForEachSet(sameWeightForEachSet);
+      }
 
       if (selectedExercise.number_of_sets_performed !== null) {
         setNumberOfSetsPerformed(selectedExercise.number_of_sets_performed);
@@ -195,16 +199,22 @@ export default function ExerciseModal(props) {
         setNumberOfSetsPerformed(selectedExercise.number_of_sets_assigned);
       }
 
-      let repsPerformed =
-        selectedExercise.number_of_reps_performed !== null
-          ? selectedExercise.number_of_reps_performed
-          : selectedExercise.number_of_reps_assigned;
-      if (repsPerformed.length != selectedExercise.number_of_sets_assigned) {
-        repsPerformed = new Array(
-          selectedExercise.number_of_sets_assigned
-        ).fill(0);
+      if (selectedExercise.number_of_reps_assigned) {
+        const sameRepsForEachSet =
+          selectedExercise.number_of_reps_assigned.length == 1;
+        setSameRepsForEachSet(sameRepsForEachSet);
+
+        let repsPerformed =
+          selectedExercise.number_of_reps_performed !== null
+            ? selectedExercise.number_of_reps_performed
+            : selectedExercise.number_of_reps_assigned;
+        if (repsPerformed.length != selectedExercise.number_of_sets_assigned) {
+          repsPerformed = new Array(
+            selectedExercise.number_of_sets_assigned
+          ).fill(0);
+        }
+        setNumberOfRepsPerformed(repsPerformed);
       }
-      setNumberOfRepsPerformed(repsPerformed);
 
       let difficulty = selectedExercise.difficulty || [];
       if (difficulty.length != selectedExercise.number_of_sets_assigned) {
@@ -219,19 +229,23 @@ export default function ExerciseModal(props) {
       console.log("parsedVideo", video);
       setVideo(video);
 
-      let weightPerformed =
-        selectedExercise.weight_performed !== null
-          ? selectedExercise.weight_performed
-          : selectedExercise.weight_assigned;
-      if (weightPerformed.length != selectedExercise.number_of_sets_assigned) {
-        weightPerformed = new Array(
-          selectedExercise.number_of_sets_assigned
-        ).fill(weightPerformed[0]);
-      }
-      if (selectedExercise.is_weight_in_kilograms) {
-        setWeightPerformedKilograms(weightPerformed);
-      } else {
-        setWeightPerformedPounds(weightPerformed);
+      if (selectedExercise.weight_assigned) {
+        let weightPerformed =
+          selectedExercise.weight_performed !== null
+            ? selectedExercise.weight_performed
+            : selectedExercise.weight_assigned;
+        if (
+          weightPerformed.length != selectedExercise.number_of_sets_assigned
+        ) {
+          weightPerformed = new Array(
+            selectedExercise.number_of_sets_assigned
+          ).fill(weightPerformed[0]);
+        }
+        if (selectedExercise.is_weight_in_kilograms) {
+          setWeightPerformedKilograms(weightPerformed);
+        } else {
+          setWeightPerformedPounds(weightPerformed);
+        }
       }
 
       if (selectedExercise.time) {
@@ -308,26 +322,32 @@ export default function ExerciseModal(props) {
   const [sameRestDurationForEachSet, setSameRestDurationForEachSet] =
     useState(false);
 
-  const [setDuration, setSetDuration] = useState([]);
+  const [setDurationAssigned, setSetDurationAssigned] = useState([]);
+  const [setDurationPerformed, setSetDurationPerformed] = useState([]);
 
   useEffect(() => {
     if (previousExercise) {
       setNumberOfSets(previousExercise.number_of_sets_assigned);
-      setSameRepsForEachSet(
-        previousExercise.number_of_reps_assigned.length !==
-          previousExercise.number_of_sets_assigned
-      );
-      setSameWeightForEachSet(
-        previousExercise.weight_assigned.length !==
-          previousExercise.number_of_sets_assigned
-      );
-      setIsUsingKilograms(previousExercise.is_weight_in_kilograms);
-
-      setNumberOfReps(previousExercise.number_of_reps_assigned);
-      setWeight(
-        previousExercise.weight_assigned,
-        previousExercise.is_weight_in_kilograms
-      );
+      if (previousExercise.number_of_reps_assigned) {
+        setNumberOfReps(previousExercise.number_of_reps_assigned);
+        setSameRepsForEachSet(
+          previousExercise.number_of_reps_assigned.length !==
+            previousExercise.number_of_sets_assigned
+        );
+      }
+      if (previousExercise.weight_assigned) {
+        setWeight(
+          previousExercise.weight_assigned,
+          previousExercise.is_weight_in_kilograms
+        );
+        setSameWeightForEachSet(
+          previousExercise.weight_assigned.length !==
+            previousExercise.number_of_sets_assigned
+        );
+      }
+      if (previousExercise.is_weight_in_kilograms !== null) {
+        setIsUsingKilograms(previousExercise.is_weight_in_kilograms);
+      }
     }
   }, [previousExercise]);
 
@@ -375,29 +395,43 @@ export default function ExerciseModal(props) {
           let status;
           if (selectedExercise) {
             const updateExerciseData = {
-              type: selectedExerciseType.id,
-              number_of_sets_assigned: numberOfSets,
-              number_of_reps_assigned: numberOfReps,
-              is_weight_in_kilograms: isUsingKilograms,
-              weight_assigned: isUsingKilograms
-                ? weightKilograms
-                : weightPounds,
+              time: includeTimePerformed ? timePerformed : null,
 
+              type: selectedExerciseType.id,
+
+              number_of_sets_assigned: numberOfSets,
               number_of_sets_performed: numberOfSetsPerformed,
-              number_of_reps_performed: numberOfRepsPerformed,
-              weight_performed: isUsingKilograms
-                ? weightPerformedKilograms
-                : weightPerformedPounds,
+
+              ...(selectedExerciseType.features?.includes("reps")
+                ? {
+                    number_of_reps_assigned: numberOfReps,
+                    number_of_reps_performed: numberOfRepsPerformed,
+                  }
+                : {}),
+
+              ...(selectedExerciseType.features?.includes("weight")
+                ? {
+                    is_weight_in_kilograms: isUsingKilograms,
+                    weight_assigned: isUsingKilograms
+                      ? weightKilograms
+                      : weightPounds,
+                    weight_performed: isUsingKilograms
+                      ? weightPerformedKilograms
+                      : weightPerformedPounds,
+                  }
+                : {}),
+
+              rest_duration: includeRestDuration ? restDuration : null,
+
+              ...(selectedExerciseType.features?.includes("duration")
+                ? {
+                    set_duration_assigned: setDurationAssigned,
+                    set_duration_performed: setDurationPerformed,
+                  }
+                : {}),
 
               difficulty,
               video,
-
-              time: includeTimePerformed ? timePerformed : null,
-
-              rest_duration: includeRestDuration ? restDuration : null,
-              set_duration: selectedExerciseType.features?.includes("duration")
-                ? setDuration
-                : null,
             };
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
@@ -427,25 +461,38 @@ export default function ExerciseModal(props) {
           } else {
             setIsAddingExercise(true);
             const createExerciseData = {
-              type: selectedExerciseType.id,
-              date: selectedDate,
-              number_of_sets_assigned: numberOfSets,
-              number_of_reps_assigned: numberOfReps,
-              is_weight_in_kilograms: isUsingKilograms,
-              weight_assigned: isUsingKilograms
-                ? weightKilograms
-                : weightPounds,
-
               client: amITheClient ? user.id : selectedClient.client,
               client_email: amITheClient
                 ? user.email
                 : selectedClient.client_email,
+
+              date: selectedDate,
               time: includeTimePerformed ? timePerformed : null,
 
-              rest_duration: includeRestDuration ? restDuration : null,
-              set_duration: selectedExerciseType.features?.includes("duration")
-                ? setDuration
+              type: selectedExerciseType.id,
+
+              number_of_sets_assigned: numberOfSets,
+              number_of_reps_assigned: selectedExerciseType.features?.includes(
+                "reps"
+              )
+                ? numberOfReps
                 : null,
+              ...(selectedExerciseType.features?.includes("reps")
+                ? {
+                    is_weight_in_kilograms: isUsingKilograms,
+                    weight_assigned: isUsingKilograms
+                      ? weightKilograms
+                      : weightPounds,
+                  }
+                : {}),
+
+              rest_duration: includeRestDuration ? restDuration : null,
+
+              ...(selectedExerciseType.features?.includes("duration")
+                ? {
+                    set_duration_assigned: setDurationAssigned,
+                  }
+                : {}),
             };
             if (!amITheClient) {
               Object.assign(createExerciseData, {
@@ -563,65 +610,81 @@ export default function ExerciseModal(props) {
                 </dd>
               </div>
             )}
-            {previousExercise.number_of_reps_performed === null && (
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Reps</dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.number_of_reps_assigned
-                    .map((reps) => (reps == 0 ? "amrap" : reps))
-                    .join(", ")}
-                </dd>
-              </div>
+
+            {previousExercise.number_of_reps_assigned && (
+              <>
+                {previousExercise.number_of_reps_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.number_of_reps_assigned
+                        .map((reps) => (reps == 0 ? "amrap" : reps))
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {previousExercise.number_of_reps_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.number_of_reps_performed
+                        .map(
+                          (numberOfReps, index) =>
+                            `${numberOfReps}/${
+                              previousExercise.number_of_reps_assigned[index] ||
+                              previousExercise.number_of_reps_assigned[0]
+                            }`
+                        )
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+              </>
             )}
 
-            {previousExercise.number_of_reps_performed !== null && (
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Reps</dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.number_of_reps_performed
-                    .map(
-                      (numberOfReps, index) =>
-                        `${numberOfReps}/${
-                          previousExercise.number_of_reps_assigned[index] ||
-                          previousExercise.number_of_reps_assigned[0]
-                        }`
-                    )
-                    .join(", ")}
-                </dd>
-              </div>
+            {previousExercise.weight_assigned && (
+              <>
+                {previousExercise.weight_assigned.some(
+                  (weight) => weight > 0
+                ) &&
+                  previousExercise.weight_performed === null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Weight (
+                        {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"}
+                        )
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {previousExercise.weight_assigned.join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                {previousExercise.weight_assigned.some(
+                  (weight) => weight > 0
+                ) &&
+                  previousExercise.weight_performed !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Weight (
+                        {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"}
+                        )
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {previousExercise.weight_performed
+                          .map(
+                            (weight, index) =>
+                              `${weight}/${
+                                previousExercise.weight_assigned[index] ||
+                                previousExercise.weight_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                      </dd>
+                    </div>
+                  )}
+              </>
             )}
-            {previousExercise.weight_assigned.some((weight) => weight > 0) &&
-              previousExercise.weight_performed === null && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Weight (
-                    {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"})
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {previousExercise.weight_assigned.join(", ")}
-                  </dd>
-                </div>
-              )}
-            {previousExercise.weight_assigned.some((weight) => weight > 0) &&
-              previousExercise.weight_performed !== null && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Weight (
-                    {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"})
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {previousExercise.weight_performed
-                      .map(
-                        (weight, index) =>
-                          `${weight}/${
-                            previousExercise.weight_assigned[index] ||
-                            previousExercise.weight_assigned[0]
-                          }`
-                      )
-                      .join(", ")}
-                  </dd>
-                </div>
-              )}
+
             {previousExercise.difficulty !== null && (
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
@@ -775,80 +838,86 @@ export default function ExerciseModal(props) {
             </div>
             {numberOfSets > 1 && (
               <>
-                <div className="relative flex self-center">
-                  <div className="flex h-5 items-center">
-                    <input
-                      id="sameRepsForEachSet"
-                      name="sameRepsForEachSet"
-                      type="checkbox"
-                      checked={sameRepsForEachSet}
-                      onChange={(e) => {
-                        const newSameRepsForEachSet = e.target.checked;
-                        if (newSameRepsForEachSet) {
-                          setNumberOfReps([numberOfReps[0]]);
-                        } else {
-                          setNumberOfReps(
-                            new Array(numberOfSets).fill(numberOfReps[0])
-                          );
-                        }
-                        setSameRepsForEachSet(newSameRepsForEachSet);
-                      }}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
+                {selectedExerciseType.features?.includes("reps") && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameRepsForEachSet"
+                        name="sameRepsForEachSet"
+                        type="checkbox"
+                        checked={sameRepsForEachSet}
+                        onChange={(e) => {
+                          const newSameRepsForEachSet = e.target.checked;
+                          if (newSameRepsForEachSet) {
+                            setNumberOfReps([numberOfReps[0]]);
+                          } else {
+                            setNumberOfReps(
+                              new Array(numberOfSets).fill(numberOfReps[0])
+                            );
+                          }
+                          setSameRepsForEachSet(newSameRepsForEachSet);
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameRepsForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Reps for Each Set
+                      </label>
+                    </div>
                   </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="sameRepsForEachSet"
-                      className="select-none font-medium text-gray-700"
-                    >
-                      Same Reps for Each Set
-                    </label>
+                )}
+                {selectedExerciseType.features?.includes("weight") && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameWeightForEachSet"
+                        name="sameWeightForEachSet"
+                        type="checkbox"
+                        checked={sameWeightForEachSet}
+                        onChange={(e) => {
+                          const newSameWeightForEachSet = e.target.checked;
+                          if (newSameWeightForEachSet) {
+                            setWeight(
+                              isUsingKilograms
+                                ? [weightKilograms[0]]
+                                : [weightPounds[0]]
+                            );
+                            setIsWeightInputEmptyString([
+                              isWeightInputEmptyString[0],
+                            ]);
+                          } else {
+                            setWeight(
+                              isUsingKilograms
+                                ? new Array(numberOfSets).fill(
+                                    weightKilograms[0]
+                                  )
+                                : new Array(numberOfSets).fill(weightPounds[0])
+                            );
+                            setIsWeightInputEmptyString(
+                              new Array(numberOfSets).fill(
+                                isWeightInputEmptyString[0]
+                              )
+                            );
+                          }
+                          setSameWeightForEachSet(newSameWeightForEachSet);
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameWeightForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Weight for Each Set
+                      </label>
+                    </div>
                   </div>
-                </div>
-                <div className="relative flex self-center">
-                  <div className="flex h-5 items-center">
-                    <input
-                      id="sameWeightForEachSet"
-                      name="sameWeightForEachSet"
-                      type="checkbox"
-                      checked={sameWeightForEachSet}
-                      onChange={(e) => {
-                        const newSameWeightForEachSet = e.target.checked;
-                        if (newSameWeightForEachSet) {
-                          setWeight(
-                            isUsingKilograms
-                              ? [weightKilograms[0]]
-                              : [weightPounds[0]]
-                          );
-                          setIsWeightInputEmptyString([
-                            isWeightInputEmptyString[0],
-                          ]);
-                        } else {
-                          setWeight(
-                            isUsingKilograms
-                              ? new Array(numberOfSets).fill(weightKilograms[0])
-                              : new Array(numberOfSets).fill(weightPounds[0])
-                          );
-                          setIsWeightInputEmptyString(
-                            new Array(numberOfSets).fill(
-                              isWeightInputEmptyString[0]
-                            )
-                          );
-                        }
-                        setSameWeightForEachSet(newSameWeightForEachSet);
-                      }}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="sameWeightForEachSet"
-                      className="select-none font-medium text-gray-700"
-                    >
-                      Same Weight for Each Set
-                    </label>
-                  </div>
-                </div>
+                )}
 
                 <div className="relative flex self-center">
                   <div className="flex h-5 items-center">
@@ -910,276 +979,304 @@ export default function ExerciseModal(props) {
               </>
             )}
 
-            {sameRepsForEachSet && (
-              <div className="col-start-1">
-                <label
-                  htmlFor="reps"
-                  className="block select-none text-sm font-medium text-gray-700"
-                >
-                  Reps
-                </label>
-                <div className="mt-1">
-                  <input
-                    required
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    max="20"
-                    value={isNumberOfRepsEmptyString[0] ? "" : numberOfReps[0]}
-                    placeholder={0}
-                    onInput={(e) => {
-                      setIsNumberOfRepsEmptyString([e.target.value === ""]);
-                      setNumberOfReps([Number(e.target.value)]);
-                    }}
-                    name="reps"
-                    id="reps"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
-                </div>
-                <p className="mt-2 text-sm text-gray-500">(0 for AMRAP)</p>
-              </div>
-            )}
-            {!sameRepsForEachSet &&
-              new Array(numberOfSets).fill(1).map((_, index) => (
-                <div className={index === 0 ? "col-start-1" : ""} key={index}>
-                  <label
-                    htmlFor={`reps-${index}`}
-                    className="block select-none text-sm font-medium text-gray-700"
-                  >
-                    Reps #{index + 1}
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      required
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      max="20"
-                      value={
-                        isNumberOfRepsEmptyString[index]
-                          ? ""
-                          : numberOfReps[index]
-                      }
-                      placeholder={0}
-                      onInput={(e) => {
-                        const newIsNumberOfRepsEmptyString =
-                          isNumberOfRepsEmptyString.slice();
-                        newIsNumberOfRepsEmptyString[index] =
-                          e.target.value === "";
-                        setIsNumberOfRepsEmptyString(
-                          newIsNumberOfRepsEmptyString
-                        );
-
-                        const newNumberOfReps = numberOfReps.slice();
-                        newNumberOfReps[index] = Number(e.target.value);
-                        setNumberOfReps(newNumberOfReps);
-                      }}
-                      name={`reps-${index}`}
-                      id={`reps-${index}`}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <p className="mt-2 text-sm text-gray-500">(0 for AMRAP)</p>
-                </div>
-              ))}
-
-            {sameWeightForEachSet && (
-              <div className="col-start-1">
-                <label
-                  htmlFor="weight"
-                  className="block select-none text-sm font-medium text-gray-700"
-                >
-                  Weight
-                </label>
-                <div className="relative mt-1 rounded-md shadow-sm">
-                  <input
-                    required
-                    type="number"
-                    inputMode="decimal"
-                    min="0"
-                    name="weight"
-                    id="weight"
-                    className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    value={
-                      isWeightInputEmptyString[0]
-                        ? ""
-                        : isUsingKilograms
-                        ? weightKilograms[0]
-                        : weightPounds[0]
-                    }
-                    placeholder={0}
-                    onInput={(e) => {
-                      setIsWeightInputEmptyString([e.target.value === ""]);
-                      const weight = Number(e.target.value);
-                      setWeight([weight]);
-                    }}
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center">
-                    <label htmlFor="weight-type" className="sr-only">
-                      weight type
-                    </label>
-                    <select
-                      id="weight-type"
-                      name="weight-type"
-                      className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      onChange={(e) =>
-                        setIsUsingKilograms(e.target.value === "kg")
-                      }
-                      value={isUsingKilograms ? "kg" : "lbs"}
+            {selectedExerciseType.features?.includes("reps") && (
+              <>
+                {sameRepsForEachSet && (
+                  <div className="col-start-1">
+                    <label
+                      htmlFor="reps"
+                      className="block select-none text-sm font-medium text-gray-700"
                     >
-                      <option>kg</option>
-                      <option>lbs</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-            {!sameWeightForEachSet &&
-              new Array(numberOfSets).fill(1).map((_, index) => (
-                <div key={index} className={index === 0 ? "col-start-1" : ""}>
-                  <label
-                    htmlFor={`weight-${index}`}
-                    className="block select-none text-sm font-medium text-gray-700"
-                  >
-                    Weight #{index + 1}
-                  </label>
-                  <div className="relative mt-1 rounded-md shadow-sm">
-                    <input
-                      required
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      name={`weight-${index}`}
-                      id={`weight-${index}`}
-                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      value={
-                        isWeightInputEmptyString[index]
-                          ? ""
-                          : isUsingKilograms
-                          ? weightKilograms[index]
-                          : weightPounds[index]
-                      }
-                      placeholder={0}
-                      onInput={(e) => {
-                        const newIsWeightInputEmptyString =
-                          isWeightInputEmptyString.slice();
-                        newIsWeightInputEmptyString[index] =
-                          e.target.value === "";
-                        setIsWeightInputEmptyString(
-                          newIsWeightInputEmptyString
-                        );
-
-                        const weight = Number(e.target.value);
-                        if (isUsingKilograms) {
-                          const newWeightKilograms = weightKilograms.slice();
-                          newWeightKilograms[index] = weight;
-                          setWeight(newWeightKilograms);
-                        } else {
-                          const newWeightPounds = weightPounds.slice();
-                          newWeightPounds[index] = weight;
-                          setWeight(newWeightPounds);
+                      Reps
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        required
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        max="20"
+                        value={
+                          isNumberOfRepsEmptyString[0] ? "" : numberOfReps[0]
                         }
-                      }}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center">
+                        placeholder={0}
+                        onInput={(e) => {
+                          setIsNumberOfRepsEmptyString([e.target.value === ""]);
+                          setNumberOfReps([Number(e.target.value)]);
+                        }}
+                        name="reps"
+                        id="reps"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">(0 for AMRAP)</p>
+                  </div>
+                )}
+                {!sameRepsForEachSet &&
+                  new Array(numberOfSets).fill(1).map((_, index) => (
+                    <div
+                      className={index === 0 ? "col-start-1" : ""}
+                      key={index}
+                    >
                       <label
-                        htmlFor={`weight-type-${index}`}
-                        className="sr-only"
+                        htmlFor={`reps-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
                       >
-                        weight type
+                        Reps #{index + 1}
                       </label>
-                      <select
-                        id={`weight-type-${index}`}
-                        name={`weight-type-${index}`}
-                        className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        onChange={(e) =>
-                          setIsUsingKilograms(e.target.value === "kg")
-                        }
-                        value={isUsingKilograms ? "kg" : "lbs"}
-                      >
-                        <option>kg</option>
-                        <option>lbs</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      <div className="mt-1">
+                        <input
+                          required
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          max="20"
+                          value={
+                            isNumberOfRepsEmptyString[index]
+                              ? ""
+                              : numberOfReps[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsNumberOfRepsEmptyString =
+                              isNumberOfRepsEmptyString.slice();
+                            newIsNumberOfRepsEmptyString[index] =
+                              e.target.value === "";
+                            setIsNumberOfRepsEmptyString(
+                              newIsNumberOfRepsEmptyString
+                            );
 
-            {sameRestDurationForEachSet && (
-              <div className="col-start-1">
-                <label
-                  htmlFor="restDuration"
-                  className="block select-none text-sm font-medium text-gray-700"
-                >
-                  Rest Duration
-                </label>
-                <div className="relative mt-1 rounded-md shadow-sm">
-                  <input
-                    required
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    value={isRestDurationEmptyString[0] ? "" : restDuration[0]}
-                    placeholder={0}
-                    onInput={(e) => {
-                      setIsRestDurationEmptyString([e.target.value === ""]);
-                      setRestDuration([Number(e.target.value)]);
-                    }}
-                    name="restDuration"
-                    id="restDuration"
-                    className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <span className="text-gray-500 sm:text-sm">min</span>
-                  </div>
-                </div>
-              </div>
+                            const newNumberOfReps = numberOfReps.slice();
+                            newNumberOfReps[index] = Number(e.target.value);
+                            setNumberOfReps(newNumberOfReps);
+                          }}
+                          name={`reps-${index}`}
+                          id={`reps-${index}`}
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                      </div>
+                      <p className="mt-2 text-sm text-gray-500">
+                        (0 for AMRAP)
+                      </p>
+                    </div>
+                  ))}
+              </>
             )}
-            {!sameRestDurationForEachSet &&
-              new Array(numberOfSets).fill(1).map((_, index) => (
-                <div className={index === 0 ? "col-start-1" : ""} key={index}>
-                  <label
-                    htmlFor={`rest-duration-${index}`}
-                    className="block select-none text-sm font-medium text-gray-700"
-                  >
-                    Rest Duration #{index + 1}
-                  </label>
-                  <div className="relative mt-1 rounded-md shadow-sm">
-                    <input
-                      required
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      value={
-                        isRestDurationEmptyString[index]
-                          ? ""
-                          : restDuration[index]
-                      }
-                      placeholder={0}
-                      onInput={(e) => {
-                        const newIsRestDurationEmptyString =
-                          isRestDurationEmptyString.slice();
-                        newIsRestDurationEmptyString[index] =
-                          e.target.value === "";
-                        setIsRestDurationEmptyString(
-                          newIsRestDurationEmptyString
-                        );
 
-                        const newRestDuration = restDuration.slice();
-                        newRestDuration[index] = Number(e.target.value);
-                        setRestDuration(newRestDuration);
-                        console.log(newRestDuration);
-                      }}
-                      name={`rest-duration-${index}`}
-                      id={`rest-duration-${index}`}
-                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <span className="text-gray-500 sm:text-sm">min</span>
+            {selectedExerciseType.features?.includes("weight") && (
+              <>
+                {sameWeightForEachSet && (
+                  <div className="col-start-1">
+                    <label
+                      htmlFor="weight"
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Weight
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        name="weight"
+                        id="weight"
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        value={
+                          isWeightInputEmptyString[0]
+                            ? ""
+                            : isUsingKilograms
+                            ? weightKilograms[0]
+                            : weightPounds[0]
+                        }
+                        placeholder={0}
+                        onInput={(e) => {
+                          setIsWeightInputEmptyString([e.target.value === ""]);
+                          const weight = Number(e.target.value);
+                          setWeight([weight]);
+                        }}
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center">
+                        <label htmlFor="weight-type" className="sr-only">
+                          weight type
+                        </label>
+                        <select
+                          id="weight-type"
+                          name="weight-type"
+                          className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          onChange={(e) =>
+                            setIsUsingKilograms(e.target.value === "kg")
+                          }
+                          value={isUsingKilograms ? "kg" : "lbs"}
+                        >
+                          <option>kg</option>
+                          <option>lbs</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )}
+                {!sameWeightForEachSet &&
+                  new Array(numberOfSets).fill(1).map((_, index) => (
+                    <div
+                      key={index}
+                      className={index === 0 ? "col-start-1" : ""}
+                    >
+                      <label
+                        htmlFor={`weight-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Weight #{index + 1}
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          min="0"
+                          name={`weight-${index}`}
+                          id={`weight-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          value={
+                            isWeightInputEmptyString[index]
+                              ? ""
+                              : isUsingKilograms
+                              ? weightKilograms[index]
+                              : weightPounds[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsWeightInputEmptyString =
+                              isWeightInputEmptyString.slice();
+                            newIsWeightInputEmptyString[index] =
+                              e.target.value === "";
+                            setIsWeightInputEmptyString(
+                              newIsWeightInputEmptyString
+                            );
+
+                            const weight = Number(e.target.value);
+                            if (isUsingKilograms) {
+                              const newWeightKilograms =
+                                weightKilograms.slice();
+                              newWeightKilograms[index] = weight;
+                              setWeight(newWeightKilograms);
+                            } else {
+                              const newWeightPounds = weightPounds.slice();
+                              newWeightPounds[index] = weight;
+                              setWeight(newWeightPounds);
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center">
+                          <label
+                            htmlFor={`weight-type-${index}`}
+                            className="sr-only"
+                          >
+                            weight type
+                          </label>
+                          <select
+                            id={`weight-type-${index}`}
+                            name={`weight-type-${index}`}
+                            className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            onChange={(e) =>
+                              setIsUsingKilograms(e.target.value === "kg")
+                            }
+                            value={isUsingKilograms ? "kg" : "lbs"}
+                          >
+                            <option>kg</option>
+                            <option>lbs</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </>
+            )}
+
+            {includeRestDuration && (
+              <>
+                {sameRestDurationForEachSet && (
+                  <div className="col-start-1">
+                    <label
+                      htmlFor="restDuration"
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Rest Duration
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        value={
+                          isRestDurationEmptyString[0] ? "" : restDuration[0]
+                        }
+                        placeholder={0}
+                        onInput={(e) => {
+                          setIsRestDurationEmptyString([e.target.value === ""]);
+                          setRestDuration([Number(e.target.value)]);
+                        }}
+                        name="restDuration"
+                        id="restDuration"
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">min</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!sameRestDurationForEachSet &&
+                  new Array(numberOfSets).fill(1).map((_, index) => (
+                    <div
+                      className={index === 0 ? "col-start-1" : ""}
+                      key={index}
+                    >
+                      <label
+                        htmlFor={`rest-duration-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Rest Duration #{index + 1}
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          value={
+                            isRestDurationEmptyString[index]
+                              ? ""
+                              : restDuration[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsRestDurationEmptyString =
+                              isRestDurationEmptyString.slice();
+                            newIsRestDurationEmptyString[index] =
+                              e.target.value === "";
+                            setIsRestDurationEmptyString(
+                              newIsRestDurationEmptyString
+                            );
+
+                            const newRestDuration = restDuration.slice();
+                            newRestDuration[index] = Number(e.target.value);
+                            setRestDuration(newRestDuration);
+                            console.log(newRestDuration);
+                          }}
+                          name={`rest-duration-${index}`}
+                          id={`rest-duration-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">min</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </>
+            )}
           </>
         )}
         {selectedExercise && (
@@ -1300,59 +1397,62 @@ export default function ExerciseModal(props) {
                   </div>
                 </div>
 
-                <div className={index === 0 ? "col-start-1" : ""}>
-                  <label
-                    htmlFor={`reps-performed-${index}`}
-                    className="block select-none text-sm font-medium text-gray-700"
-                  >
-                    Reps
-                  </label>
-                  <div className="relative mt-1 rounded-md shadow-sm">
-                    <input
-                      required
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      max="20"
-                      value={
-                        isRepsPerformedEmptyString[index]
-                          ? ""
-                          : numberOfRepsPerformed[index]
-                      }
-                      onInput={(e) => {
-                        const newIsRepsPerformedEmptyString =
-                          isRepsPerformedEmptyString.slice();
-                        newIsRepsPerformedEmptyString[index] =
-                          e.target.value === "";
-                        setIsRepsPerformedEmptyString(
-                          newIsRepsPerformedEmptyString
-                        );
+                {selectedExerciseType?.features?.includes("reps") && (
+                  <div>
+                    <label
+                      htmlFor={`reps-performed-${index}`}
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Reps
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        max="20"
+                        value={
+                          isRepsPerformedEmptyString[index]
+                            ? ""
+                            : numberOfRepsPerformed[index]
+                        }
+                        onInput={(e) => {
+                          const newIsRepsPerformedEmptyString =
+                            isRepsPerformedEmptyString.slice();
+                          newIsRepsPerformedEmptyString[index] =
+                            e.target.value === "";
+                          setIsRepsPerformedEmptyString(
+                            newIsRepsPerformedEmptyString
+                          );
 
-                        const newNumberOfRepsPerformed =
-                          numberOfRepsPerformed.slice();
-                        newNumberOfRepsPerformed[index] = Number(
-                          e.target.value
-                        );
-                        setNumberOfRepsPerformed(newNumberOfRepsPerformed);
-                      }}
-                      placeholder="0"
-                      name={`reps-performed-${index}`}
-                      id={`reps-performed-${index}`}
-                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <span
-                        className="text-gray-500 sm:text-sm"
-                        id={`reps-performed-denominator-${index}`}
-                      >
-                        /
-                        {numberOfReps.length === 1
-                          ? numberOfReps[0]
-                          : numberOfReps[index]}
-                      </span>
+                          const newNumberOfRepsPerformed =
+                            numberOfRepsPerformed.slice();
+                          newNumberOfRepsPerformed[index] = Number(
+                            e.target.value
+                          );
+                          setNumberOfRepsPerformed(newNumberOfRepsPerformed);
+                        }}
+                        placeholder="0"
+                        name={`reps-performed-${index}`}
+                        id={`reps-performed-${index}`}
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span
+                          className="text-gray-500 sm:text-sm"
+                          id={`reps-performed-denominator-${index}`}
+                        >
+                          /
+                          {numberOfReps.length === 1
+                            ? numberOfReps[0]
+                            : numberOfReps[index]}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
                 <div>
                   <label
                     htmlFor={`set-difficulty-${index}`}
@@ -1396,73 +1496,79 @@ export default function ExerciseModal(props) {
                     </div>
                   </div>
                 </div>
-                <div>
-                  <label
-                    htmlFor={`weight-performed-${index}`}
-                    className="block select-none text-sm font-medium text-gray-700"
-                  >
-                    Weight
-                  </label>
-                  <div className="relative mt-1 rounded-md shadow-sm">
-                    <input
-                      required
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      name={`weight-performed-${index}`}
-                      id={`weight-performed-${index}`}
-                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      value={
-                        isWeightPerformedEmptyString[index]
-                          ? ""
-                          : isUsingKilograms
-                          ? weightPerformedKilograms[index]
-                          : weightPerformedPounds[index]
-                      }
-                      placeholder={0}
-                      onInput={(e) => {
-                        const newIsWeightPerformedEmptyString =
-                          isWeightPerformedEmptyString.slice();
-                        newIsWeightPerformedEmptyString[index] =
-                          e.target.value === "";
-                        setIsWeightPerformedEmptyString(
-                          newIsWeightPerformedEmptyString
-                        );
-
-                        const weight = Number(e.target.value);
-                        if (isUsingKilograms) {
-                          const newWeightKilograms =
-                            weightPerformedKilograms.slice();
-                          newWeightKilograms[index] = weight;
-                          setWeightPerformed(newWeightKilograms);
-                        } else {
-                          const newWeightPounds = weightPerformedPounds.slice();
-                          newWeightPounds[index] = weight;
-                          setWeightPerformed(newWeightPounds);
+                {selectedExerciseType?.features?.includes("weight") && (
+                  <div>
+                    <label
+                      htmlFor={`weight-performed-${index}`}
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Weight
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        name={`weight-performed-${index}`}
+                        id={`weight-performed-${index}`}
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        value={
+                          isWeightPerformedEmptyString[index]
+                            ? ""
+                            : isUsingKilograms
+                            ? weightPerformedKilograms[index]
+                            : weightPerformedPounds[index]
                         }
-                      }}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center">
-                      <label
-                        htmlFor={`weight-type-performed-${index}`}
-                        className="sr-only"
-                      >
-                        weight type
-                      </label>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="w-max text-gray-500 sm:text-sm">
-                          /
-                          {isUsingKilograms
-                            ? weightKilograms[sameWeightForEachSet ? 0 : index]
-                            : weightPounds[
-                                sameWeightForEachSet ? 0 : index
-                              ]}{" "}
-                          {isUsingKilograms ? "kg" : "lbs"}
-                        </span>
+                        placeholder={0}
+                        onInput={(e) => {
+                          const newIsWeightPerformedEmptyString =
+                            isWeightPerformedEmptyString.slice();
+                          newIsWeightPerformedEmptyString[index] =
+                            e.target.value === "";
+                          setIsWeightPerformedEmptyString(
+                            newIsWeightPerformedEmptyString
+                          );
+
+                          const weight = Number(e.target.value);
+                          if (isUsingKilograms) {
+                            const newWeightKilograms =
+                              weightPerformedKilograms.slice();
+                            newWeightKilograms[index] = weight;
+                            setWeightPerformed(newWeightKilograms);
+                          } else {
+                            const newWeightPounds =
+                              weightPerformedPounds.slice();
+                            newWeightPounds[index] = weight;
+                            setWeightPerformed(newWeightPounds);
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center">
+                        <label
+                          htmlFor={`weight-type-performed-${index}`}
+                          className="sr-only"
+                        >
+                          weight type
+                        </label>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="w-max text-gray-500 sm:text-sm">
+                            /
+                            {isUsingKilograms
+                              ? weightKilograms[
+                                  sameWeightForEachSet ? 0 : index
+                                ]
+                              : weightPounds[
+                                  sameWeightForEachSet ? 0 : index
+                                ]}{" "}
+                            {isUsingKilograms ? "kg" : "lbs"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
+
                 {!video[index] && (
                   <div className="sm:col-span-3">
                     {" "}

@@ -201,6 +201,11 @@ export default function Diary() {
     }
   }, [addExerciseStatus]);
   useEffect(() => {
+    if (editExerciseStatus?.type === "succeeded") {
+      getExercises(true);
+    }
+  }, [editExerciseStatus]);
+  useEffect(() => {
     if (deleteExerciseStatus?.type === "succeeded") {
       getExercises(true);
       getExerciseDates();
@@ -1318,62 +1323,78 @@ export default function Diary() {
                   </dd>
                 </div>
               )}
-              {exercise.number_of_reps_performed === null && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Reps</dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.number_of_reps_assigned
-                      .map((reps) => (reps == 0 ? "amrap" : reps))
-                      .join(", ")}
-                  </dd>
-                </div>
+              {exercise.number_of_reps_assigned && (
+                <>
+                  {exercise.number_of_reps_performed === null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Reps
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.number_of_reps_assigned
+                          .map((reps) => (reps == 0 ? "amrap" : reps))
+                          .join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                  {exercise.number_of_reps_performed !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Reps
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.number_of_reps_performed
+                          .map(
+                            (numberOfReps, index) =>
+                              `${numberOfReps}/${
+                                exercise.number_of_reps_assigned[index] ||
+                                exercise.number_of_reps_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                </>
               )}
-              {exercise.number_of_reps_performed !== null && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Reps</dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.number_of_reps_performed
-                      .map(
-                        (numberOfReps, index) =>
-                          `${numberOfReps}/${
-                            exercise.number_of_reps_assigned[index] ||
-                            exercise.number_of_reps_assigned[0]
-                          }`
-                      )
-                      .join(", ")}
-                  </dd>
-                </div>
+
+              {exercise.weight_assigned && (
+                <>
+                  {exercise.weight_assigned.some((weight) => weight > 0) &&
+                    exercise.weight_performed === null && (
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Weight (
+                          {exercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                        </dt>
+                        <dd className="mt-1 break-words text-sm text-gray-900">
+                          {exercise.weight_assigned.join(", ")}
+                        </dd>
+                      </div>
+                    )}
+                  {exercise.weight_assigned.some((weight) => weight > 0) &&
+                    exercise.weight_performed !== null && (
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Weight (
+                          {exercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                        </dt>
+                        <dd className="mt-1 break-words text-sm text-gray-900">
+                          {exercise.weight_performed
+                            .map(
+                              (weight, index) =>
+                                `${weight}/${
+                                  exercise.weight_assigned[index] ||
+                                  exercise.weight_assigned[0]
+                                }`
+                            )
+                            .join(", ")}
+                        </dd>
+                      </div>
+                    )}
+                </>
               )}
-              {exercise.weight_assigned.some((weight) => weight > 0) &&
-                exercise.weight_performed === null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {exercise.weight_assigned.join(", ")}
-                    </dd>
-                  </div>
-                )}
-              {exercise.weight_assigned.some((weight) => weight > 0) &&
-                exercise.weight_performed !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {exercise.weight_performed
-                        .map(
-                          (weight, index) =>
-                            `${weight}/${
-                              exercise.weight_assigned[index] ||
-                              exercise.weight_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                    </dd>
-                  </div>
-                )}
+
               {exercise.rest_duration !== null && (
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
