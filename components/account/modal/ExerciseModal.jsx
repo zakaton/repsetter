@@ -762,15 +762,38 @@ export default function ExerciseModal(props) {
                 </dd>
               </div>
             )}
-            {previousExercise.set_duration_assigned !== null && (
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Set Duration (min)
-                </dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.set_duration_assigned.join(", ")}
-                </dd>
-              </div>
+
+            {previousExercise.set_duration_assigned && (
+              <>
+                {previousExercise.set_duration_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Set Duration (min)
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.set_duration_assigned.join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {previousExercise.set_duration_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Set Duration (min)
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.set_duration_performed
+                        .map(
+                          (setDurationPerformed, index) =>
+                            `${setDurationPerformed}/${
+                              previousExercise.set_duration_assigned[index] ||
+                              previousExercise.set_duration_assigned[0]
+                            }`
+                        )
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+              </>
             )}
             {previousVideo?.map(
               (video, index) =>
