@@ -167,6 +167,11 @@ export default function ExerciseModal(props) {
     setRestDuration([0]);
     setIsRestDurationEmptyString([]);
 
+    setSameSetDurationForEachSet(true);
+    setSetDurationAssigned([0]);
+    setIsSetDurationEmptyString([]);
+    setIsSetDurationPerformedEmptyString([]);
+
     setIsUpdatingExercise(false);
     setDidUpdateExercise(false);
     setSelectedExercise?.(null);
@@ -261,6 +266,28 @@ export default function ExerciseModal(props) {
         );
         setRestDuration(selectedExercise.rest_duration);
       }
+
+      if (selectedExercise.set_duration_assigned) {
+        const sameSetDurationForEachSet =
+          selectedExercise.set_duration_assigned.length == 1;
+        setSameSetDurationForEachSet(sameSetDurationForEachSet);
+
+        setSetDurationAssigned(selectedExercise.set_duration_assigned);
+
+        let setDurationPerformed =
+          selectedExercise.set_duration_performed !== null
+            ? selectedExercise.set_duration_performed
+            : selectedExercise.set_duration_assigned;
+        if (
+          setDurationPerformed.length !=
+          selectedExercise.number_of_sets_assigned
+        ) {
+          setDurationPerformed = new Array(
+            selectedExercise.number_of_sets_assigned
+          ).fill(0);
+        }
+        setSetDurationPerformed(setDurationPerformed);
+      }
     }
   }, [open, selectedExercise]);
 
@@ -320,14 +347,22 @@ export default function ExerciseModal(props) {
     []
   );
   const [sameRestDurationForEachSet, setSameRestDurationForEachSet] =
-    useState(false);
+    useState(true);
 
   const [setDurationAssigned, setSetDurationAssigned] = useState([]);
   const [setDurationPerformed, setSetDurationPerformed] = useState([]);
+  const [isSetDurationEmptyString, setIsSetDurationEmptyString] = useState([]);
+  const [
+    isSetDurationPerformedEmptyString,
+    setIsSetDurationPerformedEmptyString,
+  ] = useState([]);
+  const [sameSetDurationForEachSet, setSameSetDurationForEachSet] =
+    useState(true);
 
   useEffect(() => {
-    if (previousExercise) {
+    if (previousExercise && !selectedExercise) {
       setNumberOfSets(previousExercise.number_of_sets_assigned);
+
       if (previousExercise.number_of_reps_assigned) {
         setNumberOfReps(previousExercise.number_of_reps_assigned);
         setSameRepsForEachSet(
@@ -335,6 +370,22 @@ export default function ExerciseModal(props) {
             previousExercise.number_of_sets_assigned
         );
       }
+
+      if (previousExercise.rest_duration) {
+        setRestDuration(previousExercise.rest_duration);
+        setSameRestDurationForEachSet(
+          previousExercise.rest_duration.length !==
+            previousExercise.number_of_sets_assigned
+        );
+      }
+      if (previousExercise.set_duration_assigned) {
+        setSetDurationAssigned(previousExercise.set_duration_assigned);
+        setSameSetDurationForEachSet(
+          previousExercise.set_duration_assigned.length !==
+            previousExercise.number_of_sets_assigned
+        );
+      }
+
       if (previousExercise.weight_assigned) {
         setWeight(
           previousExercise.weight_assigned,
@@ -593,22 +644,26 @@ export default function ExerciseModal(props) {
                 </div>
               </div>
             </div>
-            {previousExercise.number_of_sets_performed === null && (
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Sets</dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.number_of_sets_assigned}
-                </dd>
-              </div>
-            )}
-            {previousExercise.number_of_sets_performed !== null && (
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Sets</dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.number_of_sets_performed}/
-                  {previousExercise.number_of_sets_assigned}
-                </dd>
-              </div>
+            {previousExercise.number_of_sets_assigned && (
+              <>
+                {previousExercise.number_of_sets_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.number_of_sets_assigned}
+                    </dd>
+                  </div>
+                )}
+                {previousExercise.number_of_sets_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.number_of_sets_performed}/
+                      {previousExercise.number_of_sets_assigned}
+                    </dd>
+                  </div>
+                )}
+              </>
             )}
 
             {previousExercise.number_of_reps_assigned && (
@@ -697,6 +752,26 @@ export default function ExerciseModal(props) {
                 </dd>
               </div>
             )}
+            {previousExercise.rest_duration !== null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Rest Duration (min)
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.rest_duration.join(", ")}
+                </dd>
+              </div>
+            )}
+            {previousExercise.set_duration_assigned !== null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Set Duration (min)
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.set_duration_assigned.join(", ")}
+                </dd>
+              </div>
+            )}
             {previousVideo?.map(
               (video, index) =>
                 video && (
@@ -760,6 +835,7 @@ export default function ExerciseModal(props) {
                 </div>
               </div>
             </div>
+
             <div>
               <label
                 htmlFor="sets"
@@ -866,6 +942,42 @@ export default function ExerciseModal(props) {
                         className="select-none font-medium text-gray-700"
                       >
                         Same Reps for Each Set
+                      </label>
+                    </div>
+                  </div>
+                )}
+                {selectedExerciseType.features?.includes("duration") && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameSetDurationForEachSet"
+                        name="sameSetDurationForEachSet"
+                        type="checkbox"
+                        checked={sameSetDurationForEachSet}
+                        onChange={(e) => {
+                          const newSameSetDurationForEachSet = e.target.checked;
+                          if (newSameSetDurationForEachSet) {
+                            setSetDurationAssigned([setDurationAssigned[0]]);
+                          } else {
+                            setSetDurationAssigned(
+                              new Array(numberOfSets).fill(
+                                setDurationAssigned[0]
+                              )
+                            );
+                          }
+                          setSameSetDurationForEachSet(
+                            newSameSetDurationForEachSet
+                          );
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameSetDurationForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Set Duration for Each Set
                       </label>
                     </div>
                   </div>
@@ -1058,6 +1170,92 @@ export default function ExerciseModal(props) {
                       <p className="mt-2 text-sm text-gray-500">
                         (0 for AMRAP)
                       </p>
+                    </div>
+                  ))}
+              </>
+            )}
+
+            {selectedExerciseType.features?.includes("duration") && (
+              <>
+                {sameSetDurationForEachSet && (
+                  <div className="col-start-1">
+                    <label
+                      htmlFor="setDuration"
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Set Duration
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        value={
+                          isSetDurationEmptyString[0]
+                            ? ""
+                            : setDurationAssigned[0]
+                        }
+                        placeholder={0}
+                        onInput={(e) => {
+                          setIsSetDurationEmptyString([e.target.value === ""]);
+                          setSetDurationAssigned([Number(e.target.value)]);
+                        }}
+                        name="setDuration"
+                        id="setDuration"
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">min</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!sameSetDurationForEachSet &&
+                  new Array(numberOfSets).fill(1).map((_, index) => (
+                    <div
+                      className={index === 0 ? "col-start-1" : ""}
+                      key={index}
+                    >
+                      <label
+                        htmlFor={`set-duration-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Set Duration #{index + 1}
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          value={
+                            isSetDurationEmptyString[index]
+                              ? ""
+                              : setDurationAssigned[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsSetDurationEmptyString =
+                              isSetDurationEmptyString.slice();
+                            newIsSetDurationEmptyString[index] =
+                              e.target.value === "";
+                            setIsSetDurationEmptyString(
+                              newIsSetDurationEmptyString
+                            );
+
+                            const newSetDuration = setDurationAssigned.slice();
+                            newSetDuration[index] = Number(e.target.value);
+                            setSetDurationAssigned(newSetDuration);
+                          }}
+                          name={`set-duration-${index}`}
+                          id={`set-duration-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">min</span>
+                        </div>
+                      </div>
                     </div>
                   ))}
               </>
@@ -1263,7 +1461,6 @@ export default function ExerciseModal(props) {
                             const newRestDuration = restDuration.slice();
                             newRestDuration[index] = Number(e.target.value);
                             setRestDuration(newRestDuration);
-                            console.log(newRestDuration);
                           }}
                           name={`rest-duration-${index}`}
                           id={`rest-duration-${index}`}
@@ -1447,6 +1644,59 @@ export default function ExerciseModal(props) {
                           {numberOfReps.length === 1
                             ? numberOfReps[0]
                             : numberOfReps[index]}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedExerciseType?.features?.includes("duration") && (
+                  <div>
+                    <label
+                      htmlFor={`set-duration-performed-${index}`}
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Set Duration
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        value={
+                          isSetDurationPerformedEmptyString[index]
+                            ? ""
+                            : setDurationPerformed[index]
+                        }
+                        onInput={(e) => {
+                          const newIsSetDurationPerformedEmptyString =
+                            isSetDurationPerformedEmptyString.slice();
+                          newIsSetDurationPerformedEmptyString[index] =
+                            e.target.value === "";
+                          setIsSetDurationPerformedEmptyString(
+                            newIsSetDurationPerformedEmptyString
+                          );
+
+                          const newSetDurationPerformed =
+                            setDurationPerformed.slice();
+                          newSetDurationPerformed[index] = Number(
+                            e.target.value
+                          );
+                          setSetDurationPerformed(newSetDurationPerformed);
+                        }}
+                        placeholder="0"
+                        name={`set-duration-performed-${index}`}
+                        id={`set-duration-performed-${index}`}
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">
+                          /
+                          {setDurationAssigned.length === 1
+                            ? setDurationAssigned[0]
+                            : setDurationAssigned[index]}{" "}
+                          min
                         </span>
                       </div>
                     </div>

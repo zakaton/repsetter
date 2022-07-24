@@ -29,7 +29,8 @@ export default function ExerciseTypesSelect({
       setIsFetchingExerciseTypes(true);
       const { data: exerciseTypes } = await supabase
         .from("exercise_type")
-        .select("*");
+        .select("*")
+        .order("name", { ascending: true });
       console.log("got exercise types", exerciseTypes);
       setExerciseTypes(exerciseTypes);
       setIsFetchingExerciseTypes(false);

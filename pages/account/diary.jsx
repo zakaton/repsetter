@@ -127,6 +127,7 @@ export default function Diary() {
       .from("exercise")
       .select("*, type(*)")
       .order("time", { ascending: true })
+      .order("created_at", { ascending: true })
       .match(matchFilters);
     if (error) {
       console.error(error);
@@ -418,7 +419,9 @@ export default function Diary() {
       .from("weight")
       .select("*")
       .match(matchFilters)
-      .order("time", { ascending: true });
+      .order("time", { ascending: true })
+      .order("created_at", { ascending: true });
+
     if (error) {
       console.error(error);
     } else {
@@ -442,6 +445,7 @@ export default function Diary() {
         .lt("date", selectedDate.toDateString())
         .order("date", { ascending: false })
         .order("time", { ascending: false })
+
         .limit(1)
         .maybeSingle();
       if (getLastWeightBeforeTodayError) {
@@ -1404,6 +1408,38 @@ export default function Diary() {
                     {exercise.rest_duration.join(", ")}
                   </dd>
                 </div>
+              )}
+              {exercise.set_duration_assigned && (
+                <>
+                  {exercise.set_duration_performed === null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Set Duration (min)
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.set_duration_assigned.join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                  {exercise.set_duration_performed !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Set Duration (min)
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.set_duration_performed
+                          .map(
+                            (durationPerformed, index) =>
+                              `${durationPerformed}/${
+                                exercise.set_duration_assigned[index] ||
+                                exercise.set_duration_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                </>
               )}
               {exercise.difficulty !== null && (
                 <div className="sm:col-span-1">

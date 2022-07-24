@@ -36,6 +36,7 @@ const orderTypes = [
     value: [
       ["date", { ascending: false }],
       ["time", { ascending: true }],
+      ["created_at", { ascending: true }],
     ],
     current: true,
   },
@@ -45,6 +46,7 @@ const orderTypes = [
     value: [
       ["date", { ascending: false }],
       ["time", { ascending: false }],
+      ["created_at", { ascending: true }],
     ],
     current: false,
   },
@@ -215,6 +217,21 @@ export default function Exercises() {
                         `${numberOfReps}/${
                           exercise.number_of_reps_assigned[index] ||
                           exercise.number_of_reps_assigned[0]
+                        }`
+                    )
+                    .join(", "),
+          },
+          exercise.set_duration_assigned && {
+            title: "set duration (min)",
+            value:
+              exercise.set_duration_performed === null
+                ? exercise.set_duration_assigned.join(", ")
+                : exercise.set_duration_performed
+                    .map(
+                      (setDurationPerformed, index) =>
+                        `${setDurationPerformed}/${
+                          exercise.set_duration_assigned[index] ||
+                          exercise.set_duration_assigned[0]
                         }`
                     )
                     .join(", "),
