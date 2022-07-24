@@ -11,6 +11,7 @@ const pathnamesForQuery = [
   "progress",
   "pictures",
   "exercises",
+  "all-users",
 ].map((pathname) => "/account/" + pathname);
 
 export function ClientContextProvider(props) {
@@ -200,6 +201,8 @@ export function ClientContextProvider(props) {
     getSelectedDate,
     isSelectedDateToday,
     isSelectedDateAfterToday,
+
+    setInitialClientEmail,
   };
 
   return <ClientContext.Provider value={value} {...props} />;

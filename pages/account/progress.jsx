@@ -51,6 +51,10 @@ const graphTypeOrder = [
   "number of sets",
   "number of reps",
   "difficulty",
+  "speed",
+  "level",
+  "duration",
+  "rest duration",
   "exercise time",
 ];
 const dateRangeFilterType = {

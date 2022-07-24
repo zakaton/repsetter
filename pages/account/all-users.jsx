@@ -4,6 +4,7 @@ import { useUser } from "../../context/user-context";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import DeleteUserModal from "../../components/account/modal/DeleteUserModal";
 import Table from "../../components/Table";
+import { useClient } from "../../context/client-context";
 
 const filterTypes = [
   {
@@ -46,6 +47,7 @@ const orderTypes = [
 export default function AllUsers() {
   const router = useRouter();
   const { isAdmin } = useUser();
+  const { setInitialClientEmail } = useClient();
 
   useEffect(() => {
     if (router.isReady && !isAdmin) {
@@ -83,6 +85,18 @@ export default function AllUsers() {
             {
               title: "joined",
               value: new Date(result.created_at).toLocaleString(),
+            },
+            {
+              jsx: (
+                <button
+                  onClick={() => {
+                    setInitialClientEmail(result.email);
+                  }}
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  View<span className="sr-only"> user</span>
+                </button>
+              ),
             },
           ]}
         ></Table>
