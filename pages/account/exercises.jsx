@@ -252,6 +252,36 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
+          exercise.level_assigned && {
+            title: "level",
+            value:
+              exercise.level_performed === null
+                ? exercise.level_assigned.join(", ")
+                : exercise.level_performed
+                    .map(
+                      (levelPerformed, index) =>
+                        `${levelPerformed}/${
+                          exercise.level_assigned[index] ||
+                          exercise.level_assigned[0]
+                        }`
+                    )
+                    .join(", "),
+          },
+          exercise.speed_assigned && {
+            title: "speed",
+            value:
+              exercise.speed_performed === null
+                ? exercise.speed_assigned.join(", ")
+                : exercise.speed_performed
+                    .map(
+                      (speedPerformed, index) =>
+                        `${speedPerformed}/${
+                          exercise.speed_assigned[index] ||
+                          exercise.speed_assigned[0]
+                        }`
+                    )
+                    .join(", "),
+          },
           exercise.weight_assigned &&
             exercise.weight_assigned.some((weight) => weight > 0) && {
               title: `Weight (${

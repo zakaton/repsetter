@@ -1441,6 +1441,70 @@ export default function Diary() {
                   )}
                 </>
               )}
+              {exercise.speed_assigned && (
+                <>
+                  {exercise.speed_performed === null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Speed
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.speed_assigned.join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                  {exercise.speed_performed !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Speed
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.speed_performed
+                          .map(
+                            (speedPerformed, index) =>
+                              `${speedPerformed}/${
+                                exercise.speed_assigned[index] ||
+                                exercise.speed_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                </>
+              )}
+              {exercise.level_assigned && (
+                <>
+                  {exercise.level_performed === null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Level
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.level_assigned.join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                  {exercise.level_performed !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Level
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.level_performed
+                          .map(
+                            (levelPerformed, index) =>
+                              `${levelPerformed}/${
+                                exercise.level_assigned[index] ||
+                                exercise.level_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                      </dd>
+                    </div>
+                  )}
+                </>
+              )}
               {exercise.difficulty !== null && (
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">

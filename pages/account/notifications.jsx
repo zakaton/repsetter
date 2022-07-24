@@ -64,7 +64,7 @@ export default function Notifications() {
 
           <fieldset>
             <legend className="text-base font-medium text-gray-900">
-              For Clients
+              Coach Updates
             </legend>
             <div className="mt-4 space-y-4">
               {notificationTypes
@@ -103,7 +103,7 @@ export default function Notifications() {
           {user.can_coach && (
             <fieldset>
               <legend className="text-base font-medium text-gray-900">
-                For Coaches
+                Client Updates
               </legend>
               <div className="mt-4 space-y-4">
                 {notificationTypes

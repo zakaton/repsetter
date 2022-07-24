@@ -172,6 +172,16 @@ export default function ExerciseModal(props) {
     setIsSetDurationEmptyString([]);
     setIsSetDurationPerformedEmptyString([]);
 
+    setSameSpeedForEachSet(true);
+    setSpeedAssigned([0]);
+    setIsSpeedEmptyString([]);
+    setIsSpeedPerformedEmptyString([]);
+
+    setSameLevelForEachSet(true);
+    setLevelAssigned([0]);
+    setIsLevelEmptyString([]);
+    setIsLevelPerformedEmptyString([]);
+
     setIsUpdatingExercise(false);
     setDidUpdateExercise(false);
     setSelectedExercise?.(null);
@@ -288,6 +298,42 @@ export default function ExerciseModal(props) {
         }
         setSetDurationPerformed(setDurationPerformed);
       }
+
+      if (selectedExercise.level_assigned) {
+        const sameLevelForEachSet = selectedExercise.level_assigned.length == 1;
+        setSameLevelForEachSet(sameLevelForEachSet);
+
+        setLevelAssigned(selectedExercise.level_assigned);
+
+        let levelPerformed =
+          selectedExercise.level_performed !== null
+            ? selectedExercise.level_performed
+            : selectedExercise.level_assigned;
+        if (levelPerformed.length != selectedExercise.number_of_sets_assigned) {
+          levelPerformed = new Array(
+            selectedExercise.number_of_sets_assigned
+          ).fill(0);
+        }
+        setLevelPerformed(levelPerformed);
+      }
+
+      if (selectedExercise.speed_assigned) {
+        const sameSpeedForEachSet = selectedExercise.speed_assigned.length == 1;
+        setSameSpeedForEachSet(sameSpeedForEachSet);
+
+        setSpeedAssigned(selectedExercise.speed_assigned);
+
+        let speedPerformed =
+          selectedExercise.speed_performed !== null
+            ? selectedExercise.speed_performed
+            : selectedExercise.speed_assigned;
+        if (speedPerformed.length != selectedExercise.number_of_sets_assigned) {
+          speedPerformed = new Array(
+            selectedExercise.number_of_sets_assigned
+          ).fill(0);
+        }
+        setSpeedPerformed(speedPerformed);
+      }
     }
   }, [open, selectedExercise]);
 
@@ -359,6 +405,20 @@ export default function ExerciseModal(props) {
   const [sameSetDurationForEachSet, setSameSetDurationForEachSet] =
     useState(true);
 
+  const [speedAssigned, setSpeedAssigned] = useState([]);
+  const [speedPerformed, setSpeedPerformed] = useState([]);
+  const [isSpeedEmptyString, setIsSpeedEmptyString] = useState([]);
+  const [isSpeedPerformedEmptyString, setIsSpeedPerformedEmptyString] =
+    useState([]);
+  const [sameSpeedForEachSet, setSameSpeedForEachSet] = useState(true);
+
+  const [levelAssigned, setLevelAssigned] = useState([]);
+  const [levelPerformed, setLevelPerformed] = useState([]);
+  const [isLevelEmptyString, setIsLevelEmptyString] = useState([]);
+  const [isLevelPerformedEmptyString, setIsLevelPerformedEmptyString] =
+    useState([]);
+  const [sameLevelForEachSet, setSameLevelForEachSet] = useState(true);
+
   useEffect(() => {
     if (previousExercise && !selectedExercise) {
       setNumberOfSets(previousExercise.number_of_sets_assigned);
@@ -378,10 +438,27 @@ export default function ExerciseModal(props) {
             previousExercise.number_of_sets_assigned
         );
       }
+
       if (previousExercise.set_duration_assigned) {
         setSetDurationAssigned(previousExercise.set_duration_assigned);
         setSameSetDurationForEachSet(
           previousExercise.set_duration_assigned.length !==
+            previousExercise.number_of_sets_assigned
+        );
+      }
+
+      if (previousExercise.speed_assigned) {
+        setSpeedAssigned(previousExercise.speed_assigned);
+        setSameSpeedForEachSet(
+          previousExercise.speed_assigned.length !==
+            previousExercise.number_of_sets_assigned
+        );
+      }
+
+      if (previousExercise.level_assigned) {
+        setLevelAssigned(previousExercise.level_assigned);
+        setSameLevelForEachSet(
+          previousExercise.level_assigned.length !==
             previousExercise.number_of_sets_assigned
         );
       }
@@ -481,6 +558,20 @@ export default function ExerciseModal(props) {
                   }
                 : {}),
 
+              ...(selectedExerciseType.features?.includes("speed")
+                ? {
+                    speed_assigned: speedAssigned,
+                    speed_performed: speedPerformed,
+                  }
+                : {}),
+
+              ...(selectedExerciseType.features?.includes("level")
+                ? {
+                    level_assigned: levelAssigned,
+                    level_performed: levelPerformed,
+                  }
+                : {}),
+
               difficulty,
               video,
             };
@@ -542,6 +633,18 @@ export default function ExerciseModal(props) {
               ...(selectedExerciseType.features?.includes("duration")
                 ? {
                     set_duration_assigned: setDurationAssigned,
+                  }
+                : {}),
+
+              ...(selectedExerciseType.features?.includes("speed")
+                ? {
+                    speed_assigned: speedAssigned,
+                  }
+                : {}),
+
+              ...(selectedExerciseType.features?.includes("level")
+                ? {
+                    level_assigned: levelAssigned,
                   }
                 : {}),
             };
@@ -796,6 +899,65 @@ export default function ExerciseModal(props) {
                 )}
               </>
             )}
+
+            {previousExercise.speed_assigned && (
+              <>
+                {previousExercise.speed_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Speed</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.speed_assigned.join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {previousExercise.speed_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Speed</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.speed_performed
+                        .map(
+                          (speedPerformed, index) =>
+                            `${speedPerformed}/${
+                              previousExercise.speed_assigned[index] ||
+                              previousExercise.speed_assigned[0]
+                            }`
+                        )
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+              </>
+            )}
+
+            {previousExercise.level_assigned && (
+              <>
+                {previousExercise.level_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Level</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.level_assigned.join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {previousExercise.level_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Level</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {previousExercise.level_performed
+                        .map(
+                          (level, index) =>
+                            `${level}/${
+                              previousExercise.level_assigned[index] ||
+                              previousExercise.level_assigned[0]
+                            }`
+                        )
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+              </>
+            )}
+
             {previousVideo?.map(
               (video, index) =>
                 video && (
@@ -970,6 +1132,7 @@ export default function ExerciseModal(props) {
                     </div>
                   </div>
                 )}
+
                 {selectedExerciseType.features?.includes("duration") && (
                   <div className="relative flex self-center">
                     <div className="flex h-5 items-center">
@@ -1006,6 +1169,73 @@ export default function ExerciseModal(props) {
                     </div>
                   </div>
                 )}
+
+                {selectedExerciseType.features?.includes("speed") && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameSpeedForEachSet"
+                        name="sameSpeedForEachSet"
+                        type="checkbox"
+                        checked={sameSpeedForEachSet}
+                        onChange={(e) => {
+                          const newSameSpeedForEachSet = e.target.checked;
+                          if (newSameSpeedForEachSet) {
+                            setSpeedAssigned([speedAssigned[0]]);
+                          } else {
+                            setSpeedAssigned(
+                              new Array(numberOfSets).fill(speedAssigned[0])
+                            );
+                          }
+                          setSameSpeedForEachSet(newSameSpeedForEachSet);
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameSpeedForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Speed for Each Set
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {selectedExerciseType.features?.includes("level") && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameLevelForEachSet"
+                        name="sameLevelForEachSet"
+                        type="checkbox"
+                        checked={sameLevelForEachSet}
+                        onChange={(e) => {
+                          const newSameLevelForEachSet = e.target.checked;
+                          if (newSameLevelForEachSet) {
+                            setLevelAssigned([levelAssigned[0]]);
+                          } else {
+                            setLevelAssigned(
+                              new Array(numberOfSets).fill(levelAssigned[0])
+                            );
+                          }
+                          setSameLevelForEachSet(newSameLevelForEachSet);
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameLevelForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Level for Each Set
+                      </label>
+                    </div>
+                  </div>
+                )}
+
                 {selectedExerciseType.features?.includes("weight") && (
                   <div className="relative flex self-center">
                     <div className="flex h-5 items-center">
@@ -1213,7 +1443,8 @@ export default function ExerciseModal(props) {
                       <input
                         required
                         type="number"
-                        inputMode="numeric"
+                        inputMode="decimal"
+                        step="0.1"
                         min="0"
                         value={
                           isSetDurationEmptyString[0]
@@ -1251,7 +1482,8 @@ export default function ExerciseModal(props) {
                         <input
                           required
                           type="number"
-                          inputMode="numeric"
+                          inputMode="decimal"
+                          step="0.1"
                           min="0"
                           value={
                             isSetDurationEmptyString[index]
@@ -1300,6 +1532,7 @@ export default function ExerciseModal(props) {
                         required
                         type="number"
                         inputMode="decimal"
+                        step="0.1"
                         min="0"
                         name="weight"
                         id="weight"
@@ -1355,6 +1588,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
+                          step="0.1"
                           min="0"
                           name={`weight-${index}`}
                           id={`weight-${index}`}
@@ -1415,6 +1649,158 @@ export default function ExerciseModal(props) {
               </>
             )}
 
+            {selectedExerciseType.features?.includes("speed") && (
+              <>
+                {sameSpeedForEachSet && (
+                  <div className="col-start-1">
+                    <label
+                      htmlFor="speed"
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Speed
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="decimal"
+                        step="0.1"
+                        min="0"
+                        value={isSpeedEmptyString[0] ? "" : speedAssigned[0]}
+                        placeholder={0}
+                        onInput={(e) => {
+                          setIsSpeedEmptyString([e.target.value === ""]);
+                          setSpeedAssigned([Number(e.target.value)]);
+                        }}
+                        name="speed"
+                        id="speed"
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+                {!sameSpeedForEachSet &&
+                  new Array(numberOfSets).fill(1).map((_, index) => (
+                    <div
+                      className={index === 0 ? "col-start-1" : ""}
+                      key={index}
+                    >
+                      <label
+                        htmlFor={`set-speed-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Speed #{index + 1}
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          value={
+                            isSpeedEmptyString[index]
+                              ? ""
+                              : speedAssigned[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsSpeedEmptyString =
+                              isSpeedEmptyString.slice();
+                            newIsSpeedEmptyString[index] =
+                              e.target.value === "";
+                            setIsSpeedEmptyString(newIsSpeedEmptyString);
+
+                            const newSpeed = speedAssigned.slice();
+                            newSpeed[index] = Number(e.target.value);
+                            setSpeedAssigned(newSpeed);
+                          }}
+                          name={`set-speed-${index}`}
+                          id={`set-speed-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+                  ))}
+              </>
+            )}
+
+            {selectedExerciseType.features?.includes("level") && (
+              <>
+                {sameLevelForEachSet && (
+                  <div className="col-start-1">
+                    <label
+                      htmlFor="level"
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Level
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="decimal"
+                        step="0.1"
+                        min="0"
+                        value={isLevelEmptyString[0] ? "" : levelAssigned[0]}
+                        placeholder={0}
+                        onInput={(e) => {
+                          setIsLevelEmptyString([e.target.value === ""]);
+                          setLevelAssigned([Number(e.target.value)]);
+                        }}
+                        name="level"
+                        id="level"
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+                {!sameLevelForEachSet &&
+                  new Array(numberOfSets).fill(1).map((_, index) => (
+                    <div
+                      className={index === 0 ? "col-start-1" : ""}
+                      key={index}
+                    >
+                      <label
+                        htmlFor={`set-level-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Level #{index + 1}
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          value={
+                            isLevelEmptyString[index]
+                              ? ""
+                              : levelAssigned[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsLevelEmptyString =
+                              isLevelEmptyString.slice();
+                            newIsLevelEmptyString[index] =
+                              e.target.value === "";
+                            setIsLevelEmptyString(newIsLevelEmptyString);
+
+                            const newLevel = levelAssigned.slice();
+                            newLevel[index] = Number(e.target.value);
+                            setLevelAssigned(newLevel);
+                          }}
+                          name={`set-level-${index}`}
+                          id={`set-level-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+                  ))}
+              </>
+            )}
+
             {includeRestDuration && (
               <>
                 {sameRestDurationForEachSet && (
@@ -1429,7 +1815,8 @@ export default function ExerciseModal(props) {
                       <input
                         required
                         type="number"
-                        inputMode="numeric"
+                        inputMode="decimal"
+                        step="0.1"
                         min="0"
                         value={
                           isRestDurationEmptyString[0] ? "" : restDuration[0]
@@ -1465,7 +1852,8 @@ export default function ExerciseModal(props) {
                         <input
                           required
                           type="number"
-                          inputMode="numeric"
+                          inputMode="decimal"
+                          step="0.1"
                           min="0"
                           value={
                             isRestDurationEmptyString[index]
@@ -1686,7 +2074,8 @@ export default function ExerciseModal(props) {
                       <input
                         required
                         type="number"
-                        inputMode="numeric"
+                        inputMode="decimal"
+                        step="0.1"
                         min="0"
                         value={
                           isSetDurationPerformedEmptyString[index]
@@ -1720,6 +2109,108 @@ export default function ExerciseModal(props) {
                           {setDurationAssigned.length === 1
                             ? setDurationAssigned[0]
                             : setDurationAssigned[index]}{" "}
+                          min
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedExerciseType?.features?.includes("speed") && (
+                  <div>
+                    <label
+                      htmlFor={`set-speed-performed-${index}`}
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Speed
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="decimal"
+                        step="0.1"
+                        min="0"
+                        value={
+                          isSpeedPerformedEmptyString[index]
+                            ? ""
+                            : speedPerformed[index]
+                        }
+                        onInput={(e) => {
+                          const newIsSpeedPerformedEmptyString =
+                            isSpeedPerformedEmptyString.slice();
+                          newIsSpeedPerformedEmptyString[index] =
+                            e.target.value === "";
+                          setIsSpeedPerformedEmptyString(
+                            newIsSpeedPerformedEmptyString
+                          );
+
+                          const newSpeedPerformed = speedPerformed.slice();
+                          newSpeedPerformed[index] = Number(e.target.value);
+                          setSpeedPerformed(newSpeedPerformed);
+                        }}
+                        placeholder="0"
+                        name={`set-speed-performed-${index}`}
+                        id={`set-speed-performed-${index}`}
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">
+                          /
+                          {speedAssigned.length === 1
+                            ? speedAssigned[0]
+                            : speedAssigned[index]}{" "}
+                          min
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedExerciseType?.features?.includes("level") && (
+                  <div>
+                    <label
+                      htmlFor={`set-level-performed-${index}`}
+                      className="block select-none text-sm font-medium text-gray-700"
+                    >
+                      Level
+                    </label>
+                    <div className="relative mt-1 rounded-md shadow-sm">
+                      <input
+                        required
+                        type="number"
+                        inputMode="decimal"
+                        step="0.1"
+                        min="0"
+                        value={
+                          isLevelPerformedEmptyString[index]
+                            ? ""
+                            : levelPerformed[index]
+                        }
+                        onInput={(e) => {
+                          const newIsLevelPerformedEmptyString =
+                            isLevelPerformedEmptyString.slice();
+                          newIsLevelPerformedEmptyString[index] =
+                            e.target.value === "";
+                          setIsLevelPerformedEmptyString(
+                            newIsLevelPerformedEmptyString
+                          );
+
+                          const newLevelPerformed = levelPerformed.slice();
+                          newLevelPerformed[index] = Number(e.target.value);
+                          setLevelPerformed(newLevelPerformed);
+                        }}
+                        placeholder="0"
+                        name={`set-level-performed-${index}`}
+                        id={`set-level-performed-${index}`}
+                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">
+                          /
+                          {levelAssigned.length === 1
+                            ? levelAssigned[0]
+                            : levelAssigned[index]}{" "}
                           min
                         </span>
                       </div>
@@ -1783,6 +2274,7 @@ export default function ExerciseModal(props) {
                         required
                         type="number"
                         inputMode="decimal"
+                        step="0.1"
                         min="0"
                         name={`weight-performed-${index}`}
                         id={`weight-performed-${index}`}
