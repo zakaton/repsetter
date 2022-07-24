@@ -752,6 +752,7 @@ export default function ExerciseModal(props) {
                 </dd>
               </div>
             )}
+
             {previousExercise.rest_duration !== null && (
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">

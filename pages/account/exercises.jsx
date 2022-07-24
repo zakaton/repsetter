@@ -122,12 +122,26 @@ export default function Exercises() {
       for (let id in videoPlayer) {
         videoPlayer[id].forEach((player) => player?.pauseVideo());
       }
+      setShowEditExerciseModal(false);
+      clearNotifications();
     } else {
       for (let id in videoPlayer) {
         videoPlayer[id].forEach((player) => player?.playVideo());
       }
     }
   };
+
+  const clearNotifications = () => {
+    setShowEditExerciseNotification(false);
+  };
+
+  const [refreshResults, setRefreshResults] = useState(false);
+
+  useEffect(() => {
+    if (editExerciseStatus?.type === "succeeded") {
+      setRefreshResults(true);
+    }
+  }, [editExerciseStatus]);
 
   return (
     <>
@@ -145,6 +159,8 @@ export default function Exercises() {
         status={editExerciseStatus}
       />
       <Table
+        refreshResults={refreshResults}
+        setRefreshResults={setRefreshResults}
         clearFiltersListener={clearFiltersListener}
         includeClientSelect={true}
         baseFilter={baseFilter}

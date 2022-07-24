@@ -89,6 +89,14 @@ export default function Bodyweight() {
     }
   }, [weights, selectedClientId]);
 
+  const [refreshResults, setRefreshResults] = useState(false);
+
+  useEffect(() => {
+    if (editWeightStatus?.type === "succeeded") {
+      setRefreshResults(true);
+    }
+  }, [editWeightStatus]);
+
   return (
     <>
       <WeightModal
@@ -105,6 +113,8 @@ export default function Bodyweight() {
         status={editWeightStatus}
       />
       <Table
+        refreshResults={refreshResults}
+        setRefreshResults={setRefreshResults}
         className={
           "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7"
         }

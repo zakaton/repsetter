@@ -75,8 +75,11 @@ export default function ExerciseTypes() {
   useEffect(() => {
     if (editExerciseTypeStatus?.type === "succeeded") {
       getExerciseVideo(editExerciseTypeStatus.exerciseTypeId, true);
+      setRefreshResults(true);
     }
   }, [editExerciseTypeStatus]);
+
+  const [refreshResults, setRefreshResults] = useState(false);
 
   return (
     <>
@@ -96,6 +99,8 @@ export default function ExerciseTypes() {
       <Table
         modalListener={modalListener}
         resultsListener={setResults}
+        refreshResults={refreshResults}
+        setRefreshResults={setRefreshResults}
         filterTypes={filterTypes}
         orderTypes={orderTypes}
         tableName="exercise_type"

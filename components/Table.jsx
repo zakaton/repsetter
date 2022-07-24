@@ -34,6 +34,8 @@ export default function Table({
   clearFiltersListener,
   modalListener,
   className,
+  refreshResults,
+  setRefreshResults,
 }) {
   const { isLoading, user } = useUser();
   const { selectedClient } = useClient();
@@ -114,6 +116,13 @@ export default function Table({
       setPreviousPageIndex(pageIndex);
     }
   };
+
+  useEffect(() => {
+    if (refreshResults) {
+      getResults(true);
+      setRefreshResults(false);
+    }
+  }, [refreshResults]);
 
   useEffect(() => {
     if (results && !isGettingResults) {
@@ -202,6 +211,17 @@ export default function Table({
       modalListener(areEitherModalOpen);
     }
   }, [showDeleteResultModal, showCreateResultModal]);
+
+  useEffect(() => {
+    if (deleteResultStatus?.type === "succeeded") {
+      getResults(true);
+    }
+  }, [deleteResultStatus]);
+  useEffect(() => {
+    if (createResultStatus?.type === "succeeded") {
+      getResults(true);
+    }
+  }, [createResultStatus]);
 
   const showPrevious = async () => {
     console.log("showPrevious");
