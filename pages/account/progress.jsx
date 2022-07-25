@@ -313,8 +313,8 @@ const graphTypes = {
   duration: {
     label: "Set Duration",
     type: "bar",
-    borderColor: "rgb(34, 197, 94)",
-    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    borderColor: "rgb(252, 143, 0)",
+    backgroundColor: "rgba(252, 143, 0, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
         let setDurationPerformed = 0;
@@ -342,8 +342,8 @@ const graphTypes = {
   "rest duration": {
     label: "Rest Duration",
     type: "bar",
-    borderColor: "rgb(34, 197, 94)",
-    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    borderColor: "rgb(0, 255, 247)",
+    backgroundColor: "rgba(0, 255, 247, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
         let topRestDuration = 0;
@@ -365,8 +365,8 @@ const graphTypes = {
   speed: {
     label: "Speed",
     type: "bar",
-    borderColor: "rgb(34, 197, 94)",
-    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    borderColor: "rgb(130, 0, 252)",
+    backgroundColor: "rgba(130, 0, 252, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
         let topSpeedPerformed = 0;
@@ -811,7 +811,7 @@ export default function Progress() {
           },
           title: {
             display: true,
-            text: `Exercise Time`,
+            text: "Exercise Time",
           },
         },
         y6: {
