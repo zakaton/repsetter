@@ -1280,8 +1280,6 @@ export default function Diary() {
             >
               <div className="sm:col-span-1">
                 <ExerciseTypeVideo
-                  width="100%"
-                  height="100%"
                   exerciseTypeId={exercise.type.id}
                   fetchVideo={false}
                 ></ExerciseTypeVideo>
