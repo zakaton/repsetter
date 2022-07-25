@@ -193,7 +193,6 @@ export default function Exercises() {
             exercise.type.id in exerciseVideos && {
               jsx: (
                 <ExerciseTypeVideo
-                  width="100px"
                   exerciseTypeId={exercise.type.id}
                   fetchVideo={false}
                 ></ExerciseTypeVideo>

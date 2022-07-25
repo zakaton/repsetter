@@ -142,8 +142,6 @@ export default function ExerciseTypesSelect({
                       className="w-min-[100px] hidden sm:block"
                       play={active || isMobile}
                       exerciseTypeId={exerciseType.id}
-                      width="100"
-                      height="100"
                       fetchVideo={false}
                     ></ExerciseTypeVideo>
 
