@@ -142,7 +142,7 @@ export default function ExerciseTypesSelect({
                       play={active || isMobile}
                       exerciseTypeId={exerciseType.id}
                       width="100"
-                      height="75"
+                      height="100"
                       fetchVideo={false}
                     ></ExerciseTypeVideo>
 
