@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import LazyLoad from "vanilla-lazyload";
 import lazyloadConfig from "../utils/lazyload-config";
 
@@ -17,8 +17,21 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
     document.lazyLoadInstance.update();
   }, []);
 
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  useEffect(() => {
+    if (src && hasPlayed && ref.current) {
+      const video = ref.current;
+      video.src = src;
+      setHasPlayed(false);
+    }
+  }, [src]);
+
   return (
     <video
+      onPlay={(e) => {
+        setHasPlayed(true);
+      }}
       {...propsSubset}
       ref={ref}
       className={classNames(className || "", "lazy")}

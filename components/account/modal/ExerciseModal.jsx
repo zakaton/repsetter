@@ -358,6 +358,8 @@ export default function ExerciseModal(props) {
       } else {
         if (previousExercises.length > 0) {
           setPreviousExercise(previousExercises[0]);
+        } else {
+          setPreviousExercise();
         }
       }
       setIsGettingPreviousExercise(false);
