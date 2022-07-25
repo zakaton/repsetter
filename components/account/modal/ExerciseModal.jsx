@@ -700,6 +700,7 @@ export default function ExerciseModal(props) {
               <ExerciseTypeVideo
                 exerciseTypeId={selectedExerciseType.id}
                 fetchVideo={false}
+                play={true}
               />
             </div>
           )}
