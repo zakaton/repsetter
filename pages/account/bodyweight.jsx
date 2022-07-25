@@ -78,8 +78,6 @@ export default function Bodyweight() {
 
   console.log("baseFilter", baseFilter);
 
-  window.s = supabase;
-
   const { pictures, getPicture } = usePictures();
   useEffect(() => {
     if (weights && selectedClientId) {
