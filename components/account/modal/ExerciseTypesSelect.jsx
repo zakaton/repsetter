@@ -131,7 +131,7 @@ export default function ExerciseTypesSelect({
                 value={exerciseType}
                 className={({ active }) =>
                   classNames(
-                    "relative cursor-pointer select-none py-2 pl-3 pr-9",
+                    "border-grey-500 relative cursor-pointer select-none border-t py-2 pl-3 pr-9",
                     active ? "bg-blue-600 text-white" : "text-gray-900"
                   )
                 }
