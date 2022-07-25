@@ -28,12 +28,17 @@ export function ExerciseVideoContextProvider(props) {
             console.error(listError);
           }
 
+          console.log("list", list);
+
           const videoDetails = list?.find(({ name }) =>
             name.startsWith("video")
           );
           const imageDetails = list?.find(({ name }) =>
             name.startsWith("image")
           );
+
+          console.log("videoDetails", videoDetails);
+          console.log("imageDetails", imageDetails);
 
           const { publicURL: url, error: getVideoUrlError } =
             await supabase.storage

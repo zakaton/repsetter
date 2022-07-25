@@ -36,6 +36,8 @@ export default function Table({
   className,
   refreshResults,
   setRefreshResults,
+  clearNotifications,
+  setClearNotifications,
 }) {
   const { isLoading, user } = useUser();
   const { selectedClient } = useClient();
@@ -211,6 +213,14 @@ export default function Table({
       modalListener(areEitherModalOpen);
     }
   }, [showDeleteResultModal, showCreateResultModal]);
+
+  useEffect(() => {
+    if (clearNotifications) {
+      setShowCreateResultNotification(false);
+      setShowDeleteResultNotification(false);
+      setClearNotifications(false);
+    }
+  }, [clearNotifications]);
 
   useEffect(() => {
     if (deleteResultStatus?.type === "succeeded") {

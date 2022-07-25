@@ -66,9 +66,12 @@ export default function ExerciseTypes() {
     setIsAnyModalOpen(isAnyModalOpen);
   };
 
+  const [clearNotifications, setClearNotifications] = useState(false);
+
   useEffect(() => {
     if (showEditExerciseTypeModal || isAnyModalOpen) {
       setShowEditExerciseTypeNotification(false);
+      setClearNotifications(true);
     }
   }, [showEditExerciseTypeModal, isAnyModalOpen]);
 
@@ -101,6 +104,8 @@ export default function ExerciseTypes() {
         resultsListener={setResults}
         refreshResults={refreshResults}
         setRefreshResults={setRefreshResults}
+        clearNotifications={clearNotifications}
+        setClearNotifications={setClearNotifications}
         filterTypes={filterTypes}
         orderTypes={orderTypes}
         tableName="exercise_type"

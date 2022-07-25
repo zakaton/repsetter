@@ -209,7 +209,7 @@ export default function ExerciseTypeModal(props) {
               console.log("updating video file", videoFile);
               const { data: replaceVideo, error } = await supabase.storage
                 .from("exercise")
-                .update(`${selectedExerciseType.id}.mp4`, videoFile);
+                .update(`${selectedExerciseType.id}/video.mp4`, videoFile);
               replaceVideoError = error;
               if (replaceVideoError) {
                 console.error(replaceVideoError);
@@ -579,6 +579,7 @@ export default function ExerciseTypeModal(props) {
               <video
                 onLoadedMetadata={(e) => {
                   setVideoDuration(e.target.duration);
+                  setVideoThumbnailTime(0);
                 }}
                 className="w-full"
                 autoPlay={true}
@@ -624,7 +625,7 @@ export default function ExerciseTypeModal(props) {
                   htmlFor="video-replace"
                   className="mt-2 inline-flex cursor-pointer items-center rounded border border-transparent bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                  <span>Replace Video</span>
+                  <span>Upload Video</span>
                   <input
                     id="video-replace"
                     name="video-replace"
