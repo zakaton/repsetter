@@ -119,11 +119,16 @@ export default function ExerciseTypeModal(props) {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageBlob = await new Promise((resolve) => canvas.toBlob(resolve));
-    const imageFile = await compressAccurately(imageBlob, {
-      size: 50,
+    const compressOptions = {
+      size: 10,
       type: "image/jpeg",
-      width: 320, // FIX
-    });
+    };
+    if (canvas.width < canvas.height) {
+      compressOptions.width = 100;
+    } else {
+      compressOptions.height = 100;
+    }
+    const imageFile = await compressAccurately(imageBlob, compressOptions);
     console.log("imageFile", imageFile);
     return imageFile;
   };

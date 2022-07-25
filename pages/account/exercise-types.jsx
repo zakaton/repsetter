@@ -127,7 +127,6 @@ export default function ExerciseTypes() {
               <ExerciseTypeVideo
                 exerciseTypeId={result.id}
                 fetchVideo={false}
-                width={80}
               ></ExerciseTypeVideo>
             ),
           },
