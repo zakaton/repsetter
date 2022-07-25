@@ -1,14 +1,29 @@
-export const muscleGroups = ["chest", "arms", "legs"];
-export const muscles = [
-  { name: "pecs", group: "chest" },
-  { name: "bicep", group: "arms" },
-  { name: "tricep", group: "arms" },
-  { name: "forearm", group: "arms" },
-  { name: "thighs", group: "legs" },
-];
-muscles.forEach((muscle, index) => {
-  muscle.index = index;
-});
+export const muscleGroupsObject = {
+  "upper body": [
+    "chest",
+    "shoulders",
+    "traps",
+    "front delts",
+    "medial delts",
+    "rear delts",
+  ],
+  arms: ["biceps", "triceps", "Forearms"],
+  "lower body": ["core", "obliques", "back", "abs"],
+  legs: ["quads", "glutes", "hamstrings", "adductors", "abductors", "calves"],
+};
+export const muscleGroups = Object.keys(muscleGroupsObject);
+export const muscles = muscleGroups.reduce((muscles, muscleGroupName) => {
+  return muscleGroupsObject[muscleGroupName].reduce(
+    (muscles, muscleGroupMuscle) => {
+      return muscles.concat({
+        name: muscleGroupMuscle,
+        group: muscleGroupName,
+        index: muscles.length,
+      });
+    },
+    muscles
+  );
+}, []);
 
 export const exerciseFeatures = [
   "reps",
