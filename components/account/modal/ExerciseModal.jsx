@@ -2160,7 +2160,6 @@ export default function ExerciseModal(props) {
                           {speedAssigned.length === 1
                             ? speedAssigned[0]
                             : speedAssigned[index]}{" "}
-                          min
                         </span>
                       </div>
                     </div>
@@ -2211,7 +2210,6 @@ export default function ExerciseModal(props) {
                           {levelAssigned.length === 1
                             ? levelAssigned[0]
                             : levelAssigned[index]}{" "}
-                          min
                         </span>
                       </div>
                     </div>

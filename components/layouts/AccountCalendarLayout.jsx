@@ -3,6 +3,7 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
 import { useClient } from "../../context/client-context";
 import ClientsSelect from "../account/ClientsSelect";
+import { dateToString } from "../../utils/supabase";
 
 const months = [
   "January",
@@ -238,13 +239,7 @@ export default function AccountCalendarLayout({
                 <div className="isolate grid w-full grid-cols-7 gap-px">
                   {calendar &&
                     calendar.map((date, dayIdx) => {
-                      const dateString = [
-                        date.getUTCFullYear(),
-                        date.getUTCMonth() + 1,
-                        date.getUTCDate(),
-                      ]
-                        .map((number) => (number < 10 ? `0${number}` : number))
-                        .join("-");
+                      const dateString = dateToString(date);
                       const day = {
                         date,
                         isCurrentMonth:

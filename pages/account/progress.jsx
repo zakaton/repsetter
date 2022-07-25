@@ -29,6 +29,7 @@ import { weightEventColors } from "../../utils/weight-utils";
 import {
   poundsToKilograms,
   kilogramsToPounds,
+  exerciseFeatures,
 } from "../../utils/exercise-utils";
 import { useRouter } from "next/router";
 
@@ -46,7 +47,7 @@ ChartJS.register(
 
 const defaultDateRange = "past month";
 const graphTypeOrder = [
-  "top set",
+  "weight",
   "bodyweight",
   "number of sets",
   "number of reps",
@@ -94,8 +95,9 @@ const filterTypes = [
     requiresExercise: true,
     checkboxes: [
       {
-        value: "top set",
+        value: "weight",
         label: "Top Set",
+        feature: "weight",
         requiresExercise: true,
       },
       {
@@ -107,10 +109,34 @@ const filterTypes = [
         value: "number of reps",
         label: "Number of Reps",
         requiresExercise: true,
+        feature: "reps",
       },
       {
         value: "difficulty",
         label: "Difficulty",
+        requiresExercise: true,
+      },
+      {
+        value: "duration",
+        label: "Set Duration",
+        requiresExercise: true,
+        feature: "duration",
+      },
+      {
+        value: "rest duration",
+        label: "Rest Duration",
+        requiresExercise: true,
+      },
+      {
+        value: "speed",
+        label: "Speed",
+        feature: "speed",
+        requiresExercise: true,
+      },
+      {
+        value: "level",
+        label: "Level",
+        feature: "level",
         requiresExercise: true,
       },
       {
@@ -158,7 +184,7 @@ const orderTypes = [
 ];
 
 const graphTypes = {
-  "top set": {
+  weight: {
     label: "Top Set",
     type: "bar",
     borderColor: "rgb(53, 162, 235)",
@@ -284,6 +310,108 @@ const graphTypes = {
     },
     yAxisID: "y5",
   },
+  duration: {
+    label: "Set Duration",
+    type: "bar",
+    borderColor: "rgb(34, 197, 94)",
+    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let setDurationPerformed = 0;
+        let topSetDurationAssigned = 0;
+        exercise.set_duration_assigned?.forEach(
+          (setDurationAssigned, index) => {
+            if (setDurationAssigned > topSetDurationAssigned) {
+              topSetDurationAssigned = setDurationAssigned;
+              setDurationPerformed =
+                exercise.set_duration_performed?.[index] || 0;
+            }
+          }
+        );
+        return {
+          x: dateFromDateAndTime(exercise.date, exercise.time),
+          y: setDurationPerformed,
+          denominator: topSetDurationAssigned,
+          includeTime: exercise.time,
+          suffix: "minutes",
+        };
+      });
+    },
+    yAxisID: "y7",
+  },
+  "rest duration": {
+    label: "Rest Duration",
+    type: "bar",
+    borderColor: "rgb(34, 197, 94)",
+    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let topRestDuration = 0;
+        exercise.rest_duration?.forEach((restDuration) => {
+          if (restDuration > topRestDuration) {
+            topRestDuration = restDuration;
+          }
+        });
+        return {
+          x: dateFromDateAndTime(exercise.date, exercise.time),
+          y: topRestDuration,
+          includeTime: exercise.time,
+          suffix: "minutes",
+        };
+      });
+    },
+    yAxisID: "y6",
+  },
+  speed: {
+    label: "Speed",
+    type: "bar",
+    borderColor: "rgb(34, 197, 94)",
+    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let topSpeedPerformed = 0;
+        let topSpeedAssigned = 0;
+        exercise.speed_assigned?.forEach((speedAssigned, index) => {
+          if (speedAssigned > topSpeedAssigned) {
+            topSpeedAssigned = speedAssigned;
+            topSpeedPerformed = exercise.speed_performed?.[index] || 0;
+          }
+        });
+        return {
+          x: dateFromDateAndTime(exercise.date, exercise.time),
+          y: topSpeedPerformed,
+          denominator: topSpeedAssigned,
+          includeTime: exercise.time,
+        };
+      });
+    },
+    yAxisID: "y8",
+  },
+  level: {
+    label: "Level",
+    type: "bar",
+    borderColor: "rgb(34, 197, 94)",
+    backgroundColor: "rgba(34, 197, 94, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let topLevelPerformed = 0;
+        let topLevelAssigned = 0;
+        exercise.level_assigned?.forEach((levelAssigned, index) => {
+          if (levelAssigned > topLevelAssigned) {
+            topLevelAssigned = levelAssigned;
+            topLevelPerformed = exercise.level_performed?.[index] || 0;
+          }
+        });
+        return {
+          x: dateFromDateAndTime(exercise.date, exercise.time),
+          y: topLevelPerformed,
+          denominator: topLevelAssigned,
+          includeTime: exercise.time,
+        };
+      });
+    },
+    yAxisID: "y9",
+  },
   bodyweight: {
     label: "Bodyweight",
     type: "line",
@@ -392,6 +520,21 @@ export default function Progress() {
     console.log("newBaseFilter", newBaseFilter);
     setBaseFilter(newBaseFilter);
   }, [selectedClient, user, selectedExerciseType]);
+
+  useEffect(() => {
+    if (
+      selectedExerciseType &&
+      containsFilters?.type &&
+      selectedExerciseType.features
+    ) {
+      const newContainsFilters = { ...containsFilters };
+      console.log("type", containsFilters.type);
+      newContainsFilters.type = newContainsFilters.type.filter((type) =>
+        selectedExerciseType.features.includes(type)
+      );
+      setContainsFilters(newContainsFilters);
+    }
+  }, [selectedExerciseType]);
 
   const getFromDate = (dayOffset = 0) => {
     let date = new Date();
@@ -562,7 +705,7 @@ export default function Progress() {
     const isWeightInKgs = (filters["weight-unit"] || "kg") === "kg";
     const isBodyweightInKgs = (filters["bodyweight-unit"] || "lbs") === "kg";
     let numberOfAvailableTypes = 2;
-    if (containsFilters.type?.includes("top set")) {
+    if (containsFilters.type?.includes("weight")) {
       numberOfAvailableTypes -= 1;
     }
     if (containsFilters.type?.includes("bodyweight")) {
@@ -600,7 +743,7 @@ export default function Progress() {
         },
         y: {
           type: "linear",
-          display: containsFilters.type?.includes("top set") || false,
+          display: containsFilters.type?.includes("weight") || false,
           position: "left",
           title: {
             display: true,
@@ -647,15 +790,13 @@ export default function Progress() {
         y4: {
           type: "linear",
           display: containsFilters.type?.includes("bodyweight") || false,
-          position: containsFilters.type?.includes("top set")
-            ? "right"
-            : "left",
+          position: containsFilters.type?.includes("weight") ? "right" : "left",
           title: {
             display: true,
             text: `Bodyweight (${isBodyweightInKgs ? "kg" : "lbs"})`,
           },
           grid: {
-            drawOnChartArea: !containsFilters.type?.includes("top set"),
+            drawOnChartArea: !containsFilters.type?.includes("weight"),
           },
           beginAtZero: true,
         },
@@ -671,6 +812,62 @@ export default function Progress() {
           title: {
             display: true,
             text: `Exercise Time`,
+          },
+        },
+        y6: {
+          type: "linear",
+          display: typesToDisplay.includes("rest duration"),
+          min: 0,
+          //max: 1,
+          position: getPosition("rest duration"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("rest duration"),
+          },
+          title: {
+            display: true,
+            text: `Rest Duration`,
+          },
+        },
+        y7: {
+          type: "linear",
+          display: typesToDisplay.includes("duration"),
+          min: 0,
+          //max: 1,
+          position: getPosition("duration"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("duration"),
+          },
+          title: {
+            display: true,
+            text: `Set Duration`,
+          },
+        },
+        y8: {
+          type: "linear",
+          display: typesToDisplay.includes("speed"),
+          min: 0,
+          //max: 1,
+          position: getPosition("speed"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("speed"),
+          },
+          title: {
+            display: true,
+            text: `Speed`,
+          },
+        },
+        y9: {
+          type: "linear",
+          display: typesToDisplay.includes("level"),
+          min: 0,
+          //max: 1,
+          position: getPosition("level"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("level"),
+          },
+          title: {
+            display: true,
+            text: `Level`,
           },
         },
       },
@@ -795,16 +992,29 @@ export default function Progress() {
             .filter(
               (filterType) =>
                 !filterType.requiresTopSet ||
-                containsFilters.type?.includes("top set")
+                containsFilters.type?.includes("weight")
             )
             .map((filterType) => {
-              if (filterType.requiresExercise && !selectedExerciseType) {
-                filterType = {
-                  ...filterType,
-                  checkboxes: filterType.checkboxes.filter(
-                    (checkbox) => !checkbox.requiresExercise
-                  ),
-                };
+              if (filterType.requiresExercise) {
+                if (!selectedExerciseType) {
+                  filterType = {
+                    ...filterType,
+                    checkboxes: filterType.checkboxes.filter(
+                      (checkbox) => !checkbox.requiresExercise
+                    ),
+                  };
+                } else {
+                  filterType = {
+                    ...filterType,
+                    checkboxes: filterType.checkboxes.filter(
+                      (checkbox) =>
+                        !checkbox.feature ||
+                        selectedExerciseType.features?.includes(
+                          checkbox.feature
+                        )
+                    ),
+                  };
+                }
               }
               return filterType;
             })}

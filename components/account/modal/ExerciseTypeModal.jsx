@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { PencilAltIcon } from "@heroicons/react/outline";
-import { muscles, muscleGroups, features } from "../../../utils/exercise-utils";
+import {
+  muscles,
+  muscleGroups,
+  exerciseFeatures,
+} from "../../../utils/exercise-utils";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
 import { compressAccurately } from "image-conversion";
@@ -84,7 +88,7 @@ export default function ExerciseTypeModal(props) {
         )
       );
       setSelectedFeatures(
-        features.filter((feature) =>
+        exerciseFeatures.filter((feature) =>
           selectedExerciseType?.features?.includes(feature)
         )
       );
@@ -449,7 +453,7 @@ export default function ExerciseTypeModal(props) {
             }}
           >
             <option value="">Select feature</option>
-            {features
+            {exerciseFeatures
               .filter((feature) => !selectedFeatures.includes(feature))
               .map((feature) => (
                 <option key={feature}>{feature}</option>
