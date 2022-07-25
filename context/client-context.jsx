@@ -169,9 +169,9 @@ export function ClientContextProvider(props) {
 
     const currentDate = new Date();
     const isSelectedDateToday =
-      selectedDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
-      selectedDate.getUTCMonth() === currentDate.getUTCMonth() &&
-      selectedDate.getUTCDate() === currentDate.getUTCDate();
+      selectedDate.getFullYear() === currentDate.getFullYear() &&
+      selectedDate.getMonth() === currentDate.getMonth() &&
+      selectedDate.getDate() === currentDate.getDate();
     setIsSelectedDateToday(isSelectedDateToday);
   }, [selectedDate]);
 

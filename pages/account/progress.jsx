@@ -540,19 +540,19 @@ export default function Progress() {
     let date = new Date();
     switch (filters["date-range"] || defaultDateRange) {
       case "past week":
-        date.setUTCDate(date.getUTCDate() - 7 - dayOffset);
+        date.setDate(date.getDate() - 7 - dayOffset);
         break;
       case "past month":
-        date.setUTCMonth(date.getUTCMonth() - 1);
+        date.setMonth(date.getMonth() - 1);
         break;
       case "past 3 months":
-        date.setUTCMonth(date.getUTCMonth() - 3);
+        date.setMonth(date.getMonth() - 3);
         break;
       case "past 6 months":
-        date.setUTCMonth(date.getUTCMonth() - 6);
+        date.setMonth(date.getMonth() - 6);
         break;
       case "past year":
-        date.setUTCFullYear(date.getUTCFullYear() - 1);
+        date.setFullYear(date.getFullYear() - 1);
         break;
     }
     return date;

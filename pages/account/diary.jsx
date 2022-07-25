@@ -298,8 +298,8 @@ export default function Diary() {
       calendar &&
       selectedDate &&
       (!lastSelectedDate ||
-        lastSelectedDate.getUTCFullYear() !== selectedDate.getUTCFullYear() ||
-        lastSelectedDate.getUTCMonth() !== selectedDate.getUTCMonth())
+        lastSelectedDate.getFullYear() !== selectedDate.getFullYear() ||
+        lastSelectedDate.getMonth() !== selectedDate.getMonth())
     ) {
       setLastSelectedDate(selectedDate);
       getExerciseDates();
@@ -759,11 +759,11 @@ export default function Diary() {
   const getPictureDates = async () => {
     const newPictureDates = [];
     const previousMonth = new Date(selectedDate);
-    previousMonth.setUTCDate(15);
-    previousMonth.setUTCMonth(previousMonth.getUTCMonth() - 1);
+    previousMonth.setDate(15);
+    previousMonth.setMonth(previousMonth.getMonth() - 1);
     const nextMonth = new Date(selectedDate);
-    nextMonth.setUTCDate(15);
-    nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1);
+    nextMonth.setDate(15);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
     const searchDates = [previousMonth, selectedDate, nextMonth];
     const searches = searchDates.map((date) =>
       dateToString(date).split("-").slice(0, 2).join("-")

@@ -3,7 +3,6 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
 import { useClient } from "../../context/client-context";
 import ClientsSelect from "../account/ClientsSelect";
-import { dateToString } from "../../utils/supabase";
 
 const months = [
   "January",
@@ -24,7 +23,7 @@ const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();
 
 const getNumberOfDaysInMonth = (date) =>
-  new Date(date.getUTCFullYear(), date.getUTCMonth() + 1, 0).getUTCDate();
+  new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -69,34 +68,33 @@ export default function AccountCalendarLayout({
 
     const dateBeforeSelectedDate = new Date(selectedDate);
     const addPreviousDate = () => {
-      dateBeforeSelectedDate.setUTCDate(
-        dateBeforeSelectedDate.getUTCDate() - 1
-      );
+      dateBeforeSelectedDate.setDate(dateBeforeSelectedDate.getDate() - 1);
+      console.log("adding date", new Date(dateBeforeSelectedDate));
       newCalendar.unshift(new Date(dateBeforeSelectedDate));
     };
     while (
-      dateBeforeSelectedDate.getUTCDate() > 1 &&
-      dateBeforeSelectedDate.getUTCDate() <= selectedDate.getUTCDate()
+      dateBeforeSelectedDate.getDate() > 1 &&
+      dateBeforeSelectedDate.getDate() <= selectedDate.getDate()
     ) {
       addPreviousDate();
     }
-    while (dateBeforeSelectedDate.getUTCDay() !== 0) {
+    while (dateBeforeSelectedDate.getDay() !== 0) {
       addPreviousDate();
     }
 
     const numberOfDaysInMonth = getNumberOfDaysInMonth(selectedDate);
     const dateAfterSelectedDate = new Date(selectedDate);
     const addNextDate = () => {
-      dateAfterSelectedDate.setUTCDate(dateAfterSelectedDate.getUTCDate() + 1);
+      dateAfterSelectedDate.setDate(dateAfterSelectedDate.getDate() + 1);
       newCalendar.push(new Date(dateAfterSelectedDate));
     };
     while (
-      dateAfterSelectedDate.getUTCDate() >= selectedDate.getUTCDate() &&
-      dateAfterSelectedDate.getUTCDate() < numberOfDaysInMonth
+      dateAfterSelectedDate.getDate() >= selectedDate.getDate() &&
+      dateAfterSelectedDate.getDate() < numberOfDaysInMonth
     ) {
       addNextDate();
     }
-    while (dateAfterSelectedDate.getUTCDay() !== 6) {
+    while (dateAfterSelectedDate.getDay() !== 6) {
       addNextDate();
     }
 
@@ -111,10 +109,9 @@ export default function AccountCalendarLayout({
     if (
       selectedDate &&
       previouslySelectedDate &&
-      selectedDate.getUTCFullYear() ==
-        previouslySelectedDate.getUTCFullYear() &&
-      selectedDate.getUTCMonth() == previouslySelectedDate.getUTCMonth() &&
-      selectedDate.getUTCDate() == previouslySelectedDate.getUTCDate()
+      selectedDate.getFullYear() == previouslySelectedDate.getFullYear() &&
+      selectedDate.getMonth() == previouslySelectedDate.getMonth() &&
+      selectedDate.getDate() == previouslySelectedDate.getDate()
     ) {
       return;
     }
@@ -153,9 +150,7 @@ export default function AccountCalendarLayout({
                 className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
                 onClick={() => {
                   const newSelectedDate = new Date(selectedDate);
-                  newSelectedDate.setUTCMonth(
-                    newSelectedDate.getUTCMonth() - 1
-                  );
+                  newSelectedDate.setMonth(newSelectedDate.getMonth() - 1);
                   setSelectedDate(newSelectedDate);
                 }}
               >
@@ -166,10 +161,10 @@ export default function AccountCalendarLayout({
                 <select
                   id="month"
                   className="mt-1 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                  value={selectedDate?.getUTCMonth() || 0}
+                  value={selectedDate?.getMonth() || 0}
                   onInput={(e) => {
                     const newSelectedDate = new Date(selectedDate);
-                    newSelectedDate.setUTCMonth(e.target.selectedIndex);
+                    newSelectedDate.setMonth(e.target.selectedIndex);
                     setSelectedDate(newSelectedDate);
                   }}
                 >
@@ -183,10 +178,10 @@ export default function AccountCalendarLayout({
                 <select
                   id="year"
                   className="mt-1 ml-4 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                  value={selectedDate?.getUTCFullYear()}
+                  value={selectedDate?.getFullYear()}
                   onInput={(e) => {
                     const newSelectedDate = new Date(selectedDate);
-                    newSelectedDate.setUTCFullYear(e.target.value);
+                    newSelectedDate.setFullYear(e.target.value);
                     setSelectedDate(newSelectedDate);
                   }}
                 >
@@ -200,9 +195,7 @@ export default function AccountCalendarLayout({
                 className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
                 onClick={() => {
                   const newSelectedDate = new Date(selectedDate);
-                  newSelectedDate.setUTCMonth(
-                    newSelectedDate.getUTCMonth() + 1
-                  );
+                  newSelectedDate.setMonth(newSelectedDate.getMonth() + 1);
                   setSelectedDate(newSelectedDate);
                 }}
               >
@@ -239,16 +232,23 @@ export default function AccountCalendarLayout({
                 <div className="isolate grid w-full grid-cols-7 gap-px">
                   {calendar &&
                     calendar.map((date, dayIdx) => {
-                      const dateString = dateToString(date);
+                      const dateString = [
+                        date.getFullYear(),
+                        date.getMonth() + 1,
+                        date.getDate(),
+                      ]
+                        .map((number) => (number < 10 ? `0${number}` : number))
+                        .join("-");
                       const day = {
                         date,
                         isCurrentMonth:
-                          date.getUTCMonth() === selectedDate.getUTCMonth(),
+                          date.getMonth() === selectedDate.getMonth(),
                         isSelected:
                           date.toDateString() === selectedDate.toDateString(),
                         isToday:
                           date.toDateString() === currentDate.toDateString(),
                         dots: datesDots[dateString] || [],
+                        dateString,
                       };
                       return (
                         <button
@@ -283,9 +283,8 @@ export default function AccountCalendarLayout({
                               "ml-auto"
                             )}
                           >
-                            {day.date.getUTCDate()}
+                            {day.date.getDate()}
                           </time>
-                          {/* FILL - exercises, weight, selfies */}
                           {day.dots.length > 0 && (
                             <span className="-mx-0.5 mt-auto flex flex-wrap-reverse">
                               {day.dots.map(({ color }, index) => (
