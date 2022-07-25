@@ -586,7 +586,7 @@ export default function ExerciseTypeModal(props) {
                   setVideoDuration(e.target.duration);
                   setVideoThumbnailTime(0);
                 }}
-                className="w-full"
+                className="w-max-[100px]"
                 autoPlay={true}
                 muted={true}
                 loop={true}
@@ -651,6 +651,7 @@ export default function ExerciseTypeModal(props) {
                     Current Thumbnail
                   </label>
                   <img
+                    className="w-max-[100px]"
                     src={
                       exerciseVideos?.[selectedExerciseType.id]?.thumbnailUrl
                     }
@@ -680,7 +681,7 @@ export default function ExerciseTypeModal(props) {
                       );
                     }}
                     id="thumbnailVideo"
-                    className="w-full"
+                    className="w-max-[100px]"
                     src={
                       videoUrl ||
                       (selectedExerciseType &&
