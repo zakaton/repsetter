@@ -699,7 +699,7 @@ export default function ExerciseModal(props) {
             <div className="m-auto mt-4 w-fit">
               <ExerciseTypeVideo
                 exerciseTypeId={selectedExerciseType.id}
-                width={150}
+                fetchVideo={false}
               />
             </div>
           )}
