@@ -562,7 +562,6 @@ export default function ExerciseTypeModal(props) {
                       type="file"
                       className="sr-only"
                       accept="video/mp4,video/*"
-                      value={videoFile}
                       onInput={(e) => {
                         const file = e.target.files[0];
                         onVideoFile(file);
@@ -581,7 +580,7 @@ export default function ExerciseTypeModal(props) {
                 onLoadedMetadata={(e) => {
                   setVideoDuration(e.target.duration);
                 }}
-                className="aspect-[4/3] w-full"
+                className="w-full"
                 autoPlay={true}
                 muted={true}
                 loop={true}
@@ -611,7 +610,7 @@ export default function ExerciseTypeModal(props) {
               {videoFile && (
                 <button
                   type="button"
-                  className="mt-2 inline-flex items-center rounded border border-transparent bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="mt-2 mr-2 inline-flex items-center rounded border border-transparent bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   onClick={() => {
                     setVideoUrl();
                     setVideoFile("");
@@ -619,6 +618,25 @@ export default function ExerciseTypeModal(props) {
                 >
                   Clear Video
                 </button>
+              )}
+              {selectedExerciseType && (
+                <label
+                  htmlFor="video-replace"
+                  className="mt-2 inline-flex cursor-pointer items-center rounded border border-transparent bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  <span>Replace Video</span>
+                  <input
+                    id="video-replace"
+                    name="video-replace"
+                    type="file"
+                    className="sr-only"
+                    accept="video/mp4,video/*"
+                    onInput={(e) => {
+                      const file = e.target.files[0];
+                      onVideoFile(file);
+                    }}
+                  />
+                </label>
               )}
 
               {selectedExerciseType && (
@@ -656,7 +674,7 @@ export default function ExerciseTypeModal(props) {
                       );
                     }}
                     id="thumbnailVideo"
-                    className="aspect-[4/3] w-full"
+                    className="w-full"
                     src={
                       videoUrl ||
                       (selectedExerciseType &&
