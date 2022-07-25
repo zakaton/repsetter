@@ -139,6 +139,7 @@ export default function ExerciseTypesSelect({
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
                     <ExerciseTypeVideo
+                      className="w-min-[100px] hidden sm:block"
                       play={active || isMobile}
                       exerciseTypeId={exerciseType.id}
                       width="100"

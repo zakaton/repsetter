@@ -56,6 +56,7 @@ export default function ExerciseTypeVideo(
         }
       }}
       className="w-[100px]"
+      {...propsSubset}
     >
       <LazyVideo
         onSuspend={(e) => {
