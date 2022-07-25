@@ -636,6 +636,14 @@ export default function Diary() {
                 const { time } = context[0].raw;
                 return time;
               },
+              label: function (context) {
+                const label = context.dataset.label;
+                let data = context.dataset.data[context.dataIndex];
+                let value = data.y;
+                return `${label}: ${value.toFixed(1)} ${
+                  isUsingKilograms ? "kg" : "lbs"
+                }`;
+              },
               footer: function (context) {
                 const { event } = context[0].raw;
                 if (event?.length > 0 && event !== "none") {
