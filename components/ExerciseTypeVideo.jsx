@@ -12,7 +12,7 @@ const keysToDelete = ["width", "height", "play"];
 export default function ExerciseTypeVideo(
   props = { exerciseTypeId: undefined, play: null, fetchVideo: true }
 ) {
-  const { exerciseTypeId, play, width = 100, height, fetchVideo } = props;
+  const { exerciseTypeId, play, width = 100, height = 100, fetchVideo } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
 
