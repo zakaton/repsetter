@@ -54,22 +54,21 @@ export default function Header() {
                   </span>
                 </MyLink>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  {navigation
-                    .filter(({ requiresUser }) => !requiresUser || user)
-                    .map(({ name, href }) => (
-                      <MyLink
-                        href={href}
-                        key={name}
-                        className={classNames(
-                          router.pathname === href
-                            ? "border-blue-500 text-gray-900"
-                            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                          "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
-                        )}
-                      >
-                        {name}
-                      </MyLink>
-                    ))}
+                  {navigation.map(({ name, href, requiresUser }) => (
+                    <MyLink
+                      href={href}
+                      key={name}
+                      className={classNames(
+                        requiresUser && !user ? "hidden" : "",
+                        router.pathname === href
+                          ? "border-blue-500 text-gray-900"
+                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                        "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
+                      )}
+                    >
+                      {name}
+                    </MyLink>
+                  ))}
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -140,23 +139,22 @@ export default function Header() {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pt-2 pb-4">
-              {navigation
-                .filter(({ requiresUser }) => !requiresUser)
-                .map(({ name, href }) => (
-                  <Disclosure.Button
-                    as="a"
-                    key={name}
-                    href={href}
-                    className={classNames(
-                      router.pathname === href
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-transparent  text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700",
-                      "block border-l-4 py-2 pl-3 pr-4 text-base font-medium"
-                    )}
-                  >
-                    {name}
-                  </Disclosure.Button>
-                ))}
+              {navigation.map(({ name, href, requiresUser }) => (
+                <Disclosure.Button
+                  as="a"
+                  key={name}
+                  href={href}
+                  className={classNames(
+                    requiresUser ? "hidden" : "",
+                    router.pathname === href
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-transparent  text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700",
+                    "block border-l-4 py-2 pl-3 pr-4 text-base font-medium"
+                  )}
+                >
+                  {name}
+                </Disclosure.Button>
+              ))}
             </div>
           </Disclosure.Panel>
         </>
