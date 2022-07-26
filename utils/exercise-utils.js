@@ -6,8 +6,10 @@ export const muscleGroupsObject = {
     "front delts",
     "medial delts",
     "rear delts",
+    "lats",
+    "upper back",
   ],
-  arms: ["biceps", "triceps", "Forearms"],
+  arms: ["biceps", "triceps", "forearms"],
   "lower body": ["core", "obliques", "back", "abs"],
   legs: ["quads", "glutes", "hamstrings", "adductors", "abductors", "calves"],
 };

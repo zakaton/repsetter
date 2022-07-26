@@ -100,6 +100,7 @@ export default function ExerciseTypes() {
         status={editExerciseTypeStatus}
       />
       <Table
+        numberOfResultsPerPage={10}
         modalListener={modalListener}
         resultsListener={setResults}
         refreshResults={refreshResults}
