@@ -37,9 +37,6 @@ export function ExerciseVideoContextProvider(props) {
             name.startsWith("image")
           );
 
-          console.log("videoDetails", videoDetails);
-          console.log("imageDetails", imageDetails);
-
           const { publicURL: url, error: getVideoUrlError } =
             await supabase.storage
               .from("exercise")

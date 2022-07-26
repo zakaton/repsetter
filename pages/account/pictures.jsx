@@ -270,6 +270,7 @@ export default function Photos() {
                       }`}
                     >
                       <img
+                        loading="lazy"
                         src={picture.signedURL + "&" + picture.suffix}
                         alt={`progress picture for ${picture.date.toDateString()}`}
                         className="pointer-events-none focus:outline-none group-hover:opacity-75"

@@ -79,6 +79,8 @@ export default function ExerciseTypeVideo(
       <img
         width={width}
         height={height}
+        loading="lazy"
+        alt="exercise"
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
         className={classNames(showVideo || isMobile ? "hidden" : "")}
       ></img>

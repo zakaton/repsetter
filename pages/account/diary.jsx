@@ -994,6 +994,7 @@ export default function Diary() {
                     )}
                   >
                     <img
+                      loading="lazy"
                       src={userPictures[type]}
                       alt={`${type} progress picture`}
                       className={classNames(

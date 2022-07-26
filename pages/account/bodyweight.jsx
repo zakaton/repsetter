@@ -142,6 +142,7 @@ export default function Bodyweight() {
                         alt={type}
                         width="100"
                         className="overflow-hidden rounded-lg"
+                        loading="lazy"
                       />
                     </>
                   ),

@@ -655,6 +655,7 @@ export default function ExerciseTypeModal(props) {
                     src={
                       exerciseVideos?.[selectedExerciseType.id]?.thumbnailUrl
                     }
+                    loading="lazy"
                   />
                 </>
               )}
