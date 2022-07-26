@@ -9,6 +9,7 @@ import MyLink from "./MyLink";
 const navigation = [
   { name: "About", href: "/" },
   { name: "FAQ", href: "/faq" },
+  { name: "Account", href: "/account", requiresUser: true },
 ];
 const accountNavigation = [
   { name: "Account", href: "/account" },
@@ -53,20 +54,22 @@ export default function Header() {
                   </span>
                 </MyLink>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  {navigation.map(({ name, href }) => (
-                    <MyLink
-                      href={href}
-                      key={name}
-                      className={classNames(
-                        router.pathname === href
-                          ? "border-blue-500 text-gray-900"
-                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                        "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
-                      )}
-                    >
-                      {name}
-                    </MyLink>
-                  ))}
+                  {navigation
+                    .filter(({ requiresUser }) => !requiresUser || user)
+                    .map(({ name, href }) => (
+                      <MyLink
+                        href={href}
+                        key={name}
+                        className={classNames(
+                          router.pathname === href
+                            ? "border-blue-500 text-gray-900"
+                            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                          "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
+                        )}
+                      >
+                        {name}
+                      </MyLink>
+                    ))}
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
