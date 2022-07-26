@@ -139,7 +139,7 @@ export default function ExerciseTypesSelect({
                 {({ active, selected }) => (
                   <div className="flex items-center gap-4">
                     <ExerciseTypeVideo
-                      className="w-min-[100px] hidden sm:block"
+                      className="w-min-[100px]"
                       play={active || isMobile}
                       exerciseTypeId={exerciseType.id}
                       fetchVideo={false}
@@ -148,7 +148,7 @@ export default function ExerciseTypesSelect({
                     <div className="flex flex-col gap-1">
                       <span
                         className={classNames(
-                          "block truncate text-base",
+                          "block text-base",
                           selected && "font-semibold"
                         )}
                       >
@@ -157,7 +157,7 @@ export default function ExerciseTypesSelect({
 
                       <span
                         className={classNames(
-                          "block truncate text-base",
+                          "block text-base",
                           selected && "font-semibold"
                         )}
                       >
