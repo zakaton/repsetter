@@ -66,8 +66,17 @@ export default function Table({
       .from(tableName)
       .select(selectString, { count: "exact", head: true })
       .match({ ...(baseFilter || {}), ...filters });
-    for (let column in containsFilters) {
-      query = query.contains(column, containsFilters[column]);
+    for (let _column in containsFilters) {
+      const value = containsFilters[_column];
+      if (value?.length > 0) {
+        const [column, filterOperator] = _column.split("?");
+        console.log("filterOperator", filterOperator, value);
+        if (filterOperator) {
+          query = query.filter(column, filterOperator, `(${value})`);
+        } else {
+          query = query.contains(column, value);
+        }
+      }
     }
     const { count: numberOfResults } = await query;
     setPageIndex(0);
@@ -95,8 +104,17 @@ export default function Table({
         .from(tableName)
         .select(selectString)
         .match({ ...(baseFilter || {}), ...filters });
-      for (let column in containsFilters) {
-        query = query.contains(column, containsFilters[column]);
+      for (let _column in containsFilters) {
+        const value = containsFilters[_column];
+        if (value?.length > 0) {
+          const [column, filterOperator] = _column.split("?");
+          console.log("filterOperator", filterOperator, value);
+          if (filterOperator) {
+            query = query.filter(column, filterOperator, `(${value})`);
+          } else {
+            query = query.contains(column, value);
+          }
+        }
       }
       if (Array.isArray(order[0])) {
         order.forEach((_order) => {

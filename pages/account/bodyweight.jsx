@@ -16,9 +16,8 @@ const filterTypes = [
   {
     name: "Weight Event",
     query: "weight-event",
-    column: "event",
-    radios: [
-      { value: null, label: "any", defaultChecked: true },
+    column: "event?in",
+    checkboxes: [
       ...weightEvents.map(({ name }, index) => ({
         value: name,
         label: name,
