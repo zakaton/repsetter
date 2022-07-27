@@ -62,8 +62,14 @@ export default function ExerciseTypeVideo(
         }
       }}
       onClick={(e) => {
-        if (videoRef?.current?.readyState <= 3) {
-          videoRef?.current?.play();
+        const { current: video } = videoRef;
+        if (video && isMobile) {
+          const video = videoRef.current;
+          if (video.readyState <= 3) {
+            video.play();
+          } else {
+            setShowVideo(!showVideo);
+          }
         }
       }}
       className="h-[100px] w-[100px]"
