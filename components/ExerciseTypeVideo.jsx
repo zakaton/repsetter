@@ -12,7 +12,14 @@ const keysToDelete = ["width", "height", "play"];
 export default function ExerciseTypeVideo(
   props = { exerciseTypeId: undefined, play: null, fetchVideo: true }
 ) {
-  const { exerciseTypeId, play, width = 100, height = 100, fetchVideo } = props;
+  const {
+    exerciseTypeId,
+    play,
+    width = 100,
+    height = 100,
+    fetchVideo,
+    className = "",
+  } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
 
@@ -102,6 +109,7 @@ export default function ExerciseTypeVideo(
         loop={true}
         className={classNames(
           "min-h-[100px] min-w-[100px]",
+          className,
           shouldShowVideo ? "" : "hidden"
         )}
         playsInline={true}
@@ -116,6 +124,7 @@ export default function ExerciseTypeVideo(
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
         className={
           ("min-h-[100px] min-w-[100px]",
+          className,
           classNames(shouldShowVideo ? "hidden" : ""))
         }
       ></img>
