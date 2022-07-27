@@ -100,7 +100,10 @@ export default function ExerciseTypeVideo(
         autoPlay={true}
         muted={true}
         loop={true}
-        className={classNames(shouldShowVideo ? "" : "hidden")}
+        className={classNames(
+          "h-[100px] w-[100px]",
+          shouldShowVideo ? "" : "hidden"
+        )}
         playsInline={true}
         controls={false}
         ref={videoRef}
@@ -111,7 +114,9 @@ export default function ExerciseTypeVideo(
         loading="lazy"
         alt="exercise"
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
-        className={classNames(shouldShowVideo ? "hidden" : "")}
+        className={
+          ("h-[100px] w-[100px]", classNames(shouldShowVideo ? "hidden" : ""))
+        }
       ></img>
     </div>
   );
