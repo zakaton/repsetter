@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
@@ -23,6 +23,11 @@ function classNames(...classes) {
 export default function Header() {
   const router = useRouter();
   const { isLoading, user, signOut } = useUser();
+
+  const [useSSR, setUseSSR] = useState(false);
+  useEffect(() => {
+    setUseSSR(true);
+  }, []);
 
   return (
     <Disclosure as="nav" className="bg-white shadow">
@@ -54,21 +59,22 @@ export default function Header() {
                   </span>
                 </MyLink>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  {navigation.map(({ name, href, requiresUser }) => (
-                    <MyLink
-                      href={href}
-                      key={name}
-                      className={classNames(
-                        requiresUser && !user ? "hidden" : "",
-                        router.pathname === href
-                          ? "border-blue-500 text-gray-900"
-                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                        "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
-                      )}
-                    >
-                      {name}
-                    </MyLink>
-                  ))}
+                  {useSSR &&
+                    navigation.map(({ name, href, requiresUser }) => (
+                      <MyLink
+                        href={href}
+                        key={name}
+                        className={classNames(
+                          requiresUser && !user ? "hidden" : "",
+                          router.pathname === href
+                            ? "border-blue-500 text-gray-900"
+                            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                          "text-md inline-flex items-center border-b-2 px-1 pt-1 font-medium"
+                        )}
+                      >
+                        {name}
+                      </MyLink>
+                    ))}
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

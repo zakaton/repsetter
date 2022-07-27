@@ -69,7 +69,6 @@ export default function AccountCalendarLayout({
     const dateBeforeSelectedDate = new Date(selectedDate);
     const addPreviousDate = () => {
       dateBeforeSelectedDate.setDate(dateBeforeSelectedDate.getDate() - 1);
-      console.log("adding date", new Date(dateBeforeSelectedDate));
       newCalendar.unshift(new Date(dateBeforeSelectedDate));
     };
     while (

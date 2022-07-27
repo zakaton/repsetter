@@ -43,6 +43,11 @@ export default function ExerciseTypeVideo(
     }
   }, [play]);
 
+  const [shouldShowVideo, setShouldShowVideo] = useState(false);
+  useEffect(() => {
+    setShouldShowVideo(!videoRef?.current.paused && (showVideo || isMobile));
+  }, [showVideo, isMobile, videoRef]);
+
   return (
     <div
       onMouseEnter={() => {
@@ -55,14 +60,20 @@ export default function ExerciseTypeVideo(
           setShowVideo(false);
         }
       }}
-      className="w-[100px]"
+      className="h-[100px] w-[100px]"
       {...propsSubset}
     >
       <LazyVideo
         onSuspend={(e) => {
-          document.addEventListener("click", () => e.target.play(), {
-            once: true,
-          });
+          document.addEventListener(
+            "click",
+            async () => {
+              await e.target.play();
+            },
+            {
+              once: true,
+            }
+          );
         }}
         width={width}
         height={height}
@@ -71,7 +82,7 @@ export default function ExerciseTypeVideo(
         autoPlay={true}
         muted={true}
         loop={true}
-        className={classNames(showVideo || isMobile ? "" : "hidden")}
+        className={classNames(shouldShowVideo ? "" : "hidden")}
         playsInline={true}
         controls={false}
         ref={videoRef}
@@ -82,7 +93,7 @@ export default function ExerciseTypeVideo(
         loading="lazy"
         alt="exercise"
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
-        className={classNames(showVideo || isMobile ? "hidden" : "")}
+        className={classNames(shouldShowVideo ? "hidden" : "")}
       ></img>
     </div>
   );
