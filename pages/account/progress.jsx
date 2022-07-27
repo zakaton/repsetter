@@ -382,6 +382,7 @@ const graphTypes = {
           y: topSpeedPerformed,
           denominator: topSpeedAssigned,
           includeTime: exercise.time,
+          suffix: "mph",
         };
       });
     },
@@ -853,7 +854,7 @@ export default function Progress() {
           },
           title: {
             display: true,
-            text: `Speed`,
+            text: `Speed (mph)`,
           },
         },
         y9: {

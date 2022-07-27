@@ -219,7 +219,7 @@ export default function Exercises() {
                 ? exercise.number_of_sets_assigned
                 : `${exercise.number_of_sets_performed}/${exercise.number_of_sets_assigned}`,
           },
-          exercise.number_of_reps_assigned && {
+          exercise.number_of_reps_assigned?.some((value) => value > 0) && {
             title: "reps",
             value:
               exercise.number_of_reps_performed === null
@@ -236,7 +236,7 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
-          exercise.set_duration_assigned && {
+          exercise.set_duration_assigned?.some((value) => value > 0) && {
             title: "set duration (min)",
             value:
               exercise.set_duration_performed === null
@@ -251,7 +251,7 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
-          exercise.level_assigned && {
+          exercise.level_assigned?.some((value) => value > 0) && {
             title: "level",
             value:
               exercise.level_performed === null
@@ -266,8 +266,8 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
-          exercise.speed_assigned && {
-            title: "speed",
+          exercise.speed_assigned?.some((value) => value > 0) && {
+            title: "speed (mph)",
             value:
               exercise.speed_performed === null
                 ? exercise.speed_assigned.join(", ")
@@ -281,25 +281,22 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
-          exercise.weight_assigned &&
-            exercise.weight_assigned.some((weight) => weight > 0) && {
-              title: `Weight (${
-                exercise.is_weight_in_kilograms ? "kg" : "lbs"
-              })`,
-              value:
-                exercise.weight_performed === null
-                  ? exercise.weight_assigned.join(", ")
-                  : exercise.weight_performed
-                      .map(
-                        (weight, index) =>
-                          `${weight}/${
-                            exercise.weight_assigned[index] ||
-                            exercise.weight_assigned[0]
-                          }`
-                      )
-                      .join(", "),
-            },
-          exercise.rest_duration !== null && {
+          exercise.weight_assigned?.some((value) => value > 0) && {
+            title: `Weight (${exercise.is_weight_in_kilograms ? "kg" : "lbs"})`,
+            value:
+              exercise.weight_performed === null
+                ? exercise.weight_assigned.join(", ")
+                : exercise.weight_performed
+                    .map(
+                      (weight, index) =>
+                        `${weight}/${
+                          exercise.weight_assigned[index] ||
+                          exercise.weight_assigned[0]
+                        }`
+                    )
+                    .join(", "),
+          },
+          exercise.rest_duration?.some((value) => value > 0) && {
             title: "rest duration (min)",
             value: exercise.rest_duration.join(", "),
           },
@@ -374,6 +371,21 @@ export default function Exercises() {
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 View Diary
+              </MyLink>
+            ),
+          },
+          {
+            jsx: (
+              <MyLink
+                onClick={() => {
+                  setSelectedExerciseType(exercise.type);
+                }}
+                href={`/account/progress?exercise-type=${exercise.type.id}${
+                  selectedClient ? `&client=${selectedClient.client_email}` : ""
+                }`}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                View Progress
               </MyLink>
             ),
           },
