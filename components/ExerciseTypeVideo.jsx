@@ -72,7 +72,7 @@ export default function ExerciseTypeVideo(
           }
         }
       }}
-      className="h-[100px] w-[100px]"
+      className="min-h-[100px] min-w-[100px]"
       {...propsSubset}
     >
       <LazyVideo
@@ -101,7 +101,7 @@ export default function ExerciseTypeVideo(
         muted={true}
         loop={true}
         className={classNames(
-          "h-[100px] w-[100px]",
+          "min-h-[100px] min-w-[100px]",
           shouldShowVideo ? "" : "hidden"
         )}
         playsInline={true}
@@ -115,7 +115,8 @@ export default function ExerciseTypeVideo(
         alt="exercise"
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
         className={
-          ("h-[100px] w-[100px]", classNames(shouldShowVideo ? "hidden" : ""))
+          ("min-h-[100px] min-w-[100px]",
+          classNames(shouldShowVideo ? "hidden" : ""))
         }
       ></img>
     </div>
