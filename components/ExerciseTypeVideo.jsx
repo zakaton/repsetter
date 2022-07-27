@@ -125,7 +125,7 @@ export default function ExerciseTypeVideo(
         className={classNames(
           "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
           className,
-          classNames(shouldShowVideo ? "hidden" : "")
+          shouldShowVideo ? "hidden" : ""
         )}
       ></img>
     </div>
