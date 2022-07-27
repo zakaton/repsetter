@@ -308,7 +308,7 @@ export default function PictureModal(props) {
                 src={pictureUrl}
                 alt="progress picture"
                 loading="lazy"
-                className="m-auto"
+                className="m-auto overflow-hidden rounded-lg"
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

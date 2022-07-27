@@ -108,7 +108,7 @@ export default function ExerciseTypeVideo(
         muted={true}
         loop={true}
         className={classNames(
-          "min-h-[100px] min-w-[100px]",
+          "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
           className,
           shouldShowVideo ? "" : "hidden"
         )}
@@ -122,11 +122,11 @@ export default function ExerciseTypeVideo(
         loading="lazy"
         alt="exercise"
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
-        className={
-          ("min-h-[100px] min-w-[100px]",
+        className={classNames(
+          "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
           className,
-          classNames(shouldShowVideo ? "hidden" : ""))
-        }
+          classNames(shouldShowVideo ? "hidden" : "")
+        )}
       ></img>
     </div>
   );
