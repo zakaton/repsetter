@@ -5,9 +5,16 @@ import lazyloadConfig from "../utils/lazyload-config";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-const keysToDelete = ["srcset", "sizes", "className", "src"];
+const keysToDelete = [
+  "srcset",
+  "sizes",
+  "className",
+  "src",
+  "onPlay",
+  "onPause",
+];
 const LazyVideo = React.forwardRef((props = {}, ref) => {
-  const { className, src, srcset, sizes } = props;
+  const { className, src, srcset, sizes, onPlay, onPause } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
   useEffect(() => {
@@ -24,6 +31,7 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
       const video = ref.current;
       video.src = src;
       setHasPlayed(false);
+      onPause();
     }
   }, [src]);
 
@@ -31,6 +39,7 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
     <video
       onPlay={(e) => {
         setHasPlayed(true);
+        onPlay();
       }}
       {...propsSubset}
       ref={ref}

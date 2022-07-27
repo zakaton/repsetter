@@ -44,9 +44,10 @@ export default function ExerciseTypeVideo(
   }, [play]);
 
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
   useEffect(() => {
-    setShouldShowVideo(!videoRef?.current.paused && (showVideo || isMobile));
-  }, [showVideo, isMobile, videoRef]);
+    setShouldShowVideo(hasPlayed && (showVideo || isMobile));
+  }, [showVideo, isMobile, hasPlayed]);
 
   return (
     <div
@@ -74,6 +75,12 @@ export default function ExerciseTypeVideo(
               once: true,
             }
           );
+        }}
+        onPlay={() => {
+          setHasPlayed(true);
+        }}
+        onPause={() => {
+          setHasPlayed(false);
         }}
         width={width}
         height={height}
