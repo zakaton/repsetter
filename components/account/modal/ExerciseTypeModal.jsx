@@ -105,6 +105,7 @@ export default function ExerciseTypeModal(props) {
     ) {
       setVideoFile(file);
       setVideoUrl(URL.createObjectURL(file));
+      setExerciseTypeName(file.name.split(".")[0]);
     }
   };
 
