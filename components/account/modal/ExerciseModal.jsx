@@ -1682,6 +1682,9 @@ export default function ExerciseModal(props) {
                         id="speed"
                         className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                       />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">mph</span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1725,6 +1728,9 @@ export default function ExerciseModal(props) {
                           id={`set-speed-${index}`}
                           className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">mph</span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -2068,159 +2074,163 @@ export default function ExerciseModal(props) {
                   </div>
                 )}
 
-                {selectedExerciseType?.features?.includes("duration") && (
-                  <div>
-                    <label
-                      htmlFor={`set-duration-performed-${index}`}
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Set Duration
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={
-                          isSetDurationPerformedEmptyString[index]
-                            ? ""
-                            : setDurationPerformed[index]
-                        }
-                        onInput={(e) => {
-                          const newIsSetDurationPerformedEmptyString =
-                            isSetDurationPerformedEmptyString.slice();
-                          newIsSetDurationPerformedEmptyString[index] =
-                            e.target.value === "";
-                          setIsSetDurationPerformedEmptyString(
-                            newIsSetDurationPerformedEmptyString
-                          );
+                {selectedExerciseType?.features?.includes("duration") &&
+                  setDurationAssigned?.some((value) => value > 0) && (
+                    <div>
+                      <label
+                        htmlFor={`set-duration-performed-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Set Duration
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          value={
+                            isSetDurationPerformedEmptyString[index]
+                              ? ""
+                              : setDurationPerformed[index]
+                          }
+                          onInput={(e) => {
+                            const newIsSetDurationPerformedEmptyString =
+                              isSetDurationPerformedEmptyString.slice();
+                            newIsSetDurationPerformedEmptyString[index] =
+                              e.target.value === "";
+                            setIsSetDurationPerformedEmptyString(
+                              newIsSetDurationPerformedEmptyString
+                            );
 
-                          const newSetDurationPerformed =
-                            setDurationPerformed.slice();
-                          newSetDurationPerformed[index] = Number(
-                            e.target.value
-                          );
-                          setSetDurationPerformed(newSetDurationPerformed);
-                        }}
-                        placeholder="0"
-                        name={`set-duration-performed-${index}`}
-                        id={`set-duration-performed-${index}`}
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="text-gray-500 sm:text-sm">
-                          /
-                          {setDurationAssigned.length === 1
-                            ? setDurationAssigned[0]
-                            : setDurationAssigned[index]}{" "}
-                          min
-                        </span>
+                            const newSetDurationPerformed =
+                              setDurationPerformed.slice();
+                            newSetDurationPerformed[index] = Number(
+                              e.target.value
+                            );
+                            setSetDurationPerformed(newSetDurationPerformed);
+                          }}
+                          placeholder="0"
+                          name={`set-duration-performed-${index}`}
+                          id={`set-duration-performed-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">
+                            /
+                            {setDurationAssigned.length === 1
+                              ? setDurationAssigned[0]
+                              : setDurationAssigned[index]}{" "}
+                            min
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {selectedExerciseType?.features?.includes("speed") && (
-                  <div>
-                    <label
-                      htmlFor={`set-speed-performed-${index}`}
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Speed
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={
-                          isSpeedPerformedEmptyString[index]
-                            ? ""
-                            : speedPerformed[index]
-                        }
-                        onInput={(e) => {
-                          const newIsSpeedPerformedEmptyString =
-                            isSpeedPerformedEmptyString.slice();
-                          newIsSpeedPerformedEmptyString[index] =
-                            e.target.value === "";
-                          setIsSpeedPerformedEmptyString(
-                            newIsSpeedPerformedEmptyString
-                          );
+                {selectedExerciseType?.features?.includes("speed") &&
+                  speedAssigned?.some((value) => value > 0) && (
+                    <div>
+                      <label
+                        htmlFor={`set-speed-performed-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Speed
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          value={
+                            isSpeedPerformedEmptyString[index]
+                              ? ""
+                              : speedPerformed[index]
+                          }
+                          onInput={(e) => {
+                            const newIsSpeedPerformedEmptyString =
+                              isSpeedPerformedEmptyString.slice();
+                            newIsSpeedPerformedEmptyString[index] =
+                              e.target.value === "";
+                            setIsSpeedPerformedEmptyString(
+                              newIsSpeedPerformedEmptyString
+                            );
 
-                          const newSpeedPerformed = speedPerformed.slice();
-                          newSpeedPerformed[index] = Number(e.target.value);
-                          setSpeedPerformed(newSpeedPerformed);
-                        }}
-                        placeholder="0"
-                        name={`set-speed-performed-${index}`}
-                        id={`set-speed-performed-${index}`}
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="text-gray-500 sm:text-sm">
-                          /
-                          {speedAssigned.length === 1
-                            ? speedAssigned[0]
-                            : speedAssigned[index]}{" "}
-                        </span>
+                            const newSpeedPerformed = speedPerformed.slice();
+                            newSpeedPerformed[index] = Number(e.target.value);
+                            setSpeedPerformed(newSpeedPerformed);
+                          }}
+                          placeholder="0"
+                          name={`set-speed-performed-${index}`}
+                          id={`set-speed-performed-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">
+                            /
+                            {speedAssigned.length === 1
+                              ? speedAssigned[0]
+                              : speedAssigned[index]}{" "}
+                            mph
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {selectedExerciseType?.features?.includes("level") && (
-                  <div>
-                    <label
-                      htmlFor={`set-level-performed-${index}`}
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Level
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={
-                          isLevelPerformedEmptyString[index]
-                            ? ""
-                            : levelPerformed[index]
-                        }
-                        onInput={(e) => {
-                          const newIsLevelPerformedEmptyString =
-                            isLevelPerformedEmptyString.slice();
-                          newIsLevelPerformedEmptyString[index] =
-                            e.target.value === "";
-                          setIsLevelPerformedEmptyString(
-                            newIsLevelPerformedEmptyString
-                          );
+                {selectedExerciseType?.features?.includes("level") &&
+                  levelAssigned?.some((value) => value > 0) && (
+                    <div>
+                      <label
+                        htmlFor={`set-level-performed-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Level
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          value={
+                            isLevelPerformedEmptyString[index]
+                              ? ""
+                              : levelPerformed[index]
+                          }
+                          onInput={(e) => {
+                            const newIsLevelPerformedEmptyString =
+                              isLevelPerformedEmptyString.slice();
+                            newIsLevelPerformedEmptyString[index] =
+                              e.target.value === "";
+                            setIsLevelPerformedEmptyString(
+                              newIsLevelPerformedEmptyString
+                            );
 
-                          const newLevelPerformed = levelPerformed.slice();
-                          newLevelPerformed[index] = Number(e.target.value);
-                          setLevelPerformed(newLevelPerformed);
-                        }}
-                        placeholder="0"
-                        name={`set-level-performed-${index}`}
-                        id={`set-level-performed-${index}`}
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="text-gray-500 sm:text-sm">
-                          /
-                          {levelAssigned.length === 1
-                            ? levelAssigned[0]
-                            : levelAssigned[index]}{" "}
-                        </span>
+                            const newLevelPerformed = levelPerformed.slice();
+                            newLevelPerformed[index] = Number(e.target.value);
+                            setLevelPerformed(newLevelPerformed);
+                          }}
+                          placeholder="0"
+                          name={`set-level-performed-${index}`}
+                          id={`set-level-performed-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">
+                            /
+                            {levelAssigned.length === 1
+                              ? levelAssigned[0]
+                              : levelAssigned[index]}{" "}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 <div>
                   <label
@@ -2265,79 +2275,83 @@ export default function ExerciseModal(props) {
                     </div>
                   </div>
                 </div>
-                {selectedExerciseType?.features?.includes("weight") && (
-                  <div>
-                    <label
-                      htmlFor={`weight-performed-${index}`}
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Weight
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        name={`weight-performed-${index}`}
-                        id={`weight-performed-${index}`}
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        value={
-                          isWeightPerformedEmptyString[index]
-                            ? ""
-                            : isUsingKilograms
-                            ? weightPerformedKilograms[index]
-                            : weightPerformedPounds[index]
-                        }
-                        placeholder={0}
-                        onInput={(e) => {
-                          const newIsWeightPerformedEmptyString =
-                            isWeightPerformedEmptyString.slice();
-                          newIsWeightPerformedEmptyString[index] =
-                            e.target.value === "";
-                          setIsWeightPerformedEmptyString(
-                            newIsWeightPerformedEmptyString
-                          );
 
-                          const weight = Number(e.target.value);
-                          if (isUsingKilograms) {
-                            const newWeightKilograms =
-                              weightPerformedKilograms.slice();
-                            newWeightKilograms[index] = weight;
-                            setWeightPerformed(newWeightKilograms);
-                          } else {
-                            const newWeightPounds =
-                              weightPerformedPounds.slice();
-                            newWeightPounds[index] = weight;
-                            setWeightPerformed(newWeightPounds);
+                {selectedExerciseType?.features?.includes("weight") &&
+                  (isUsingKilograms ? weightKilograms : weightPounds)?.some(
+                    (value) => value > 0
+                  ) && (
+                    <div>
+                      <label
+                        htmlFor={`weight-performed-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Weight
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          name={`weight-performed-${index}`}
+                          id={`weight-performed-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          value={
+                            isWeightPerformedEmptyString[index]
+                              ? ""
+                              : isUsingKilograms
+                              ? weightPerformedKilograms[index]
+                              : weightPerformedPounds[index]
                           }
-                        }}
-                      />
-                      <div className="absolute inset-y-0 right-0 flex items-center">
-                        <label
-                          htmlFor={`weight-type-performed-${index}`}
-                          className="sr-only"
-                        >
-                          weight type
-                        </label>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                          <span className="w-max text-gray-500 sm:text-sm">
-                            /
-                            {isUsingKilograms
-                              ? weightKilograms[
-                                  sameWeightForEachSet ? 0 : index
-                                ]
-                              : weightPounds[
-                                  sameWeightForEachSet ? 0 : index
-                                ]}{" "}
-                            {isUsingKilograms ? "kg" : "lbs"}
-                          </span>
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsWeightPerformedEmptyString =
+                              isWeightPerformedEmptyString.slice();
+                            newIsWeightPerformedEmptyString[index] =
+                              e.target.value === "";
+                            setIsWeightPerformedEmptyString(
+                              newIsWeightPerformedEmptyString
+                            );
+
+                            const weight = Number(e.target.value);
+                            if (isUsingKilograms) {
+                              const newWeightKilograms =
+                                weightPerformedKilograms.slice();
+                              newWeightKilograms[index] = weight;
+                              setWeightPerformed(newWeightKilograms);
+                            } else {
+                              const newWeightPounds =
+                                weightPerformedPounds.slice();
+                              newWeightPounds[index] = weight;
+                              setWeightPerformed(newWeightPounds);
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center">
+                          <label
+                            htmlFor={`weight-type-performed-${index}`}
+                            className="sr-only"
+                          >
+                            weight type
+                          </label>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span className="w-max text-gray-500 sm:text-sm">
+                              /
+                              {isUsingKilograms
+                                ? weightKilograms[
+                                    sameWeightForEachSet ? 0 : index
+                                  ]
+                                : weightPounds[
+                                    sameWeightForEachSet ? 0 : index
+                                  ]}{" "}
+                              {isUsingKilograms ? "kg" : "lbs"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {!video[index] && (
                   <div className="sm:col-span-3">
