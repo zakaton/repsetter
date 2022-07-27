@@ -61,6 +61,11 @@ export default function ExerciseTypeVideo(
           setShowVideo(false);
         }
       }}
+      onClick={(e) => {
+        if (videoRef?.current?.readyState <= 3) {
+          videoRef?.current?.play();
+        }
+      }}
       className="h-[100px] w-[100px]"
       {...propsSubset}
     >
