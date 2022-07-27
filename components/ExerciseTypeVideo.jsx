@@ -124,8 +124,7 @@ export default function ExerciseTypeVideo(
         src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
         className={classNames(
           "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
-          className,
-          shouldShowVideo ? "hidden" : ""
+          className
         )}
       ></img>
     </div>
