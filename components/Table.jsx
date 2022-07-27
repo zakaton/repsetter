@@ -85,12 +85,13 @@ export default function Table({
   };
   useEffect(() => {
     if (numberOfResults !== null && !isGettingNumberOfResults) {
-      console.log("update number of results");
+      console.log("updating number of results");
       getNumberOfResults();
     }
   }, [filters, containsFilters, order]);
   useEffect(() => {
     if (!isLoading && user && numberOfResults === null) {
+      console.log("updating number of results");
       getNumberOfResults();
     }
   }, [isLoading, user]);
@@ -139,7 +140,7 @@ export default function Table({
 
   useEffect(() => {
     if (refreshResults) {
-      getResults(true);
+      getNumberOfResults();
       setRefreshResults(false);
     }
   }, [refreshResults]);
@@ -153,6 +154,7 @@ export default function Table({
 
   useEffect(() => {
     if (resultsListener) {
+      console.log("calling results listener");
       resultsListener(results);
     }
   }, [results]);
@@ -242,12 +244,12 @@ export default function Table({
 
   useEffect(() => {
     if (deleteResultStatus?.type === "succeeded") {
-      getResults(true);
+      getNumberOfResults();
     }
   }, [deleteResultStatus]);
   useEffect(() => {
     if (createResultStatus?.type === "succeeded") {
-      getResults(true);
+      getNumberOfResults();
     }
   }, [createResultStatus]);
 

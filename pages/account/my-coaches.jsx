@@ -4,6 +4,8 @@ import Table from "../../components/Table";
 import { useUser } from "../../context/user-context";
 import { formatDollars } from "../../utils/subscription-utils";
 import MyLink from "../../components/MyLink";
+import { useCoachPictures } from "../../context/coach-picture-context";
+import { useEffect, useState } from "react";
 
 const filterTypes = [
   {
@@ -41,6 +43,22 @@ const orderTypes = [
 
 export default function MyCoaches() {
   const { user, stripeLinks } = useUser();
+  const { coachPictures, getCoachPicture } = useCoachPictures();
+
+  const [baseFilter, setBaseFilter] = useState({});
+  useEffect(() => {
+    if (user) {
+      setBaseFilter({ client: user.id });
+    }
+  }, [user]);
+
+  const [coaches, setCoaches] = useState();
+  useEffect(() => {
+    if (coaches) {
+      coaches.forEach(({ coach }) => getCoachPicture(coach));
+    }
+  }, [coaches]);
+
   return (
     <>
       <Table
@@ -61,13 +79,14 @@ export default function MyCoaches() {
         filterTypes={filterTypes}
         orderTypes={orderTypes}
         tableName="subscription"
-        baseFilter={{ client: user.id }}
+        baseFilter={baseFilter}
         resultName="coach"
         resultNamePlural="coaches"
         title="My Coaches"
         DeleteResultModal={DeleteSubscriptionModal}
-        resultMap={(result) =>
-          [
+        resultMap={(result) => {
+          const coachPicture = coachPictures[result.coach]?.url;
+          return [
             {
               title: "coach",
               value: result.coach_email,
@@ -88,8 +107,21 @@ export default function MyCoaches() {
               title: "cancelled?",
               value: result.is_cancelled ? "yes" : "no",
             },
-          ].filter(Boolean)
-        }
+            coachPicture && {
+              jsx: (
+                <img
+                  alt="coach picture"
+                  src={coachPicture}
+                  className="max-h-[150px] max-w-[150px] overflow-hidden rounded-lg sm:col-start-1"
+                />
+              ),
+            },
+          ].filter(Boolean);
+        }}
+        resultsListener={(results) => {
+          console.log("resultsListener", results);
+          setCoaches(results);
+        }}
       ></Table>
     </>
   );

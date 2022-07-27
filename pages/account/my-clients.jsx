@@ -5,6 +5,7 @@ import CreateSubscriptionModal from "../../components/account/modal/CreateSubscr
 import { useUser } from "../../context/user-context";
 import { formatDollars } from "../../utils/subscription-utils";
 import MyLink from "../../components/MyLink";
+import { useEffect, useState } from "react";
 
 const filterTypes = [
   {
@@ -48,13 +49,21 @@ const orderTypes = [
 
 export default function MyClients() {
   const { user } = useUser();
+
+  const [baseFilter, setBaseFilter] = useState({});
+  useEffect(() => {
+    if (user) {
+      setBaseFilter({ client: user.id });
+    }
+  }, [user]);
+
   return (
     <>
       <Table
         filterTypes={filterTypes}
         orderTypes={orderTypes}
         tableName="subscription"
-        baseFilter={{ coach: user.id }}
+        baseFilter={baseFilter}
         resultName="client"
         title="My Clients"
         createTitle="Add Client"
