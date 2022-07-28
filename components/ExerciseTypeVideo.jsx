@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import LazyVideo from "./LazyVideo";
+import Image from "next/image";
 import { useExerciseVideos } from "../context/exercise-videos-context";
 import { isMobile, isDesktop } from "react-device-detect";
 
@@ -116,18 +117,24 @@ export default function ExerciseTypeVideo(
         controls={false}
         ref={videoRef}
       ></LazyVideo>
-      <img
-        width={width}
-        height={height}
-        loading="lazy"
-        alt="exercise"
-        src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
+      <div
         className={classNames(
-          "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
+          "h-[100px] w-[100px]",
           className,
           shouldShowVideo ? "hidden" : ""
         )}
-      ></img>
+      >
+        {exerciseVideos?.[exerciseTypeId]?.thumbnailUrl && (
+          <Image
+            width={width}
+            height={height}
+            loading="lazy"
+            alt="exercise"
+            src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
+            className={classNames("overflow-hidden rounded-lg")}
+          ></Image>
+        )}
+      </div>
     </div>
   );
 }
