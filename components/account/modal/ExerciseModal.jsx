@@ -809,100 +809,66 @@ export default function ExerciseModal(props) {
                 </div>
               </div>
             </div>
+
             {previousExercise.number_of_sets_assigned && (
-              <>
-                {previousExercise.number_of_sets_performed === null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Sets</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.number_of_sets_assigned}
-                    </dd>
-                  </div>
-                )}
-                {previousExercise.number_of_sets_performed !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Sets</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.number_of_sets_performed === null &&
+                    previousExercise.number_of_sets_assigned}
+                  {previousExercise.number_of_sets_performed !== null && (
+                    <>
                       {previousExercise.number_of_sets_performed}/
                       {previousExercise.number_of_sets_assigned}
-                    </dd>
-                  </div>
-                )}
-              </>
+                    </>
+                  )}
+                </dd>
+              </div>
             )}
 
             {previousExercise.number_of_reps_assigned && (
-              <>
-                {previousExercise.number_of_reps_performed === null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Reps</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.number_of_reps_assigned
-                        .map((reps) => (reps == 0 ? "amrap" : reps))
-                        .join(", ")}
-                    </dd>
-                  </div>
-                )}
-                {previousExercise.number_of_reps_performed !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Reps</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.number_of_reps_performed
-                        .map(
-                          (numberOfReps, index) =>
-                            `${numberOfReps}/${
-                              previousExercise.number_of_reps_assigned[index] ||
-                              previousExercise.number_of_reps_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                    </dd>
-                  </div>
-                )}
-              </>
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Reps</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.number_of_reps_performed === null &&
+                    previousExercise.number_of_reps_assigned
+                      .map((reps) => (reps == 0 ? "amrap" : reps))
+                      .join(", ")}
+                  {previousExercise.number_of_reps_performed !== null &&
+                    previousExercise.number_of_reps_performed
+                      .map(
+                        (numberOfReps, index) =>
+                          `${numberOfReps}/${
+                            previousExercise.number_of_reps_assigned[index] ||
+                            previousExercise.number_of_reps_assigned[0]
+                          }`
+                      )
+                      .join(", ")}
+                </dd>
+              </div>
             )}
 
-            {previousExercise.weight_assigned && (
-              <>
-                {previousExercise.weight_assigned.some(
-                  (weight) => weight > 0
-                ) &&
-                  previousExercise.weight_performed === null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Weight (
-                        {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"}
-                        )
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {previousExercise.weight_assigned.join(", ")}
-                      </dd>
-                    </div>
-                  )}
-                {previousExercise.weight_assigned.some(
-                  (weight) => weight > 0
-                ) &&
-                  previousExercise.weight_performed !== null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Weight (
-                        {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"}
-                        )
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {previousExercise.weight_performed
-                          .map(
-                            (weight, index) =>
-                              `${weight}/${
-                                previousExercise.weight_assigned[index] ||
-                                previousExercise.weight_assigned[0]
-                              }`
-                          )
-                          .join(", ")}
-                      </dd>
-                    </div>
-                  )}
-              </>
+            {previousExercise.weight_assigned?.some((weight) => weight > 0) && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Weight (
+                  {previousExercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.weight_performed === null &&
+                    previousExercise.weight_assigned.join(", ")}
+                  {previousExercise.weight_performed !== null &&
+                    previousExercise.weight_performed
+                      .map(
+                        (weight, index) =>
+                          `${weight}/${
+                            previousExercise.weight_assigned[index] ||
+                            previousExercise.weight_assigned[0]
+                          }`
+                      )
+                      .join(", ")}
+                </dd>
+              </div>
             )}
 
             {previousExercise.difficulty !== null && (
@@ -918,7 +884,7 @@ export default function ExerciseModal(props) {
               </div>
             )}
 
-            {previousExercise.rest_duration !== null && (
+            {previousExercise.rest_duration?.some((value) => value > 0) && (
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
                   Rest Duration (min)
@@ -929,95 +895,78 @@ export default function ExerciseModal(props) {
               </div>
             )}
 
-            {previousExercise.set_duration_assigned && (
-              <>
-                {previousExercise.set_duration_performed === null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Set Duration (min)
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.set_duration_assigned.join(", ")}
-                    </dd>
-                  </div>
-                )}
-                {previousExercise.set_duration_performed !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Set Duration (min)
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.set_duration_performed
-                        .map(
-                          (setDurationPerformed, index) =>
-                            `${setDurationPerformed}/${
-                              previousExercise.set_duration_assigned[index] ||
-                              previousExercise.set_duration_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                    </dd>
-                  </div>
-                )}
-              </>
+            {previousExercise.set_duration_assigned?.some(
+              (value) => value > 0
+            ) && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Set Duration (min)
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.set_duration_performed === null &&
+                    previousExercise.set_duration_assigned.join(", ")}
+                  {previousExercise.set_duration_performed !== null &&
+                    previousExercise.set_duration_performed
+                      .map(
+                        (setDurationPerformed, index) =>
+                          `${setDurationPerformed}/${
+                            previousExercise.set_duration_assigned[index] ||
+                            previousExercise.set_duration_assigned[0]
+                          }`
+                      )
+                      .join(", ")}
+                </dd>
+              </div>
             )}
 
-            {previousExercise.speed_assigned && (
+            {previousExercise.speed_assigned?.some((value) => value > 0) && (
               <>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Speed</dt>
+                  <dd className="mt-1 break-words text-sm text-gray-900">
+                    {previousExercise.speed_assigned.join(", ")}
+                  </dd>
+                </div>
                 {previousExercise.speed_performed === null && (
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Speed</dt>
                     <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.speed_assigned.join(", ")}
-                    </dd>
-                  </div>
-                )}
-                {previousExercise.speed_performed !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Speed</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.speed_performed
-                        .map(
-                          (speedPerformed, index) =>
-                            `${speedPerformed}/${
-                              previousExercise.speed_assigned[index] ||
-                              previousExercise.speed_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
+                      {previousExercise.speed_performed === null &&
+                        previousExercise.speed_performed
+                          .map(
+                            (speedPerformed, index) =>
+                              `${speedPerformed}/${
+                                previousExercise.speed_assigned[index] ||
+                                previousExercise.speed_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                      {previousExercise.speed_performed !== null &&
+                        previousExercise.speed_assigned.join(", ")}
                     </dd>
                   </div>
                 )}
               </>
             )}
 
-            {previousExercise.level_assigned && (
-              <>
-                {previousExercise.level_performed === null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Level</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.level_assigned.join(", ")}
-                    </dd>
-                  </div>
-                )}
-                {previousExercise.level_performed !== null && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Level</dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {previousExercise.level_performed
-                        .map(
-                          (level, index) =>
-                            `${level}/${
-                              previousExercise.level_assigned[index] ||
-                              previousExercise.level_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                    </dd>
-                  </div>
-                )}
-              </>
+            {previousExercise.level_assigned?.some((value) => value > 0) && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Level</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.level_performed === null &&
+                    previousExercise.level_assigned.join(", ")}
+                  {previousExercise.level_performed !== null &&
+                    previousExercise.level_performed
+                      .map(
+                        (level, index) =>
+                          `${level}/${
+                            previousExercise.level_assigned[index] ||
+                            previousExercise.level_assigned[0]
+                          }`
+                      )
+                      .join(", ")}
+                </dd>
+              </div>
             )}
 
             {previousVideo?.map(
