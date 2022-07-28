@@ -36,6 +36,8 @@ export const exerciseFeatures = [
   "distance",
 ];
 
+export const distanceUnits = ["mi", "km", "m", "ft"];
+
 const kilogramToPoundRatio = 2.2046;
 export const kilogramsToPounds = (kilograms) =>
   kilograms * kilogramToPoundRatio;

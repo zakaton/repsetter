@@ -6,6 +6,7 @@ import { supabase, timeToDate, stringToDate } from "../../../utils/supabase";
 import {
   poundsToKilograms,
   kilogramsToPounds,
+  distanceUnits,
 } from "../../../utils/exercise-utils";
 import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
@@ -1563,60 +1564,9 @@ export default function ExerciseModal(props) {
 
             {selectedExerciseType.features?.includes("weight") && (
               <>
-                {sameWeightForEachSet && (
-                  <div className="col-start-1">
-                    <label
-                      htmlFor="weight"
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Weight
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        name="weight"
-                        id="weight"
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        value={
-                          isWeightInputEmptyString[0]
-                            ? ""
-                            : isUsingKilograms
-                            ? weightKilograms[0]
-                            : weightPounds[0]
-                        }
-                        placeholder={0}
-                        onInput={(e) => {
-                          setIsWeightInputEmptyString([e.target.value === ""]);
-                          const weight = Number(e.target.value);
-                          setWeight([weight]);
-                        }}
-                      />
-                      <div className="absolute inset-y-0 right-0 flex items-center">
-                        <label htmlFor="weight-type" className="sr-only">
-                          weight type
-                        </label>
-                        <select
-                          id="weight-type"
-                          name="weight-type"
-                          className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          onChange={(e) =>
-                            setIsUsingKilograms(e.target.value === "kg")
-                          }
-                          value={isUsingKilograms ? "kg" : "lbs"}
-                        >
-                          <option>kg</option>
-                          <option>lbs</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {!sameWeightForEachSet &&
-                  new Array(numberOfSets).fill(1).map((_, index) => (
+                {new Array(sameWeightForEachSet ? 1 : numberOfSets)
+                  .fill(1)
+                  .map((_, index) => (
                     <div
                       key={index}
                       className={index === 0 ? "col-start-1" : ""}
@@ -1625,14 +1575,15 @@ export default function ExerciseModal(props) {
                         htmlFor={`weight-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Weight #{index + 1}
+                        Weight
+                        {sameWeightForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           name={`weight-${index}`}
                           id={`weight-${index}`}
@@ -1695,39 +1646,9 @@ export default function ExerciseModal(props) {
 
             {selectedExerciseType.features?.includes("speed") && (
               <>
-                {sameSpeedForEachSet && (
-                  <div className="col-start-1">
-                    <label
-                      htmlFor="speed"
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Speed
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={isSpeedEmptyString[0] ? "" : speedAssigned[0]}
-                        placeholder={0}
-                        onInput={(e) => {
-                          setIsSpeedEmptyString([e.target.value === ""]);
-                          setSpeedAssigned([Number(e.target.value)]);
-                        }}
-                        name="speed"
-                        id="speed"
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="text-gray-500 sm:text-sm">mph</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {!sameSpeedForEachSet &&
-                  new Array(numberOfSets).fill(1).map((_, index) => (
+                {new Array(sameSpeedForEachSet ? 1 : numberOfSets)
+                  .fill(1)
+                  .map((_, index) => (
                     <div
                       className={index === 0 ? "col-start-1" : ""}
                       key={index}
@@ -1736,7 +1657,8 @@ export default function ExerciseModal(props) {
                         htmlFor={`set-speed-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Speed #{index + 1}
+                        Speed
+                        {sameSpeedForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
@@ -1777,36 +1699,9 @@ export default function ExerciseModal(props) {
 
             {selectedExerciseType.features?.includes("level") && (
               <>
-                {sameLevelForEachSet && (
-                  <div className="col-start-1">
-                    <label
-                      htmlFor="level"
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Level
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={isLevelEmptyString[0] ? "" : levelAssigned[0]}
-                        placeholder={0}
-                        onInput={(e) => {
-                          setIsLevelEmptyString([e.target.value === ""]);
-                          setLevelAssigned([Number(e.target.value)]);
-                        }}
-                        name="level"
-                        id="level"
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                )}
-                {!sameLevelForEachSet &&
-                  new Array(numberOfSets).fill(1).map((_, index) => (
+                {new Array(sameLevelForEachSet ? 1 : numberOfSets)
+                  .fill(1)
+                  .map((_, index) => (
                     <div
                       className={index === 0 ? "col-start-1" : ""}
                       key={index}
@@ -1815,14 +1710,15 @@ export default function ExerciseModal(props) {
                         htmlFor={`set-level-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Level #{index + 1}
+                        Level
+                        {sameLevelForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isLevelEmptyString[index]
@@ -1851,43 +1747,77 @@ export default function ExerciseModal(props) {
               </>
             )}
 
-            {includeRestDuration && (
+            {selectedExerciseType.features?.includes("distance") && (
               <>
-                {sameRestDurationForEachSet && (
-                  <div className="col-start-1">
-                    <label
-                      htmlFor="restDuration"
-                      className="block select-none text-sm font-medium text-gray-700"
+                {new Array(sameDistanceForEachSet ? 1 : numberOfSets)
+                  .fill(1)
+                  .map((_, index) => (
+                    <div
+                      className={index === 0 ? "col-start-1" : ""}
+                      key={index}
                     >
-                      Rest Duration
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={
-                          isRestDurationEmptyString[0] ? "" : restDuration[0]
-                        }
-                        placeholder={0}
-                        onInput={(e) => {
-                          setIsRestDurationEmptyString([e.target.value === ""]);
-                          setRestDuration([Number(e.target.value)]);
-                        }}
-                        name="restDuration"
-                        id="restDuration"
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="text-gray-500 sm:text-sm">min</span>
+                      <label
+                        htmlFor={`set-distance-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Distance
+                        {sameDistanceForEachSet ? "" : `#${index + 1}`}
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="0.1"
+                          min="0"
+                          value={
+                            isDistanceEmptyString[index]
+                              ? ""
+                              : distanceAssigned[index]
+                          }
+                          placeholder={0}
+                          onInput={(e) => {
+                            const newIsDistanceEmptyString =
+                              isDistanceEmptyString.slice();
+                            newIsDistanceEmptyString[index] =
+                              e.target.value === "";
+                            setIsDistanceEmptyString(newIsDistanceEmptyString);
+
+                            const newDistance = distanceAssigned.slice();
+                            newDistance[index] = Number(e.target.value);
+                            setDistanceAssigned(newDistance);
+                          }}
+                          name={`set-distance-${index}`}
+                          id={`set-distance-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center">
+                          <label htmlFor="distance-unit" className="sr-only">
+                            distance unit
+                          </label>
+                          <select
+                            id={`distance-unit-${index}`}
+                            name={`distance-unit-${index}`}
+                            className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            onChange={(e) => setDistanceUnit(e.target.value)}
+                            value={distanceUnit}
+                          >
+                            {distanceUnits.map((unit) => (
+                              <option key={unit}>{unit}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {!sameRestDurationForEachSet &&
-                  new Array(numberOfSets).fill(1).map((_, index) => (
+                  ))}
+              </>
+            )}
+
+            {includeRestDuration && (
+              <>
+                {new Array(sameRestDurationForEachSet ? 1 : numberOfSets)
+                  .fill(1)
+                  .map((_, index) => (
                     <div
                       className={index === 0 ? "col-start-1" : ""}
                       key={index}
@@ -1896,14 +1826,15 @@ export default function ExerciseModal(props) {
                         htmlFor={`rest-duration-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Rest Duration #{index + 1}
+                        Rest Duration
+                        {sameRestDurationForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isRestDurationEmptyString[index]
@@ -1938,6 +1869,7 @@ export default function ExerciseModal(props) {
             )}
           </>
         )}
+
         {selectedExercise && (
           <>
             <div className="relative w-full sm:col-span-3">
