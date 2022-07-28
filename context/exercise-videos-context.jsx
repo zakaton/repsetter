@@ -28,8 +28,6 @@ export function ExerciseVideoContextProvider(props) {
             console.error(listError);
           }
 
-          console.log("list", list);
-
           const videoDetails = list?.find(({ name }) =>
             name.startsWith("video")
           );

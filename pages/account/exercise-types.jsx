@@ -9,6 +9,8 @@ import { useExerciseVideos } from "../../context/exercise-videos-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import MyLink from "../../components/MyLink";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
+import { useSelectedExerciseType } from "../../context/selected-exercise-context";
+import { useClient } from "../../context/client-context";
 
 const filterTypes = [
   ...muscleGroups.map((muscleGroup) => ({
@@ -42,6 +44,11 @@ const orderTypes = [
 
 export default function ExerciseTypes() {
   const { isAdmin } = useUser();
+
+  const { setSelectedExerciseType: _setSelectedExerciseType } =
+    useSelectedExerciseType();
+
+  const { selectedClient, setSelectedDate, amITheClient } = useClient();
 
   const [showEditExerciseTypeModal, setShowEditExerciseTypeModal] =
     useState(false);
@@ -152,13 +159,31 @@ export default function ExerciseTypes() {
               </button>
             ),
           },
-          isAdmin && {
+          {
             jsx: (
               <MyLink
-                href={`/account/exercises?exercise-type=${result.name}`}
+                onClick={(e) => {
+                  _setSelectedExerciseType(result);
+                }}
+                href={`/account/exercises?exercise-type=${result.id}`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 View
+              </MyLink>
+            ),
+          },
+          {
+            jsx: (
+              <MyLink
+                onClick={(e) => {
+                  _setSelectedExerciseType(result);
+                }}
+                href={`/account/progress?exercise-type=${result.id}${
+                  selectedClient ? `&client=${selectedClient.client_email}` : ""
+                }`}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                Progress
               </MyLink>
             ),
           },

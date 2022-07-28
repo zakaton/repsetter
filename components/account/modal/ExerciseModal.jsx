@@ -196,16 +196,25 @@ export default function ExerciseModal(props) {
       if (selectedExercise.number_of_reps_assigned) {
         setNumberOfReps(selectedExercise.number_of_reps_assigned);
       }
+
       if (selectedExercise.is_weight_in_kilograms !== null) {
         setIsUsingKilograms(selectedExercise.is_weight_in_kilograms);
       }
       if (selectedExercise.weight_assigned) {
         setWeight(selectedExercise.weight_assigned);
-      }
-      if (selectedExercise.weight_assigned !== null) {
         const sameWeightForEachSet =
           selectedExercise.weight_assigned?.length == 1;
         setSameWeightForEachSet(sameWeightForEachSet);
+      }
+
+      if (selectedExercise.distance_unit !== null) {
+        setDistanceUnit(selectedExercise.distance_unit);
+      }
+      if (selectedExercise.distance_assigned) {
+        setDistanceAssigned(selectedExercise.distance_assigned);
+        const sameDistanceForEachSet =
+          selectedExercise.distance_assigned?.length == 1;
+        setSameDistanceForEachSet(sameDistanceForEachSet);
       }
 
       if (selectedExercise.number_of_sets_performed !== null) {
@@ -261,6 +270,21 @@ export default function ExerciseModal(props) {
         } else {
           setWeightPerformedPounds(weightPerformed);
         }
+      }
+
+      if (selectedExercise.distance_assigned) {
+        let distancePerformed =
+          selectedExercise.distance_performed !== null
+            ? selectedExercise.distance_performed
+            : selectedExercise.distance_assigned;
+        if (
+          distancePerformed.length != selectedExercise.number_of_sets_assigned
+        ) {
+          distancePerformed = new Array(
+            selectedExercise.number_of_sets_assigned
+          ).fill(distancePerformed[0]);
+        }
+        setDistancePerformed(distancePerformed);
       }
 
       if (selectedExercise.time) {
@@ -414,6 +438,14 @@ export default function ExerciseModal(props) {
     useState([]);
   const [sameSpeedForEachSet, setSameSpeedForEachSet] = useState(true);
 
+  const [distanceAssigned, setDistanceAssigned] = useState([]);
+  const [distancePerformed, setDistancePerformed] = useState([]);
+  const [isDistanceEmptyString, setIsDistanceEmptyString] = useState([]);
+  const [isDistancePerformedEmptyString, setIsDistancePerformedEmptyString] =
+    useState([]);
+  const [sameDistanceForEachSet, setSameDistanceForEachSet] = useState(true);
+  const [distanceUnit, setDistanceUnit] = useState("miles");
+
   const [levelAssigned, setLevelAssigned] = useState([]);
   const [levelPerformed, setLevelPerformed] = useState([]);
   const [isLevelEmptyString, setIsLevelEmptyString] = useState([]);
@@ -455,6 +487,15 @@ export default function ExerciseModal(props) {
           previousExercise.speed_assigned.length !==
             previousExercise.number_of_sets_assigned
         );
+      }
+
+      if (previousExercise.distance_assigned) {
+        setDistanceAssigned(previousExercise.distance_assigned);
+        setSameDistanceForEachSet(
+          previousExercise.distance_assigned.length !==
+            previousExercise.number_of_sets_assigned
+        );
+        setDistanceUnit(previousExercise.distance_unit);
       }
 
       if (previousExercise.level_assigned) {
@@ -574,6 +615,14 @@ export default function ExerciseModal(props) {
                   }
                 : {}),
 
+              ...(selectedExerciseType.features?.includes("distance")
+                ? {
+                    distance_assigned: distanceAssigned,
+                    distance_performed: distancePerformed,
+                    distance_unit: distanceUnit,
+                  }
+                : {}),
+
               difficulty,
               video,
             };
@@ -647,6 +696,13 @@ export default function ExerciseModal(props) {
               ...(selectedExerciseType.features?.includes("level")
                 ? {
                     level_assigned: levelAssigned,
+                  }
+                : {}),
+
+              ...(selectedExerciseType.features?.includes("distance")
+                ? {
+                    distance_assigned: distanceAssigned,
+                    distance_unit: distanceUnit,
                   }
                 : {}),
             };
@@ -1204,6 +1260,39 @@ export default function ExerciseModal(props) {
                         className="select-none font-medium text-gray-700"
                       >
                         Same Speed for Each Set
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {selectedExerciseType.features?.includes("distance") && (
+                  <div className="relative flex self-center">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="sameDistanceForEachSet"
+                        name="sameDistanceForEachSet"
+                        type="checkbox"
+                        checked={sameDistanceForEachSet}
+                        onChange={(e) => {
+                          const newSameDistanceForEachSet = e.target.checked;
+                          if (newSameDistanceForEachSet) {
+                            setDistanceAssigned([distanceAssigned[0]]);
+                          } else {
+                            setDistanceAssigned(
+                              new Array(numberOfSets).fill(distanceAssigned[0])
+                            );
+                          }
+                          setSameDistanceForEachSet(newSameDistanceForEachSet);
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label
+                        htmlFor="sameDistanceForEachSet"
+                        className="select-none font-medium text-gray-700"
+                      >
+                        Same Distance for Each Set
                       </label>
                     </div>
                   </div>

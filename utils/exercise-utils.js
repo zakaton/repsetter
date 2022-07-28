@@ -33,6 +33,7 @@ export const exerciseFeatures = [
   "speed",
   "level",
   "duration",
+  "distance",
 ];
 
 const kilogramToPoundRatio = 2.2046;
