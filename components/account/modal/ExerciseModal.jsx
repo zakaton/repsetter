@@ -1495,7 +1495,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isSetDurationEmptyString[index]
@@ -1630,7 +1630,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isSpeedEmptyString[index]
@@ -1731,7 +1731,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isDistanceEmptyString[index]

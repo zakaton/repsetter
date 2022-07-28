@@ -250,7 +250,7 @@ export default function WeightModal(props) {
               placeholder="0"
               name="weight"
               id="weight"
-              step="0.1"
+              step="1"
               className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               value={isWeightEmptyString ? "" : weight}
               onInput={(e) => {

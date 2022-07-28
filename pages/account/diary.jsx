@@ -1100,6 +1100,7 @@ export default function Diary() {
               previousWeight = weights[index - 1];
             }
             let weightDifference;
+            console.log("FUCK", weight, previousWeight);
             if (previousWeight) {
               let previousWeightValue = previousWeight.weight;
               if (
@@ -1111,6 +1112,7 @@ export default function Diary() {
                   : kilogramsToPounds(previousWeightValue);
               }
               weightDifference = weight.weight - previousWeightValue;
+              console.log("diff", weightDifference);
             }
             return (
               <div
@@ -1146,10 +1148,12 @@ export default function Diary() {
                           }
                         >
                           ({weightDifference < 0 ? "" : "+"}
-                          {(isUsingKilograms
-                            ? poundsToKilograms(weightDifference)
-                            : kilogramsToPounds(weightDifference)
-                          ).toFixed(Number.isInteger(weightDifference) ? 0 : 1)}
+                          {weight.is_weight_in_kilograms == isUsingKilograms
+                            ? weightDifference
+                            : (isUsingKilograms
+                                ? poundsToKilograms(weightDifference)
+                                : kilogramsToPounds(weightDifference)
+                              ).toFixed(1)}
                           )
                         </span>
                       )}
