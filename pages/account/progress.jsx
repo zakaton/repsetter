@@ -53,6 +53,7 @@ const graphTypeOrder = [
   "number of reps",
   "difficulty",
   "speed",
+  "distance",
   "level",
   "duration",
   "rest duration",
@@ -134,6 +135,12 @@ const filterTypes = [
         requiresExercise: true,
       },
       {
+        value: "distance",
+        label: "Distance",
+        feature: "distance",
+        requiresExercise: true,
+      },
+      {
         value: "level",
         label: "Level",
         feature: "level",
@@ -193,10 +200,11 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topWeightAssigned = 0;
         let topWeightPerformed = 0;
-        exercise.weight_assigned?.forEach((weightAssigned, index) => {
-          if (weightAssigned > topWeightAssigned) {
-            topWeightAssigned = weightAssigned;
-            topWeightPerformed = exercise.weight_performed?.[index] || 0;
+        exercise.weight_performed?.forEach((weightPerformed, index) => {
+          if (topWeightPerformed < weightPerformed) {
+            topWeightPerformed = weightPerformed;
+            topWeightAssigned =
+              exercise.weight_assigned[index] || exercise.weight_assigned[0];
           }
         });
         const showKilograms = (filters["weight-unit"] || "kg") === "kg";
@@ -248,10 +256,12 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let maxRepsAssigned = 0;
         let maxRepsPerformed = 0;
-        exercise.number_of_reps_assigned?.forEach((repsAssigned, index) => {
-          if (repsAssigned > maxRepsAssigned) {
-            maxRepsAssigned = repsAssigned;
-            maxRepsPerformed = exercise.number_of_reps_performed?.[index] || 0;
+        exercise.number_of_reps_performed?.forEach((repsPerformed, index) => {
+          if (maxRepsPerformed < repsPerformed) {
+            maxRepsPerformed = repsPerformed;
+            maxRepsAssigned =
+              exercise.number_of_reps_assigned[index] ||
+              exercise.number_of_reps_assigned[0];
           }
         });
         return {
@@ -271,14 +281,12 @@ const graphTypes = {
     backgroundColor: "rgba(250, 204, 21, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
-        let difficulty = 0;
-        let topWeightAssigned = 0;
-        exercise.weight_assigned?.forEach((weightAssigned, index) => {
-          if (weightAssigned > topWeightAssigned) {
-            topWeightAssigned = weightAssigned;
-            difficulty = exercise.difficulty?.[index] || 0;
-          }
-        });
+        let difficulty =
+          exercise.difficulty?.reduce(
+            (topDifficulty, difficulty) => Math.max(topDifficulty, difficulty),
+            0
+          ) || 0;
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: difficulty,
@@ -317,20 +325,21 @@ const graphTypes = {
     backgroundColor: "rgba(252, 143, 0, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
-        let setDurationPerformed = 0;
+        let topSetDurationPerformed = 0;
         let topSetDurationAssigned = 0;
-        exercise.set_duration_assigned?.forEach(
-          (setDurationAssigned, index) => {
-            if (setDurationAssigned > topSetDurationAssigned) {
-              topSetDurationAssigned = setDurationAssigned;
-              setDurationPerformed =
-                exercise.set_duration_performed?.[index] || 0;
+        exercise.set_duration_performed?.forEach(
+          (setDurationPerformed, index) => {
+            if (topSetDurationPerformed < setDurationPerformed) {
+              topSetDurationPerformed = setDurationPerformed;
+              topSetDurationAssigned =
+                exercise.set_duration_assigned[index] ||
+                exercise.set_duration_assigned[0];
             }
           }
         );
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
-          y: setDurationPerformed,
+          y: topSetDurationPerformed,
           denominator: topSetDurationAssigned,
           includeTime: exercise.time,
           suffix: "minutes",
@@ -348,7 +357,7 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topRestDuration = 0;
         exercise.rest_duration?.forEach((restDuration) => {
-          if (restDuration > topRestDuration) {
+          if (topRestDuration < restDuration) {
             topRestDuration = restDuration;
           }
         });
@@ -371,10 +380,11 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topSpeedPerformed = 0;
         let topSpeedAssigned = 0;
-        exercise.speed_assigned?.forEach((speedAssigned, index) => {
-          if (speedAssigned > topSpeedAssigned) {
-            topSpeedAssigned = speedAssigned;
-            topSpeedPerformed = exercise.speed_performed?.[index] || 0;
+        exercise.speed_performed?.forEach((speedPerformed, index) => {
+          if (topSpeedPerformed < speedPerformed) {
+            topSpeedPerformed = speedPerformed;
+            topSpeedAssigned =
+              exercise.speed_assigned[index] || exercise.speed_assigned[0];
           }
         });
         return {
@@ -387,6 +397,34 @@ const graphTypes = {
       });
     },
     yAxisID: "y8",
+  },
+  distance: {
+    label: "Distance",
+    type: "bar",
+    borderColor: "rgb(130, 0, 252)",
+    backgroundColor: "rgba(130, 100, 252, 0.5)",
+    getData: ({ exercises }) => {
+      return exercises?.map((exercise) => {
+        let topDistancePerformed = 0;
+        let topDistanceAssigned = 0;
+        exercise.distance_performed?.forEach((distancePerformed, index) => {
+          if (topDistancePerformed < distancePerformed) {
+            topDistancePerformed = distancePerformed;
+            topDistanceAssigned =
+              exercise.distance_assigned[index] ||
+              exercise.distance_assigned[0];
+          }
+        });
+        return {
+          x: dateFromDateAndTime(exercise.date, exercise.time),
+          y: topDistancePerformed,
+          denominator: topDistanceAssigned,
+          includeTime: exercise.time,
+          suffix: exercise.distance_unit,
+        };
+      });
+    },
+    yAxisID: "y10",
   },
   level: {
     label: "Level",
@@ -869,6 +907,20 @@ export default function Progress() {
           title: {
             display: true,
             text: `Level`,
+          },
+        },
+        y10: {
+          type: "linear",
+          display: typesToDisplay.includes("distance"),
+          min: 0,
+          //max: 1,
+          position: getPosition("distance"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("distance"),
+          },
+          title: {
+            display: true,
+            text: `Distance`,
           },
         },
       },

@@ -251,21 +251,7 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
-          exercise.level_assigned?.some((value) => value > 0) && {
-            title: "level",
-            value:
-              exercise.level_performed === null
-                ? exercise.level_assigned.join(", ")
-                : exercise.level_performed
-                    .map(
-                      (levelPerformed, index) =>
-                        `${levelPerformed}/${
-                          exercise.level_assigned[index] ||
-                          exercise.level_assigned[0]
-                        }`
-                    )
-                    .join(", "),
-          },
+
           exercise.speed_assigned?.some((value) => value > 0) && {
             title: "speed (mph)",
             value:
@@ -281,8 +267,38 @@ export default function Exercises() {
                     )
                     .join(", "),
           },
+          exercise.level_assigned?.some((value) => value > 0) && {
+            title: "level",
+            value:
+              exercise.level_performed === null
+                ? exercise.level_assigned.join(", ")
+                : exercise.level_performed
+                    .map(
+                      (levelPerformed, index) =>
+                        `${levelPerformed}/${
+                          exercise.level_assigned[index] ||
+                          exercise.level_assigned[0]
+                        }`
+                    )
+                    .join(", "),
+          },
+          exercise.distance_assigned?.some((value) => value > 0) && {
+            title: `distance (${exercise.distance_unit})`,
+            value:
+              exercise.distance_performed === null
+                ? exercise.distance_assigned.join(", ")
+                : exercise.distance_performed
+                    .map(
+                      (distancePerformed, index) =>
+                        `${distancePerformed}/${
+                          exercise.distance_assigned[index] ||
+                          exercise.distance_assigned[0]
+                        }`
+                    )
+                    .join(", "),
+          },
           exercise.weight_assigned?.some((value) => value > 0) && {
-            title: `Weight (${exercise.is_weight_in_kilograms ? "kg" : "lbs"})`,
+            title: `weight (${exercise.is_weight_in_kilograms ? "kg" : "lbs"})`,
             value:
               exercise.weight_performed === null
                 ? exercise.weight_assigned.join(", ")

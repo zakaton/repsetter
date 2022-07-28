@@ -1464,6 +1464,29 @@ export default function Diary() {
                   </div>
                 </>
               )}
+              {exercise.distance_assigned?.some((value) => value > 0) && (
+                <>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Distance ({exercise.distance_unit})
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.distance_performed === null &&
+                        exercise.distance_assigned.join(", ")}
+                      {exercise.distance_performed !== null &&
+                        exercise.distance_performed
+                          .map(
+                            (distancePerformed, index) =>
+                              `${distancePerformed}/${
+                                exercise.distance_assigned[index] ||
+                                exercise.distance_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                    </dd>
+                  </div>
+                </>
+              )}
               {exercise.difficulty !== null && (
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">

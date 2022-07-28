@@ -872,19 +872,6 @@ export default function ExerciseModal(props) {
               </div>
             )}
 
-            {previousExercise.difficulty !== null && (
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Difficulty
-                </dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.difficulty
-                    .map((value) => `${value}/10`)
-                    .join(", ")}
-                </dd>
-              </div>
-            )}
-
             {previousExercise.rest_duration?.some((value) => value > 0) && (
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
@@ -966,6 +953,19 @@ export default function ExerciseModal(props) {
                           }`
                       )
                       .join(", ")}
+                </dd>
+              </div>
+            )}
+
+            {previousExercise.difficulty !== null && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Difficulty
+                </dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.difficulty
+                    .map((value) => `${value}/10`)
+                    .join(", ")}
                 </dd>
               </div>
             )}
@@ -1476,43 +1476,9 @@ export default function ExerciseModal(props) {
 
             {selectedExerciseType.features?.includes("duration") && (
               <>
-                {sameSetDurationForEachSet && (
-                  <div className="col-start-1">
-                    <label
-                      htmlFor="setDuration"
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      Set Duration
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <input
-                        required
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        value={
-                          isSetDurationEmptyString[0]
-                            ? ""
-                            : setDurationAssigned[0]
-                        }
-                        placeholder={0}
-                        onInput={(e) => {
-                          setIsSetDurationEmptyString([e.target.value === ""]);
-                          setSetDurationAssigned([Number(e.target.value)]);
-                        }}
-                        name="setDuration"
-                        id="setDuration"
-                        className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span className="text-gray-500 sm:text-sm">min</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {!sameSetDurationForEachSet &&
-                  new Array(numberOfSets).fill(1).map((_, index) => (
+                {new Array(sameSetDurationForEachSet ? 1 : numberOfSets)
+                  .fill(1)
+                  .map((_, index) => (
                     <div
                       className={index === 0 ? "col-start-1" : ""}
                       key={index}
@@ -1521,7 +1487,8 @@ export default function ExerciseModal(props) {
                         htmlFor={`set-duration-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Set Duration #{index + 1}
+                        Set Duration{" "}
+                        {sameSetDurationForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
@@ -1575,8 +1542,7 @@ export default function ExerciseModal(props) {
                         htmlFor={`weight-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Weight
-                        {sameWeightForEachSet ? "" : `#${index + 1}`}
+                        Weight {sameWeightForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
@@ -1657,8 +1623,7 @@ export default function ExerciseModal(props) {
                         htmlFor={`set-speed-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Speed
-                        {sameSpeedForEachSet ? "" : `#${index + 1}`}
+                        Speed {sameSpeedForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
@@ -1710,8 +1675,7 @@ export default function ExerciseModal(props) {
                         htmlFor={`set-level-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Level
-                        {sameLevelForEachSet ? "" : `#${index + 1}`}
+                        Level {sameLevelForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
@@ -1760,8 +1724,7 @@ export default function ExerciseModal(props) {
                         htmlFor={`set-distance-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Distance
-                        {sameDistanceForEachSet ? "" : `#${index + 1}`}
+                        Distance {sameDistanceForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <input
@@ -1826,7 +1789,7 @@ export default function ExerciseModal(props) {
                         htmlFor={`rest-duration-${index}`}
                         className="block select-none text-sm font-medium text-gray-700"
                       >
-                        Rest Duration
+                        Rest Duration{" "}
                         {sameRestDurationForEachSet ? "" : `#${index + 1}`}
                       </label>
                       <div className="relative mt-1 rounded-md shadow-sm">
@@ -1972,6 +1935,7 @@ export default function ExerciseModal(props) {
                 </div>
               </div>
             )}
+
             {new Array(numberOfSetsPerformed).fill(1).map((_, index) => (
               <React.Fragment key={index}>
                 <div className="relative w-full sm:col-span-3">
@@ -2058,7 +2022,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isSetDurationPerformedEmptyString[index]
@@ -2113,7 +2077,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isSpeedPerformedEmptyString[index]
@@ -2151,6 +2115,61 @@ export default function ExerciseModal(props) {
                     </div>
                   )}
 
+                {selectedExerciseType?.features?.includes("distance") &&
+                  distanceAssigned?.some((value) => value > 0) && (
+                    <div>
+                      <label
+                        htmlFor={`set-distance-performed-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Distance
+                      </label>
+                      <div className="relative mt-1 rounded-md shadow-sm">
+                        <input
+                          required
+                          type="number"
+                          inputMode="decimal"
+                          step="1"
+                          min="0"
+                          value={
+                            isDistancePerformedEmptyString[index]
+                              ? ""
+                              : distancePerformed[index]
+                          }
+                          onInput={(e) => {
+                            const newIsDistancePerformedEmptyString =
+                              isDistancePerformedEmptyString.slice();
+                            newIsDistancePerformedEmptyString[index] =
+                              e.target.value === "";
+                            setIsDistancePerformedEmptyString(
+                              newIsDistancePerformedEmptyString
+                            );
+
+                            const newDistancePerformed =
+                              distancePerformed.slice();
+                            newDistancePerformed[index] = Number(
+                              e.target.value
+                            );
+                            setDistancePerformed(newDistancePerformed);
+                          }}
+                          placeholder="0"
+                          name={`set-distance-performed-${index}`}
+                          id={`set-distance-performed-${index}`}
+                          className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-gray-500 sm:text-sm">
+                            /
+                            {distanceAssigned.length === 1
+                              ? distanceAssigned[0]
+                              : distanceAssigned[index]}{" "}
+                            {distanceUnit}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                 {selectedExerciseType?.features?.includes("level") &&
                   levelAssigned?.some((value) => value > 0) && (
                     <div>
@@ -2165,7 +2184,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           value={
                             isLevelPerformedEmptyString[index]
@@ -2202,50 +2221,6 @@ export default function ExerciseModal(props) {
                     </div>
                   )}
 
-                <div>
-                  <label
-                    htmlFor={`set-difficulty-${index}`}
-                    className="block select-none text-sm font-medium text-gray-700"
-                  >
-                    Difficulty
-                  </label>
-                  <div className="relative mt-1 rounded-md shadow-sm">
-                    <input
-                      required
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      max="10"
-                      value={
-                        isDifficultyEmptyString[index] ? "" : difficulty[index]
-                      }
-                      placeholder={0}
-                      onInput={(e) => {
-                        const newIsDifficultyEmptyString =
-                          isDifficultyEmptyString.slice();
-                        newIsDifficultyEmptyString[index] =
-                          e.target.value === "";
-                        setIsDifficultyEmptyString(newIsDifficultyEmptyString);
-
-                        const newDifficulty = difficulty.slice();
-                        newDifficulty[index] = Number(e.target.value);
-                        setDifficulty(newDifficulty);
-                      }}
-                      name={`set-difficulty-${index}`}
-                      id={`set-difficulty-${index}`}
-                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <span
-                        className="text-gray-500 sm:text-sm"
-                        id={`reps-performed-denominator-${index}`}
-                      >
-                        /10
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
                 {selectedExerciseType?.features?.includes("weight") &&
                   (isUsingKilograms ? weightKilograms : weightPounds)?.some(
                     (value) => value > 0
@@ -2262,7 +2237,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="0.1"
+                          step="1"
                           min="0"
                           name={`weight-performed-${index}`}
                           id={`weight-performed-${index}`}
@@ -2322,6 +2297,50 @@ export default function ExerciseModal(props) {
                       </div>
                     </div>
                   )}
+
+                <div>
+                  <label
+                    htmlFor={`set-difficulty-${index}`}
+                    className="block select-none text-sm font-medium text-gray-700"
+                  >
+                    Difficulty
+                  </label>
+                  <div className="relative mt-1 rounded-md shadow-sm">
+                    <input
+                      required
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      max="10"
+                      value={
+                        isDifficultyEmptyString[index] ? "" : difficulty[index]
+                      }
+                      placeholder={0}
+                      onInput={(e) => {
+                        const newIsDifficultyEmptyString =
+                          isDifficultyEmptyString.slice();
+                        newIsDifficultyEmptyString[index] =
+                          e.target.value === "";
+                        setIsDifficultyEmptyString(newIsDifficultyEmptyString);
+
+                        const newDifficulty = difficulty.slice();
+                        newDifficulty[index] = Number(e.target.value);
+                        setDifficulty(newDifficulty);
+                      }}
+                      name={`set-difficulty-${index}`}
+                      id={`set-difficulty-${index}`}
+                      className="hide-arrows block w-full rounded-md border-gray-300 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <span
+                        className="text-gray-500 sm:text-sm"
+                        id={`reps-performed-denominator-${index}`}
+                      >
+                        /10
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
                 {!video[index] && (
                   <div className="sm:col-span-3">
