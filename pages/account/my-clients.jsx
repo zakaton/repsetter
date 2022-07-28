@@ -53,7 +53,7 @@ export default function MyClients() {
   const [baseFilter, setBaseFilter] = useState({});
   useEffect(() => {
     if (user) {
-      setBaseFilter({ client: user.id });
+      setBaseFilter({ coach: user.id });
     }
   }, [user]);
 

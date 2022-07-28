@@ -1025,7 +1025,7 @@ export default function Diary() {
           </ul>
         )}
 
-        {(amITheClient || weights?.length > 0) && (
+        {
           <div className="relative pt-2">
             <div
               className="absolute inset-0 flex items-center"
@@ -1075,7 +1075,7 @@ export default function Diary() {
               </span>
             </div>
           </div>
-        )}
+        }
         {weightChartData && weightChartOptions && (
           <Line options={weightChartOptions} data={weightChartData} />
         )}

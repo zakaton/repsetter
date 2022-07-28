@@ -269,8 +269,8 @@ export default function WeightModal(props) {
                 onChange={(e) => setIsUsingKilograms(e.target.value === "kg")}
                 value={isUsingKilograms ? "kg" : "lbs"}
               >
-                <option>kg</option>
                 <option>lbs</option>
+                <option>kg</option>
               </select>
             </div>
           </div>
