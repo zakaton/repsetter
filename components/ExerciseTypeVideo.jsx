@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import LazyVideo from "./LazyVideo";
-import Image from "next/image";
 import { useExerciseVideos } from "../context/exercise-videos-context";
 import { isMobile, isDesktop } from "react-device-detect";
 import LazyImage from "./LazyImage";

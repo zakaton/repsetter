@@ -9,9 +9,16 @@ const faqs = [
       <>
         <p>
           Nope. You can sign up for free and just use this as standalone workout
-          app if you aren&apos;t a coach or don&apos;t wanna coach others.
+          app if you aren&apos;t a coach.
         </p>
-        <p>You&apos;re only charged when you subscribe to any coaches.</p>
+        <p>
+          The only time you&apos;d be charged is if you subscribe to a coach
+          with a nonzero subscription fee.
+        </p>
+        <p>
+          If you want to be a coach, it&apos;s free to sign up and we only take
+          a flat 5% fee on any subscriptions.
+        </p>
       </>
     ),
   },
@@ -19,7 +26,7 @@ const faqs = [
     question: "Can I cancel my coaching subscription anytime?",
     answer: () => (
       <>
-        <p>You&apos;re free to cancel anytime.</p>
+        <p>Yep. You&apos;re free to cancel anytime.</p>
       </>
     ),
   },
@@ -27,7 +34,7 @@ const faqs = [
     question: "What percent does Repsetter take from coaching subscriptions?",
     answer: () => (
       <>
-        <p>We take 5% from coaching subscriptions.</p>
+        <p>We take a flat 5% fee from coaching subscriptions.</p>
       </>
     ),
   },

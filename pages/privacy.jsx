@@ -29,8 +29,16 @@ export default function Privacy() {
             disabled by default, you&apos;d need to opt-in to receive emails)
           </li>
           <li>
-            Your workout information, so you can view and edit your workouts, as
-            well as allow coaches to view and plan your workout routines.
+            Your exercise information, so you can view and edit your exercise,
+            as well as allow coaches to view and plan your exercises.
+          </li>
+          <li>
+            Your bodyweight information, so you can view and edit your
+            bodyweight, as well as allow coaches to view your bodyweight.
+          </li>
+          <li>
+            Your progress pictures, so you can view and edit your progress
+            pictures, as well as allow coaches to view your progress pictures.
           </li>
           <li>
             Stripe customer information, so you can make payments to coaches

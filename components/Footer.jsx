@@ -10,7 +10,7 @@ const navigation = {
   social: [
     {
       name: "Email",
-      href: "mailto:contact@repsetter.fund?subject=Repsetter",
+      href: "mailto:contact@repsetter.com?subject=Repsetter",
       icon: (props) => (
         <MailIcon
           className="h-6 w-6 text-gray-400"

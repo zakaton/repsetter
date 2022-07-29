@@ -4,8 +4,8 @@ import {
   CurrencyDollarIcon,
   CreditCardIcon,
   TagIcon,
-  HeartIcon,
   FireIcon,
+  CameraIcon,
 } from "@heroicons/react/outline";
 
 const clientFeatures = [
@@ -36,15 +36,14 @@ const coachingFeatures = [
     icon: FireIcon,
   },
   {
-    name: "Design Meal Plans",
+    name: "Share Progress Pics",
     description:
-      "Set meal plans for clients, monitoring their nutritional intake and how well it correlates with performance in the gym.",
-    icon: HeartIcon,
+      "Post front, back, and side pictures each day, checking progress on each angle",
+    icon: CameraIcon,
   },
   {
-    name: "Share Weight and Progress Pics",
-    description:
-      "Track weight fluctuations as you build muscle or burn fat, sharing progress pictures along the way for comparison.",
+    name: "Share Weight",
+    description: "Track weight fluctuations as you build muscle or burn fat",
     icon: ScaleIcon,
   },
 ];
