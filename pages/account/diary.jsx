@@ -24,6 +24,8 @@ import {
   PaperClipIcon,
   PlusIcon,
   ClipboardIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/outline";
 import {
   kilogramsToPounds,
@@ -828,6 +830,10 @@ export default function Diary() {
     }
   }, [exerciseDates, weightDates, pictureDates]);
 
+  const [showExercises, setShowExercises] = useState(true);
+  const [showWeights, setShowWeights] = useState(true);
+  const [showPictures, setShowPictures] = useState(true);
+
   return (
     <>
       <ExerciseModal
@@ -940,14 +946,35 @@ export default function Diary() {
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-blue-500">
-                Exercises
-              </span>
+            <div className="relative z-10 flex justify-start">
+              <button
+                onClick={() => {
+                  setShowExercises(!showExercises);
+                }}
+                className="flex bg-white pr-2 text-base text-blue-500"
+              >
+                <span className="pr-1">Exercises</span>
+                {showExercises ? (
+                  <ChevronDownIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <ChevronUpIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
+                )}
+              </button>
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
-          <div className="relative flex justify-end sm:justify-center">
+          <div
+            className={classNames(
+              "relative flex justify-end sm:justify-center",
+              showExercises ? "" : "invisible"
+            )}
+          >
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
               <button
                 type="button"
@@ -992,327 +1019,352 @@ export default function Diary() {
             </span>
           </div>
         </div>
-        {exercises?.map((exercise, index) => (
-          <div
-            key={exercise.id}
-            className={classNames(
-              "pt-5",
-              index === 0 ? "pb-5" : "border-gray-20 border-t"
-            )}
-          >
-            <dl
-              className={
-                "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-              }
+        {showExercises &&
+          exercises?.map((exercise, index) => (
+            <div
+              key={exercise.id}
+              className={classNames(
+                "pt-5",
+                index === 0 ? "pb-5" : "border-gray-20 border-t"
+              )}
             >
-              <div className="sm:col-span-1">
-                <ExerciseTypeVideo
-                  exerciseTypeId={exercise.type.id}
-                  fetchVideo={false}
-                ></ExerciseTypeVideo>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Name</dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {exercise.type.name}
-                </dd>
-              </div>
-              {exercise.time && (
+              <dl
+                className={
+                  "grid grid-cols-1 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                }
+              >
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Time</dt>
+                  <ExerciseTypeVideo
+                    exerciseTypeId={exercise.type.id}
+                    fetchVideo={false}
+                  ></ExerciseTypeVideo>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Name</dt>
                   <dd className="mt-1 break-words text-sm text-gray-900">
-                    {timeToDate(exercise.time).toLocaleTimeString([], {
-                      timeStyle: "short",
-                    })}
+                    {exercise.type.name}
                   </dd>
                 </div>
-              )}
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Muscles Used
-                </dt>
-                <dd className="mt-1 break-words text-sm text-gray-900">
-                  {exercise.type.muscles.join(", ")}
-                </dd>
-              </div>
-              {amITheClient && exercise.coach_email && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Coach</dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.coach_email}
-                  </dd>
-                </div>
-              )}
-              {exercise.number_of_sets_performed === null && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Sets</dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.number_of_sets_assigned}
-                  </dd>
-                </div>
-              )}
-              {exercise.number_of_sets_performed !== null && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Sets</dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.number_of_sets_performed}/
-                    {exercise.number_of_sets_assigned}
-                  </dd>
-                </div>
-              )}
-              {exercise.number_of_reps_assigned && (
-                <>
-                  {exercise.number_of_reps_performed === null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Reps
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {exercise.number_of_reps_assigned
-                          .map((reps) => (reps == 0 ? "amrap" : reps))
-                          .join(", ")}
-                      </dd>
-                    </div>
-                  )}
-                  {exercise.number_of_reps_performed !== null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Reps
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {exercise.number_of_reps_performed
-                          .map(
-                            (numberOfReps, index) =>
-                              `${numberOfReps}/${
-                                exercise.number_of_reps_assigned[index] ||
-                                exercise.number_of_reps_assigned[0]
-                              }`
-                          )
-                          .join(", ")}
-                      </dd>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {exercise.weight_assigned?.some((weight) => weight > 0) && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.weight_performed === null &&
-                      exercise.weight_assigned.join(", ")}
-                    {exercise.weight_performed !== null &&
-                      exercise.weight_performed
-                        .map(
-                          (weight, index) =>
-                            `${weight}/${
-                              exercise.weight_assigned[index] ||
-                              exercise.weight_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                  </dd>
-                </div>
-              )}
-
-              {exercise.rest_duration?.some((rest) => rest > 0) && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Rest Duration (min)
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.rest_duration.join(", ")}
-                  </dd>
-                </div>
-              )}
-              {exercise.set_duration_assigned?.some((value) => value > 0) && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Set Duration (min)
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.set_duration_performed === null &&
-                      exercise.set_duration_assigned.join(", ")}
-                    {exercise.set_duration_performed !== null &&
-                      exercise.set_duration_performed
-                        .map(
-                          (durationPerformed, index) =>
-                            `${durationPerformed}/${
-                              exercise.set_duration_assigned[index] ||
-                              exercise.set_duration_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                  </dd>
-                </div>
-              )}
-              {exercise.speed_assigned?.some((value) => value > 0) && (
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Speed (mph)
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.speed_performed === null &&
-                      exercise.speed_assigned.join(", ")}
-                    {exercise.speed_performed !== null &&
-                      exercise.speed_performed
-                        .map(
-                          (speedPerformed, index) =>
-                            `${speedPerformed}/${
-                              exercise.speed_assigned[index] ||
-                              exercise.speed_assigned[0]
-                            }`
-                        )
-                        .join(", ")}
-                  </dd>
-                </div>
-              )}
-              {exercise.level_assigned?.some((value) => value > 0) && (
-                <>
+                {exercise.time && (
                   <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Level</dt>
+                    <dt className="text-sm font-medium text-gray-500">Time</dt>
                     <dd className="mt-1 break-words text-sm text-gray-900">
-                      {exercise.level_performed === null &&
-                        exercise.level_assigned.join(", ")}
-                      {exercise.level_performed !== null &&
-                        exercise.level_performed
-                          .map(
-                            (levelPerformed, index) =>
-                              `${levelPerformed}/${
-                                exercise.level_assigned[index] ||
-                                exercise.level_assigned[0]
-                              }`
-                          )
-                          .join(", ")}
+                      {timeToDate(exercise.time).toLocaleTimeString([], {
+                        timeStyle: "short",
+                      })}
                     </dd>
                   </div>
-                </>
-              )}
-              {exercise.distance_assigned?.some((value) => value > 0) && (
-                <>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Distance ({exercise.distance_unit})
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {exercise.distance_performed === null &&
-                        exercise.distance_assigned.join(", ")}
-                      {exercise.distance_performed !== null &&
-                        exercise.distance_performed
-                          .map(
-                            (distancePerformed, index) =>
-                              `${distancePerformed}/${
-                                exercise.distance_assigned[index] ||
-                                exercise.distance_assigned[0]
-                              }`
-                          )
-                          .join(", ")}
-                    </dd>
-                  </div>
-                </>
-              )}
-              {exercise.difficulty !== null && (
+                )}
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
-                    Difficulty
+                    Muscles Used
                   </dt>
                   <dd className="mt-1 break-words text-sm text-gray-900">
-                    {exercise.difficulty
-                      .map((value) => `${value}/10`)
-                      .join(", ")}
+                    {exercise.type.muscles.join(", ")}
                   </dd>
                 </div>
-              )}
-              {video[exercise.id]?.map(
-                (video, index) =>
-                  video && (
-                    <React.Fragment key={index}>
+                {amITheClient && exercise.coach_email && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Coach</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.coach_email}
+                    </dd>
+                  </div>
+                )}
+                {exercise.number_of_sets_performed === null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.number_of_sets_assigned}
+                    </dd>
+                  </div>
+                )}
+                {exercise.number_of_sets_performed !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Sets</dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.number_of_sets_performed}/
+                      {exercise.number_of_sets_assigned}
+                    </dd>
+                  </div>
+                )}
+                {exercise.number_of_reps_assigned && (
+                  <>
+                    {exercise.number_of_reps_performed === null && (
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">
-                          Set #{index + 1}
+                          Reps
                         </dt>
                         <dd className="mt-1 break-words text-sm text-gray-900">
-                          <YouTube
-                            videoId={video.videoId}
-                            className="aspect-[16/9] w-full"
-                            iframeClassName="aspect-[16/9] w-full"
-                            opts={{
-                              height: "100%",
-                              width: "100%",
-                              playerVars: {
-                                autoplay: 1,
-                                loop: 1,
-                                playsinline: 1,
-                                modestbranding: 1,
-                                controls: 1,
-                                enablejsapi: 1,
-                                start: video.start || 0,
-                                end: video.end,
-                              },
-                            }}
-                            onReady={(e) => {
-                              e.target.mute();
-                              console.log("player", e.target);
-                              console.log(video);
-                              const newVideoPlayer = { ...videoPlayer };
-                              newVideoPlayer[exercise.id] =
-                                newVideoPlayer[exercise.id] || [];
-                              newVideoPlayer[exercise.id][index] = e.target;
-                              setVideoPlayer(newVideoPlayer);
-                            }}
-                            onEnd={(e) => {
-                              e.target.seekTo(video.start || 0);
-                              e.target.playVideo();
-                            }}
-                          ></YouTube>
+                          {exercise.number_of_reps_assigned
+                            .map((reps) => (reps == 0 ? "amrap" : reps))
+                            .join(", ")}
                         </dd>
                       </div>
-                    </React.Fragment>
-                  )
-              )}
-              <div className="sm:col-span-1">
-                <button
-                  onClick={() => {
-                    setSelectedExercise(exercise);
-                    setShowEditExerciseModal(true);
-                  }}
-                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                >
-                  Edit<span className="sr-only"> exercise</span>
-                </button>
-              </div>
-              <div className="sm:col-span-1">
-                <button
-                  onClick={() => {
-                    setSelectedExercise(exercise);
-                    setShowDeleteExerciseModal(true);
-                  }}
-                  type="button"
-                  className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                >
-                  Delete
-                  <span className="sr-only"> exercise</span>
-                </button>
-              </div>
-            </dl>
-          </div>
-        ))}
+                    )}
+                    {exercise.number_of_reps_performed !== null && (
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Reps
+                        </dt>
+                        <dd className="mt-1 break-words text-sm text-gray-900">
+                          {exercise.number_of_reps_performed
+                            .map(
+                              (numberOfReps, index) =>
+                                `${numberOfReps}/${
+                                  exercise.number_of_reps_assigned[index] ||
+                                  exercise.number_of_reps_assigned[0]
+                                }`
+                            )
+                            .join(", ")}
+                        </dd>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {exercise.weight_assigned?.some((weight) => weight > 0) && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Weight ({exercise.is_weight_in_kilograms ? "kg" : "lbs"})
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.weight_performed === null &&
+                        exercise.weight_assigned.join(", ")}
+                      {exercise.weight_performed !== null &&
+                        exercise.weight_performed
+                          .map(
+                            (weight, index) =>
+                              `${weight}/${
+                                exercise.weight_assigned[index] ||
+                                exercise.weight_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                    </dd>
+                  </div>
+                )}
+
+                {exercise.rest_duration?.some((rest) => rest > 0) && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Rest Duration (min)
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.rest_duration.join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {exercise.set_duration_assigned?.some((value) => value > 0) && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Set Duration (min)
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.set_duration_performed === null &&
+                        exercise.set_duration_assigned.join(", ")}
+                      {exercise.set_duration_performed !== null &&
+                        exercise.set_duration_performed
+                          .map(
+                            (durationPerformed, index) =>
+                              `${durationPerformed}/${
+                                exercise.set_duration_assigned[index] ||
+                                exercise.set_duration_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {exercise.speed_assigned?.some((value) => value > 0) && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Speed (mph)
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.speed_performed === null &&
+                        exercise.speed_assigned.join(", ")}
+                      {exercise.speed_performed !== null &&
+                        exercise.speed_performed
+                          .map(
+                            (speedPerformed, index) =>
+                              `${speedPerformed}/${
+                                exercise.speed_assigned[index] ||
+                                exercise.speed_assigned[0]
+                              }`
+                          )
+                          .join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {exercise.level_assigned?.some((value) => value > 0) && (
+                  <>
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Level
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.level_performed === null &&
+                          exercise.level_assigned.join(", ")}
+                        {exercise.level_performed !== null &&
+                          exercise.level_performed
+                            .map(
+                              (levelPerformed, index) =>
+                                `${levelPerformed}/${
+                                  exercise.level_assigned[index] ||
+                                  exercise.level_assigned[0]
+                                }`
+                            )
+                            .join(", ")}
+                      </dd>
+                    </div>
+                  </>
+                )}
+                {exercise.distance_assigned?.some((value) => value > 0) && (
+                  <>
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Distance ({exercise.distance_unit})
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {exercise.distance_performed === null &&
+                          exercise.distance_assigned.join(", ")}
+                        {exercise.distance_performed !== null &&
+                          exercise.distance_performed
+                            .map(
+                              (distancePerformed, index) =>
+                                `${distancePerformed}/${
+                                  exercise.distance_assigned[index] ||
+                                  exercise.distance_assigned[0]
+                                }`
+                            )
+                            .join(", ")}
+                      </dd>
+                    </div>
+                  </>
+                )}
+                {exercise.difficulty !== null && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Difficulty
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {exercise.difficulty
+                        .map((value) => `${value}/10`)
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
+                {video[exercise.id]?.map(
+                  (video, index) =>
+                    video && (
+                      <React.Fragment key={index}>
+                        <div className="sm:col-span-1">
+                          <dt className="text-sm font-medium text-gray-500">
+                            Set #{index + 1}
+                          </dt>
+                          <dd className="mt-1 break-words text-sm text-gray-900">
+                            <YouTube
+                              videoId={video.videoId}
+                              className="aspect-[16/9] w-full"
+                              iframeClassName="aspect-[16/9] w-full"
+                              opts={{
+                                height: "100%",
+                                width: "100%",
+                                playerVars: {
+                                  autoplay: 1,
+                                  loop: 1,
+                                  playsinline: 1,
+                                  modestbranding: 1,
+                                  controls: 1,
+                                  enablejsapi: 1,
+                                  start: video.start || 0,
+                                  end: video.end,
+                                },
+                              }}
+                              onReady={(e) => {
+                                e.target.mute();
+                                console.log("player", e.target);
+                                console.log(video);
+                                const newVideoPlayer = { ...videoPlayer };
+                                newVideoPlayer[exercise.id] =
+                                  newVideoPlayer[exercise.id] || [];
+                                newVideoPlayer[exercise.id][index] = e.target;
+                                setVideoPlayer(newVideoPlayer);
+                              }}
+                              onEnd={(e) => {
+                                e.target.seekTo(video.start || 0);
+                                e.target.playVideo();
+                              }}
+                            ></YouTube>
+                          </dd>
+                        </div>
+                      </React.Fragment>
+                    )
+                )}
+                <div className="sm:col-span-1">
+                  <button
+                    onClick={() => {
+                      setSelectedExercise(exercise);
+                      setShowEditExerciseModal(true);
+                    }}
+                    className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Edit<span className="sr-only"> exercise</span>
+                  </button>
+                </div>
+                <div className="sm:col-span-1">
+                  <button
+                    onClick={() => {
+                      setSelectedExercise(exercise);
+                      setShowDeleteExerciseModal(true);
+                    }}
+                    type="button"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    Delete
+                    <span className="sr-only"> exercise</span>
+                  </button>
+                </div>
+              </dl>
+            </div>
+          ))}
 
         <div className="relative pt-2">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-yellow-600">
-                Bodyweight
-              </span>
+            <div className="relative z-10 flex justify-start">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowWeights(!showWeights);
+                }}
+                className="flex bg-white pr-2 text-base text-yellow-600"
+              >
+                <span className="pr-1">Bodyweight</span>
+                {showWeights ? (
+                  <ChevronDownIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <ChevronUpIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
+                )}
+              </button>
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
-          <div className="relative flex justify-end sm:justify-center">
+          <div
+            className={classNames(
+              "relative flex justify-end sm:justify-center",
+              showWeights ? "" : "invisible"
+            )}
+          >
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
               {amITheClient && !weights?.some((weight) => weight.time == null) && (
                 <button
@@ -1348,155 +1400,181 @@ export default function Diary() {
             </span>
           </div>
         </div>
-        {weightChartData && weightChartOptions && (
-          <Line options={weightChartOptions} data={weightChartData} />
-        )}
-        {weights
-          ?.slice()
-          .sort((a, b) => {
-            const [aHour, aMinute, aCreated_at] = a.time.split(":");
-            const [bHour, bMinute, bCreated_at] = b.time.split(":");
-            if (aHour != bHour) {
-              return aHour - bHour;
-            } else if (aMinute != bMinute) {
-              return aMinute - bMinute;
-            } else {
-              return aCreated_at - bCreated_at;
-            }
-          })
-          .map((weight, index, weights) => {
-            let previousWeight;
-            if (index === 0) {
-              previousWeight = lastWeightBeforeToday;
-            } else {
-              previousWeight = weights[index - 1];
-            }
-            let weightDifference;
-            if (previousWeight) {
-              let previousWeightValue = previousWeight.weight;
-              if (
-                weight.is_weight_in_kilograms !==
-                previousWeight.is_weight_in_kilograms
-              ) {
-                previousWeightValue = weight.is_weight_in_kilograms
-                  ? poundsToKilograms(previousWeightValue)
-                  : kilogramsToPounds(previousWeightValue);
-              }
-              weightDifference = weight.weight - previousWeightValue;
-            }
-            return (
-              <div
-                key={weight.id}
-                className={classNames(
-                  "py-5",
-                  index === 0 ? "" : "border-gray-20 border-t"
-                )}
-              >
-                <dl
-                  className={
-                    "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
+        {showWeights && (
+          <>
+            {weightChartData && weightChartOptions && (
+              <Line options={weightChartOptions} data={weightChartData} />
+            )}
+            {weights
+              ?.slice()
+              .sort((a, b) => {
+                const [aHour, aMinute, aCreated_at] = a.time.split(":");
+                const [bHour, bMinute, bCreated_at] = b.time.split(":");
+                if (aHour != bHour) {
+                  return aHour - bHour;
+                } else if (aMinute != bMinute) {
+                  return aMinute - bMinute;
+                } else {
+                  return aCreated_at - bCreated_at;
+                }
+              })
+              .map((weight, index, weights) => {
+                let previousWeight;
+                if (index === 0) {
+                  previousWeight = lastWeightBeforeToday;
+                } else {
+                  previousWeight = weights[index - 1];
+                }
+                let weightDifference;
+                if (previousWeight) {
+                  let previousWeightValue = previousWeight.weight;
+                  if (
+                    weight.is_weight_in_kilograms !==
+                    previousWeight.is_weight_in_kilograms
+                  ) {
+                    previousWeightValue = weight.is_weight_in_kilograms
+                      ? poundsToKilograms(previousWeightValue)
+                      : kilogramsToPounds(previousWeightValue);
                   }
-                >
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Weight
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {weight.is_weight_in_kilograms == isUsingKilograms
-                        ? weight.weight
-                        : (isUsingKilograms
-                            ? poundsToKilograms(weight.weight)
-                            : kilogramsToPounds(weight.weight)
-                          ).toFixed(1)}{" "}
-                      {isUsingKilograms ? "kg" : "lbs"}{" "}
-                      {previousWeight && (
-                        <span
-                          className={
-                            weightDifference < 0
-                              ? "text-red-500"
-                              : "text-green-500"
-                          }
-                        >
-                          ({weightDifference < 0 ? "" : "+"}
+                  weightDifference = weight.weight - previousWeightValue;
+                }
+                return (
+                  <div
+                    key={weight.id}
+                    className={classNames(
+                      "py-5",
+                      index === 0 ? "" : "border-gray-20 border-t"
+                    )}
+                  >
+                    <dl
+                      className={
+                        "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
+                      }
+                    >
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Weight
+                        </dt>
+                        <dd className="mt-1 break-words text-sm text-gray-900">
                           {weight.is_weight_in_kilograms == isUsingKilograms
-                            ? weightDifference
+                            ? weight.weight
                             : (isUsingKilograms
-                                ? poundsToKilograms(weightDifference)
-                                : kilogramsToPounds(weightDifference)
-                              ).toFixed(1)}
-                          )
-                        </span>
+                                ? poundsToKilograms(weight.weight)
+                                : kilogramsToPounds(weight.weight)
+                              ).toFixed(1)}{" "}
+                          {isUsingKilograms ? "kg" : "lbs"}{" "}
+                          {previousWeight && (
+                            <span
+                              className={
+                                weightDifference < 0
+                                  ? "text-red-500"
+                                  : "text-green-500"
+                              }
+                            >
+                              ({weightDifference < 0 ? "" : "+"}
+                              {weight.is_weight_in_kilograms == isUsingKilograms
+                                ? weightDifference
+                                : (isUsingKilograms
+                                    ? poundsToKilograms(weightDifference)
+                                    : kilogramsToPounds(weightDifference)
+                                  ).toFixed(1)}
+                              )
+                            </span>
+                          )}
+                        </dd>
+                      </div>
+                      {weight.time !== null && (
+                        <div className="sm:col-span-1">
+                          <dt className="text-sm font-medium text-gray-500">
+                            Time
+                          </dt>
+                          <dd className="mt-1 break-words text-sm text-gray-900">
+                            {timeToDate(weight.time).toLocaleTimeString([], {
+                              timeStyle: "short",
+                            })}
+                          </dd>
+                        </div>
                       )}
-                    </dd>
+                      {weight.time !== null && weight.event !== null && (
+                        <div className="sm:col-span-1">
+                          <dt className="text-sm font-medium text-gray-500">
+                            Event
+                          </dt>
+                          <dd className="mt-1 break-words text-sm text-gray-900">
+                            {weight.event}
+                          </dd>
+                        </div>
+                      )}
+                      {amITheClient && (
+                        <div className="sm:col-span-1">
+                          <button
+                            onClick={() => {
+                              setSelectedWeight(weight);
+                              setShowWeightModal(true);
+                            }}
+                            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                          >
+                            Edit<span className="sr-only"> weight</span>
+                          </button>
+                        </div>
+                      )}
+                      {amITheClient && (
+                        <div className="sm:col-span-1">
+                          <button
+                            onClick={() => {
+                              setSelectedWeight(weight);
+                              setShowDeleteWeightModal(true);
+                            }}
+                            type="button"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          >
+                            Delete
+                            <span className="sr-only"> weight</span>
+                          </button>
+                        </div>
+                      )}
+                    </dl>
                   </div>
-                  {weight.time !== null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Time
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {timeToDate(weight.time).toLocaleTimeString([], {
-                          timeStyle: "short",
-                        })}
-                      </dd>
-                    </div>
-                  )}
-                  {weight.time !== null && weight.event !== null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Event
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {weight.event}
-                      </dd>
-                    </div>
-                  )}
-                  {amITheClient && (
-                    <div className="sm:col-span-1">
-                      <button
-                        onClick={() => {
-                          setSelectedWeight(weight);
-                          setShowWeightModal(true);
-                        }}
-                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                      >
-                        Edit<span className="sr-only"> weight</span>
-                      </button>
-                    </div>
-                  )}
-                  {amITheClient && (
-                    <div className="sm:col-span-1">
-                      <button
-                        onClick={() => {
-                          setSelectedWeight(weight);
-                          setShowDeleteWeightModal(true);
-                        }}
-                        type="button"
-                        className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                      >
-                        Delete
-                        <span className="sr-only"> weight</span>
-                      </button>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            );
-          })}
+                );
+              })}
+          </>
+        )}
 
         <div className="relative pt-2">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-green-600">
-                Pictures
-              </span>
+            <div className="relative z-10 flex justify-start">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPictures(!showPictures);
+                }}
+                className="flex bg-white pr-2 text-base text-green-600"
+              >
+                <span className="pr-1">Pictures</span>
+                {showPictures ? (
+                  <ChevronDownIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <ChevronUpIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
+                )}
+              </button>
             </div>
             <div className="w-full border-t border-gray-300" />
           </div>
-          <div className="relative flex justify-end sm:justify-center">
+          <div
+            className={classNames(
+              "relative flex justify-end sm:justify-center",
+              showPictures ? "" : "invisible"
+            )}
+          >
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
               {amITheClient &&
                 !isSelectedDateAfterToday &&
@@ -1524,7 +1602,7 @@ export default function Diary() {
             </span>
           </div>
         </div>
-        {Object.keys(userPictures).length > 0 && (
+        {showPictures && Object.keys(userPictures).length > 0 && (
           <ul
             role="list"
             className="mt-4 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
