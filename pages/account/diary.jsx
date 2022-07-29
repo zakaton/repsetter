@@ -24,7 +24,6 @@ import {
   PaperClipIcon,
   PlusIcon,
   ClipboardIcon,
-  PencilIcon,
 } from "@heroicons/react/outline";
 import {
   kilogramsToPounds,
@@ -809,15 +808,15 @@ export default function Diary() {
     if (exerciseDates || weightDates || pictureDates) {
       console.log("updating date dots");
       const newDatesDots = {};
-      weightDates?.forEach((weightDate) => {
-        const dots = newDatesDots[weightDate.date] || [];
-        dots.push({ color: "bg-yellow-500" });
-        newDatesDots[weightDate.date] = dots;
-      });
       exerciseDates?.forEach((exerciseDate) => {
         const dots = newDatesDots[exerciseDate.date] || [];
         dots.push({ color: "bg-blue-500" });
         newDatesDots[exerciseDate.date] = dots;
+      });
+      weightDates?.forEach((weightDate) => {
+        const dots = newDatesDots[weightDate.date] || [];
+        dots.push({ color: "bg-yellow-500" });
+        newDatesDots[weightDate.date] = dots;
       });
       pictureDates?.forEach((pictureDate) => {
         const dots = newDatesDots[pictureDate.date] || [];
@@ -937,281 +936,6 @@ export default function Diary() {
         datesDots={datesDots}
       >
         <div className="relative">
-          <div
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <div className="relative flex justify-start">
-              <span className="bg-white pr-2 text-base text-green-600">
-                Picture
-              </span>
-            </div>
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-end sm:justify-center">
-            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient &&
-                !isSelectedDateAfterToday &&
-                userPictures &&
-                Object.keys(userPictures).length < pictureTypes.length && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const existingTypes = Object.keys(userPictures);
-                      const newPictureType = pictureTypes.find(
-                        (type) => !existingTypes.includes(type)
-                      );
-                      setPictureType(newPictureType);
-                      setShowPictureModal(true);
-                    }}
-                    className={classNames(
-                      "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                      "rounded-md"
-                    )}
-                  >
-                    <span className="sr-only">Add Picture</span>
-                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                )}
-            </span>
-          </div>
-        </div>
-        {Object.keys(userPictures).length > 0 && (
-          <ul
-            role="list"
-            className="mt-4 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
-          >
-            {pictureTypes
-              .filter((type) => type in userPictures)
-              .map((type) => (
-                <li className="relative flex flex-col" key={type}>
-                  <div
-                    className={classNames(
-                      "group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100",
-                      amITheClient
-                        ? "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
-                        : ""
-                    )}
-                  >
-                    <img
-                      loading="lazy"
-                      src={userPictures[type]}
-                      alt={`${type} progress picture`}
-                      className={classNames(
-                        "pointer-events-none",
-                        amITheClient
-                          ? "focus:outline-none group-hover:opacity-75"
-                          : ""
-                      )}
-                    ></img>
-                    {amITheClient && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPictureType(type);
-                          setShowPictureModal(true);
-                        }}
-                        className="absolute inset-0 focus:outline-none"
-                      >
-                        <span className="sr-only">Edit</span>
-                      </button>
-                    )}
-                  </div>
-                  <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
-                    {capitalizeFirstLetter(type)}
-                  </p>
-                </li>
-              ))}
-          </ul>
-        )}
-
-        {
-          <div className="relative pt-2">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="relative flex justify-start">
-                <span className="bg-white pr-2 text-base text-yellow-600">
-                  Bodyweight
-                </span>
-              </div>
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-end sm:justify-center">
-              <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-                {amITheClient &&
-                  !weights?.some((weight) => weight.time == null) && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedWeight();
-                        setShowWeightModal(true);
-                      }}
-                      className={classNames(
-                        "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                        "rounded-l-md",
-                        isSelectedDateAfterToday && "invisible"
-                      )}
-                    >
-                      <span className="sr-only">Add Weight</span>
-                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  )}
-                <button
-                  type="button"
-                  onClick={() => setIsUsingKilograms(!isUsingKilograms)}
-                  className={classNames(
-                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                    !weights?.some((weight) => weight.time == null)
-                      ? "rounded-r-md"
-                      : "rounded-md",
-                    isSelectedDateAfterToday && "invisible"
-                  )}
-                >
-                  <span className="sr-only">Toggle Weight</span>
-                  {isUsingKilograms ? "kg" : "lbs"}
-                </button>
-              </span>
-            </div>
-          </div>
-        }
-        {weightChartData && weightChartOptions && (
-          <Line options={weightChartOptions} data={weightChartData} />
-        )}
-        {weights
-          ?.slice()
-          .sort((a, b) => {
-            const [aHour, aMinute, aCreated_at] = a.time.split(":");
-            const [bHour, bMinute, bCreated_at] = b.time.split(":");
-            if (aHour != bHour) {
-              return aHour - bHour;
-            } else if (aMinute != bMinute) {
-              return aMinute - bMinute;
-            } else {
-              return aCreated_at - bCreated_at;
-            }
-          })
-          .map((weight, index, weights) => {
-            let previousWeight;
-            if (index === 0) {
-              previousWeight = lastWeightBeforeToday;
-            } else {
-              previousWeight = weights[index - 1];
-            }
-            let weightDifference;
-            if (previousWeight) {
-              let previousWeightValue = previousWeight.weight;
-              if (
-                weight.is_weight_in_kilograms !==
-                previousWeight.is_weight_in_kilograms
-              ) {
-                previousWeightValue = weight.is_weight_in_kilograms
-                  ? poundsToKilograms(previousWeightValue)
-                  : kilogramsToPounds(previousWeightValue);
-              }
-              weightDifference = weight.weight - previousWeightValue;
-            }
-            return (
-              <div
-                key={weight.id}
-                className={classNames(
-                  "py-5",
-                  index === 0 ? "" : "border-gray-20 border-t"
-                )}
-              >
-                <dl
-                  className={
-                    "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
-                  }
-                >
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Weight
-                    </dt>
-                    <dd className="mt-1 break-words text-sm text-gray-900">
-                      {weight.is_weight_in_kilograms == isUsingKilograms
-                        ? weight.weight
-                        : (isUsingKilograms
-                            ? poundsToKilograms(weight.weight)
-                            : kilogramsToPounds(weight.weight)
-                          ).toFixed(1)}{" "}
-                      {isUsingKilograms ? "kg" : "lbs"}{" "}
-                      {previousWeight && (
-                        <span
-                          className={
-                            weightDifference < 0
-                              ? "text-red-500"
-                              : "text-green-500"
-                          }
-                        >
-                          ({weightDifference < 0 ? "" : "+"}
-                          {weight.is_weight_in_kilograms == isUsingKilograms
-                            ? weightDifference
-                            : (isUsingKilograms
-                                ? poundsToKilograms(weightDifference)
-                                : kilogramsToPounds(weightDifference)
-                              ).toFixed(1)}
-                          )
-                        </span>
-                      )}
-                    </dd>
-                  </div>
-                  {weight.time !== null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Time
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {timeToDate(weight.time).toLocaleTimeString([], {
-                          timeStyle: "short",
-                        })}
-                      </dd>
-                    </div>
-                  )}
-                  {weight.time !== null && weight.event !== null && (
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Event
-                      </dt>
-                      <dd className="mt-1 break-words text-sm text-gray-900">
-                        {weight.event}
-                      </dd>
-                    </div>
-                  )}
-                  {amITheClient && (
-                    <div className="sm:col-span-1">
-                      <button
-                        onClick={() => {
-                          setSelectedWeight(weight);
-                          setShowWeightModal(true);
-                        }}
-                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                      >
-                        Edit<span className="sr-only"> weight</span>
-                      </button>
-                    </div>
-                  )}
-                  {amITheClient && (
-                    <div className="sm:col-span-1">
-                      <button
-                        onClick={() => {
-                          setSelectedWeight(weight);
-                          setShowDeleteWeightModal(true);
-                        }}
-                        type="button"
-                        className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                      >
-                        Delete
-                        <span className="sr-only"> weight</span>
-                      </button>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            );
-          })}
-        <div className="relative pt-2">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -1575,6 +1299,279 @@ export default function Diary() {
             </dl>
           </div>
         ))}
+
+        <div className="relative pt-2">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
+            <div className="relative flex justify-start">
+              <span className="bg-white pr-2 text-base text-yellow-600">
+                Bodyweight
+              </span>
+            </div>
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-end sm:justify-center">
+            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+              {amITheClient && !weights?.some((weight) => weight.time == null) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedWeight();
+                    setShowWeightModal(true);
+                  }}
+                  className={classNames(
+                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                    "rounded-l-md",
+                    isSelectedDateAfterToday && "invisible"
+                  )}
+                >
+                  <span className="sr-only">Add Weight</span>
+                  <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsUsingKilograms(!isUsingKilograms)}
+                className={classNames(
+                  "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                  !weights?.some((weight) => weight.time == null)
+                    ? "rounded-r-md"
+                    : "rounded-md",
+                  isSelectedDateAfterToday && "invisible"
+                )}
+              >
+                <span className="sr-only">Toggle Weight</span>
+                {isUsingKilograms ? "kg" : "lbs"}
+              </button>
+            </span>
+          </div>
+        </div>
+        {weightChartData && weightChartOptions && (
+          <Line options={weightChartOptions} data={weightChartData} />
+        )}
+        {weights
+          ?.slice()
+          .sort((a, b) => {
+            const [aHour, aMinute, aCreated_at] = a.time.split(":");
+            const [bHour, bMinute, bCreated_at] = b.time.split(":");
+            if (aHour != bHour) {
+              return aHour - bHour;
+            } else if (aMinute != bMinute) {
+              return aMinute - bMinute;
+            } else {
+              return aCreated_at - bCreated_at;
+            }
+          })
+          .map((weight, index, weights) => {
+            let previousWeight;
+            if (index === 0) {
+              previousWeight = lastWeightBeforeToday;
+            } else {
+              previousWeight = weights[index - 1];
+            }
+            let weightDifference;
+            if (previousWeight) {
+              let previousWeightValue = previousWeight.weight;
+              if (
+                weight.is_weight_in_kilograms !==
+                previousWeight.is_weight_in_kilograms
+              ) {
+                previousWeightValue = weight.is_weight_in_kilograms
+                  ? poundsToKilograms(previousWeightValue)
+                  : kilogramsToPounds(previousWeightValue);
+              }
+              weightDifference = weight.weight - previousWeightValue;
+            }
+            return (
+              <div
+                key={weight.id}
+                className={classNames(
+                  "py-5",
+                  index === 0 ? "" : "border-gray-20 border-t"
+                )}
+              >
+                <dl
+                  className={
+                    "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
+                  }
+                >
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Weight
+                    </dt>
+                    <dd className="mt-1 break-words text-sm text-gray-900">
+                      {weight.is_weight_in_kilograms == isUsingKilograms
+                        ? weight.weight
+                        : (isUsingKilograms
+                            ? poundsToKilograms(weight.weight)
+                            : kilogramsToPounds(weight.weight)
+                          ).toFixed(1)}{" "}
+                      {isUsingKilograms ? "kg" : "lbs"}{" "}
+                      {previousWeight && (
+                        <span
+                          className={
+                            weightDifference < 0
+                              ? "text-red-500"
+                              : "text-green-500"
+                          }
+                        >
+                          ({weightDifference < 0 ? "" : "+"}
+                          {weight.is_weight_in_kilograms == isUsingKilograms
+                            ? weightDifference
+                            : (isUsingKilograms
+                                ? poundsToKilograms(weightDifference)
+                                : kilogramsToPounds(weightDifference)
+                              ).toFixed(1)}
+                          )
+                        </span>
+                      )}
+                    </dd>
+                  </div>
+                  {weight.time !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Time
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {timeToDate(weight.time).toLocaleTimeString([], {
+                          timeStyle: "short",
+                        })}
+                      </dd>
+                    </div>
+                  )}
+                  {weight.time !== null && weight.event !== null && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Event
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-gray-900">
+                        {weight.event}
+                      </dd>
+                    </div>
+                  )}
+                  {amITheClient && (
+                    <div className="sm:col-span-1">
+                      <button
+                        onClick={() => {
+                          setSelectedWeight(weight);
+                          setShowWeightModal(true);
+                        }}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        Edit<span className="sr-only"> weight</span>
+                      </button>
+                    </div>
+                  )}
+                  {amITheClient && (
+                    <div className="sm:col-span-1">
+                      <button
+                        onClick={() => {
+                          setSelectedWeight(weight);
+                          setShowDeleteWeightModal(true);
+                        }}
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      >
+                        Delete
+                        <span className="sr-only"> weight</span>
+                      </button>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            );
+          })}
+
+        <div className="relative pt-2">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
+            <div className="relative flex justify-start">
+              <span className="bg-white pr-2 text-base text-green-600">
+                Pictures
+              </span>
+            </div>
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-end sm:justify-center">
+            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+              {amITheClient &&
+                !isSelectedDateAfterToday &&
+                userPictures &&
+                Object.keys(userPictures).length < pictureTypes.length && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const existingTypes = Object.keys(userPictures);
+                      const newPictureType = pictureTypes.find(
+                        (type) => !existingTypes.includes(type)
+                      );
+                      setPictureType(newPictureType);
+                      setShowPictureModal(true);
+                    }}
+                    className={classNames(
+                      "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                      "rounded-md"
+                    )}
+                  >
+                    <span className="sr-only">Add Picture</span>
+                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                )}
+            </span>
+          </div>
+        </div>
+        {Object.keys(userPictures).length > 0 && (
+          <ul
+            role="list"
+            className="mt-4 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+          >
+            {pictureTypes
+              .filter((type) => type in userPictures)
+              .map((type) => (
+                <li className="relative flex flex-col" key={type}>
+                  <div
+                    className={classNames(
+                      "group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100",
+                      amITheClient
+                        ? "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+                        : ""
+                    )}
+                  >
+                    <img
+                      loading="lazy"
+                      src={userPictures[type]}
+                      alt={`${type} progress picture`}
+                      className={classNames(
+                        "pointer-events-none",
+                        amITheClient
+                          ? "focus:outline-none group-hover:opacity-75"
+                          : ""
+                      )}
+                    ></img>
+                    {amITheClient && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPictureType(type);
+                          setShowPictureModal(true);
+                        }}
+                        className="absolute inset-0 focus:outline-none"
+                      >
+                        <span className="sr-only">Edit</span>
+                      </button>
+                    )}
+                  </div>
+                  <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
+                    {capitalizeFirstLetter(type)}
+                  </p>
+                </li>
+              ))}
+          </ul>
+        )}
       </AccountCalendarLayout>
     </>
   );
