@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Combobox } from "@headlessui/react";
-import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
 import ExerciseTypeVideo from "../../ExerciseTypeVideo";
 import { isMobile } from "react-device-detect";
+import { useExerciseTypes } from "../../../context/exercise-types-context";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -19,23 +19,9 @@ export default function ExerciseTypesSelect({
   selectedExerciseTypeName,
   setSelectedExerciseTypeName,
 }) {
-  const [exerciseTypes, setExerciseTypes] = useState();
+  const { exerciseTypes, getExerciseTypes } = useExerciseTypes();
   const { getExerciseVideo } = useExerciseVideos();
-  const [isFetchingExerciseTypes, setIsFetchingExerciseTypes] = useState(false);
 
-  const getExerciseTypes = async (refresh) => {
-    if ((!exerciseTypes || refresh) && !isFetchingExerciseTypes) {
-      console.log(`fetching exercise types...`);
-      setIsFetchingExerciseTypes(true);
-      const { data: exerciseTypes } = await supabase
-        .from("exercise_type")
-        .select("*")
-        .order("name", { ascending: true });
-      console.log("got exercise types", exerciseTypes);
-      setExerciseTypes(exerciseTypes);
-      setIsFetchingExerciseTypes(false);
-    }
-  };
   useEffect(() => {
     console.log("open", open, exerciseTypes);
     if (open) {

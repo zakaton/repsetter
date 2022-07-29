@@ -1100,7 +1100,6 @@ export default function Diary() {
               previousWeight = weights[index - 1];
             }
             let weightDifference;
-            console.log("FUCK", weight, previousWeight);
             if (previousWeight) {
               let previousWeightValue = previousWeight.weight;
               if (
@@ -1112,7 +1111,6 @@ export default function Diary() {
                   : kilogramsToPounds(previousWeightValue);
               }
               weightDifference = weight.weight - previousWeightValue;
-              console.log("diff", weightDifference);
             }
             return (
               <div

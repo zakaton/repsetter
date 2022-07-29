@@ -7,6 +7,7 @@ import { SelectedExerciseTypeContextProvider } from "../context/selected-exercis
 import { ProgressContextProvider } from "../context/progress-context";
 import { CoachPicturesContextProvider } from "../context/coach-picture-context";
 import { PicturesContextProvider } from "../context/picture-context";
+import { ExerciseTypesContextProvider } from "../context/exercise-types-context";
 import Layout from "../components/layouts/Layout";
 
 function MyApp({ Component, pageProps }) {
@@ -14,19 +15,21 @@ function MyApp({ Component, pageProps }) {
   return (
     <OnlineContextProvider>
       <UserContextProvider>
-        <ExerciseVideoContextProvider>
-          <ClientContextProvider>
-            <SelectedExerciseTypeContextProvider>
-              <ProgressContextProvider>
-                <CoachPicturesContextProvider>
-                  <PicturesContextProvider>
-                    <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
-                  </PicturesContextProvider>
-                </CoachPicturesContextProvider>
-              </ProgressContextProvider>
-            </SelectedExerciseTypeContextProvider>
-          </ClientContextProvider>
-        </ExerciseVideoContextProvider>
+        <ExerciseTypesContextProvider>
+          <ExerciseVideoContextProvider>
+            <ClientContextProvider>
+              <SelectedExerciseTypeContextProvider>
+                <ProgressContextProvider>
+                  <CoachPicturesContextProvider>
+                    <PicturesContextProvider>
+                      <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+                    </PicturesContextProvider>
+                  </CoachPicturesContextProvider>
+                </ProgressContextProvider>
+              </SelectedExerciseTypeContextProvider>
+            </ClientContextProvider>
+          </ExerciseVideoContextProvider>
+        </ExerciseTypesContextProvider>
       </UserContextProvider>
     </OnlineContextProvider>
   );
