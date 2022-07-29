@@ -5,18 +5,12 @@ import lazyloadConfig from "../utils/lazyload-config";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-const keysToDelete = [
-  "srcset",
-  "sizes",
-  "className",
-  "src",
-  "onPlay",
-  "onPause",
-];
-const LazyVideo = React.forwardRef((props = {}, ref) => {
-  const { className, src, srcset, sizes, onPlay, onPause } = props;
+const keysToDelete = ["srcset", "sizes", "className", "src"];
+const LazyImage = React.forwardRef((props = {}, ref) => {
+  const { className, src, srcset, sizes } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
+
   useEffect(() => {
     if (!document.lazyLoadInstance) {
       document.lazyLoadInstance = new LazyLoad(lazyloadConfig);
@@ -28,23 +22,8 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
     document.lazyLoadInstance?.update();
   }, []);
 
-  const [hasPlayed, setHasPlayed] = useState(false);
-
-  useEffect(() => {
-    if (src && hasPlayed && ref.current) {
-      const video = ref.current;
-      video.src = src;
-      setHasPlayed(false);
-      onPause();
-    }
-  }, [src]);
-
   return (
-    <video
-      onPlay={(e) => {
-        setHasPlayed(true);
-        onPlay();
-      }}
+    <img
       {...propsSubset}
       ref={ref}
       className={classNames(className || "", "lazy")}
@@ -54,5 +33,5 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
     />
   );
 });
-LazyVideo.displayName = "LazyVideo";
-export default LazyVideo;
+LazyImage.displayName = "LazyImage";
+export default LazyImage;

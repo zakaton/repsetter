@@ -3,6 +3,7 @@ import LazyVideo from "./LazyVideo";
 import Image from "next/image";
 import { useExerciseVideos } from "../context/exercise-videos-context";
 import { isMobile, isDesktop } from "react-device-detect";
+import LazyImage from "./LazyImage";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -125,14 +126,13 @@ export default function ExerciseTypeVideo(
         )}
       >
         {exerciseVideos?.[exerciseTypeId]?.thumbnailUrl && (
-          <Image
+          <LazyImage
             width={width}
             height={height}
-            loading="lazy"
             alt="exercise"
             src={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
             className={classNames("overflow-hidden rounded-lg")}
-          ></Image>
+          ></LazyImage>
         )}
       </div>
     </div>
