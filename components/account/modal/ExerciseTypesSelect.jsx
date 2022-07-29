@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Combobox } from "@headlessui/react";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
 import ExerciseTypeVideo from "../../ExerciseTypeVideo";
 import { isMobile } from "react-device-detect";
 import { useExerciseTypes } from "../../../context/exercise-types-context";
+import { debounce } from "lodash";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -58,6 +59,17 @@ export default function ExerciseTypesSelect({
   }, [open, selectedExercise, exerciseTypes]);
 
   const [query, setQuery] = useState("");
+  const debouncedQueryUpdate = useRef(
+    debounce((query) => {
+      setQuery(query);
+    }, 300)
+  ).current;
+  useEffect(() => {
+    return () => {
+      debouncedQueryUpdate.cancel();
+    };
+  }, [debouncedQueryUpdate]);
+
   const [filteredExerciseTypes, setFilteredExerciseTypes] = useState([]);
   useEffect(() => {
     if (exerciseTypes) {
@@ -102,7 +114,9 @@ export default function ExerciseTypesSelect({
         <Combobox.Input
           required
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            debouncedQueryUpdate(event.target.value);
+          }}
           displayValue={(exerciseType) => exerciseType?.name}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">

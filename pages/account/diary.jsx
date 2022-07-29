@@ -955,12 +955,12 @@ export default function Diary() {
               >
                 <span className="pr-1">Exercises</span>
                 {showExercises ? (
-                  <ChevronDownIcon
+                  <ChevronUpIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
                 ) : (
-                  <ChevronUpIcon
+                  <ChevronDownIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
@@ -1345,12 +1345,12 @@ export default function Diary() {
               >
                 <span className="pr-1">Bodyweight</span>
                 {showWeights ? (
-                  <ChevronDownIcon
+                  <ChevronUpIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
                 ) : (
-                  <ChevronUpIcon
+                  <ChevronDownIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
@@ -1555,12 +1555,12 @@ export default function Diary() {
               >
                 <span className="pr-1">Pictures</span>
                 {showPictures ? (
-                  <ChevronDownIcon
+                  <ChevronUpIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
                 ) : (
-                  <ChevronUpIcon
+                  <ChevronDownIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
