@@ -142,7 +142,7 @@ export default function AccountCalendarLayout({
                 } ${resultNamePlural}`}
             </p>
           </div>
-          <div className="mt-8 text-center lg:col-start-9 lg:col-end-13 lg:row-span-2 lg:row-start-1 lg:mt-0">
+          <div className="mt-4 text-center lg:col-start-9 lg:col-end-13 lg:row-span-2 lg:row-start-1 lg:mt-0">
             <div className="flex items-center text-gray-900">
               <button
                 type="button"
