@@ -1549,7 +1549,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.5"
                           min="0"
                           name={`weight-${index}`}
                           id={`weight-${index}`}
@@ -1630,7 +1630,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.1"
                           min="0"
                           value={
                             isSpeedEmptyString[index]
@@ -1682,7 +1682,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.1"
                           min="0"
                           value={
                             isLevelEmptyString[index]
@@ -1731,7 +1731,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.1"
                           min="0"
                           value={
                             isDistanceEmptyString[index]
@@ -2077,7 +2077,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.1"
                           min="0"
                           value={
                             isSpeedPerformedEmptyString[index]
@@ -2129,7 +2129,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.01"
                           min="0"
                           value={
                             isDistancePerformedEmptyString[index]
@@ -2184,7 +2184,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.1"
                           min="0"
                           value={
                             isLevelPerformedEmptyString[index]
@@ -2237,7 +2237,7 @@ export default function ExerciseModal(props) {
                           required
                           type="number"
                           inputMode="decimal"
-                          step="1"
+                          step="0.1"
                           min="0"
                           name={`weight-performed-${index}`}
                           id={`weight-performed-${index}`}
