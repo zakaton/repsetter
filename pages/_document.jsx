@@ -1,9 +1,13 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
-import { isMobileSafari } from "react-device-detect";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
     const initialProps = await Document.getInitialProps(ctx);
+    if (ctx.req) {
+      const userAgent = ctx.req["userAgent"];
+      const { isIOS } = getSelectorsByUserAgent(userAgent);
+      initialProps.isIOS = isIOS;
+    }
     return { ...initialProps };
   }
 
@@ -15,7 +19,7 @@ class MyDocument extends Document {
           <link rel="icon" href="/favicon.ico" />
           <link
             rel="manifest"
-            href={isMobileSafari ? "/manifest-ios.json" : "/manifest.json"}
+            href={this.props.isIOS ? "/manifest-ios.json" : "/manifest.json"}
           />
           <link
             rel="apple-touch-icon"
