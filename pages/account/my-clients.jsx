@@ -50,7 +50,7 @@ const orderTypes = [
 export default function MyClients() {
   const { user } = useUser();
 
-  const [baseFilter, setBaseFilter] = useState({});
+  const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
     if (user) {
       setBaseFilter({ coach: user.id });

@@ -45,7 +45,7 @@ export default function MyCoaches() {
   const { user, stripeLinks } = useUser();
   const { coachPictures, getCoachPicture } = useCoachPictures();
 
-  const [baseFilter, setBaseFilter] = useState({});
+  const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
     if (user) {
       setBaseFilter({ client: user.id });

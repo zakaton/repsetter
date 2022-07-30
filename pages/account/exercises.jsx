@@ -57,7 +57,8 @@ export default function Exercises() {
 
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
 
-  const { selectedClient, setSelectedDate, amITheClient } = useClient();
+  const { selectedClientId, selectedClient, setSelectedDate, amITheClient } =
+    useClient();
 
   const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
   const [editExerciseStatus, setEditExerciseStatus] = useState(false);
@@ -73,22 +74,21 @@ export default function Exercises() {
   } = useSelectedExerciseType();
 
   const [exercises, setExercises] = useState();
-  const [baseFilter, setBaseFilter] = useState({});
+  const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
-    const newBaseFilter = {};
-
-    if (selectedClient) {
-      newBaseFilter.client = selectedClient.client;
-      newBaseFilter.coach = user.id;
-    } else {
-      newBaseFilter.client = user.id;
+    if (!selectedClientId) {
+      return;
     }
+
+    const newBaseFilter = {
+      client: selectedClientId,
+    };
 
     if (selectedExerciseType) {
       newBaseFilter["type.name"] = selectedExerciseType.name;
     }
     setBaseFilter(newBaseFilter);
-  }, [selectedClient, user, selectedExerciseType]);
+  }, [selectedClientId, user, selectedExerciseType]);
 
   const clearFiltersListener = () => {
     setSelectedExerciseType();

@@ -19,7 +19,6 @@ function MyApp({ Component, pageProps }) {
     const manifestElement = document.querySelector("link[rel='manifest']");
     if (manifestElement) {
       manifestElement.href = isIOS ? "/manifest-ios.json" : "/manifest.json";
-      console.log(manifestElement.href);
     }
   };
   useEffect(() => {

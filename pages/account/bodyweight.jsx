@@ -62,7 +62,7 @@ export default function Bodyweight() {
   const [selectedWeight, setSelectedWeight] = useState();
 
   const [weights, setWeights] = useState();
-  const [baseFilter, setBaseFilter] = useState(null);
+  const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
     if (!selectedClientId) {
       return;

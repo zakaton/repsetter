@@ -578,7 +578,7 @@ export default function Progress() {
   } = useProgress();
   const [order, setOrder] = useState(orderTypes[0].value);
 
-  const [baseFilter, setBaseFilter] = useState({});
+  const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
     const newBaseFilter = {};
 
