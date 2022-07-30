@@ -165,11 +165,11 @@ export default function Bodyweight() {
                 weight.is_weight_in_kilograms ? "kg" : "lbs"
               })`,
             },
+            ...pictureItems,
             weight.event && {
               title: "event",
               value: weight.event,
             },
-            ...pictureItems,
             {
               jsx: (
                 <button
