@@ -49,7 +49,7 @@ const orderTypes = [
 ];
 
 export default function Bodyweight() {
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
 
   const { selectedClient, setSelectedDate, selectedClientId, amITheClient } =
     useClient();
@@ -62,9 +62,9 @@ export default function Bodyweight() {
   const [selectedWeight, setSelectedWeight] = useState();
 
   const [weights, setWeights] = useState();
-  const [baseFilter, setBaseFilter] = useState({});
+  const [baseFilter, setBaseFilter] = useState(null);
   useEffect(() => {
-    if (isLoading) {
+    if (!selectedClientId) {
       return;
     }
 
@@ -73,7 +73,7 @@ export default function Bodyweight() {
     const newBaseFilter = {};
     newBaseFilter.client = selectedClientId;
     setBaseFilter(newBaseFilter);
-  }, [user, isLoading, selectedClientId]);
+  }, [user, selectedClientId]);
 
   console.log("baseFilter", baseFilter);
 

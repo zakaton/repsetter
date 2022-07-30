@@ -61,7 +61,15 @@ export default function Table({
   const [pageIndex, setPageIndex] = useState(0);
   const [previousPageIndex, setPreviousPageIndex] = useState(-1);
   const getNumberOfResults = async () => {
+    if (isGettingNumberOfResults) {
+      return;
+    }
     setIsGettingNumberOfResults(true);
+    console.log("getting number of results...", {
+      ...(baseFilter || {}),
+      ...filters,
+    });
+
     let query = supabase
       .from(tableName)
       .select(selectString, { count: "exact", head: true })
@@ -84,17 +92,18 @@ export default function Table({
     setIsGettingNumberOfResults(false);
   };
   useEffect(() => {
-    if (numberOfResults !== null && !isGettingNumberOfResults) {
-      console.log("updating number of results");
+    if (baseFilter && numberOfResults === null) {
+      console.log("initial getNumberOfResults");
       getNumberOfResults();
     }
-  }, [filters, containsFilters, order]);
+  }, [baseFilter]);
+
   useEffect(() => {
-    if (!isLoading && user && numberOfResults === null) {
-      console.log("updating number of results");
+    if (numberOfResults !== null) {
+      console.log("secondary getNumberOfResults");
       getNumberOfResults();
     }
-  }, [isLoading, user]);
+  }, [filters, containsFilters, order, baseFilter]);
 
   const getResults = async (refresh) => {
     if (pageIndex !== previousPageIndex || refresh) {
