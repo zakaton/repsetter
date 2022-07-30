@@ -256,14 +256,25 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let maxRepsAssigned = 0;
         let maxRepsPerformed = 0;
-        exercise.number_of_reps_performed?.forEach((repsPerformed, index) => {
-          if (maxRepsPerformed < repsPerformed) {
-            maxRepsPerformed = repsPerformed;
-            maxRepsAssigned =
-              exercise.number_of_reps_assigned[index] ||
-              exercise.number_of_reps_assigned[0];
-          }
-        });
+
+        // FIX?
+        const topWeightIndex = getTopWeightIndex(exercise);
+        if (topWeightIndex >= 0) {
+          maxRepsAssigned =
+            exercise.number_of_reps_assigned[topWeightIndex] ||
+            exercise.number_of_reps_assigned[0];
+          maxRepsPerformed = exercise.number_of_reps_performed[topWeightIndex];
+        } else {
+          exercise.number_of_reps_performed?.forEach((repsPerformed, index) => {
+            if (maxRepsPerformed < repsPerformed) {
+              maxRepsPerformed = repsPerformed;
+              maxRepsAssigned =
+                exercise.number_of_reps_assigned[index] ||
+                exercise.number_of_reps_assigned[0];
+            }
+          });
+        }
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: maxRepsPerformed,
@@ -281,11 +292,20 @@ const graphTypes = {
     backgroundColor: "rgba(250, 204, 21, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
-        let difficulty =
-          exercise.difficulty?.reduce(
-            (topDifficulty, difficulty) => Math.max(topDifficulty, difficulty),
-            0
-          ) || 0;
+        const topWeightIndex = getTopWeightIndex(exercise);
+        let difficulty = 0;
+
+        // FIX?
+        if (topWeightIndex >= 0) {
+          difficulty = exercise.difficulty?.[topWeightIndex] || 0;
+        } else {
+          difficulty =
+            exercise.difficulty?.reduce(
+              (topDifficulty, difficulty) =>
+                Math.max(topDifficulty, difficulty),
+              0
+            ) || 0;
+        }
 
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
@@ -325,6 +345,7 @@ const graphTypes = {
     backgroundColor: "rgba(252, 143, 0, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
+        // FIX
         let topSetDurationPerformed = 0;
         let topSetDurationAssigned = 0;
         exercise.set_duration_performed?.forEach(
@@ -356,6 +377,7 @@ const graphTypes = {
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
         let topRestDuration = 0;
+        // FIX
         exercise.rest_duration?.forEach((restDuration) => {
           if (topRestDuration < restDuration) {
             topRestDuration = restDuration;
@@ -380,6 +402,7 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topSpeedPerformed = 0;
         let topSpeedAssigned = 0;
+        // FIX
         exercise.speed_performed?.forEach((speedPerformed, index) => {
           if (topSpeedPerformed < speedPerformed) {
             topSpeedPerformed = speedPerformed;
@@ -407,6 +430,7 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topDistancePerformed = 0;
         let topDistanceAssigned = 0;
+        // FIX
         exercise.distance_performed?.forEach((distancePerformed, index) => {
           if (topDistancePerformed < distancePerformed) {
             topDistancePerformed = distancePerformed;
@@ -435,6 +459,7 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topLevelPerformed = 0;
         let topLevelAssigned = 0;
+        // FIX
         exercise.level_assigned?.forEach((levelAssigned, index) => {
           if (levelAssigned > topLevelAssigned) {
             topLevelAssigned = levelAssigned;
@@ -518,6 +543,20 @@ const graphTypes = {
     },
     yAxisID: "y4",
   },
+};
+
+const getTopWeightIndex = (exercise) => {
+  let topWeightIndex = -1;
+  if (exercise.weight_assigned?.length > 0) {
+    let maxWeight = 0;
+    return exercise.weight_assigned.forEach((weight, index) => {
+      if (maxWeight < weight) {
+        maxWeight = weight;
+        topWeightIndex = index;
+      }
+    });
+  }
+  return topWeightIndex;
 };
 
 export default function Progress() {

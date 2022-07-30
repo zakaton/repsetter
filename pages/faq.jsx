@@ -4,20 +4,12 @@ import Head from "next/head";
 
 const faqs = [
   {
-    question: "Are are any fees to get started?",
+    question: "Are there any fees to get started?",
     answer: () => (
       <>
         <p>
           Nope. You can sign up for free and just use this as standalone workout
-          app if you aren&apos;t a coach.
-        </p>
-        <p>
-          The only time you&apos;d be charged is if you subscribe to a coach
-          with a nonzero subscription fee.
-        </p>
-        <p>
-          If you want to be a coach, it&apos;s free to sign up and we only take
-          a flat 5% fee on any subscriptions.
+          app.
         </p>
       </>
     ),
@@ -27,6 +19,16 @@ const faqs = [
     answer: () => (
       <>
         <p>Yep. You&apos;re free to cancel anytime.</p>
+      </>
+    ),
+  },
+  {
+    question: "Can anyone be a coach?",
+    answer: () => (
+      <>
+        <p>
+          Only people 18 years and older in the United States can be coaches.
+        </p>
       </>
     ),
   },
