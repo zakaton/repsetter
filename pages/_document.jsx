@@ -1,5 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
-import { isIOS } from "react-device-detect";
+import { isMobileSafari } from "react-device-detect";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -15,7 +15,7 @@ class MyDocument extends Document {
           <link rel="icon" href="/favicon.ico" />
           <link
             rel="manifest"
-            href={isIOS ? "/manifest-ios.json" : "/manifest.json"}
+            href={isMobileSafari ? "/manifest-ios.json" : "/manifest.json"}
           />
           <link
             rel="apple-touch-icon"
