@@ -1,4 +1,5 @@
-import Document, { Html, Head, Main, NextScript } from 'next/document';
+import Document, { Html, Head, Main, NextScript } from "next/document";
+import { isIOS } from "react-device-detect";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -12,17 +13,17 @@ class MyDocument extends Document {
         <Head>
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="icon" href="/favicon.ico" />
-          <link rel="manifest" href="/manifest.json" />
+          <link
+            rel="manifest"
+            href={isIOS ? "/manifest-ios.json" : "/manifest.json"}
+          />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
             href="/images/apple-touch-icon.png"
           />
           <meta name="theme-color" content="#fff" />
-          <meta
-            name="description"
-            content="Repsetter - online coaching"
-          />
+          <meta name="description" content="Repsetter - online coaching" />
           <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
         </Head>
         <body>
