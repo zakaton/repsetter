@@ -25,7 +25,7 @@ import {
   PlusIcon,
   ClipboardIcon,
   ChevronDownIcon,
-  ChevronUpIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/outline";
 import {
   kilogramsToPounds,
@@ -834,6 +834,14 @@ export default function Diary() {
   const [showWeights, setShowWeights] = useState(true);
   const [showPictures, setShowPictures] = useState(true);
 
+  /*
+  useEffect(() => {
+    setShowExercises(true);
+    setShowWeights(true);
+    setShowPictures(true);
+  }, [selectedDate]);
+  */
+
   return (
     <>
       <ExerciseModal
@@ -953,18 +961,18 @@ export default function Diary() {
                 }}
                 className="flex bg-white pr-2 text-base text-blue-500"
               >
-                <span className="pr-1">Exercises</span>
                 {showExercises ? (
-                  <ChevronUpIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                ) : (
                   <ChevronDownIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
+                ) : (
+                  <ChevronRightIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
                 )}
+                <span className="pl-0.5">Exercises</span>
               </button>
             </div>
             <div className="w-full border-t border-gray-300" />
@@ -1343,18 +1351,18 @@ export default function Diary() {
                 }}
                 className="flex bg-white pr-2 text-base text-yellow-600"
               >
-                <span className="pr-1">Bodyweight</span>
                 {showWeights ? (
-                  <ChevronUpIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                ) : (
                   <ChevronDownIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
+                ) : (
+                  <ChevronRightIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
                 )}
+                <span className="pl-0.5">Bodyweight</span>
               </button>
             </div>
             <div className="w-full border-t border-gray-300" />
@@ -1553,18 +1561,18 @@ export default function Diary() {
                 }}
                 className="flex bg-white pr-2 text-base text-green-600"
               >
-                <span className="pr-1">Pictures</span>
                 {showPictures ? (
-                  <ChevronUpIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                ) : (
                   <ChevronDownIcon
                     className="m-auto inline h-4 w-4"
                     aria-hidden="true"
                   />
+                ) : (
+                  <ChevronRightIcon
+                    className="m-auto inline h-4 w-4"
+                    aria-hidden="true"
+                  />
                 )}
+                <span className="pl-0.5">Pictures</span>
               </button>
             </div>
             <div className="w-full border-t border-gray-300" />
