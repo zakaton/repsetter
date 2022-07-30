@@ -91,6 +91,8 @@ export default function ExerciseTypes() {
 
   const [refreshResults, setRefreshResults] = useState(false);
 
+  const [baseFilter, setBaseFilter] = useState({});
+
   return (
     <>
       <ExerciseTypeModal
@@ -107,6 +109,7 @@ export default function ExerciseTypes() {
         status={editExerciseTypeStatus}
       />
       <Table
+        baseFilter={baseFilter}
         numberOfResultsPerPage={10}
         modalListener={modalListener}
         resultsListener={setResults}

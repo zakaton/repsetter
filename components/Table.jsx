@@ -27,7 +27,7 @@ export default function Table({
   resultMap,
   deleteTitle,
   HeaderButton,
-  baseFilter = {},
+  baseFilter,
   resultsListener,
   filterChildren,
   includeClientSelect,
