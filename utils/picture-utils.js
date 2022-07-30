@@ -1,1 +1,1 @@
-export const pictureTypes = ["front", "back", "side"];
+export const pictureTypes = ["front", "side", "back"];
