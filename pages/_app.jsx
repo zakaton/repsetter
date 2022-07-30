@@ -9,9 +9,21 @@ import { CoachPicturesContextProvider } from "../context/coach-picture-context";
 import { PicturesContextProvider } from "../context/picture-context";
 import { ExerciseTypesContextProvider } from "../context/exercise-types-context";
 import Layout from "../components/layouts/Layout";
+import { useEffect } from "react";
+import { isIOS } from "react-device-detect";
 
 function MyApp({ Component, pageProps }) {
   const getLayout = Component.getLayout || ((page) => page);
+
+  const updateManifest = async () => {
+    const manifestElement = document.querySelector("link[rel='manifest']");
+    if (manifestElement) {
+      manifestElement.href = isIOS ? "manifest-ios.json" : "manifest.json";
+    }
+  };
+  useEffect(() => {
+    updateManifest();
+  }, [isIOS]);
   return (
     <OnlineContextProvider>
       <UserContextProvider>
