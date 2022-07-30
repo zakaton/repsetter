@@ -8,7 +8,7 @@ import { weightEvents } from "../../utils/weight-utils";
 import Table from "../../components/Table";
 import { useClient } from "../../context/client-context";
 import MyLink from "../../components/MyLink";
-import { timeToDate, stringToDate, supabase } from "../../utils/supabase";
+import { timeToDate, stringToDate } from "../../utils/supabase";
 import { usePictures } from "../../context/picture-context";
 import { pictureTypes } from "../../utils/picture-utils";
 
