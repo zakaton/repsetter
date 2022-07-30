@@ -1480,12 +1480,13 @@ export default function Diary() {
                               }
                             >
                               ({weightDifference < 0 ? "" : "+"}
-                              {weight.is_weight_in_kilograms == isUsingKilograms
+                              {(weight.is_weight_in_kilograms ==
+                              isUsingKilograms
                                 ? weightDifference
-                                : (isUsingKilograms
-                                    ? poundsToKilograms(weightDifference)
-                                    : kilogramsToPounds(weightDifference)
-                                  ).toFixed(1)}
+                                : isUsingKilograms
+                                ? poundsToKilograms(weightDifference)
+                                : kilogramsToPounds(weightDifference)
+                              ).toFixed(1)}
                               )
                             </span>
                           )}
