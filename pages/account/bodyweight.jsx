@@ -169,6 +169,7 @@ export default function Bodyweight() {
               title: "event",
               value: weight.event,
             },
+            ...pictureItems,
             {
               jsx: (
                 <button
@@ -182,7 +183,6 @@ export default function Bodyweight() {
                 </button>
               ),
             },
-            ...pictureItems,
             {
               jsx: (
                 <MyLink
