@@ -82,9 +82,32 @@ export default function ExerciseModal(props) {
     []
   );
   const [numberOfRepsPerformed, setNumberOfRepsPerformed] = useState(0);
-  const [isRepsPerformedEmptyString, setIsRepsPerformedEmptyString] = useState(
-    []
-  );
+  const [
+    isNumberOfRepsPerformedEmptyString,
+    setIsNumberOfRepsPerformedEmptyString,
+  ] = useState([]);
+
+  useEffect(() => {
+    if (sameRepsForEachSet) {
+      setNumberOfReps([numberOfReps[0]]);
+      setIsNumberOfRepsEmptyString([isNumberOfRepsEmptyString[0]]);
+    } else {
+      setNumberOfReps(new Array(numberOfSets).fill(numberOfReps[0]));
+      setIsNumberOfRepsEmptyString(
+        new Array(numberOfSets).fill(isNumberOfRepsEmptyString[0])
+      );
+    }
+
+    if (numberOfRepsPerformed) {
+      // FIX!
+      setNumberOfRepsPerformed(
+        new Array(numberOfSets).fill(numberOfRepsPerformed[0])
+      );
+      setIsNumberOfRepsPerformedEmptyString(
+        new Array(numberOfSets).fill(isNumberOfRepsPerformedEmptyString[0])
+      );
+    }
+  }, [numberOfSets]);
 
   const [sameWeightForEachSet, setSameWeightForEachSet] = useState(true);
   const [isUsingKilograms, setIsUsingKilograms] = useState(true);
@@ -92,6 +115,22 @@ export default function ExerciseModal(props) {
   const [weightPounds, setWeightPounds] = useState([0]);
   const [weightPerformedKilograms, setWeightPerformedKilograms] = useState([0]);
   const [weightPerformedPounds, setWeightPerformedPounds] = useState([0]);
+
+  useEffect(() => {
+    if (sameWeightForEachSet) {
+      setIsWeightInputEmptyString([isWeightInputEmptyString[0]]);
+      setWeight(isUsingKilograms ? [weightKilograms[0]] : [weightPounds[0]]);
+    } else {
+      setWeight(
+        isUsingKilograms
+          ? new Array(numberOfSets).fill(weightKilograms[0])
+          : new Array(numberOfSets).fill(weightPounds[0])
+      );
+      setIsWeightInputEmptyString(
+        new Array(numberOfSets).fill(isWeightInputEmptyString[0])
+      );
+    }
+  }, [numberOfSets]);
 
   useEffect(() => {
     if (isUsingKilograms) {
@@ -427,6 +466,17 @@ export default function ExerciseModal(props) {
   const [sameRestDurationForEachSet, setSameRestDurationForEachSet] =
     useState(true);
 
+  useEffect(() => {
+    if (sameRestDurationForEachSet) {
+      setRestDuration([restDuration[0]]);
+    } else {
+      setRestDuration(new Array(numberOfSets).fill(restDuration[0]));
+      setIsRestDurationEmptyString(
+        new Array(numberOfSets).fill(isRestDurationEmptyString[0])
+      );
+    }
+  }, [numberOfSets]);
+
   const [setDurationAssigned, setSetDurationAssigned] = useState([]);
   const [setDurationPerformed, setSetDurationPerformed] = useState([]);
   const [isSetDurationEmptyString, setIsSetDurationEmptyString] = useState([]);
@@ -437,12 +487,40 @@ export default function ExerciseModal(props) {
   const [sameSetDurationForEachSet, setSameSetDurationForEachSet] =
     useState(true);
 
+  useEffect(() => {
+    if (sameSetDurationForEachSet) {
+      setSetDurationAssigned([setDurationAssigned[0]]);
+    } else {
+      setSetDurationAssigned(new Array(numberOfSets).fill(restDuration[0]));
+      setIsSetDurationEmptyString(
+        new Array(numberOfSets).fill(isSetDurationEmptyString[0])
+      );
+    }
+    if (setDurationPerformed && setDurationPerformed.length < numberOfSets) {
+      setSetDurationPerformed(setDurationPerformed.slice(0, numberOfSets));
+    }
+  }, [numberOfSets]);
+
   const [speedAssigned, setSpeedAssigned] = useState([]);
   const [speedPerformed, setSpeedPerformed] = useState([]);
   const [isSpeedEmptyString, setIsSpeedEmptyString] = useState([]);
   const [isSpeedPerformedEmptyString, setIsSpeedPerformedEmptyString] =
     useState([]);
   const [sameSpeedForEachSet, setSameSpeedForEachSet] = useState(true);
+
+  useEffect(() => {
+    if (sameSpeedForEachSet) {
+      setSpeedAssigned([speedAssigned[0]]);
+    } else {
+      setSpeedAssigned(new Array(numberOfSets).fill(restDuration[0]));
+      setIsSpeedEmptyString(
+        new Array(numberOfSets).fill(isSpeedEmptyString[0])
+      );
+    }
+    if (speedPerformed && speedPerformed.length < numberOfSets) {
+      setSpeedPerformed(speedPerformed.slice(0, numberOfSets));
+    }
+  }, [numberOfSets]);
 
   const [distanceAssigned, setDistanceAssigned] = useState([]);
   const [distancePerformed, setDistancePerformed] = useState([]);
@@ -452,12 +530,40 @@ export default function ExerciseModal(props) {
   const [sameDistanceForEachSet, setSameDistanceForEachSet] = useState(true);
   const [distanceUnit, setDistanceUnit] = useState("miles");
 
+  useEffect(() => {
+    if (sameDistanceForEachSet) {
+      setDistanceAssigned([distanceAssigned[0]]);
+    } else {
+      setDistanceAssigned(new Array(numberOfSets).fill(restDuration[0]));
+      setIsDistanceEmptyString(
+        new Array(numberOfSets).fill(isDistanceEmptyString[0])
+      );
+    }
+    if (distancePerformed && distancePerformed.length < numberOfSets) {
+      setDistancePerformed(distancePerformed.slice(0, numberOfSets));
+    }
+  }, [numberOfSets]);
+
   const [levelAssigned, setLevelAssigned] = useState([]);
   const [levelPerformed, setLevelPerformed] = useState([]);
   const [isLevelEmptyString, setIsLevelEmptyString] = useState([]);
   const [isLevelPerformedEmptyString, setIsLevelPerformedEmptyString] =
     useState([]);
   const [sameLevelForEachSet, setSameLevelForEachSet] = useState(true);
+
+  useEffect(() => {
+    if (sameLevelForEachSet) {
+      setLevelAssigned([levelAssigned[0]]);
+    } else {
+      setLevelAssigned(new Array(numberOfSets).fill(restDuration[0]));
+      setIsLevelEmptyString(
+        new Array(numberOfSets).fill(isLevelEmptyString[0])
+      );
+    }
+    if (levelPerformed && levelPerformed.length < numberOfSets) {
+      setLevelPerformed(levelPerformed.slice(0, numberOfSets));
+    }
+  }, [numberOfSets]);
 
   useEffect(() => {
     if (previousExercise && !selectedExercise) {
@@ -1057,56 +1163,7 @@ export default function ExerciseModal(props) {
                   value={isNumberOfSetsEmptyString ? "" : numberOfSets}
                   onInput={(e) => {
                     setIsNumberOfSetsEmptyString(e.target.value === "");
-
                     const newNumberOfSets = Number(e.target.value);
-                    if (sameRepsForEachSet) {
-                      setNumberOfReps([numberOfReps[0]]);
-                    } else {
-                      setNumberOfReps(
-                        new Array(newNumberOfSets).fill(numberOfReps[0])
-                      );
-                      setIsNumberOfRepsEmptyString(
-                        new Array(newNumberOfSets).fill(
-                          isNumberOfRepsEmptyString[0]
-                        )
-                      );
-                    }
-
-                    if (sameWeightForEachSet) {
-                      setIsWeightInputEmptyString([
-                        isWeightInputEmptyString[0],
-                      ]);
-                      setWeight(
-                        isUsingKilograms
-                          ? [weightKilograms[0]]
-                          : [weightPounds[0]]
-                      );
-                    } else {
-                      setWeight(
-                        isUsingKilograms
-                          ? new Array(newNumberOfSets).fill(weightKilograms[0])
-                          : new Array(newNumberOfSets).fill(weightPounds[0])
-                      );
-                      setIsWeightInputEmptyString(
-                        new Array(newNumberOfSets).fill(
-                          isWeightInputEmptyString[0]
-                        )
-                      );
-                    }
-
-                    if (sameRestDurationForEachSet) {
-                      setRestDuration([restDuration[0]]);
-                    } else {
-                      setRestDuration(
-                        new Array(newNumberOfSets).fill(restDuration[0])
-                      );
-                      setIsRestDurationEmptyString(
-                        new Array(newNumberOfSets).fill(
-                          isRestDurationEmptyString[0]
-                        )
-                      );
-                    }
-
                     setNumberOfSets(newNumberOfSets);
                   }}
                   name="sets"
@@ -1973,16 +2030,16 @@ export default function ExerciseModal(props) {
                         min="0"
                         max="20"
                         value={
-                          isRepsPerformedEmptyString[index]
+                          isNumberOfRepsPerformedEmptyString[index]
                             ? ""
                             : numberOfRepsPerformed[index]
                         }
                         onInput={(e) => {
                           const newIsRepsPerformedEmptyString =
-                            isRepsPerformedEmptyString.slice();
+                            isNumberOfRepsPerformedEmptyString.slice();
                           newIsRepsPerformedEmptyString[index] =
                             e.target.value === "";
-                          setIsRepsPerformedEmptyString(
+                          setIsNumberOfRepsPerformedEmptyString(
                             newIsRepsPerformedEmptyString
                           );
 

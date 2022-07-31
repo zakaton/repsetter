@@ -164,8 +164,8 @@ const filterTypes = [
     requiresTopSet: true,
     defaultValue: "lbs",
     radios: [
-      { value: "lbs", label: "lbs", defaultChecked: true },
-      { value: "kg", label: "kg" },
+      { value: "kg", label: "kg", defaultChecked: true },
+      { value: "lbs", label: "lbs" },
     ],
   },
   {
@@ -257,7 +257,6 @@ const graphTypes = {
         let maxRepsAssigned = 0;
         let maxRepsPerformed = 0;
 
-        // FIX?
         const topWeightIndex = getTopWeightIndex(exercise);
         if (topWeightIndex >= 0) {
           maxRepsAssigned =
@@ -295,7 +294,6 @@ const graphTypes = {
         const topWeightIndex = getTopWeightIndex(exercise);
         let difficulty = 0;
 
-        // FIX?
         if (topWeightIndex >= 0) {
           difficulty = exercise.difficulty?.[topWeightIndex] || 0;
         } else {
@@ -345,19 +343,28 @@ const graphTypes = {
     backgroundColor: "rgba(252, 143, 0, 0.5)",
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
-        // FIX
         let topSetDurationPerformed = 0;
         let topSetDurationAssigned = 0;
-        exercise.set_duration_performed?.forEach(
-          (setDurationPerformed, index) => {
-            if (topSetDurationPerformed < setDurationPerformed) {
-              topSetDurationPerformed = setDurationPerformed;
-              topSetDurationAssigned =
-                exercise.set_duration_assigned[index] ||
-                exercise.set_duration_assigned[0];
+        const topWeightIndex = getTopWeightIndex(exercise);
+        if (topWeightIndex >= 0) {
+          maxSetDurationAssigned =
+            exercise.set_duration_assigned[topWeightIndex] ||
+            exercise.set_duration_assigned[0];
+          maxSetDurationPerformed =
+            exercise.set_duration_performed[topWeightIndex];
+        } else {
+          exercise.set_duration_performed?.forEach(
+            (setDurationPerformed, index) => {
+              if (topSetDurationPerformed < setDurationPerformed) {
+                topSetDurationPerformed = setDurationPerformed;
+                topSetDurationAssigned =
+                  exercise.set_duration_assigned[index] ||
+                  exercise.set_duration_assigned[0];
+              }
             }
-          }
-        );
+          );
+        }
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: topSetDurationPerformed,
@@ -377,12 +384,18 @@ const graphTypes = {
     getData: ({ exercises }) => {
       return exercises?.map((exercise) => {
         let topRestDuration = 0;
-        // FIX
-        exercise.rest_duration?.forEach((restDuration) => {
-          if (topRestDuration < restDuration) {
-            topRestDuration = restDuration;
-          }
-        });
+        const topWeightIndex = getTopWeightIndex(exercise);
+        if (topWeightIndex >= 0) {
+          topRestDuration =
+            exercise.rest_duration[topWeightIndex] || exercise.rest_duration[0];
+        } else {
+          exercise.rest_duration?.forEach((restDuration) => {
+            if (topRestDuration < restDuration) {
+              topRestDuration = restDuration;
+            }
+          });
+        }
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: topRestDuration,
@@ -402,14 +415,23 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topSpeedPerformed = 0;
         let topSpeedAssigned = 0;
-        // FIX
-        exercise.speed_performed?.forEach((speedPerformed, index) => {
-          if (topSpeedPerformed < speedPerformed) {
-            topSpeedPerformed = speedPerformed;
-            topSpeedAssigned =
-              exercise.speed_assigned[index] || exercise.speed_assigned[0];
-          }
-        });
+
+        const topWeightIndex = getTopWeightIndex(exercise);
+        if (topWeightIndex >= 0) {
+          topSpeedAssigned =
+            exercise.speed_assigned[topWeightIndex] ||
+            exercise.speed_assigned[0];
+          topSpeedPerformed = exercise.speed_performed[topWeightIndex];
+        } else {
+          exercise.speed_performed?.forEach((speedPerformed, index) => {
+            if (topSpeedPerformed < speedPerformed) {
+              topSpeedPerformed = speedPerformed;
+              topSpeedAssigned =
+                exercise.speed_assigned[index] || exercise.speed_assigned[0];
+            }
+          });
+        }
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: topSpeedPerformed,
@@ -430,15 +452,24 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topDistancePerformed = 0;
         let topDistanceAssigned = 0;
-        // FIX
-        exercise.distance_performed?.forEach((distancePerformed, index) => {
-          if (topDistancePerformed < distancePerformed) {
-            topDistancePerformed = distancePerformed;
-            topDistanceAssigned =
-              exercise.distance_assigned[index] ||
-              exercise.distance_assigned[0];
-          }
-        });
+
+        const topWeightIndex = getTopWeightIndex(exercise);
+        if (topWeightIndex >= 0) {
+          topDistanceAssigned =
+            exercise.distance_assigned[topWeightIndex] ||
+            exercise.distance_assigned[0];
+          topDistancePerformed = exercise.distance_performed[topWeightIndex];
+        } else {
+          exercise.distance_performed?.forEach((distancePerformed, index) => {
+            if (topDistancePerformed < distancePerformed) {
+              topDistancePerformed = distancePerformed;
+              topDistanceAssigned =
+                exercise.distance_assigned[index] ||
+                exercise.distance_assigned[0];
+            }
+          });
+        }
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: topDistancePerformed,
@@ -459,13 +490,22 @@ const graphTypes = {
       return exercises?.map((exercise) => {
         let topLevelPerformed = 0;
         let topLevelAssigned = 0;
-        // FIX
-        exercise.level_assigned?.forEach((levelAssigned, index) => {
-          if (levelAssigned > topLevelAssigned) {
-            topLevelAssigned = levelAssigned;
-            topLevelPerformed = exercise.level_performed?.[index] || 0;
-          }
-        });
+
+        const topWeightIndex = getTopWeightIndex(exercise);
+        if (topWeightIndex >= 0) {
+          topLevelAssigned =
+            exercise.level_assigned[topWeightIndex] ||
+            exercise.level_assigned[0];
+          topLevelPerformed = exercise.level_performed[topWeightIndex];
+        } else {
+          exercise.level_assigned?.forEach((levelAssigned, index) => {
+            if (levelAssigned > topLevelAssigned) {
+              topLevelAssigned = levelAssigned;
+              topLevelPerformed = exercise.level_performed?.[index] || 0;
+            }
+          });
+        }
+
         return {
           x: dateFromDateAndTime(exercise.date, exercise.time),
           y: topLevelPerformed,
@@ -547,7 +587,7 @@ const graphTypes = {
 
 const getTopWeightIndex = (exercise) => {
   let topWeightIndex = -1;
-  if (exercise.weight_assigned?.length > 0) {
+  if (exercise.weight_assigned?.some((value) => value > 0)) {
     let maxWeight = 0;
     return exercise.weight_assigned.forEach((weight, index) => {
       if (maxWeight < weight) {
@@ -857,6 +897,8 @@ export default function Progress() {
           grid: {
             drawOnChartArea: getGridDrawOnChartArea("difficulty"),
           },
+          min: 0,
+          max: 10,
           title: {
             display: true,
             text: `Difficulty`,
