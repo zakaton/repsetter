@@ -20,6 +20,8 @@ import YouTube from "react-youtube";
 import MyLink from "../../MyLink";
 import ExerciseTypeVideo from "../../ExerciseTypeVideo";
 
+const initialNumberOfSets = 3;
+
 export default function ExerciseModal(props) {
   const {
     open,
@@ -66,7 +68,7 @@ export default function ExerciseModal(props) {
   const [didUpdateExercise, setDidUpdateExercise] = useState(false);
 
   const [selectedExerciseType, setSelectedExerciseType] = useState(null);
-  const [numberOfSets, setNumberOfSets] = useState(3);
+  const [numberOfSets, setNumberOfSets] = useState(initialNumberOfSets);
   const [isNumberOfSetsEmptyString, setIsNumberOfSetsEmptyString] =
     useState(false);
   const [numberOfSetsPerformed, setNumberOfSetsPerformed] = useState(0);
@@ -81,11 +83,22 @@ export default function ExerciseModal(props) {
   const [isNumberOfRepsEmptyString, setIsNumberOfRepsEmptyString] = useState(
     []
   );
-  const [numberOfRepsPerformed, setNumberOfRepsPerformed] = useState(0);
+  const [numberOfRepsPerformed, setNumberOfRepsPerformed] = useState([0]);
   const [
     isNumberOfRepsPerformedEmptyString,
     setIsNumberOfRepsPerformedEmptyString,
   ] = useState([]);
+
+  /*
+  console.log({
+    numberOfSets,
+    isNumberOfSetsEmptyString,
+    numberOfReps,
+    numberOfRepsPerformed,
+    isNumberOfRepsEmptyString,
+    isNumberOfRepsPerformedEmptyString,
+  });
+  */
 
   useEffect(() => {
     if (sameRepsForEachSet) {
@@ -99,13 +112,27 @@ export default function ExerciseModal(props) {
     }
 
     if (numberOfRepsPerformed) {
-      // FIX!
-      setNumberOfRepsPerformed(
-        new Array(numberOfSets).fill(numberOfRepsPerformed[0])
-      );
-      setIsNumberOfRepsPerformedEmptyString(
-        new Array(numberOfSets).fill(isNumberOfRepsPerformedEmptyString[0])
-      );
+      if (numberOfSets != numberOfRepsPerformed.length) {
+        if (numberOfSets > numberOfRepsPerformed.length) {
+          setNumberOfRepsPerformed(
+            numberOfRepsPerformed.slice(0, numberOfSets)
+          );
+          setIsNumberOfRepsPerformedEmptyString(
+            isNumberOfRepsPerformedEmptyString.slice(0, numberOfSets)
+          );
+        } else {
+          setNumberOfRepsPerformed(
+            numberOfRepsPerformed.concat(
+              new Array(numberOfRepsPerformed.length - numberOfSets).fill(0)
+            )
+          );
+          setIsNumberOfRepsPerformedEmptyString(
+            isNumberOfRepsPerformedEmptyString.concat(
+              new Array(numberOfRepsPerformed.length - numberOfSets).fill(true)
+            )
+          );
+        }
+      }
     }
   }, [numberOfSets]);
 
@@ -115,6 +142,22 @@ export default function ExerciseModal(props) {
   const [weightPounds, setWeightPounds] = useState([0]);
   const [weightPerformedKilograms, setWeightPerformedKilograms] = useState([0]);
   const [weightPerformedPounds, setWeightPerformedPounds] = useState([0]);
+  const [isWeightInputEmptyString, setIsWeightInputEmptyString] = useState([]);
+  const [isWeightPerformedEmptyString, setIsWeightPerformedEmptyString] =
+    useState([]);
+
+  /*
+  console.log({
+    numberOfSets,
+    sameWeightForEachSet,
+    weightKilograms,
+    weightPounds,
+    weightPerformedKilograms,
+    weightPerformedPounds,
+    isWeightInputEmptyString,
+    isWeightPerformedEmptyString,
+  });
+  */
 
   useEffect(() => {
     if (sameWeightForEachSet) {
@@ -180,10 +223,6 @@ export default function ExerciseModal(props) {
       );
     }
   }, [weightPerformedPounds]);
-
-  const [isWeightInputEmptyString, setIsWeightInputEmptyString] = useState([]);
-  const [isWeightPerformedEmptyString, setIsWeightPerformedEmptyString] =
-    useState([]);
 
   const [isDifficultyEmptyString, setIsDifficultyEmptyString] = useState([]);
   const [difficulty, setDifficulty] = useState([]);
@@ -477,8 +516,8 @@ export default function ExerciseModal(props) {
     }
   }, [numberOfSets]);
 
-  const [setDurationAssigned, setSetDurationAssigned] = useState([]);
-  const [setDurationPerformed, setSetDurationPerformed] = useState([]);
+  const [setDurationAssigned, setSetDurationAssigned] = useState([0]);
+  const [setDurationPerformed, setSetDurationPerformed] = useState([0]);
   const [isSetDurationEmptyString, setIsSetDurationEmptyString] = useState([]);
   const [
     isSetDurationPerformedEmptyString,
@@ -486,6 +525,17 @@ export default function ExerciseModal(props) {
   ] = useState([]);
   const [sameSetDurationForEachSet, setSameSetDurationForEachSet] =
     useState(true);
+
+  /*
+  console.log({
+    numberOfSets,
+    setDurationAssigned,
+    setDurationPerformed,
+    isSetDurationEmptyString,
+    isSetDurationPerformedEmptyString,
+    sameSetDurationForEachSet,
+  });
+  */
 
   useEffect(() => {
     if (sameSetDurationForEachSet) {
@@ -501,12 +551,23 @@ export default function ExerciseModal(props) {
     }
   }, [numberOfSets]);
 
-  const [speedAssigned, setSpeedAssigned] = useState([]);
-  const [speedPerformed, setSpeedPerformed] = useState([]);
+  const [speedAssigned, setSpeedAssigned] = useState([0]);
+  const [speedPerformed, setSpeedPerformed] = useState([0]);
   const [isSpeedEmptyString, setIsSpeedEmptyString] = useState([]);
   const [isSpeedPerformedEmptyString, setIsSpeedPerformedEmptyString] =
     useState([]);
   const [sameSpeedForEachSet, setSameSpeedForEachSet] = useState(true);
+
+  /*
+  console.log({
+    numberOfSets,
+    speedAssigned,
+    speedPerformed,
+    isSpeedEmptyString,
+    isSpeedPerformedEmptyString,
+    sameSpeedForEachSet,
+  });
+  */
 
   useEffect(() => {
     if (sameSpeedForEachSet) {
@@ -522,13 +583,25 @@ export default function ExerciseModal(props) {
     }
   }, [numberOfSets]);
 
-  const [distanceAssigned, setDistanceAssigned] = useState([]);
-  const [distancePerformed, setDistancePerformed] = useState([]);
+  const [distanceAssigned, setDistanceAssigned] = useState([0]);
+  const [distancePerformed, setDistancePerformed] = useState([0]);
   const [isDistanceEmptyString, setIsDistanceEmptyString] = useState([]);
   const [isDistancePerformedEmptyString, setIsDistancePerformedEmptyString] =
     useState([]);
   const [sameDistanceForEachSet, setSameDistanceForEachSet] = useState(true);
-  const [distanceUnit, setDistanceUnit] = useState("miles");
+  const [distanceUnit, setDistanceUnit] = useState("mi");
+
+  /*
+  console.log({
+    numberOfSets,
+    distanceAssigned,
+    distancePerformed,
+    isDistanceEmptyString,
+    isDistancePerformedEmptyString,
+    sameDistanceForEachSet,
+    distanceUnit,
+  });
+  */
 
   useEffect(() => {
     if (sameDistanceForEachSet) {
@@ -544,12 +617,23 @@ export default function ExerciseModal(props) {
     }
   }, [numberOfSets]);
 
-  const [levelAssigned, setLevelAssigned] = useState([]);
-  const [levelPerformed, setLevelPerformed] = useState([]);
+  const [levelAssigned, setLevelAssigned] = useState([0]);
+  const [levelPerformed, setLevelPerformed] = useState([0]);
   const [isLevelEmptyString, setIsLevelEmptyString] = useState([]);
   const [isLevelPerformedEmptyString, setIsLevelPerformedEmptyString] =
     useState([]);
   const [sameLevelForEachSet, setSameLevelForEachSet] = useState(true);
+
+  /*
+  console.log({
+    numberOfSets,
+    levelAssigned,
+    levelPerformed,
+    isLevelEmptyString,
+    isLevelPerformedEmptyString,
+    sameLevelForEachSet,
+  });
+  */
 
   useEffect(() => {
     if (sameLevelForEachSet) {
@@ -2028,7 +2112,6 @@ export default function ExerciseModal(props) {
                         type="number"
                         inputMode="numeric"
                         min="0"
-                        max="20"
                         value={
                           isNumberOfRepsPerformedEmptyString[index]
                             ? ""
