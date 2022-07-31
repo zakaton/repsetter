@@ -772,7 +772,10 @@ export default function ExerciseModal(props) {
               ...(selectedExerciseType.features?.includes("reps")
                 ? {
                     number_of_reps_assigned: numberOfReps,
-                    number_of_reps_performed: numberOfRepsPerformed,
+                    number_of_reps_performed: numberOfRepsPerformed.slice(
+                      0,
+                      numberOfSetsPerformed
+                    ),
                   }
                 : {}),
 
@@ -782,9 +785,10 @@ export default function ExerciseModal(props) {
                     weight_assigned: isUsingKilograms
                       ? weightKilograms
                       : weightPounds,
-                    weight_performed: isUsingKilograms
+                    weight_performed: (isUsingKilograms
                       ? weightPerformedKilograms
-                      : weightPerformedPounds,
+                      : weightPerformedPounds
+                    ).slice(0, numberOfSetsPerformed),
                   }
                 : {}),
 
@@ -793,28 +797,40 @@ export default function ExerciseModal(props) {
               ...(selectedExerciseType.features?.includes("duration")
                 ? {
                     set_duration_assigned: setDurationAssigned,
-                    set_duration_performed: setDurationPerformed,
+                    set_duration_performed: setDurationPerformed.slice(
+                      0,
+                      numberOfSetsPerformed
+                    ),
                   }
                 : {}),
 
               ...(selectedExerciseType.features?.includes("speed")
                 ? {
                     speed_assigned: speedAssigned,
-                    speed_performed: speedPerformed,
+                    speed_performed: speedPerformed.slice(
+                      0,
+                      numberOfSetsPerformed
+                    ),
                   }
                 : {}),
 
               ...(selectedExerciseType.features?.includes("level")
                 ? {
                     level_assigned: levelAssigned,
-                    level_performed: levelPerformed,
+                    level_performed: levelPerformed.slice(
+                      0,
+                      numberOfSetsPerformed
+                    ),
                   }
                 : {}),
 
               ...(selectedExerciseType.features?.includes("distance")
                 ? {
                     distance_assigned: distanceAssigned,
-                    distance_performed: distancePerformed,
+                    distance_performed: distancePerformed.slice(
+                      0,
+                      numberOfSetsPerformed
+                    ),
                     distance_unit: distanceUnit,
                   }
                 : {}),
