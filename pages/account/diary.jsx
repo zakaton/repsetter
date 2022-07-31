@@ -26,6 +26,7 @@ import {
   ClipboardIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  TrashIcon,
 } from "@heroicons/react/outline";
 import {
   kilogramsToPounds,
@@ -99,6 +100,7 @@ export default function Diary() {
   const [editExerciseStatus, setEditExerciseStatus] = useState();
 
   const [selectedExercise, setSelectedExercise] = useState();
+  const [selectedExercises, setSelectedExercises] = useState();
 
   const [gotExerciseForUserId, setGotExerciseForUserId] = useState();
   const [gotExerciseForDate, setGotExerciseForDate] = useState();
@@ -834,14 +836,6 @@ export default function Diary() {
   const [showWeights, setShowWeights] = useState(true);
   const [showPictures, setShowPictures] = useState(true);
 
-  /*
-  useEffect(() => {
-    setShowExercises(true);
-    setShowWeights(true);
-    setShowPictures(true);
-  }, [selectedDate]);
-  */
-
   return (
     <>
       <ExerciseModal
@@ -861,7 +855,9 @@ export default function Diary() {
         open={showDeleteExerciseModal}
         setOpen={setShowDeleteExerciseModal}
         selectedResult={selectedExercise}
+        selectedResults={selectedExercises}
         setSelectedResult={setSelectedExercise}
+        setSelectedResults={setSelectedExercises}
         setDeleteResultStatus={setDeleteExerciseStatus}
         setShowDeleteResultNotification={setShowDeleteExerciseNotification}
       />
@@ -1015,7 +1011,7 @@ export default function Diary() {
                   pasteExercises();
                 }}
                 className={classNames(
-                  "relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
+                  "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
                   copiedExercises?.length > 0
                     ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     : "bg-gray-100"
@@ -1023,6 +1019,23 @@ export default function Diary() {
               >
                 <span className="sr-only">Paste</span>
                 <ClipboardIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                disabled={!(exercises?.length > 0)}
+                onClick={() => {
+                  setSelectedExercises(exercises);
+                  setShowDeleteExerciseModal(true);
+                }}
+                className={classNames(
+                  "relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
+                  exercises?.length > 0
+                    ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    : "bg-gray-100"
+                )}
+              >
+                <span className="sr-only">Delete Exercises</span>
+                <TrashIcon className="h-5 w-5" aria-hidden="true" />
               </button>
             </span>
           </div>

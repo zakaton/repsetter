@@ -8,7 +8,9 @@ export default function DeleteExerciseModal(props) {
     open,
     setOpen,
     selectedResult: selectedExercise,
+    selectedResults: selectedExercises,
     setSelectedResult: setSelectedExercise,
+    setSelectedResults: setSelectedExercises,
     setDeleteResultStatus: setDeleteExerciseStatus,
     setShowDeleteResultNotification: setShowDeleteExerciseNotification,
   } = props;
@@ -22,48 +24,82 @@ export default function DeleteExerciseModal(props) {
     }
   }, [open]);
 
+  const resultName = `Exercise${selectedExercises ? "s" : "s"}`;
+
   return (
     <Modal
       {...props}
-      title="Delete Exercise"
-      message="Are you sure you want to delete this exercise? This action cannot be undone."
+      title={`Delete ${resultName}`}
+      message={`Are you sure you want to delete ${
+        selectedExercises ? "these exercises" : "this exercise"
+      }? This action cannot be undone.`}
       color="red"
       Button={
         <button
           role="button"
           onClick={async () => {
-            console.log("DELETING", selectedExercise);
+            console.log("DELETING", selectedExercise, selectedExercises);
             setIsDeleting(true);
-            const { data: deleteExerciseResult, error: deleteExerciseError } =
-              await supabase
+            let status;
+            let error;
+            if (selectedExercise) {
+              const { data: deleteExerciseResult, error: deleteExerciseError } =
+                await supabase
+                  .from("exercise")
+                  .delete()
+                  .eq("id", selectedExercise.id);
+              console.log("deleteExerciseResult", deleteExerciseResult);
+              if (deleteExerciseError) {
+                console.error(deleteExerciseError);
+                error = deleteExerciseError;
+              }
+            } else if (selectedExercises) {
+              const {
+                data: deleteExercisesResult,
+                error: deleteExercisesError,
+              } = await supabase
                 .from("exercise")
                 .delete()
-                .eq("id", selectedExercise.id);
-            console.log("deleteExerciseResult", deleteExerciseResult);
-            if (deleteExerciseError) {
-              console.error(deleteExerciseError);
+                .in(
+                  "id",
+                  selectedExercises.map((exercise) => exercise.id)
+                );
+              console.log("deleteExercisesResult", deleteExercisesResult);
+              if (deleteExercisesError) {
+                console.error(deleteExercisesError);
+                error = deleteExercisesError;
+              }
             }
 
             setIsDeleting(false);
             setDidDelete(true);
-            const status = {
-              type: "succeeded",
-              title: "Successfully deleted Exercise",
-            };
+            if (error) {
+              status = {
+                type: "failed",
+                title: `Failed to delete ${resultName}`,
+                message: error.message,
+              };
+            } else {
+              status = {
+                type: "succeeded",
+                title: `Successfully deleted ${resultName}`,
+              };
+            }
             console.log("status", status);
             setDeleteExerciseStatus(status);
             setShowDeleteExerciseNotification(true);
             setOpen(false);
             setSelectedExercise?.(null);
+            setSelectedExercises?.(null);
           }}
           className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >
           {/* eslint-disable-next-line no-nested-ternary */}
           {isDeleting
-            ? "Deleting Exercise..."
+            ? `Deleting ${resultName}...`
             : didDelete
-            ? "Deleted Exercise!"
-            : "Delete Exercise"}
+            ? `Deleted ${resultName}!`
+            : `Delete ${resultName}`}
         </button>
       }
     ></Modal>
