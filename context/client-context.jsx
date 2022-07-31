@@ -98,8 +98,11 @@ export function ClientContextProvider(props) {
         const newClients = [...clients, newClient];
         setClients(newClients);
         setSelectedClient(newClient);
+      } else {
+        setSelectedClient();
       }
     }
+    setCheckedQuery(true);
   };
   useEffect(() => {
     if (clients && initialClientEmail) {
@@ -115,11 +118,14 @@ export function ClientContextProvider(props) {
     }
   }, [clients, initialClientEmail]);
 
+  const [checkedQuery, setCheckedQuery] = useState(false);
   useEffect(() => {
     if (router.isReady) {
       console.log("CHECK QUERY", router.query);
       if ("client" in router.query) {
         setInitialClientEmail(router.query.client);
+      } else {
+        setCheckedQuery(true);
       }
     }
   }, [router.isReady]);
@@ -157,10 +163,10 @@ export function ClientContextProvider(props) {
 
   const [selectedClientId, setSelectedClientId] = useState();
   useEffect(() => {
-    if (!isLoading && user) {
+    if (!isLoading && user && checkedQuery) {
       setSelectedClientId(selectedClient ? selectedClient.client : user.id);
     }
-  }, [selectedClient, user, isLoading]);
+  }, [selectedClient, user, isLoading, checkedQuery]);
 
   const [isSelectedDateToday, setIsSelectedDateToday] = useState(false);
   useEffect(() => {
