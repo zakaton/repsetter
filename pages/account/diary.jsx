@@ -1338,7 +1338,7 @@ export default function Diary() {
             </div>
           ))}
 
-        <div className="relative min-h-[1rem] pt-2">
+        <div className="relative min-h-[1rem]">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -1550,7 +1550,7 @@ export default function Diary() {
           </>
         )}
 
-        <div className="relative min-h-[1rem] pt-2">
+        <div className="relative min-h-[1rem]">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
