@@ -560,8 +560,7 @@ const getTopWeightIndex = (exercise) => {
 };
 
 export default function Progress() {
-  const { selectedClient, setSelectedDate } = useClient();
-  const { user } = useUser();
+  const { selectedClient, setSelectedDate, selectedClientId } = useClient();
 
   const {
     selectedExerciseType,
@@ -580,14 +579,12 @@ export default function Progress() {
 
   const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
-    const newBaseFilter = {};
-
-    if (selectedClient) {
-      newBaseFilter.client = selectedClient.client;
-      //newBaseFilter.coach = user.id;
-    } else {
-      newBaseFilter.client = user.id;
+    if (!selectedClientId) {
+      return;
     }
+
+    const newBaseFilter = {};
+    newBaseFilter.client = selectedClientId;
 
     setMaxDateRange();
     setPreviousFilters();
@@ -597,7 +594,7 @@ export default function Progress() {
     }
     console.log("newBaseFilter", newBaseFilter);
     setBaseFilter(newBaseFilter);
-  }, [selectedClient, user, selectedExerciseType]);
+  }, [selectedClientId, selectedExerciseType]);
 
   useEffect(() => {
     if (
@@ -701,7 +698,7 @@ export default function Progress() {
 
   const [maxDateRange, setMaxDateRange] = useState();
   useEffect(() => {
-    if ("client" in baseFilter) {
+    if (baseFilter && "client" in baseFilter) {
       let didDateRangeExpand = didDateRangeExpand;
       if (previousFilters?.["date-range"] !== filters["date-range"]) {
         console.log("new date range");

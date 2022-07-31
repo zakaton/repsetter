@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "../../context/user-context";
 import { getAccountLayout } from "../../components/layouts/AccountLayout";
@@ -49,6 +49,8 @@ export default function AllUsers() {
   const { isAdmin } = useUser();
   const { setInitialClientEmail } = useClient();
 
+  const [baseFilter, setBaseFilter] = useState({});
+
   useEffect(() => {
     if (router.isReady && !isAdmin) {
       console.log("redirect to /account");
@@ -62,6 +64,7 @@ export default function AllUsers() {
     isAdmin && (
       <>
         <Table
+          baseFilter={baseFilter}
           filterTypes={filterTypes}
           orderTypes={orderTypes}
           tableName="profile"

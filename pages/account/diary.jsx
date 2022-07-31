@@ -949,7 +949,7 @@ export default function Diary() {
         subtitle="View and edit your weight, pictures, and exercises"
         datesDots={datesDots}
       >
-        <div className="relative">
+        <div className="relative min-h-[1rem]">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -1338,7 +1338,7 @@ export default function Diary() {
             </div>
           ))}
 
-        <div className="relative pt-2">
+        <div className="relative min-h-[1rem] pt-2">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -1396,7 +1396,8 @@ export default function Diary() {
                 onClick={() => setIsUsingKilograms(!isUsingKilograms)}
                 className={classNames(
                   "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                  !weights?.some((weight) => weight.time == null)
+                  amITheClient &&
+                    !weights?.some((weight) => weight.time == null)
                     ? "rounded-r-md"
                     : "rounded-md",
                   isSelectedDateAfterToday && "invisible"
@@ -1549,7 +1550,7 @@ export default function Diary() {
           </>
         )}
 
-        <div className="relative pt-2">
+        <div className="relative min-h-[1rem] pt-2">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"

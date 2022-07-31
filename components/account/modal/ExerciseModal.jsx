@@ -2,7 +2,12 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ClipboardCheckIcon, RefreshIcon } from "@heroicons/react/outline";
-import { supabase, timeToDate, stringToDate } from "../../../utils/supabase";
+import {
+  supabase,
+  timeToDate,
+  stringToDate,
+  dateToString,
+} from "../../../utils/supabase";
 import {
   poundsToKilograms,
   kilogramsToPounds,
