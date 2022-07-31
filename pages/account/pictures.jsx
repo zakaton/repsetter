@@ -11,6 +11,7 @@ import {
 } from "../../utils/supabase";
 import MyLink from "../../components/MyLink";
 import Filters from "../../components/Filters";
+import { pictureTypes } from "../../utils/picture-utils";
 
 const orderTypes = [
   {
@@ -146,6 +147,15 @@ export default function Photos() {
           suffix: generateUrlSuffix(details),
           type,
         });
+      });
+      pictures.sort((a, b) => {
+        if (a.date.getTime() == b.date.getTime()) {
+          const aTypeIndex = pictureTypes.indexOf(a.type);
+          const bTypeIndex = pictureTypes.indexOf(b.type);
+          return aTypeIndex - bTypeIndex;
+        } else {
+          return a - b;
+        }
       });
       setPictures(pictures);
     }
