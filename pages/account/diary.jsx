@@ -1711,15 +1711,10 @@ export default function Diary() {
                     loading="lazy"
                     src={userPictures[type]}
                     alt={`${type} progress picture`}
-                    className={classNames(
-                      "pointer-events-none overflow-hidden rounded-lg",
-                      amITheClient
-                        ? "focus:outline-none group-hover:opacity-75"
-                        : ""
-                    )}
+                    className="pointer-events-none rounded-lg"
                   ></img>
                   {amITheClient && (
-                    <div className="mt-3 space-y-2 xs:mt-2 xs:grid xs:grid-flow-row-dense xs:grid-cols-2 xs:gap-3 xs:space-y-0">
+                    <div className="mt-3 space-y-2 xs:mt-2 xs:grid xs:grid-flow-row-dense xs:grid-cols-2 xs:gap-2 xs:space-y-0">
                       <button
                         type="button"
                         onClick={() => {

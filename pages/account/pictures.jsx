@@ -57,7 +57,8 @@ const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();
 
 export default function Photos() {
-  const { selectedClientId, selectedClient, setSelectedDate } = useClient();
+  const { selectedClientId, selectedClient, setSelectedDate, amITheClient } =
+    useClient();
 
   const [filters, setFilters] = useState({});
   const [containsFilters, setContainsFilters] = useState({});
@@ -231,6 +232,7 @@ export default function Photos() {
       <Head>
         <title>Pictures - Repsetter</title>
       </Head>
+
       <div className="bg-white px-4 pt-4 sm:px-6">
         <div className="flex items-center pb-4">
           <div className="flex-auto lg:col-span-8 lg:col-start-1 lg:row-start-1">
@@ -268,25 +270,6 @@ export default function Photos() {
               );
               return (
                 <li key={picture.path} className="relative flex flex-col">
-                  <div className="group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                    <MyLink
-                      onClick={() => {
-                        setSelectedDate(picture.date);
-                      }}
-                      href={`/account/diary?date=${picture.date.toDateString()}${
-                        selectedClient
-                          ? `&client=${selectedClient.client_email}`
-                          : ""
-                      }`}
-                    >
-                      <img
-                        loading="lazy"
-                        src={picture.signedURL + "&" + picture.suffix}
-                        alt={`progress picture for ${picture.date.toDateString()}`}
-                        className="pointer-events-none focus:outline-none group-hover:opacity-75"
-                      />
-                    </MyLink>
-                  </div>
                   <p className="pointer-events-none mt-2 block text-center text-sm font-medium text-gray-900">
                     {picture.date.toDateString()} (
                     {capitalizeFirstLetter(picture.type)})
@@ -297,6 +280,24 @@ export default function Photos() {
                       {weight.is_weight_in_kilograms ? "kg" : "lbs"}
                     </p>
                   )}
+                  <MyLink
+                    onClick={() => {
+                      setSelectedDate(picture.date);
+                    }}
+                    href={`/account/diary?date=${picture.date.toDateString()}${
+                      selectedClient
+                        ? `&client=${selectedClient.client_email}`
+                        : ""
+                    }`}
+                    className="group relative mt-1 block w-fit overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+                  >
+                    <img
+                      loading="lazy"
+                      src={picture.signedURL + "&" + picture.suffix}
+                      alt={`progress picture for ${picture.date.toDateString()}`}
+                      className="pointer-events-none focus:outline-none group-hover:opacity-75"
+                    />
+                  </MyLink>
                 </li>
               );
             })}

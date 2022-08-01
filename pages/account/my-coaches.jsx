@@ -112,7 +112,7 @@ export default function MyCoaches() {
                 <img
                   alt="coach picture"
                   src={coachPicture}
-                  className="max-h-[150px] max-w-[150px] overflow-hidden rounded-lg sm:col-start-1"
+                  className="max-h-[150px] max-w-[150px] rounded-lg sm:col-start-1"
                 />
               ),
             },

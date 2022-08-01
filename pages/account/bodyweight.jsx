@@ -141,7 +141,7 @@ export default function Bodyweight() {
                         src={todaysPictures[type]}
                         alt={type}
                         width="100"
-                        className="overflow-hidden rounded-lg"
+                        className="rounded-lg"
                         loading="lazy"
                       />
                     </>

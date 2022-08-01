@@ -267,7 +267,7 @@ export default function CoachPictureModal(props) {
             <>
               <img
                 src={pictureUrl}
-                className="overflow-hidden rounded-lg"
+                className="rounded-lg"
                 alt="coaching picture"
                 onDragOver={(e) => {
                   e.preventDefault();
