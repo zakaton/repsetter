@@ -5,6 +5,7 @@ import { getAccountLayout } from "../../components/layouts/AccountLayout";
 import DeleteUserModal from "../../components/account/modal/DeleteUserModal";
 import Table from "../../components/Table";
 import { useClient } from "../../context/client-context";
+import { useCoachPictures } from "../../context/coach-picture-context";
 
 const filterTypes = [
   {
@@ -51,6 +52,14 @@ export default function AllUsers() {
 
   const [baseFilter, setBaseFilter] = useState({});
 
+  const { coachPictures, getCoachPicture } = useCoachPictures();
+  const [users, setUsers] = useState();
+  useEffect(() => {
+    if (users) {
+      users.forEach(({ id }) => getCoachPicture(id));
+    }
+  }, [users]);
+
   useEffect(() => {
     if (router.isReady && !isAdmin) {
       console.log("redirect to /account");
@@ -72,6 +81,7 @@ export default function AllUsers() {
           title="All Users"
           subtitle="View all Users"
           DeleteResultModal={DeleteUserModal}
+          resultsListener={setUsers}
           resultMap={(result) => [
             {
               title: "email",
@@ -115,6 +125,17 @@ export default function AllUsers() {
                 >
                   Update<span className="sr-only"> user</span>
                 </button>
+              ),
+            },
+            coachPictures?.[result.id]?.url && {
+              jsx: (
+                <img
+                  alt="coach picture"
+                  src={coachPictures[result.id].url}
+                  width={100}
+                  loading="lazy"
+                  className="mb-1.5 rounded-lg focus:outline-none group-hover:opacity-75"
+                />
               ),
             },
           ]}
