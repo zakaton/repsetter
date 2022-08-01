@@ -388,6 +388,7 @@ export default function Diary() {
   const [deleteWeightStatus, setDeleteWeightStatus] = useState();
 
   const [selectedWeight, setSelectedWeight] = useState();
+  const [selectedWeights, setSelectedWeights] = useState();
   const [gotWeightForUserId, setGotWeightForUserId] = useState();
   const [gotWeightForDate, setGotWeightForDate] = useState();
   const [weights, setWeights] = useState();
@@ -903,6 +904,8 @@ export default function Diary() {
         setOpen={setShowDeleteWeightModal}
         selectedResult={selectedWeight}
         setSelectedResult={setSelectedWeight}
+        selectedResults={selectedWeights}
+        setSelectedResults={setSelectedWeights}
         setDeleteResultStatus={setDeleteWeightStatus}
         setShowDeleteResultNotification={setShowDeleteWeightNotification}
       />
@@ -1401,38 +1404,60 @@ export default function Diary() {
             )}
           >
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && !weights?.some((weight) => weight.time == null) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedWeight();
-                    setShowWeightModal(true);
-                  }}
-                  className={classNames(
-                    "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                    "rounded-l-md",
-                    isSelectedDateAfterToday && "invisible"
+              {!isSelectedDateAfterToday && (
+                <>
+                  {amITheClient &&
+                    !weights?.some((weight) => weight.time == null) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedWeight();
+                          setShowWeightModal(true);
+                        }}
+                        className={classNames(
+                          "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                          "rounded-l-md"
+                        )}
+                      >
+                        <span className="sr-only">Add Weight</span>
+                        <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                    )}
+                  <button
+                    type="button"
+                    onClick={() => setIsUsingKilograms(!isUsingKilograms)}
+                    className={classNames(
+                      "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                      amITheClient &&
+                        !weights?.some((weight) => weight.time == null)
+                        ? ""
+                        : "rounded-l-md"
+                    )}
+                  >
+                    <span className="sr-only">Toggle Weight</span>
+                    {isUsingKilograms ? "kg" : "lbs"}
+                  </button>
+                  {amITheClient && (
+                    <button
+                      type="button"
+                      disabled={!(weights?.length > 0)}
+                      onClick={() => {
+                        setSelectedWeights(weights);
+                        setShowDeleteWeightModal(true);
+                      }}
+                      className={classNames(
+                        "relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
+                        weights?.length > 0
+                          ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          : "bg-gray-100"
+                      )}
+                    >
+                      <span className="sr-only">Delete Weights</span>
+                      <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
                   )}
-                >
-                  <span className="sr-only">Add Weight</span>
-                  <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                </button>
+                </>
               )}
-              <button
-                type="button"
-                onClick={() => setIsUsingKilograms(!isUsingKilograms)}
-                className={classNames(
-                  "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                  amITheClient &&
-                    !weights?.some((weight) => weight.time == null)
-                    ? "rounded-r-md"
-                    : "rounded-md",
-                  isSelectedDateAfterToday && "invisible"
-                )}
-              >
-                <span className="sr-only">Toggle Weight</span>
-                {isUsingKilograms ? "kg" : "lbs"}
-              </button>
             </span>
           </div>
         </div>

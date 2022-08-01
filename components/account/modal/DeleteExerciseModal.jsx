@@ -24,14 +24,14 @@ export default function DeleteExerciseModal(props) {
     }
   }, [open]);
 
-  const resultName = `Exercise${selectedExercises ? "s" : ""}`;
+  const resultName = `Exercise${selectedExercises?.length > 1 ? "s" : ""}`;
 
   return (
     <Modal
       {...props}
       title={`Delete ${resultName}`}
       message={`Are you sure you want to delete ${
-        selectedExercises ? "these exercises" : "this exercise"
+        selectedExercises?.length > 1 ? "these exercises" : "this exercise"
       }? This action cannot be undone.`}
       color="red"
       Button={
