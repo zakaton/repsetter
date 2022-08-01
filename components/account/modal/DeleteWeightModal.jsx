@@ -38,7 +38,7 @@ export default function DeleteWeightModal(props) {
         <button
           role="button"
           onClick={async () => {
-            console.log("DELETING", selectedWeight);
+            console.log("DELETING", selectedWeight, selectedWeights);
             setIsDeleting(true);
 
             let status;
@@ -71,8 +71,6 @@ export default function DeleteWeightModal(props) {
               }
             }
 
-            setIsDeleting(false);
-            setDidDelete(true);
             if (error) {
               status = {
                 type: "failed",
@@ -85,7 +83,10 @@ export default function DeleteWeightModal(props) {
                 title: `Successfully deleted ${resultName}`,
               };
             }
+
             console.log("status", status);
+            setIsDeleting(false);
+            setDidDelete(true);
             setDeleteWeightStatus(status);
             setShowDeleteWeightNotification(true);
             setOpen(false);

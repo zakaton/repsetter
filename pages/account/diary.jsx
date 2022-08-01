@@ -730,6 +730,7 @@ export default function Diary() {
   }, [weights, lastWeightBeforeToday, firstWeightAfterToday, isUsingKilograms]);
 
   const { pictures, getPicture } = usePictures();
+  const [selectedPictureTypes, setSelectedPictureTypes] = useState();
   const [pictureType, setPictureType] = useState(pictureTypes[0]);
   useEffect(() => {
     if (!selectedDate) {
@@ -763,6 +764,8 @@ export default function Diary() {
     (selectedDate &&
       pictures?.[selectedClientId]?.[dateToString(selectedDate)]) ||
     {};
+  const userPictureTypes = Object.keys(userPictures);
+  const numberOfUserPictures = userPictureTypes.length;
 
   const [pictureDates, setPictureDates] = useState();
   const [gotPictureDatesForDate, setGotPictureDatesForDate] = useState();
@@ -932,6 +935,8 @@ export default function Diary() {
       <DeletePictureModal
         open={showDeletePictureModal}
         setOpen={setShowDeletePictureModal}
+        types={selectedPictureTypes}
+        setTypes={setSelectedPictureTypes}
         setDeleteResultStatus={setDeletePictureStatus}
         setShowDeleteResultNotification={setShowDeletePictureNotification}
       />
@@ -1638,76 +1643,105 @@ export default function Diary() {
             )}
           >
             <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient &&
-                !isSelectedDateAfterToday &&
-                userPictures &&
-                Object.keys(userPictures).length < pictureTypes.length && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const existingTypes = Object.keys(userPictures);
-                      const newPictureType = pictureTypes.find(
-                        (type) => !existingTypes.includes(type)
-                      );
-                      setPictureType(newPictureType);
-                      setShowPictureModal(true);
-                    }}
-                    className={classNames(
-                      "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                      "rounded-md"
-                    )}
-                  >
-                    <span className="sr-only">Add Picture</span>
-                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                )}
+              {amITheClient && !isSelectedDateAfterToday && userPictures && (
+                <>
+                  {numberOfUserPictures < pictureTypes.length && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const existingTypes = userPictureTypes;
+                        const newPictureType = pictureTypes.find(
+                          (type) => !existingTypes.includes(type)
+                        );
+                        setPictureType(newPictureType);
+                        setShowPictureModal(true);
+                      }}
+                      className={classNames(
+                        "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                        numberOfUserPictures === 0
+                          ? "rounded-md"
+                          : "rounded-l-md"
+                      )}
+                    >
+                      <span className="sr-only">Add Picture</span>
+                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  )}
+                  {numberOfUserPictures > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        console.log("FUCK", pictureTypes, userPictureTypes);
+                        setSelectedPictureTypes(
+                          pictureTypes.filter((pictureType) =>
+                            userPictureTypes.includes(pictureType)
+                          )
+                        );
+                        setShowDeletePictureModal(true);
+                      }}
+                      className={classNames(
+                        "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                        numberOfUserPictures === pictureTypes.length
+                          ? "rounded-md"
+                          : "rounded-r-md"
+                      )}
+                    >
+                      <span className="sr-only">Delete Pictures</span>
+                      <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  )}
+                </>
+              )}
             </span>
           </div>
         </div>
-        {showPictures && Object.keys(userPictures).length > 0 && (
+        {showPictures && numberOfUserPictures > 0 && (
           <ul
             role="list"
-            className="mt-4 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+            className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
           >
             {pictureTypes
               .filter((type) => type in userPictures)
               .map((type) => (
                 <li className="relative flex flex-col" key={type}>
-                  <div
+                  <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
+                    {capitalizeFirstLetter(type)}
+                  </p>
+                  <img
+                    loading="lazy"
+                    src={userPictures[type]}
+                    alt={`${type} progress picture`}
                     className={classNames(
-                      "group m-auto block w-fit overflow-hidden rounded-lg bg-gray-100",
+                      "pointer-events-none overflow-hidden rounded-lg",
                       amITheClient
-                        ? "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+                        ? "focus:outline-none group-hover:opacity-75"
                         : ""
                     )}
-                  >
-                    <img
-                      loading="lazy"
-                      src={userPictures[type]}
-                      alt={`${type} progress picture`}
-                      className={classNames(
-                        "pointer-events-none",
-                        amITheClient
-                          ? "focus:outline-none group-hover:opacity-75"
-                          : ""
-                      )}
-                    ></img>
-                    {amITheClient && (
+                  ></img>
+                  {amITheClient && (
+                    <div className="mt-3 space-y-2 xs:mt-2 xs:grid xs:grid-flow-row-dense xs:grid-cols-2 xs:gap-3 xs:space-y-0">
                       <button
                         type="button"
                         onClick={() => {
                           setPictureType(type);
                           setShowPictureModal(true);
                         }}
-                        className="absolute inset-0 focus:outline-none"
+                        className="w-full justify-center rounded-md border border-transparent bg-blue-600 px-2 py-1 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
                       >
-                        <span className="sr-only">Edit</span>
+                        Edit
                       </button>
-                    )}
-                  </div>
-                  <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
-                    {capitalizeFirstLetter(type)}
-                  </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedPictureTypes([type]);
+                          setShowDeletePictureModal(true);
+                        }}
+                        className="w-full justify-center rounded-md border border-transparent bg-red-600 px-2 py-1 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </li>
               ))}
           </ul>

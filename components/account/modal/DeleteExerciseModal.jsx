@@ -42,6 +42,7 @@ export default function DeleteExerciseModal(props) {
             setIsDeleting(true);
             let status;
             let error;
+
             if (selectedExercise) {
               const { data: deleteExerciseResult, error: deleteExerciseError } =
                 await supabase
