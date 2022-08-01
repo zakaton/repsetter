@@ -262,7 +262,7 @@ export default function Photos() {
         {pictures?.length > 0 && (
           <ul
             role="list"
-            className="grid grid-cols-2 gap-x-4 gap-y-8 border-t border-gray-200 pt-4 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+            className="grid grid-cols-2 gap-x-4 gap-y-4 border-t border-gray-200 pt-4 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
           >
             {pictures?.map((picture) => {
               const weight = weights?.find(
@@ -270,9 +270,21 @@ export default function Photos() {
               );
               return (
                 <li key={picture.path} className="relative flex flex-col">
-                  <p className="pointer-events-none mt-2 block text-center text-sm font-medium text-gray-900">
-                    {picture.date.toDateString()} (
-                    {capitalizeFirstLetter(picture.type)})
+                  <p className="mt-2 block text-center text-sm font-medium text-gray-900">
+                    <MyLink
+                      onClick={() => {
+                        setSelectedDate(picture.date);
+                      }}
+                      href={`/account/diary?date=${picture.date.toDateString()}${
+                        selectedClient
+                          ? `&client=${selectedClient.client_email}`
+                          : ""
+                      }`}
+                      className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-2 py-0.5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      {picture.date.toDateString()}
+                    </MyLink>{" "}
+                    ({capitalizeFirstLetter(picture.type)})
                   </p>
                   {weight && (
                     <p className="pointer-events-none block text-center text-sm font-medium text-gray-500">
@@ -280,24 +292,12 @@ export default function Photos() {
                       {weight.is_weight_in_kilograms ? "kg" : "lbs"}
                     </p>
                   )}
-                  <MyLink
-                    onClick={() => {
-                      setSelectedDate(picture.date);
-                    }}
-                    href={`/account/diary?date=${picture.date.toDateString()}${
-                      selectedClient
-                        ? `&client=${selectedClient.client_email}`
-                        : ""
-                    }`}
-                    className="group relative mt-1 block w-fit overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
-                  >
-                    <img
-                      loading="lazy"
-                      src={picture.signedURL + "&" + picture.suffix}
-                      alt={`progress picture for ${picture.date.toDateString()}`}
-                      className="pointer-events-none focus:outline-none group-hover:opacity-75"
-                    />
-                  </MyLink>
+                  <img
+                    loading="lazy"
+                    src={picture.signedURL + "&" + picture.suffix}
+                    alt={`progress picture for ${picture.date.toDateString()}`}
+                    className="mt-1 rounded-lg"
+                  />
                 </li>
               );
             })}
