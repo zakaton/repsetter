@@ -36,13 +36,13 @@ const coachingFeatures = [
     icon: FireIcon,
   },
   {
-    name: "Share Progress Pics",
+    name: "Post Progress Pics",
     description:
       "Post front, back, and side pictures each day, checking progress on each angle",
     icon: CameraIcon,
   },
   {
-    name: "Share Weight",
+    name: "Log Weight",
     description: "Track weight fluctuations as you build muscle or burn fat",
     icon: ScaleIcon,
   },
