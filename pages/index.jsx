@@ -10,6 +10,7 @@ import {
   ScaleIcon,
   ChartBarIcon,
   TrendingUpIcon,
+  PhotographIcon,
 } from "@heroicons/react/outline";
 
 import Image from "next/image";
@@ -89,28 +90,20 @@ const features = [
     ),
     list: [
       {
-        title: "Custom Subscription Pricing",
-        description:
-          "Set your own prices for each client, charging more for your more demanding clients.",
-        icon: CurrencyDollarIcon,
+        title: "Post Different Angles",
+        description: "Upload pictures from the Front, Side, and Back",
+        icon: PhotographIcon,
       },
       {
-        title: "Automatic Billing",
+        title: "View Bodyweight alongside Pictures",
         description:
-          "Clients get charged automatically every month for your coaching.",
-        icon: CreditCardIcon,
-      },
-      {
-        title: "5% Flat Rate",
-        description:
-          "We take 5% of Coaching Subscription payments to keep this website running.",
-        icon: TagIcon,
+          "If you tracked Bodyweight the same day, it'll show your weight on that day",
+        icon: ScaleIcon,
       },
     ],
   },
   {
-    title: "Monitor Progress",
-    description: "",
+    title: "Visualize Progress",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -118,28 +111,23 @@ const features = [
     ),
     list: [
       {
-        title: "Custom Subscription Pricing",
+        title: "Toggle Exercise Features",
         description:
-          "Set your own prices for each client, charging more for your more demanding clients.",
-        icon: CurrencyDollarIcon,
+          "Choose which exercise features to graph (top set, number of reps, difficulty, etc)",
+        icon: ChartBarIcon,
       },
       {
-        title: "Automatic Billing",
+        title: "View Bodyweight",
         description:
-          "Clients get charged automatically every month for your coaching.",
-        icon: CreditCardIcon,
-      },
-      {
-        title: "5% Flat Rate",
-        description:
-          "We take 5% of Coaching Subscription payments to keep this website running.",
-        icon: TagIcon,
+          "View your Bodyweight over time and correlate it with performance",
+        icon: ScaleIcon,
       },
     ],
   },
   {
     title: "Coach Clients",
-    description: "",
+    description:
+      "Persons 18+ and older in the United States can coach other users on Repsetter",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -192,7 +180,7 @@ export default function Home() {
             <div
               className={classNames(
                 "lg:col-span-2",
-                index % 2 ? "lg:col-start-4 lg:self-baseline" : ""
+                index % 2 ? "lg:col-start-4" : ""
               )}
             >
               <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
