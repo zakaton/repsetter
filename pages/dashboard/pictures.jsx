@@ -262,7 +262,7 @@ export default function Photos() {
         {pictures?.length > 0 && (
           <ul
             role="list"
-            className="grid grid-cols-2 gap-x-4 gap-y-4 border-t border-gray-200 pt-4 pb-4 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+            className="grid grid-cols-1 gap-x-4 gap-y-4 border-t border-gray-200 pt-4 pb-4 xs:grid-cols-2 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-8"
           >
             {pictures?.map((picture) => {
               const weight = weights?.find(
