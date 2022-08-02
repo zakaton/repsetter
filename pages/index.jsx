@@ -8,17 +8,18 @@ import {
   CameraIcon,
 } from "@heroicons/react/outline";
 
+import Image from "next/image";
+import screenshot_1 from "../public/features/screenshot_1.png";
+import screenshot_2 from "../public/features/screenshot_2.png";
+
 const features = [
   {
     title: "Track your Progress",
     description: "Plan workouts, measure bodyweight, and add pictures",
     media: (props) => (
-      <img
-        className="relative mx-auto"
-        width={490}
-        src="https://tailwindui.com/img/features/feature-example-2.png"
-        alt=""
-      />
+      <div {...props}>
+        <Image src={screenshot_1} alt="" />
+      </div>
     ),
     list: [
       {
@@ -47,12 +48,9 @@ const features = [
     description:
       "We streamline the process so you can easily add clients, collect subscription payments, and sync workouts so you can focus on optimizing your clients' progress.",
     media: (props) => (
-      <img
-        className="relative mx-auto overflow-hidden rounded-md"
-        width={490}
-        src="https://tailwindui.com/img/features/feature-example-1.png"
-        alt=""
-      />
+      <div {...props}>
+        <Image src={screenshot_2} alt="" />
+      </div>
     ),
     list: [
       {
@@ -96,7 +94,7 @@ export default function Home() {
         {features.map((feature, index) => (
           <div
             key={feature.title}
-            className="relative mt-12 lg:grid lg:grid-flow-row-dense lg:grid-cols-2 lg:items-center lg:gap-8"
+            className="relative mt-12 lg:grid lg:grid-flow-row-dense lg:grid-cols-2 lg:items-center lg:gap-10"
           >
             <div className={index % 2 ? "lg:col-start-2 lg:self-baseline" : ""}>
               <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
@@ -125,8 +123,8 @@ export default function Home() {
               </dl>
             </div>
 
-            <div className=" -mx-4 mt-10  lg:mt-0">
-              <feature.media></feature.media>
+            <div className="-mx-4 mt-10 lg:mt-0">
+              <feature.media className="flex overflow-hidden rounded-lg shadow-lg"></feature.media>
             </div>
           </div>
         ))}
