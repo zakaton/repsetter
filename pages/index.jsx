@@ -1,11 +1,12 @@
 import Head from "next/head";
 import {
-  ScaleIcon,
   CurrencyDollarIcon,
   CreditCardIcon,
   TagIcon,
-  FireIcon,
-  CameraIcon,
+  SearchIcon,
+  VideoCameraIcon,
+  ClipboardListIcon,
+  ClipboardCheckIcon,
 } from "@heroicons/react/outline";
 
 import Image from "next/image";
@@ -18,8 +19,8 @@ function classNames(...classes) {
 
 const features = [
   {
-    title: "Track your Progress",
-    description: "Plan workouts, measure bodyweight, and add pictures",
+    title: "Plan and Log Exercises",
+    description: "",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_1} alt="" />
@@ -27,30 +28,121 @@ const features = [
     ),
     list: [
       {
-        title: "Plan, Track, and Monitor Workouts",
+        title: "Search Exercises",
         description:
-          "Plan workouts ahead of time, and track your performance as you do them. Check how well your clients perform and update the programs as needed.",
-        icon: FireIcon,
+          "Search exercises by name or muscles used, accompanied by images and videos of each exercise",
+        icon: SearchIcon,
       },
       {
-        title: "Post Progress Pics",
+        title: "Plan Exercises",
         description:
-          "Post front, back, and side pictures each day, checking progress on each angle",
-        icon: CameraIcon,
+          "Specify weight, number of sets/reps, and other features like set/rest duration ahead of time",
+        icon: ClipboardListIcon,
       },
       {
-        title: "Log Weight",
+        title: "Log Exercises",
         description:
-          "Track weight fluctuations as you build muscle or burn fat",
-        icon: ScaleIcon,
+          "Specify when you did each exercise, how many sets/reps you actually did, as well as how difficult it was",
+        icon: ClipboardCheckIcon,
+      },
+      {
+        title: "Upload Sets",
+        description:
+          "Embed videos of your sets that you've uploaded to YouTube",
+        icon: VideoCameraIcon,
       },
     ],
   },
-
   {
-    title: "Easy Client Management",
-    description:
-      "We streamline the process so you can easily add clients, collect subscription payments, and sync workouts so you can focus on optimizing your clients' progress.",
+    title: "Track Weight",
+    description: "Visualize Exercise performance and Bodyweight over time",
+    media: (props) => (
+      <div {...props}>
+        <Image src={screenshot_2} alt="" />
+      </div>
+    ),
+    list: [
+      {
+        title: "Custom Subscription Pricing",
+        description:
+          "Set your own prices for each client, charging more for your more demanding clients.",
+        icon: CurrencyDollarIcon,
+      },
+      {
+        title: "Automatic Billing",
+        description:
+          "Clients get charged automatically every month for your coaching.",
+        icon: CreditCardIcon,
+      },
+      {
+        title: "5% Flat Rate",
+        description:
+          "We take 5% of Coaching Subscription payments to keep this website running.",
+        icon: TagIcon,
+      },
+    ],
+  },
+  {
+    title: "Upload Progress Pictures",
+    description: "Visualize Exercise performance and Bodyweight over time",
+    media: (props) => (
+      <div {...props}>
+        <Image src={screenshot_2} alt="" />
+      </div>
+    ),
+    list: [
+      {
+        title: "Custom Subscription Pricing",
+        description:
+          "Set your own prices for each client, charging more for your more demanding clients.",
+        icon: CurrencyDollarIcon,
+      },
+      {
+        title: "Automatic Billing",
+        description:
+          "Clients get charged automatically every month for your coaching.",
+        icon: CreditCardIcon,
+      },
+      {
+        title: "5% Flat Rate",
+        description:
+          "We take 5% of Coaching Subscription payments to keep this website running.",
+        icon: TagIcon,
+      },
+    ],
+  },
+  {
+    title: "Monitor Progress",
+    description: "Visualize Exercise performance and Bodyweight over time",
+    media: (props) => (
+      <div {...props}>
+        <Image src={screenshot_2} alt="" />
+      </div>
+    ),
+    list: [
+      {
+        title: "Custom Subscription Pricing",
+        description:
+          "Set your own prices for each client, charging more for your more demanding clients.",
+        icon: CurrencyDollarIcon,
+      },
+      {
+        title: "Automatic Billing",
+        description:
+          "Clients get charged automatically every month for your coaching.",
+        icon: CreditCardIcon,
+      },
+      {
+        title: "5% Flat Rate",
+        description:
+          "We take 5% of Coaching Subscription payments to keep this website running.",
+        icon: TagIcon,
+      },
+    ],
+  },
+  {
+    title: "Coach Clients",
+    description: "Visualize Exercise performance and Bodyweight over time",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -88,9 +180,9 @@ export default function Home() {
       <div className="mx-auto mt-2 overflow-hidden px-4 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Made for Personal Trainers
+            Made to Work
           </h2>
-          <p className="mt-3 text-lg text-gray-500">
+          <p className="mt-2 text-lg text-gray-500">
             A simple workout website that simply works
           </p>
         </div>
@@ -102,7 +194,7 @@ export default function Home() {
           >
             <div
               className={classNames(
-                "col-span-2",
+                "lg:col-span-2",
                 index % 2 ? "lg:col-start-4 lg:self-baseline" : ""
               )}
             >
@@ -132,7 +224,7 @@ export default function Home() {
               </dl>
             </div>
 
-            <div className="col-span-3 -mx-4 mt-10 lg:mt-0">
+            <div className="-mx-4 mt-10 lg:col-span-3 lg:mt-0">
               <feature.media className="flex overflow-hidden rounded-lg shadow-lg"></feature.media>
             </div>
           </div>
