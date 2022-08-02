@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { useEffect, useState } from "react";
 import Modal from "../../Modal";
-import { ClipboardCheckIcon, RefreshIcon } from "@heroicons/react/outline";
+import { ClipboardCheckIcon, UploadIcon } from "@heroicons/react/outline";
 import {
   supabase,
   timeToDate,
@@ -2558,7 +2558,7 @@ export default function ExerciseModal(props) {
                         }}
                         className="relative -ml-px inline-flex select-none items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       >
-                        <RefreshIcon
+                        <UploadIcon
                           className="h-5 w-5 text-gray-400"
                           aria-hidden="true"
                         />

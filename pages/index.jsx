@@ -7,6 +7,9 @@ import {
   VideoCameraIcon,
   ClipboardListIcon,
   ClipboardCheckIcon,
+  ScaleIcon,
+  ChartBarIcon,
+  TrendingUpIcon,
 } from "@heroicons/react/outline";
 
 import Image from "next/image";
@@ -54,8 +57,8 @@ const features = [
     ],
   },
   {
-    title: "Track Weight",
-    description: "Visualize Exercise performance and Bodyweight over time",
+    title: "Track Bodyweight",
+    description: "",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -63,28 +66,22 @@ const features = [
     ),
     list: [
       {
-        title: "Custom Subscription Pricing",
+        title: "Add Multiple Weights a Day",
         description:
-          "Set your own prices for each client, charging more for your more demanding clients.",
-        icon: CurrencyDollarIcon,
+          "Set a single weight per day, or add multiple weights, adding timestamps and what the most recent weight change was due to (e.g. drinking water or bowel movements)",
+        icon: ScaleIcon,
       },
       {
-        title: "Automatic Billing",
+        title: "Visualize Bodyweight Fluctuations",
         description:
-          "Clients get charged automatically every month for your coaching.",
-        icon: CreditCardIcon,
-      },
-      {
-        title: "5% Flat Rate",
-        description:
-          "We take 5% of Coaching Subscription payments to keep this website running.",
-        icon: TagIcon,
+          "View your bodyweight fluctuate throughout the day you eat, drink, and use the restoom, as well as decline over time due to exhaling Carbon Dioxide",
+        icon: TrendingUpIcon,
       },
     ],
   },
   {
     title: "Upload Progress Pictures",
-    description: "Visualize Exercise performance and Bodyweight over time",
+    description: "",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -113,7 +110,7 @@ const features = [
   },
   {
     title: "Monitor Progress",
-    description: "Visualize Exercise performance and Bodyweight over time",
+    description: "",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -142,7 +139,7 @@ const features = [
   },
   {
     title: "Coach Clients",
-    description: "Visualize Exercise performance and Bodyweight over time",
+    description: "",
     media: (props) => (
       <div {...props}>
         <Image src={screenshot_2} alt="" />
@@ -177,7 +174,7 @@ export default function Home() {
       <Head>
         <title>Repsetter</title>
       </Head>
-      <div className="mx-auto mt-2 overflow-hidden px-4 lg:px-8">
+      <div className="mx-auto mt-2 px-4 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
             Made to Work
@@ -225,7 +222,7 @@ export default function Home() {
             </div>
 
             <div className="-mx-4 mt-10 lg:col-span-3 lg:mt-0">
-              <feature.media className="flex overflow-hidden rounded-lg shadow-lg"></feature.media>
+              <feature.media className="flex overflow-hidden rounded-lg shadow-md"></feature.media>
             </div>
           </div>
         ))}
