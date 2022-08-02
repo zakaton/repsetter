@@ -150,7 +150,7 @@ export default function Photos() {
         });
       });
       pictures.sort((a, b) => {
-        if (a.date.getDateString() == b.date.getDateString()) {
+        if (a.date.toDateString() == b.date.toDateString()) {
           const aTypeIndex = pictureTypes.indexOf(a.type);
           const bTypeIndex = pictureTypes.indexOf(b.type);
           return aTypeIndex - bTypeIndex;
