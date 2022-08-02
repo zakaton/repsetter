@@ -67,9 +67,9 @@ const features = [
     ),
     list: [
       {
-        title: "Add Multiple Weights a Day",
+        title: "Add Multiple Bodyweights a Day",
         description:
-          "Set a single weight per day, or add multiple weights, adding timestamps and what the most recent weight change was due to (e.g. drinking water or bowel movements)",
+          "Set a single bodyweight per day, or add multiple bodyweights, adding timestamps and what the most recent weight change was due to (e.g. drinking water or bowel movements)",
         icon: ScaleIcon,
       },
       {
@@ -90,8 +90,8 @@ const features = [
     ),
     list: [
       {
-        title: "Post Different Angles",
-        description: "Upload pictures from the Front, Side, and Back",
+        title: "Post up to 3 Different Angles",
+        description: "Upload pictures from the front, side, and back",
         icon: PhotographIcon,
       },
       {
@@ -147,7 +147,7 @@ const features = [
         icon: CreditCardIcon,
       },
       {
-        title: "5% Flat Rate",
+        title: "5% Flat fee",
         description:
           "We take 5% of Coaching Subscription payments to keep this website running.",
         icon: TagIcon,
