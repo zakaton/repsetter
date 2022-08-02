@@ -13,7 +13,7 @@ const pathnamesForQuery = [
   "exercises",
   "all-users",
   "bodyweight",
-].map((pathname) => "/account/" + pathname);
+].map((pathname) => "/dashboard/" + pathname);
 
 export function ClientContextProvider(props) {
   const { user, isLoading, isAdmin } = useUser();

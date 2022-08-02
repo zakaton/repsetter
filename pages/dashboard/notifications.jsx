@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import { useUser } from "../../context/user-context";
 import Notification from "../../components/Notification";
 import { notificationTypes } from "../api/account/set-notifications";
@@ -170,4 +170,4 @@ export default function Notifications() {
   );
 }
 
-Notifications.getLayout = getAccountLayout;
+Notifications.getLayout = getDashboardLayout;

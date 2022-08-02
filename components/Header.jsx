@@ -9,10 +9,10 @@ import MyLink from "./MyLink";
 const navigation = [
   { name: "About", href: "/" },
   { name: "FAQ", href: "/faq" },
-  { name: "Account", href: "/account", requiresUser: true },
+  { name: "Dashboard", href: "/dashboard", requiresUser: true },
 ];
-const accountNavigation = [
-  { name: "Account", href: "/account" },
+const dashboardNavigation = [
+  { name: "Dashboard", href: "/dashboard" },
   { name: "Sign Out", href: "/sign-out" },
 ];
 
@@ -102,7 +102,7 @@ export default function Header() {
                           leaveTo="transform opacity-0 scale-95"
                         >
                           <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {accountNavigation.map(({ name, href }) => (
+                            {dashboardNavigation.map(({ name, href }) => (
                               <Menu.Item key={name}>
                                 {({ active }) => (
                                   <MyLink

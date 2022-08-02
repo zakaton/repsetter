@@ -6,7 +6,7 @@ import Notification from "./Notification";
 import Filters from "./Filters";
 import Pagination from "./Pagination";
 import { useClient } from "../context/client-context";
-import ClientsSelect from "./account/ClientsSelect";
+import ClientsSelect from "./dashboard/ClientsSelect";
 
 const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();

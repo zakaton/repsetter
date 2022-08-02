@@ -165,7 +165,7 @@ export default function Home() {
       <div className="mx-auto mt-2 px-4 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Made to Work
+            Your Favorite Workout Diary
           </h2>
           <p className="mt-2 text-lg text-gray-500">
             A simple workout website that simply works

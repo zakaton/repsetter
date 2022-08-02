@@ -4,7 +4,7 @@ import { QrcodeIcon } from "@heroicons/react/outline";
 import { supabase } from "../../utils/supabase";
 import { formatDollars } from "../../utils/subscription-utils";
 import { useUser } from "../../context/user-context";
-import DeleteSubscriptionModal from "../account/modal/DeleteSubscriptionModal";
+import DeleteSubscriptionModal from "../dashboard/modal/DeleteSubscriptionModal";
 import Notification from "../Notification";
 import QRCodeModal from "../QRCodeModal";
 import { ClipboardListIcon } from "@heroicons/react/outline";

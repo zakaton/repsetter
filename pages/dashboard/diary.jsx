@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import AccountCalendarLayout from "../../components/layouts/AccountCalendarLayout";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import ExerciseModal from "../../components/account/modal/ExerciseModal";
-import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
-import WeightModal from "../../components/account/modal/WeightModal";
-import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal";
-import PictureModal from "../../components/account/modal/PictureModal";
-import DeletePictureModal from "../../components/account/modal/DeletePictureModal";
+import DashboardCalendarLayout from "../../components/layouts/DashboardCalendarLayout";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import ExerciseModal from "../../components/dashboard/modal/ExerciseModal";
+import DeleteExerciseModal from "../../components/dashboard/modal/DeleteExerciseModal";
+import WeightModal from "../../components/dashboard/modal/WeightModal";
+import DeleteWeightModal from "../../components/dashboard/modal/DeleteWeightModal";
+import PictureModal from "../../components/dashboard/modal/PictureModal";
+import DeletePictureModal from "../../components/dashboard/modal/DeletePictureModal";
 import Notification from "../../components/Notification";
 import {
   supabase,
@@ -946,7 +946,7 @@ export default function Diary() {
         status={deletePictureStatus}
       />
 
-      <AccountCalendarLayout
+      <DashboardCalendarLayout
         setCalendar={setCalendar}
         tableName="diary"
         resultNamePlural="diary"
@@ -1436,7 +1436,9 @@ export default function Diary() {
                       amITheClient &&
                         !weights?.some((weight) => weight.time == null)
                         ? ""
-                        : "rounded-l-md"
+                        : amITheClient
+                        ? "rounded-l-md"
+                        : "rounded-md"
                     )}
                   >
                     <span className="sr-only">Toggle Weight</span>
@@ -1741,9 +1743,9 @@ export default function Diary() {
               ))}
           </ul>
         )}
-      </AccountCalendarLayout>
+      </DashboardCalendarLayout>
     </>
   );
 }
 
-Diary.getLayout = getAccountLayout;
+Diary.getLayout = getDashboardLayout;

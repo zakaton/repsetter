@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
 import Notification from "../../components/Notification";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import ExerciseTypeModal from "../../components/account/modal/ExerciseTypeModal";
-import DeleteExerciseTypeModal from "../../components/account/modal/DeleteExerciseTypeModal";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import ExerciseTypeModal from "../../components/dashboard/modal/ExerciseTypeModal";
+import DeleteExerciseTypeModal from "../../components/dashboard/modal/DeleteExerciseTypeModal";
 import Table from "../../components/Table";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
@@ -168,7 +168,7 @@ export default function ExerciseTypes() {
                 onClick={(e) => {
                   _setSelectedExerciseType(result);
                 }}
-                href={`/account/exercises?exercise-type=${result.id}`}
+                href={`/dashboard/exercises?exercise-type=${result.id}`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 View
@@ -181,7 +181,7 @@ export default function ExerciseTypes() {
                 onClick={(e) => {
                   _setSelectedExerciseType(result);
                 }}
-                href={`/account/progress?exercise-type=${result.id}${
+                href={`/dashboard/progress?exercise-type=${result.id}${
                   selectedClient ? `&client=${selectedClient.client_email}` : ""
                 }`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
@@ -196,4 +196,4 @@ export default function ExerciseTypes() {
   );
 }
 
-ExerciseTypes.getLayout = getAccountLayout;
+ExerciseTypes.getLayout = getDashboardLayout;

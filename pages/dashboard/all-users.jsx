@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "../../context/user-context";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import DeleteUserModal from "../../components/account/modal/DeleteUserModal";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import DeleteUserModal from "../../components/dashboard/modal/DeleteUserModal";
 import Table from "../../components/Table";
 import { useClient } from "../../context/client-context";
 import { useCoachPictures } from "../../context/coach-picture-context";
@@ -63,7 +63,7 @@ export default function AllUsers() {
   useEffect(() => {
     if (router.isReady && !isAdmin) {
       console.log("redirect to /account");
-      router.replace("/account", undefined, {
+      router.replace("/dashboard", undefined, {
         shallow: true,
       });
     }
@@ -145,4 +145,4 @@ export default function AllUsers() {
   );
 }
 
-AllUsers.getLayout = getAccountLayout;
+AllUsers.getLayout = getDashboardLayout;

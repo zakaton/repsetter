@@ -19,59 +19,59 @@ import { useUser } from "../../context/user-context";
 const navigation = [
   {
     name: "General",
-    href: "/account",
+    href: "/dashboard",
     icon: UserCircleIcon,
   },
   {
     name: "All Users",
-    href: "/account/all-users",
+    href: "/dashboard/all-users",
     icon: UserGroupIcon,
     isAdmin: true,
   },
   {
     name: "My Coaches",
-    href: "/account/my-coaches",
+    href: "/dashboard/my-coaches",
     icon: ClipboardIcon,
   },
   {
     name: "My Clients",
-    href: "/account/my-clients",
+    href: "/dashboard/my-clients",
     icon: UserGroupIcon,
     canCoach: true,
   },
   {
     name: "Exercise Types",
-    href: "/account/exercise-types",
+    href: "/dashboard/exercise-types",
     icon: ClipboardCheckIcon,
   },
   {
     name: "Diary",
-    href: "/account/diary",
+    href: "/dashboard/diary",
     icon: ClipboardListIcon,
   },
   {
     name: "Exercises",
-    href: "/account/exercises",
+    href: "/dashboard/exercises",
     icon: HeartIcon,
   },
   {
     name: "Progress",
-    href: "/account/progress",
+    href: "/dashboard/progress",
     icon: ChartBarIcon,
   },
   {
     name: "Bodyweight",
-    href: "/account/bodyweight",
+    href: "/dashboard/bodyweight",
     icon: ScaleIcon,
   },
   {
     name: "Pictures",
-    href: "/account/pictures",
+    href: "/dashboard/pictures",
     icon: CameraIcon,
   },
   {
     name: "Notifications",
-    href: "/account/notifications",
+    href: "/dashboard/notifications",
     icon: BellIcon,
   },
 ];
@@ -80,7 +80,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function AccountLayout({ children }) {
+export default function DashboardLayout({ children }) {
   const router = useRouter();
   const { isLoading, user, isAdmin } = useUser();
 
@@ -104,7 +104,7 @@ export default function AccountLayout({ children }) {
     user && (
       <>
         <Head>
-          <title>Account - Repsetter</title>
+          <title>Dashboard - Repsetter</title>
         </Head>
         <div className="lg:grid lg:grid-cols-7 lg:gap-x-5">
           <aside className="lg:col-span-1 lg:py-0">
@@ -151,6 +151,6 @@ export default function AccountLayout({ children }) {
   );
 }
 
-export function getAccountLayout(page) {
-  return <AccountLayout>{page}</AccountLayout>;
+export function getDashboardLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
 }

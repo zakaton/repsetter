@@ -1,11 +1,11 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable camelcase */
 import { useEffect, useState, useRef } from "react";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import ClientsSelect from "../../components/account/ClientsSelect";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import ClientsSelect from "../../components/dashboard/ClientsSelect";
 import { useClient } from "../../context/client-context";
 import { useUser } from "../../context/user-context";
-import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
+import ExerciseTypesSelect from "../../components/dashboard/modal/ExerciseTypesSelect";
 import Filters from "../../components/Filters";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import { useProgress } from "../../context/progress-context";
@@ -1089,7 +1089,7 @@ export default function Progress() {
     const data = dataset.data[index];
     const date = new Date(data.x);
     setSelectedDate(date);
-    router.push("/account/diary");
+    router.push("/dashboard/diary");
   };
 
   return (
@@ -1183,4 +1183,4 @@ export default function Progress() {
   );
 }
 
-Progress.getLayout = getAccountLayout;
+Progress.getLayout = getDashboardLayout;

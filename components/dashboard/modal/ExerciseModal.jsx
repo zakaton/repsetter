@@ -993,7 +993,7 @@ export default function ExerciseModal(props) {
                   setSelectedDate(stringToDate(previousExercise.date));
                   setOpen(false);
                 }}
-                href={`/account/diary?date=${stringToDate(
+                href={`/dashboard/diary?date=${stringToDate(
                   previousExercise.date
                 ).toDateString()}${
                   selectedClient ? `&client=${selectedClient.client_email}` : ""

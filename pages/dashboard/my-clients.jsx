@@ -1,7 +1,7 @@
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import DeleteSubscriptionModal from "../../components/account/modal/DeleteSubscriptionModal";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import DeleteSubscriptionModal from "../../components/dashboard/modal/DeleteSubscriptionModal";
 import Table from "../../components/Table";
-import CreateSubscriptionModal from "../../components/account/modal/CreateSubscriptionModal";
+import CreateSubscriptionModal from "../../components/dashboard/modal/CreateSubscriptionModal";
 import { useUser } from "../../context/user-context";
 import { formatDollars } from "../../utils/subscription-utils";
 import MyLink from "../../components/MyLink";
@@ -116,4 +116,4 @@ export default function MyClients() {
   );
 }
 
-MyClients.getLayout = getAccountLayout;
+MyClients.getLayout = getDashboardLayout;

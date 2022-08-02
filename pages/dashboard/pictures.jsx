@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import { useClient } from "../../context/client-context";
 import Head from "next/head";
-import ClientsSelect from "../../components/account/ClientsSelect";
+import ClientsSelect from "../../components/dashboard/ClientsSelect";
 import Pagination from "../../components/Pagination";
 import {
   supabase,
@@ -275,7 +275,7 @@ export default function Photos() {
                       onClick={() => {
                         setSelectedDate(picture.date);
                       }}
-                      href={`/account/diary?date=${picture.date.toDateString()}${
+                      href={`/dashboard/diary?date=${picture.date.toDateString()}${
                         selectedClient
                           ? `&client=${selectedClient.client_email}`
                           : ""
@@ -330,4 +330,4 @@ export default function Photos() {
   );
 }
 
-Photos.getLayout = getAccountLayout;
+Photos.getLayout = getDashboardLayout;

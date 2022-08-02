@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
 import Notification from "../../components/Notification";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import WeightModal from "../../components/account/modal/WeightModal";
-import DeleteWeightModal from "../../components/account/modal/DeleteWeightModal";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import WeightModal from "../../components/dashboard/modal/WeightModal";
+import DeleteWeightModal from "../../components/dashboard/modal/DeleteWeightModal";
 import { weightEvents } from "../../utils/weight-utils";
 import Table from "../../components/Table";
 import { useClient } from "../../context/client-context";
@@ -189,7 +189,7 @@ export default function Bodyweight() {
                   onClick={() => {
                     setSelectedDate(stringToDate(weight.date));
                   }}
-                  href={`/account/diary?date=${stringToDate(
+                  href={`/dashboard/diary?date=${stringToDate(
                     weight.date
                   ).toDateString()}${
                     selectedClient
@@ -209,4 +209,4 @@ export default function Bodyweight() {
   );
 }
 
-Bodyweight.getLayout = getAccountLayout;
+Bodyweight.getLayout = getDashboardLayout;

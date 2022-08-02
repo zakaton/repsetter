@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
 import Notification from "../../components/Notification";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
-import ExerciseModal from "../../components/account/modal/ExerciseModal";
-import DeleteExerciseModal from "../../components/account/modal/DeleteExerciseModal";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
+import ExerciseModal from "../../components/dashboard/modal/ExerciseModal";
+import DeleteExerciseModal from "../../components/dashboard/modal/DeleteExerciseModal";
 import Table from "../../components/Table";
-import ExerciseTypesSelect from "../../components/account/modal/ExerciseTypesSelect";
+import ExerciseTypesSelect from "../../components/dashboard/modal/ExerciseTypesSelect";
 import { useClient } from "../../context/client-context";
 import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
@@ -379,7 +379,7 @@ export default function Exercises() {
                 onClick={() => {
                   setSelectedDate(stringToDate(exercise.date));
                 }}
-                href={`/account/diary?date=${stringToDate(
+                href={`/dashboard/diary?date=${stringToDate(
                   exercise.date
                 ).toDateString()}${
                   selectedClient ? `&client=${selectedClient.client_email}` : ""
@@ -396,7 +396,7 @@ export default function Exercises() {
                 onClick={() => {
                   setSelectedExerciseType(exercise.type);
                 }}
-                href={`/account/progress?exercise-type=${exercise.type.id}${
+                href={`/dashboard/progress?exercise-type=${exercise.type.id}${
                   selectedClient ? `&client=${selectedClient.client_email}` : ""
                 }`}
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
@@ -420,4 +420,4 @@ export default function Exercises() {
   );
 }
 
-Exercises.getLayout = getAccountLayout;
+Exercises.getLayout = getDashboardLayout;

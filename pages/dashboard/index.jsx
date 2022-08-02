@@ -2,10 +2,10 @@
 /* eslint-disable camelcase */
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
-import DeleteAccountModal from "../../components/account/modal/DeleteAccountModal";
-import CoachPictureModal from "../../components/account/modal/CoachPictureModal";
+import DeleteAccountModal from "../../components/dashboard/modal/DeleteAccountModal";
+import CoachPictureModal from "../../components/dashboard/modal/CoachPictureModal";
 import MyLink from "../../components/MyLink";
-import { getAccountLayout } from "../../components/layouts/AccountLayout";
+import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import Notification from "../../components/Notification";
 import { useCoachPictures } from "../../context/coach-picture-context";
 
@@ -164,4 +164,4 @@ export default function AccountGeneral() {
   );
 }
 
-AccountGeneral.getLayout = getAccountLayout;
+AccountGeneral.getLayout = getDashboardLayout;

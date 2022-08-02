@@ -2,7 +2,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
 import { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
 import { useClient } from "../../context/client-context";
-import ClientsSelect from "../account/ClientsSelect";
+import ClientsSelect from "../dashboard/ClientsSelect";
 
 const months = [
   "January",
@@ -29,7 +29,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function AccountCalendarLayout({
+export default function DashboardCalendarLayout({
   children,
   title,
   subtitle,
