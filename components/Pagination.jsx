@@ -215,7 +215,7 @@ export default function Pagination({
         <div
           className={classNames(
             numberOfResults > numberOfResultsPerPage
-              ? "hidden xs:block"
+              ? "hidden sm:block"
               : "block"
           )}
         >
