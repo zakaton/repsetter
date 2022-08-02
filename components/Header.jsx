@@ -151,7 +151,7 @@ export default function Header() {
                   key={name}
                   href={href}
                   className={classNames(
-                    requiresUser ? "hidden" : "",
+                    //requiresUser ? "hidden" : "",
                     router.pathname === href
                       ? "border-blue-500 bg-blue-50 text-blue-700"
                       : "border-transparent  text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700",
