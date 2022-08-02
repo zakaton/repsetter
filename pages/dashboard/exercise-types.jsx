@@ -124,7 +124,7 @@ export default function ExerciseTypes() {
         title="Exercise Types"
         subtitle="View all Exercise Types"
         className={
-          "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7"
+          "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8"
         }
         CreateResultModal={isAdmin && ExerciseTypeModal}
         DeleteResultModal={isAdmin && DeleteExerciseTypeModal}
