@@ -46,7 +46,7 @@ const features = [
       {
         title: "Log Exercises",
         description:
-          "Specify when you did each exercise, how many sets/reps you actually did, as well as how difficult it was",
+          "Log when you did each exercise, how many sets/reps you did, and how difficult it was",
         icon: ClipboardCheckIcon,
       },
       {
@@ -75,7 +75,7 @@ const features = [
       {
         title: "Visualize Bodyweight Fluctuations",
         description:
-          "View your bodyweight fluctuate throughout the day you eat, drink, and use the restoom, as well as decline over time due to exhaling Carbon Dioxide",
+          "View your bodyweight fluctuate throughout the day you eat, drink, and use the restoom, as well as decline over time from exhaling Carbon Dioxide",
         icon: TrendingUpIcon,
       },
     ],
@@ -168,7 +168,7 @@ export default function Home() {
             Your Favorite Workout Diary
           </h2>
           <p className="mt-2 text-lg text-gray-500">
-            A simple workout website that simply works
+            A simple workout diary that simply works
           </p>
         </div>
 
