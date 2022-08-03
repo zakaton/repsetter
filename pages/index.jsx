@@ -19,6 +19,11 @@ import { UserGroupIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import screenshot_1 from "../public/features/screenshot_1.png";
 import screenshot_2 from "../public/features/screenshot_2.png";
+import screenshot_3 from "../public/features/screenshot_3.png";
+import screenshot_4 from "../public/features/screenshot_4.png";
+import screenshot_5 from "../public/features/screenshot_5.png";
+import screenshot_6 from "../public/features/screenshot_6.png";
+import screenshot_7 from "../public/features/screenshot_7.png";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -35,7 +40,7 @@ const features = [
     ),
     list: [
       {
-        title: "Summarizes each Day",
+        title: "Summarize each Day",
         description:
           "Shows exercises, bodyweight, and pictures all in one plane",
         icon: BookOpenIcon,
@@ -59,21 +64,21 @@ const features = [
     description: "",
     media: (props) => (
       <div {...props}>
-        <Image src={screenshot_1} alt="" />
+        <Image src={screenshot_2} alt="" />
       </div>
     ),
     list: [
-      {
-        title: "Visual Exerise Directory",
-        description:
-          "Search exercises by name or muscles used, accompanied by images and videos of each exercise",
-        icon: SearchIcon,
-      },
       {
         title: "Plan Ahead",
         description:
           "Prepare weight, number of sets & reps, and other features like set & rest duration",
         icon: ClipboardListIcon,
+      },
+      {
+        title: "Visual Exerise Directory",
+        description:
+          "Search exercises by name or muscles used, accompanied by images and videos of each exercise",
+        icon: SearchIcon,
       },
     ],
   },
@@ -82,7 +87,7 @@ const features = [
     description: "",
     media: (props) => (
       <div {...props}>
-        <Image src={screenshot_1} alt="" />
+        <Image src={screenshot_3} alt="" />
       </div>
     ),
     list: [
@@ -104,7 +109,7 @@ const features = [
     description: "",
     media: (props) => (
       <div {...props}>
-        <Image src={screenshot_2} alt="" />
+        <Image src={screenshot_4} alt="" />
       </div>
     ),
     list: [
@@ -127,7 +132,7 @@ const features = [
     description: "",
     media: (props) => (
       <div {...props}>
-        <Image src={screenshot_2} alt="" />
+        <Image src={screenshot_5} alt="" />
       </div>
     ),
     list: [
@@ -148,7 +153,7 @@ const features = [
     title: "Visualize Progress",
     media: (props) => (
       <div {...props}>
-        <Image src={screenshot_2} alt="" />
+        <Image src={screenshot_6} alt="" />
       </div>
     ),
     list: [
@@ -172,7 +177,7 @@ const features = [
       "Persons 18+ and older in the United States can coach other users on Repsetter",
     media: (props) => (
       <div {...props}>
-        <Image src={screenshot_2} alt="" />
+        <Image src={screenshot_7} alt="" />
       </div>
     ),
     list: [
@@ -207,7 +212,7 @@ export default function Home() {
       <div className="mx-auto mt-2 px-4 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Your Favorite Workout Diary
+            Your New Favorite Workout Diary
           </h2>
           <p className="mt-2 text-lg text-gray-500">
             A simple workout diary that simply works

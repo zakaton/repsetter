@@ -62,7 +62,7 @@ export default function AllUsers() {
 
   useEffect(() => {
     if (router.isReady && !isAdmin) {
-      console.log("redirect to /account");
+      console.log("redirect to /dashboard");
       router.replace("/dashboard", undefined, {
         shallow: true,
       });
