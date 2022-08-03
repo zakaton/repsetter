@@ -83,6 +83,15 @@ export default async function handler(req, res) {
   }
 
   if (Object.keys(updatedProfile).length > 0) {
+    if (updatedProfile.stripe_account) {
+      Object.assign(updatedProfile, {
+        product_id: null,
+        default_price_id: null,
+        has_completed_onboarding: false,
+        can_coach: false,
+        number_of_unredeemed_subscriptions: 0,
+      });
+    }
     await supabase.from("profile").update(updatedProfile).eq("id", profile.id);
   }
 

@@ -9,9 +9,12 @@ import {
   ClipboardCheckIcon,
   ScaleIcon,
   ChartBarIcon,
-  TrendingUpIcon,
-  PhotographIcon,
+  TrendingDownIcon,
+  CameraIcon,
+  BookOpenIcon,
+  CalendarIcon,
 } from "@heroicons/react/outline";
+import { UserGroupIcon } from "@heroicons/react/solid";
 
 import Image from "next/image";
 import screenshot_1 from "../public/features/screenshot_1.png";
@@ -23,7 +26,7 @@ function classNames(...classes) {
 
 const features = [
   {
-    title: "Plan and Log Exercises",
+    title: "Calendar Explorer",
     description: "",
     media: (props) => (
       <div {...props}>
@@ -32,27 +35,66 @@ const features = [
     ),
     list: [
       {
-        title: "Search Exercises",
+        title: "Summarizes each Day",
+        description:
+          "Shows exercises, bodyweight, and pictures all in one plane",
+        icon: BookOpenIcon,
+      },
+      {
+        title: "Color-coded logging Dots",
+        description:
+          "See which days you've logged exercises, bodyweight, and pictures",
+        icon: CalendarIcon,
+      },
+      {
+        title: "View Clients' Diaries",
+        description:
+          "Easily switch between your diary and your clients' diaries",
+        icon: UserGroupIcon,
+      },
+    ],
+  },
+  {
+    title: "Plan Exercises",
+    description: "",
+    media: (props) => (
+      <div {...props}>
+        <Image src={screenshot_1} alt="" />
+      </div>
+    ),
+    list: [
+      {
+        title: "Visual Exerise Directory",
         description:
           "Search exercises by name or muscles used, accompanied by images and videos of each exercise",
         icon: SearchIcon,
       },
       {
-        title: "Plan Exercises",
+        title: "Plan Ahead",
         description:
-          "Specify weight, number of sets/reps, and other features like set/rest duration ahead of time",
+          "Prepare weight, number of sets & reps, and other features like set & rest duration",
         icon: ClipboardListIcon,
       },
+    ],
+  },
+  {
+    title: "Log Exercise Performance",
+    description: "",
+    media: (props) => (
+      <div {...props}>
+        <Image src={screenshot_1} alt="" />
+      </div>
+    ),
+    list: [
       {
-        title: "Log Exercises",
+        title: "Detail Performances",
         description:
-          "Log when you did each exercise, how many sets/reps you did, and how difficult it was",
+          "Log when you did each exercise, how many sets & reps you did, and how difficult it was",
         icon: ClipboardCheckIcon,
       },
       {
-        title: "Upload Sets",
-        description:
-          "Embed videos of your sets that you've uploaded to YouTube",
+        title: "Add Videos",
+        description: "Embed YouTube videos of your sets",
         icon: VideoCameraIcon,
       },
     ],
@@ -69,19 +111,19 @@ const features = [
       {
         title: "Add Multiple Bodyweights a Day",
         description:
-          "Set a single bodyweight per day, or add multiple bodyweights, adding timestamps and what the most recent weight change was due to (e.g. drinking water or bowel movements)",
+          "Set a single bodyweight per day, or add multiple bodyweights, including timestamps and context of each weight change (e.g. drinking water or bowel movements)",
         icon: ScaleIcon,
       },
       {
         title: "Visualize Bodyweight Fluctuations",
         description:
           "View your bodyweight fluctuate throughout the day you eat, drink, and use the restoom, as well as decline over time from exhaling Carbon Dioxide",
-        icon: TrendingUpIcon,
+        icon: TrendingDownIcon,
       },
     ],
   },
   {
-    title: "Upload Progress Pictures",
+    title: "Upload Pictures",
     description: "",
     media: (props) => (
       <div {...props}>
@@ -90,14 +132,14 @@ const features = [
     ),
     list: [
       {
-        title: "Post up to 3 Different Angles",
+        title: "Post up to 3 Angles per Day",
         description: "Upload pictures from the front, side, and back",
-        icon: PhotographIcon,
+        icon: CameraIcon,
       },
       {
         title: "View Bodyweight alongside Pictures",
         description:
-          "If you tracked Bodyweight the same day, it'll show your weight on that day",
+          "If you tracked Bodyweight the same day, it'll also show your weight",
         icon: ScaleIcon,
       },
     ],
