@@ -101,6 +101,9 @@ export function PicturesContextProvider(props) {
         setPictures(newPictures);
       }
     } else {
+      dateStrings.forEach((dateString) => {
+        newPictures[userId][dateString] = newPictures[userId][dateString] || {};
+      });
       console.log("newPictures", newPictures);
       setPictures(newPictures);
     }
