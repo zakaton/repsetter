@@ -635,6 +635,7 @@ export default function Diary() {
             display: false,
           },
           tooltip: {
+            intersect: true,
             callbacks: {
               title: function (context) {
                 const { time } = context[0].raw;

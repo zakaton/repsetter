@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import ClientsSelect from "../../components/dashboard/ClientsSelect";
 import { useClient } from "../../context/client-context";
-import { useUser } from "../../context/user-context";
 import ExerciseTypesSelect from "../../components/dashboard/modal/ExerciseTypesSelect";
 import Filters from "../../components/Filters";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
@@ -1016,6 +1015,7 @@ export default function Progress() {
           display: false,
         },
         tooltip: {
+          intersect: true,
           callbacks: {
             title: function (context) {
               const { includeTime } = context[0].raw;
