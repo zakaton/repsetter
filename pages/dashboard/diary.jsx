@@ -599,6 +599,7 @@ export default function Diary() {
       fromDate.setHours(0);
       const toDate = new Date(selectedDate);
       toDate.setHours(24);
+
       const newWeightChartOptions = {
         scales: {
           x: {
