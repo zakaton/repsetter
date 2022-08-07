@@ -589,17 +589,16 @@ export default function Diary() {
   const [weightChartOptions, setWeightChartOptions] = useState();
   const [weightChartData, setWeightChartData] = useState();
 
-  const fromDate = new Date(selectedDate);
-  fromDate.setHours(0);
-  const toDate = new Date(selectedDate);
-  toDate.setHours(24);
-
   useEffect(() => {
     if (
       weights &&
       weights.length > 1 &&
       weights?.every((weight) => weight.time)
     ) {
+      const fromDate = new Date(selectedDate);
+      fromDate.setHours(0);
+      const toDate = new Date(selectedDate);
+      toDate.setHours(24);
       const newWeightChartOptions = {
         scales: {
           x: {
@@ -608,13 +607,13 @@ export default function Diary() {
             time: {
               unit: "hour",
             },
-            min: fromDate,
-            max: toDate,
+            //min: fromDate,
+            //max: toDate,
           },
           y: {
             type: "linear",
             display: true,
-            min: 0,
+            //min: 0,
             title: {
               display: true,
               text: `Weight (${isUsingKilograms ? "kg" : "lbs"})`,
