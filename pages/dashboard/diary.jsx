@@ -1341,8 +1341,8 @@ export default function Diary() {
                                     <dd className="mt-1 break-words text-sm text-gray-900">
                                       <YouTube
                                         videoId={video.videoId}
-                                        className="aspect-[16/9] w-full"
-                                        iframeClassName="aspect-[16/9] w-full"
+                                        className=""
+                                        iframeClassName="rounded-lg"
                                         opts={{
                                           height: "100%",
                                           width: "100%",

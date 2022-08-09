@@ -326,8 +326,8 @@ export default function Exercises() {
                 jsx: (
                   <YouTube
                     videoId={video.videoId}
-                    className="aspect-[16/9] w-full"
-                    iframeClassName="aspect-[16/9] w-full"
+                    className=""
+                    iframeClassName="rounded-lg"
                     opts={{
                       height: "100%",
                       width: "100%",

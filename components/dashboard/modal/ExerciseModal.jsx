@@ -1192,8 +1192,8 @@ export default function ExerciseModal(props) {
                       <dd className="mt-1 break-words text-sm text-gray-900">
                         <YouTube
                           videoId={video.videoId}
-                          className="aspect-[16/9] w-full"
-                          iframeClassName="aspect-[16/9] w-full"
+                          className=""
+                          iframeClassName="rounded-lg"
                           opts={{
                             height: "100%",
                             width: "100%",
@@ -2571,8 +2571,8 @@ export default function ExerciseModal(props) {
                     <div className="sm:col-span-3">
                       <YouTube
                         videoId={video[index].videoId}
-                        className="aspect-[16/9] w-full"
-                        iframeClassName="aspect-[16/9] w-full"
+                        className=""
+                        iframeClassName="rounded-lg"
                         opts={{
                           height: "100%",
                           width: "100%",
