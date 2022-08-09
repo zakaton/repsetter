@@ -533,7 +533,8 @@ const graphTypes = {
           }
         }
 
-        const showIndividualWeights = filters["date-range"] == "past week";
+        const showIndividualWeights =
+          false && filters["date-range"] == "past week";
         const date = dateFromDateAndTime(weight.date, weight.time);
         let datum = data.find((_data) => _data._date === weight.date);
         if (datum && !showIndividualWeights) {
@@ -576,10 +577,12 @@ const graphTypes = {
         return weightEventColors[event || "none"];
       },
     },
+    /*
     pointBackgroundColor: (context) => {
       const event = context?.raw?.event;
       return weightEventColors[event || "none"];
     },
+    */
     yAxisID: "y4",
   },
 };
@@ -809,7 +812,7 @@ export default function Progress() {
               maxBarThickness: 10,
               minBarLength: 2,
               segment,
-              pointBackgroundColor,
+              //pointBackgroundColor,
             };
           }) || [],
     };
@@ -914,7 +917,7 @@ export default function Progress() {
           grid: {
             drawOnChartArea: !containsFilters.type?.includes("weight"),
           },
-          beginAtZero: true,
+          beginAtZero: false,
         },
         y5: {
           type: "linear",

@@ -712,10 +712,12 @@ export default function Diary() {
                 return weightEventColors[event || "none"];
               },
             },
+            /*
             pointBackgroundColor: (context) => {
               const event = context?.raw?.event;
               return weightEventColors[event || "none"];
             },
+            */
             borderColor: "rgb(250, 204, 21)",
             backgroundColor: "rgba(250, 204, 21, 0.5)",
           },
