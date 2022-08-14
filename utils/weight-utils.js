@@ -1,6 +1,6 @@
 export const weightEvents = [
   { name: "none", color: "rgb(255, 191, 102)" },
-  { name: "changed clothes", color: "rgb(255, 191, 102)" },
+  { name: "changed clothes", color: "rgb(240, 15, 247)" },
   { name: "ate", color: "rgb(83, 242, 78)" },
   { name: "drank", color: "rgb(73, 242, 234)" },
   { name: "urinated", color: "rgb(252, 255, 59)" },
