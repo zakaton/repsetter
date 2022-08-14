@@ -26,7 +26,7 @@ export default function Privacy() {
           <li>
             Your email address so you can sign in, receive pledge receipts, as
             well as optionally receive coaching subscription updates (which is
-            disabled by default, you&apos;d need to opt-in to receive emails)
+            disabled by default; you need to opt-in to receive emails)
           </li>
           <li>
             Your exercise information, so you can view and edit your exercise,
