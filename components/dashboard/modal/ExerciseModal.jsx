@@ -205,6 +205,7 @@ export default function ExerciseModal(props) {
     }
   };
 
+  /*
   useEffect(() => {
     if (isUsingKilograms) {
       setWeightPerformedPounds(
@@ -223,6 +224,7 @@ export default function ExerciseModal(props) {
       );
     }
   }, [weightPerformedPounds]);
+  */
 
   const [isDifficultyEmptyString, setIsDifficultyEmptyString] = useState([]);
   const [difficulty, setDifficulty] = useState([]);
