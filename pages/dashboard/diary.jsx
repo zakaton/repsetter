@@ -766,11 +766,6 @@ export default function Diary() {
   const isGettingPictures = !(
     selectedDate && pictures?.[selectedClientId]?.[dateToString(selectedDate)]
   );
-  console.log(
-    "FUCK",
-    selectedDate,
-    pictures?.[selectedClientId]?.[dateToString(selectedDate)]
-  );
   const userPictures =
     (selectedDate &&
       pictures?.[selectedClientId]?.[dateToString(selectedDate)]) ||
@@ -1750,7 +1745,6 @@ export default function Diary() {
                     <button
                       type="button"
                       onClick={() => {
-                        console.log("FUCK", pictureTypes, userPictureTypes);
                         setSelectedPictureTypes(
                           pictureTypes.filter((pictureType) =>
                             userPictureTypes.includes(pictureType)
