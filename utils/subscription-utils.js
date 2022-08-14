@@ -12,7 +12,7 @@ export function dollarsToCents(dollars) {
   return Math.round(dollars * 100);
 }
 
-export const repsetterFeePercentage = 0.05;
+export const repsetterFeePercentage = 5;
 
 const defaultLocale = "en-us";
 
