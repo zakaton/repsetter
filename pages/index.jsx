@@ -122,7 +122,7 @@ const features = [
       {
         title: "Visualize Bodyweight Fluctuations",
         description:
-          "View your bodyweight fluctuate throughout the day you eat, drink, and use the restoom, as well as decline over time from exhaling Carbon Dioxide",
+          "View your bodyweight fluctuate throughout the day as you eat, drink, and use the restroom, as well as decline over time from exhaling Carbon Dioxide",
         icon: TrendingDownIcon,
       },
     ],
