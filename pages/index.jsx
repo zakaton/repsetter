@@ -143,8 +143,7 @@ const features = [
       },
       {
         title: "View Bodyweight alongside Pictures",
-        description:
-          "If you tracked Bodyweight the same day, it'll also show your weight",
+        description: "Bodyweight is displayed alongside pictures if tracked.",
         icon: ScaleIcon,
       },
     ],
