@@ -68,7 +68,7 @@ function classNames(...classes) {
 
 export default function Diary() {
   const { user } = useUser();
-  const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
+  const { getExerciseVideo } = useExerciseVideos();
   const {
     selectedClient,
     selectedDate,
@@ -151,6 +151,10 @@ export default function Diary() {
 
   useEffect(() => {
     if (!selectedDate) {
+      return;
+    }
+
+    if (!selectedClientId) {
       return;
     }
 
@@ -263,6 +267,12 @@ export default function Diary() {
       calendar[0].toDateString(),
       calendar[calendar.length - 1].toDateString()
     );
+    console.log(
+      "getting exercise dates for user",
+      amITheClient,
+      selectedClient,
+      selectedClientId
+    );
     const { data: exerciseDates, error } = await supabase
       .rpc("get_exercise_dates", {
         email: amITheClient ? user.email : selectedClient.client_email,
@@ -298,6 +308,7 @@ export default function Diary() {
   };
   useEffect(() => {
     if (
+      selectedClientId &&
       calendar &&
       selectedDate &&
       (!lastSelectedDate ||
@@ -309,7 +320,7 @@ export default function Diary() {
       getWeightDates();
       getPictureDates();
     }
-  }, [calendar]);
+  }, [calendar, selectedClientId]);
 
   const [copiedExercises, setCopiedExercises] = useState();
   const copyExercises = () => {
@@ -484,6 +495,10 @@ export default function Diary() {
 
   useEffect(() => {
     if (!selectedDate) {
+      return;
+    }
+
+    if (!selectedClientId) {
       return;
     }
 
@@ -737,6 +752,10 @@ export default function Diary() {
   const [pictureType, setPictureType] = useState(pictureTypes[0]);
   useEffect(() => {
     if (!selectedDate) {
+      return;
+    }
+
+    if (!selectedClientId) {
       return;
     }
 

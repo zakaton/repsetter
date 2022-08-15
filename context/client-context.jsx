@@ -104,19 +104,6 @@ export function ClientContextProvider(props) {
     }
     setCheckedQuery(true);
   };
-  useEffect(() => {
-    if (clients && initialClientEmail) {
-      const selectedClient = clients.find(
-        (client) => client.client_email === initialClientEmail
-      );
-      if (selectedClient) {
-        setSelectedClient(selectedClient);
-      } else if (isAdmin) {
-        console.log("getting user outside of clients", initialClientEmail);
-        getUserProfile();
-      }
-    }
-  }, [clients, initialClientEmail]);
 
   const [checkedQuery, setCheckedQuery] = useState(false);
   useEffect(() => {
@@ -129,6 +116,24 @@ export function ClientContextProvider(props) {
       }
     }
   }, [router.isReady]);
+
+  useEffect(() => {
+    if (clients && initialClientEmail && !checkedQuery) {
+      const selectedClient = clients.find(
+        (client) => client.client_email === initialClientEmail
+      );
+      if (selectedClient) {
+        console.log("initialClient", selectedClient, initialClientEmail);
+        setSelectedClient(selectedClient);
+        setCheckedQuery(true);
+      } else if (isAdmin) {
+        console.log("getting user outside of clients", initialClientEmail);
+        getUserProfile();
+      } else {
+        setCheckedQuery(true);
+      }
+    }
+  }, [clients, initialClientEmail, checkedQuery]);
 
   useEffect(() => {
     if (!router.isReady) {
@@ -156,17 +161,22 @@ export function ClientContextProvider(props) {
     });
   }, [router.isReady, selectedClient, selectedDate, router.pathname]);
 
-  const [amITheClient, setAmITheClient] = useState(true);
+  const [amITheClient, setAmITheClient] = useState(false);
   useEffect(() => {
-    setAmITheClient(!selectedClient);
-  }, [selectedClient]);
+    if (checkedQuery) {
+      setAmITheClient(!selectedClient);
+    }
+  }, [selectedClient, checkedQuery]);
 
   const [selectedClientId, setSelectedClientId] = useState();
   useEffect(() => {
+    console.log("LOL", selectedClient, user, isLoading, checkedQuery);
     if (!isLoading && user && checkedQuery) {
       setSelectedClientId(selectedClient ? selectedClient.client : user.id);
     }
   }, [selectedClient, user, isLoading, checkedQuery]);
+
+  console.log("checkedQuery", checkedQuery);
 
   const [isSelectedDateToday, setIsSelectedDateToday] = useState(false);
   useEffect(() => {

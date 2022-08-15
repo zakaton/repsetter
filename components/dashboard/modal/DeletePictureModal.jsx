@@ -29,8 +29,6 @@ export default function DeletePictureModal(props) {
 
   const resultName = `Picture${pictureTypes?.length > 1 ? "s" : ""}`;
 
-  console.log(resultName, pictureTypes);
-
   return (
     <Modal
       {...props}
