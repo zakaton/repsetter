@@ -1064,7 +1064,7 @@ export default function Diary() {
                       <div
                         key={exercise.id}
                         className={classNames(
-                          "pt-5",
+                          "py-5",
                           index === 0 ? "pb-5" : "border-gray-20 border-t"
                         )}
                       >
