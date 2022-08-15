@@ -2519,7 +2519,7 @@ export default function ExerciseModal(props) {
                       <input
                         autoComplete="off"
                         type="text"
-                        placeholder="https://youtu.be/R--Nz8rkGe8?t=15179"
+                        placeholder="https://youtu.be/6Lk49reiGxQ"
                         name={`video-${index}`}
                         id={`video-${index}`}
                         className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
