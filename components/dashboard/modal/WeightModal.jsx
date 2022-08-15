@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { ScaleIcon } from "@heroicons/react/outline";
-import { supabase, dateFromDateAndTime } from "../../../utils/supabase";
+import {
+  supabase,
+  dateFromDateAndTime,
+  dateToString,
+} from "../../../utils/supabase";
 import { useClient } from "../../../context/client-context";
 import { useUser } from "../../../context/user-context";
 import {
@@ -203,7 +207,8 @@ export default function WeightModal(props) {
             setIsAddingWeight(true);
             console.log("args", weight, includeTime, time);
             const addWeightData = {
-              date: selectedDate,
+              //date: selectedDate,
+              date: dateToString(selectedDate),
               weight,
               is_weight_in_kilograms: isUsingKilograms,
               client: user.id,
