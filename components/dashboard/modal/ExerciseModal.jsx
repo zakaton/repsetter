@@ -873,7 +873,8 @@ export default function ExerciseModal(props) {
                 ? user.email
                 : selectedClient.client_email,
 
-              date: selectedDate,
+              //date: selectedDate,
+              date: dateToString(selectedDate),
               time: includeTimePerformed ? timePerformed : null,
 
               type: selectedExerciseType.id,
