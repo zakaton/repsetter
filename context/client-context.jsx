@@ -176,8 +176,6 @@ export function ClientContextProvider(props) {
     }
   }, [selectedClient, user, isLoading, checkedQuery]);
 
-  console.log("checkedQuery", checkedQuery);
-
   const [isSelectedDateToday, setIsSelectedDateToday] = useState(false);
   useEffect(() => {
     if (!selectedDate) {
