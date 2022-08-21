@@ -56,7 +56,8 @@ export default function AllUsers() {
   const [users, setUsers] = useState();
   useEffect(() => {
     if (users) {
-      users.forEach(({ id }) => getCoachPicture(id));
+      //users.forEach(({ id }) => getCoachPicture(id));
+      getCoachPicture(users.map(({ id }) => id));
     }
   }, [users]);
 

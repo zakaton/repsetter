@@ -6,49 +6,60 @@ export const CoachPicturesContext = createContext();
 export function CoachPicturesContextProvider(props) {
   const [coachPictures, setCoachPictures] = useState({});
 
-  const getCoachPicture = async (id, refresh = false) => {
-    console.log("requesting coach picture", id);
+  const getCoachPicture = async (ids, refresh = false) => {
+    console.log("requesting coach picture", ids);
 
-    if (!coachPictures[id] || refresh) {
-      const { data: list, error: listError } = await supabase.storage
-        .from("coach-picture")
-        .list(id);
-      if (listError) {
-        console.error(listError);
-      }
+    ids = Array.isArray(ids) ? ids : [ids];
 
-      console.log("coachesList", list);
+    const newCoachPictures = { ...coachPictures };
+    let updateCoachPictures = false;
 
-      const imageDetails = list?.find(({ name }) => name.startsWith("image"));
-
-      if (imageDetails) {
-        const { publicURL: coachPictureUrl, error: getCoachPictureError } =
-          await supabase.storage
+    await Promise.all(
+      ids.map(async (id) => {
+        if (!coachPictures[id] || refresh) {
+          const { data: list, error: listError } = await supabase.storage
             .from("coach-picture")
-            .getPublicUrl(`${id}/image.jpg?${generateUrlSuffix(imageDetails)}`);
+            .list(id);
+          if (listError) {
+            console.error(listError);
+          }
 
-        if (getCoachPictureError) {
-          console.error(getCoachPictureError);
+          console.log("coachesList", list);
+
+          const imageDetails = list?.find(({ name }) =>
+            name.startsWith("image")
+          );
+
+          if (imageDetails) {
+            const { publicURL: coachPictureUrl, error: getCoachPictureError } =
+              await supabase.storage
+                .from("coach-picture")
+                .getPublicUrl(
+                  `${id}/image.jpg?${generateUrlSuffix(imageDetails)}`
+                );
+
+            if (getCoachPictureError) {
+              console.error(getCoachPictureError);
+            } else {
+              newCoachPictures[id] = {
+                url: coachPictureUrl,
+              };
+              updateCoachPictures = true;
+            }
+          } else {
+            console.log("existing", coachPictures);
+            newCoachPictures[id] = {};
+            updateCoachPictures = true;
+            console.log("newCoachPictures", newCoachPictures);
+          }
         } else {
-          const newCoachPictures = {
-            ...coachPictures,
-            [id]: {
-              url: coachPictureUrl,
-            },
-          };
-          console.log("newCoachPictures", newCoachPictures);
-          setCoachPictures(newCoachPictures);
+          console.log("coach picture cache hit");
         }
-      } else {
-        const newCoachPictures = {
-          ...coachPictures,
-          [id]: {},
-        };
-        console.log("newCoachPictures", newCoachPictures);
-        setCoachPictures(newCoachPictures);
-      }
-    } else {
-      console.log("coach picture cache hit");
+      })
+    );
+
+    if (updateCoachPictures) {
+      setCoachPictures(newCoachPictures);
     }
   };
 
