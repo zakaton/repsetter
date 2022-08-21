@@ -78,6 +78,8 @@ export function ClientContextProvider(props) {
 
   const router = useRouter();
 
+  const [overrideInitialClientEmail, setOverrideInitialClientEmail] =
+    useState(false);
   const [initialClientEmail, setInitialClientEmail] = useState();
   const getUserProfile = async () => {
     console.log("getUserProfile", initialClientEmail);
@@ -95,7 +97,7 @@ export function ClientContextProvider(props) {
           client_email: profile.email,
           client: profile.id,
         };
-        const newClients = [...clients, newClient];
+        const newClients = [...(clients?.length > 0 ? clients : []), newClient];
         setClients(newClients);
         setSelectedClient(newClient);
       } else {
@@ -104,6 +106,12 @@ export function ClientContextProvider(props) {
     }
     setCheckedQuery(true);
   };
+  useEffect(() => {
+    if (initialClientEmail && overrideInitialClientEmail) {
+      getUserProfile();
+      setOverrideInitialClientEmail(false);
+    }
+  }, [initialClientEmail, overrideInitialClientEmail]);
 
   const [checkedQuery, setCheckedQuery] = useState(false);
   useEffect(() => {
@@ -218,6 +226,7 @@ export function ClientContextProvider(props) {
     isSelectedDateAfterToday,
 
     setInitialClientEmail,
+    setOverrideInitialClientEmail,
   };
 
   return <ClientContext.Provider value={value} {...props} />;
