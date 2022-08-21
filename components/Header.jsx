@@ -155,7 +155,7 @@ export default function Header() {
                 <Disclosure.Button
                   key={name}
                   className={classNames(
-                    //requiresUser ? "hidden" : "",
+                    requiresUser ? "hidden" : "",
                     shouldHighlightHref(href) &&
                       (!(href === "/") || router.pathname === href)
                       ? "border-blue-500 bg-blue-50 text-blue-700"
