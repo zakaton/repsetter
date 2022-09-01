@@ -386,6 +386,7 @@ export default function Diary() {
       }
       setIsPastingExercises(false);
       getExerciseDates();
+      getExercises(true);
     }
   };
 
