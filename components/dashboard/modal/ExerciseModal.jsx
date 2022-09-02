@@ -248,6 +248,9 @@ export default function ExerciseModal(props) {
     setSameWeightForEachSet(true);
     setIsWeightInputEmptyString([]);
 
+    setWeightPerformed([0]);
+    setIsWeightPerformedEmptyString([]);
+
     setIncludeRestDuration(false);
     setSameRestDurationForEachSet(true);
     setRestDuration([0]);
