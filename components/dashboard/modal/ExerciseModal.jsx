@@ -121,15 +121,18 @@ export default function ExerciseModal(props) {
             isNumberOfRepsPerformedEmptyString.slice(0, numberOfSets)
           );
         } else {
-          setNumberOfRepsPerformed(
-            numberOfRepsPerformed.concat(
-              new Array(numberOfRepsPerformed.length - numberOfSets).fill(0)
-            )
+          const newNumberOfRepsPerformed = numberOfRepsPerformed.concat(
+            new Array(numberOfRepsPerformed.length - numberOfSets).fill(0)
           );
-          setIsNumberOfRepsPerformedEmptyString(
+          setNumberOfRepsPerformed(
+            newNumberOfRepsPerformed.slice(0, numberOfSets)
+          );
+          const newIsNumberOfRepsPerformedEmptyString =
             isNumberOfRepsPerformedEmptyString.concat(
               new Array(numberOfRepsPerformed.length - numberOfSets).fill(true)
-            )
+            );
+          setIsNumberOfRepsPerformedEmptyString(
+            newIsNumberOfRepsPerformedEmptyString.slice(0, numberOfSets)
           );
         }
       }
@@ -205,7 +208,6 @@ export default function ExerciseModal(props) {
     }
   };
 
-  /*
   useEffect(() => {
     if (isUsingKilograms) {
       setWeightPerformedPounds(
@@ -224,7 +226,6 @@ export default function ExerciseModal(props) {
       );
     }
   }, [weightPerformedPounds]);
-  */
 
   const [isDifficultyEmptyString, setIsDifficultyEmptyString] = useState([]);
   const [difficulty, setDifficulty] = useState([]);
@@ -330,6 +331,7 @@ export default function ExerciseModal(props) {
           ).fill(0);
         }
         setNumberOfRepsPerformed(repsPerformed);
+        setIsNumberOfRepsPerformedEmptyString([]);
       }
 
       let difficulty = selectedExercise.difficulty || [];
