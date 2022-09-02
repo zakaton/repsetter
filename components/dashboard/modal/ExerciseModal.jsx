@@ -287,7 +287,10 @@ export default function ExerciseModal(props) {
         setIsUsingKilograms(selectedExercise.is_weight_in_kilograms);
       }
       if (selectedExercise.weight_assigned) {
-        setWeight(selectedExercise.weight_assigned);
+        setWeight(
+          selectedExercise.weight_assigned,
+          selectedExercise.is_weight_in_kilograms
+        );
         const sameWeightForEachSet =
           selectedExercise.weight_assigned?.length == 1;
         setSameWeightForEachSet(sameWeightForEachSet);
