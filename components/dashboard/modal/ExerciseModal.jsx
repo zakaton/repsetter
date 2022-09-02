@@ -112,8 +112,8 @@ export default function ExerciseModal(props) {
     }
 
     if (numberOfRepsPerformed) {
-      if (numberOfSets != numberOfRepsPerformed.length) {
-        if (numberOfSets > numberOfRepsPerformed.length) {
+      if (numberOfRepsPerformed.length !== numberOfSets) {
+        if (numberOfRepsPerformed.length > numberOfSets) {
           setNumberOfRepsPerformed(
             numberOfRepsPerformed.slice(0, numberOfSets)
           );
@@ -122,14 +122,14 @@ export default function ExerciseModal(props) {
           );
         } else {
           const newNumberOfRepsPerformed = numberOfRepsPerformed.concat(
-            new Array(numberOfRepsPerformed.length - numberOfSets).fill(0)
+            new Array(numberOfSets - numberOfRepsPerformed.length).fill(0)
           );
           setNumberOfRepsPerformed(
             newNumberOfRepsPerformed.slice(0, numberOfSets)
           );
           const newIsNumberOfRepsPerformedEmptyString =
             isNumberOfRepsPerformedEmptyString.concat(
-              new Array(numberOfRepsPerformed.length - numberOfSets).fill(true)
+              new Array(numberOfSets - numberOfRepsPerformed.length).fill(true)
             );
           setIsNumberOfRepsPerformedEmptyString(
             newIsNumberOfRepsPerformedEmptyString.slice(0, numberOfSets)
@@ -454,6 +454,19 @@ export default function ExerciseModal(props) {
       }
     }
   }, [open, selectedExercise]);
+
+  useEffect(() => {
+    if (difficulty.length !== numberOfSets) {
+      if (difficulty.length > numberOfSets) {
+        setDifficulty(difficulty.slice(0, numberOfSets));
+      } else {
+        const newDifficulty = difficulty.concat(
+          new Array(numberOfSets - difficulty.length).fill(0)
+        );
+        setDifficulty(newDifficulty.slice(0, numberOfSets));
+      }
+    }
+  }, [numberOfSets]);
 
   const [previousExercise, setPreviousExercise] = useState();
   const [isGettingPreviousExercise, setIsGettingPreviousExercise] =
