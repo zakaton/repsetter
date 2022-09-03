@@ -150,29 +150,36 @@ export default function ExerciseModal(props) {
   const [isWeightPerformedEmptyString, setIsWeightPerformedEmptyString] =
     useState([]);
 
-  /*
   console.log({
     numberOfSets,
     sameWeightForEachSet,
     weightKilograms,
     weightPounds,
+    isUsingKilograms,
     weightPerformedKilograms,
     weightPerformedPounds,
     isWeightInputEmptyString,
     isWeightPerformedEmptyString,
+    numberOfReps,
+    isNumberOfRepsEmptyString,
   });
-  */
 
   useEffect(() => {
     if (sameWeightForEachSet) {
       setIsWeightInputEmptyString([isWeightInputEmptyString[0]]);
       setWeight(isUsingKilograms ? [weightKilograms[0]] : [weightPounds[0]]);
     } else {
-      setWeight(
-        isUsingKilograms
-          ? new Array(numberOfSets).fill(weightKilograms[0])
-          : new Array(numberOfSets).fill(weightPounds[0])
-      );
+      let currentWeight = isUsingKilograms ? weightKilograms : weightPounds;
+      let newWeight;
+      if (currentWeight.length > numberOfSets) {
+        newWeight = currentWeight.slice(0, numberOfSets);
+      } else {
+        newWeight = currentWeight.slice();
+        while (newWeight.length < numberOfSets) {
+          newWeight.push(newWeight[newWeight.length - 1]);
+        }
+      }
+      setWeight(newWeight);
       setIsWeightInputEmptyString(
         new Array(numberOfSets).fill(isWeightInputEmptyString[0])
       );
