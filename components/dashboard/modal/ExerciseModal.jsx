@@ -159,6 +159,7 @@ export default function ExerciseModal(props) {
   const [isWeightPerformedEmptyString, setIsWeightPerformedEmptyString] =
     useState([]);
 
+  /*
   console.log({
     numberOfSets,
     sameWeightForEachSet,
@@ -172,6 +173,7 @@ export default function ExerciseModal(props) {
     numberOfReps,
     isNumberOfRepsEmptyString,
   });
+  */
 
   useEffect(() => {
     if (sameWeightForEachSet) {
