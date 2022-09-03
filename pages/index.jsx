@@ -99,7 +99,7 @@ const features = [
       },
       {
         title: "Add Videos",
-        description: "Embed YouTube videos of your sets",
+        description: "Embed YouTube or Google Drive videos of your sets",
         icon: VideoCameraIcon,
       },
     ],

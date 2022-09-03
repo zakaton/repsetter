@@ -20,6 +20,7 @@ import { useClient } from "../../context/client-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import YouTube from "react-youtube";
+import GoogleDriveVideo from "../../components/GoogleDriveVideo";
 import {
   PaperClipIcon,
   PlusIcon,
@@ -1354,42 +1355,49 @@ export default function Diary() {
                                       Set #{index + 1}
                                     </dt>
                                     <dd className="mt-1 break-words text-sm text-gray-900">
-                                      <YouTube
-                                        videoId={video.videoId}
-                                        className=""
-                                        iframeClassName="rounded-lg"
-                                        opts={{
-                                          height: "100%",
-                                          width: "100%",
-                                          playerVars: {
-                                            autoplay: 0,
-                                            loop: 1,
-                                            playsinline: 1,
-                                            modestbranding: 1,
-                                            controls: 1,
-                                            enablejsapi: 1,
-                                            start: video.start || 0,
-                                            end: video.end,
-                                          },
-                                        }}
-                                        onReady={(e) => {
-                                          e.target.mute();
-                                          console.log("player", e.target);
-                                          console.log(video);
-                                          const newVideoPlayer = {
-                                            ...videoPlayer,
-                                          };
-                                          newVideoPlayer[exercise.id] =
-                                            newVideoPlayer[exercise.id] || [];
-                                          newVideoPlayer[exercise.id][index] =
-                                            e.target;
-                                          setVideoPlayer(newVideoPlayer);
-                                        }}
-                                        onEnd={(e) => {
-                                          e.target.seekTo(video.start || 0);
-                                          e.target.playVideo();
-                                        }}
-                                      ></YouTube>
+                                      {video.isGoogleDriveVideo ? (
+                                        <GoogleDriveVideo
+                                          videoId={video.videoId}
+                                          className="w-full rounded-lg"
+                                        ></GoogleDriveVideo>
+                                      ) : (
+                                        <YouTube
+                                          videoId={video.videoId}
+                                          className=""
+                                          iframeClassName="rounded-lg"
+                                          opts={{
+                                            height: "100%",
+                                            width: "100%",
+                                            playerVars: {
+                                              autoplay: 0,
+                                              loop: 1,
+                                              playsinline: 1,
+                                              modestbranding: 1,
+                                              controls: 1,
+                                              enablejsapi: 1,
+                                              start: video.start || 0,
+                                              end: video.end,
+                                            },
+                                          }}
+                                          onReady={(e) => {
+                                            e.target.mute();
+                                            console.log("player", e.target);
+                                            console.log(video);
+                                            const newVideoPlayer = {
+                                              ...videoPlayer,
+                                            };
+                                            newVideoPlayer[exercise.id] =
+                                              newVideoPlayer[exercise.id] || [];
+                                            newVideoPlayer[exercise.id][index] =
+                                              e.target;
+                                            setVideoPlayer(newVideoPlayer);
+                                          }}
+                                          onEnd={(e) => {
+                                            e.target.seekTo(video.start || 0);
+                                            e.target.playVideo();
+                                          }}
+                                        ></YouTube>
+                                      )}
                                     </dd>
                                   </div>
                                 </React.Fragment>

@@ -17,6 +17,7 @@ import { useClient } from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
 import YouTube from "react-youtube";
+import GoogleDriveVideo from "../../GoogleDriveVideo";
 import MyLink from "../../MyLink";
 import ExerciseTypeVideo from "../../ExerciseTypeVideo";
 
@@ -1214,37 +1215,44 @@ export default function ExerciseModal(props) {
                         Set #{index + 1}
                       </dt>
                       <dd className="mt-1 break-words text-sm text-gray-900">
-                        <YouTube
-                          videoId={video.videoId}
-                          className=""
-                          iframeClassName="rounded-lg"
-                          opts={{
-                            height: "100%",
-                            width: "100%",
-                            playerVars: {
-                              autoplay: 1,
-                              loop: 1,
-                              playsinline: 1,
-                              modestbranding: 1,
-                              controls: 1,
-                              enablejsapi: 1,
-                              start: video.start || 0,
-                              end: video.end,
-                            },
-                          }}
-                          onReady={(e) => {
-                            e.target.mute();
-                            console.log("player", e.target);
-                            console.log(video);
-                            const newVideoPlayer = previousVideoPlayer;
-                            newVideoPlayer[index] = e.target;
-                            setPreviousVideoPlayer(newVideoPlayer);
-                          }}
-                          onEnd={(e) => {
-                            e.target.seekTo(video.start || 0);
-                            e.target.playVideo();
-                          }}
-                        ></YouTube>
+                        {video.isGoogleDriveVideo ? (
+                          <GoogleDriveVideo
+                            videoId={video.videoId}
+                            className="w-full rounded-lg"
+                          ></GoogleDriveVideo>
+                        ) : (
+                          <YouTube
+                            videoId={video.videoId}
+                            className=""
+                            iframeClassName="rounded-lg"
+                            opts={{
+                              height: "100%",
+                              width: "100%",
+                              playerVars: {
+                                autoplay: 1,
+                                loop: 1,
+                                playsinline: 1,
+                                modestbranding: 1,
+                                controls: 1,
+                                enablejsapi: 1,
+                                start: video.start || 0,
+                                end: video.end,
+                              },
+                            }}
+                            onReady={(e) => {
+                              e.target.mute();
+                              console.log("player", e.target);
+                              console.log(video);
+                              const newVideoPlayer = previousVideoPlayer;
+                              newVideoPlayer[index] = e.target;
+                              setPreviousVideoPlayer(newVideoPlayer);
+                            }}
+                            onEnd={(e) => {
+                              e.target.seekTo(video.start || 0);
+                              e.target.playVideo();
+                            }}
+                          ></YouTube>
+                        )}
                       </dd>
                     </div>
                   </React.Fragment>
@@ -2528,170 +2536,255 @@ export default function ExerciseModal(props) {
                 </div>
 
                 {!video[index] && (
-                  <div className="sm:col-span-3">
-                    {" "}
-                    <label
-                      htmlFor={`video-${index}`}
-                      className="block select-none text-sm font-medium text-gray-700"
-                    >
-                      YouTube Video
-                    </label>
-                    <div className="relative mt-1 flex flex-grow items-stretch focus-within:z-10">
-                      <input
-                        autoComplete="off"
-                        type="text"
-                        placeholder="https://youtu.be/6Lk49reiGxQ"
-                        name={`video-${index}`}
-                        id={`video-${index}`}
-                        className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          const inputValue = e.target
-                            .closest("div")
-                            .querySelector("input").value;
-                          let videoId;
-                          let timecode;
-                          try {
-                            const url = new URL(inputValue);
-                            console.log("url", url);
-                            if (url.host.endsWith("youtube.com")) {
-                              if (url.pathname === "/watch") {
-                                videoId = url.searchParams.get("v");
-                                timecode = url.searchParams.get("t") || 0;
-                              } else if (url.pathname.startsWith("/shorts")) {
-                                videoId = url.pathname.split("/")[2];
-                                timecode = 0;
-                              }
-                            } else if (url.host === "youtu.be") {
-                              videoId = url.pathname.slice(1);
-                              timecode = url.searchParams.get("t") || 0;
-                            }
-                          } catch (error) {
-                            console.log("invalid url", inputValue, error);
-                          }
-
-                          console.log("videoId", videoId);
-                          console.log("timecode", timecode);
-                          console.log("video", video);
-
-                          const newVideo = video.slice();
-                          newVideo[index] = { videoId, start: timecode };
-                          setVideo(newVideo);
-                        }}
-                        className="relative -ml-px inline-flex select-none items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      >
-                        <UploadIcon
-                          className="h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {video[index] && (
-                  <React.Fragment>
+                  <>
                     <div className="sm:col-span-3">
-                      <YouTube
-                        videoId={video[index].videoId}
-                        className=""
-                        iframeClassName="rounded-lg"
-                        opts={{
-                          height: "100%",
-                          width: "100%",
-                          playerVars: {
-                            autoplay: 1,
-                            loop: 1,
-                            playsinline: 1,
-                            modestbranding: 1,
-                            controls: 1,
-                            enablejsapi: 1,
-                            start: video[index].start || 0,
-                            end: video[index].end,
-                          },
-                        }}
-                        onReady={(e) => {
-                          e.target.mute();
-                          console.log("player", e.target);
-                          const newVideoPlayer = videoPlayer.slice();
-                          newVideoPlayer[index] = e.target;
-                          setVideoPlayer(newVideoPlayer);
-                        }}
-                        onEnd={(e) => {
-                          e.target.seekTo(video[index].start || 0);
-                          e.target.playVideo();
-                        }}
-                      ></YouTube>
-                    </div>
-                    <div className="flex justify-around gap-2 sm:col-span-3">
-                      <div>
+                      {" "}
+                      <label
+                        htmlFor={`video-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        YouTube Video
+                      </label>
+                      <div className="relative mt-1 flex flex-grow items-stretch focus-within:z-10">
+                        <input
+                          autoComplete="off"
+                          type="text"
+                          placeholder="https://youtu.be/6Lk49reiGxQ"
+                          name={`video-${index}`}
+                          id={`video-${index}`}
+                          className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
                         <button
                           type="button"
-                          onClick={() => {
-                            if (video[index] && videoPlayer[index]) {
-                              const start = Math.floor(
-                                videoPlayer[index].getCurrentTime()
-                              );
+                          onClick={(e) => {
+                            const inputValue = e.target
+                              .closest("div")
+                              .querySelector("input").value;
+                            let videoId;
+                            let timecode;
+                            try {
+                              const url = new URL(inputValue);
+                              console.log("url", url);
+                              if (url.host.endsWith("youtube.com")) {
+                                if (url.pathname === "/watch") {
+                                  videoId = url.searchParams.get("v");
+                                  timecode = url.searchParams.get("t") || 0;
+                                } else if (url.pathname.startsWith("/shorts")) {
+                                  videoId = url.pathname.split("/")[2];
+                                  timecode = 0;
+                                }
+                              } else if (url.host === "youtu.be") {
+                                videoId = url.pathname.slice(1);
+                                timecode = url.searchParams.get("t") || 0;
+                              }
+                            } catch (error) {
+                              console.log("invalid url", inputValue, error);
+                            }
+
+                            console.log("videoId", videoId);
+                            console.log("timecode", timecode);
+                            console.log("video", video);
+
+                            if (videoId) {
                               const newVideo = video.slice();
-                              newVideo[index].start = start;
+                              newVideo[index] = { videoId, start: timecode };
                               setVideo(newVideo);
                             }
                           }}
-                          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                          className="relative -ml-px inline-flex select-none items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                          Set Start
-                        </button>
-                      </div>
-                      <div className="sm:col-span-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (video[index] && videoPlayer[index]) {
-                              const end = Math.floor(
-                                videoPlayer[index].getCurrentTime()
-                              );
-                              const newVideo = video.slice();
-                              newVideo[index].end = end;
-                              setVideo(newVideo);
-                            }
-                          }}
-                          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                        >
-                          Set End
-                        </button>
-                      </div>
-                      <div className="sm:col-span-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (video[index] && videoPlayer[index]) {
-                              const newVideo = video.slice();
-                              delete newVideo[index].end;
-                              setVideo(newVideo);
-                            }
-                          }}
-                          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                        >
-                          Clear End
-                        </button>
-                      </div>
-                      <div>
-                        <button
-                          onClick={() => {
-                            const newVideo = video.slice();
-                            delete newVideo[index];
-                            setVideo(newVideo);
-                          }}
-                          type="button"
-                          className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                        >
-                          Remove Video
+                          <UploadIcon
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
                         </button>
                       </div>
                     </div>
-                  </React.Fragment>
+                    <div className="sm:col-span-3">
+                      {" "}
+                      <label
+                        htmlFor={`google-drive-video-${index}`}
+                        className="block select-none text-sm font-medium text-gray-700"
+                      >
+                        Google Drive Video
+                      </label>
+                      <div className="relative mt-1 flex flex-grow items-stretch focus-within:z-10">
+                        <input
+                          autoComplete="off"
+                          type="text"
+                          placeholder="https://drive.google.com/file/d/abcdef12345/view"
+                          name={`google-drive-video-${index}`}
+                          id={`google-drive-video-${index}`}
+                          className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            const inputValue = e.target
+                              .closest("div")
+                              .querySelector("input").value;
+
+                            let videoId;
+                            try {
+                              const url = new URL(inputValue);
+                              console.log("url", url);
+                              if (
+                                url.hostname === "drive.google.com" &&
+                                url.pathname.startsWith("/file/d/")
+                              ) {
+                                videoId = url.pathname.split("/")[3];
+                              }
+                            } catch (error) {
+                              console.log("invalid url", inputValue, error);
+                            }
+
+                            if (videoId) {
+                              const newVideo = video.slice();
+                              newVideo[index] = {
+                                videoId,
+                                isGoogleDriveVideo: true,
+                              };
+                              setVideo(newVideo);
+                            }
+                          }}
+                          className="relative -ml-px inline-flex select-none items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        >
+                          <UploadIcon
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
+                {video[index] &&
+                  (video[index].isGoogleDriveVideo ? (
+                    <>
+                      <div className="sm:col-span-3">
+                        <GoogleDriveVideo
+                          videoId={video[index].videoId}
+                          className="w-full rounded-lg"
+                        ></GoogleDriveVideo>
+                      </div>
+                      <div className="flex justify-around gap-2 sm:col-span-3">
+                        <div>
+                          <button
+                            onClick={() => {
+                              const newVideo = video.slice();
+                              delete newVideo[index];
+                              setVideo(newVideo);
+                            }}
+                            type="button"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          >
+                            Remove Video
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="sm:col-span-3">
+                        <YouTube
+                          videoId={video[index].videoId}
+                          className=""
+                          iframeClassName="rounded-lg"
+                          opts={{
+                            height: "100%",
+                            width: "100%",
+                            playerVars: {
+                              autoplay: 1,
+                              loop: 1,
+                              playsinline: 1,
+                              modestbranding: 1,
+                              controls: 1,
+                              enablejsapi: 1,
+                              start: video[index].start || 0,
+                              end: video[index].end,
+                            },
+                          }}
+                          onReady={(e) => {
+                            e.target.mute();
+                            console.log("player", e.target);
+                            const newVideoPlayer = videoPlayer.slice();
+                            newVideoPlayer[index] = e.target;
+                            setVideoPlayer(newVideoPlayer);
+                          }}
+                          onEnd={(e) => {
+                            e.target.seekTo(video[index].start || 0);
+                            e.target.playVideo();
+                          }}
+                        ></YouTube>
+                      </div>
+                      <div className="flex justify-around gap-2 sm:col-span-3">
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (video[index] && videoPlayer[index]) {
+                                const start = Math.floor(
+                                  videoPlayer[index].getCurrentTime()
+                                );
+                                const newVideo = video.slice();
+                                newVideo[index].start = start;
+                                setVideo(newVideo);
+                              }
+                            }}
+                            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                          >
+                            Set Start
+                          </button>
+                        </div>
+                        <div className="sm:col-span-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (video[index] && videoPlayer[index]) {
+                                const end = Math.floor(
+                                  videoPlayer[index].getCurrentTime()
+                                );
+                                const newVideo = video.slice();
+                                newVideo[index].end = end;
+                                setVideo(newVideo);
+                              }
+                            }}
+                            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                          >
+                            Set End
+                          </button>
+                        </div>
+                        <div className="sm:col-span-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (video[index] && videoPlayer[index]) {
+                                const newVideo = video.slice();
+                                delete newVideo[index].end;
+                                setVideo(newVideo);
+                              }
+                            }}
+                            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                          >
+                            Clear End
+                          </button>
+                        </div>
+                        <div>
+                          <button
+                            onClick={() => {
+                              const newVideo = video.slice();
+                              delete newVideo[index];
+                              setVideo(newVideo);
+                            }}
+                            type="button"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          >
+                            Remove Video
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ))}
               </React.Fragment>
             ))}
           </>

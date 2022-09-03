@@ -11,6 +11,7 @@ import { muscles, muscleGroups } from "../../utils/exercise-utils";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
+import GoogleDriveVideo from "../../components/GoogleDriveVideo";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import MyLink from "../../components/MyLink";
 import { timeToDate, stringToDate } from "../../utils/supabase";
@@ -323,7 +324,12 @@ export default function Exercises() {
           ...(video[exercise.id]?.map(
             (video, index) =>
               video && {
-                jsx: (
+                jsx: video.isGoogleDriveVideo ? (
+                  <GoogleDriveVideo
+                    videoId={video.videoId}
+                    className="w-full rounded-lg"
+                  ></GoogleDriveVideo>
+                ) : (
                   <YouTube
                     videoId={video.videoId}
                     className=""
