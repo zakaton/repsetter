@@ -342,7 +342,7 @@ export default function Diary() {
             (exercise) => exercise.type.id === copiedExercise.type.id
           )
       );
-      // FILL - replace clientId with the current clientId if switched
+
       const newExercises = uniqueExercises.map((uniqueExercise) => {
         const {
           client,
@@ -1137,7 +1137,7 @@ export default function Diary() {
                               {exercise.type.muscles.join(", ")}
                             </dd>
                           </div>
-                          {amITheClient && exercise.coach_email && (
+                          {exercise.coach_email && (
                             <div className="sm:col-span-1">
                               <dt className="text-sm font-medium text-gray-500">
                                 Coach
