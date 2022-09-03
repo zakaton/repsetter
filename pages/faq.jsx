@@ -40,6 +40,19 @@ const faqs = [
       </>
     ),
   },
+  {
+    question: "I can't play Google Drive videos on iOS Safari!",
+    answer: () => (
+      <>
+        <p>
+          Because of how Google Drive embeds work, you&apos;ll either have to
+          tap the button in the player that opens it in Google Drive, or allow
+          cross-site tracking by setting <b>Prevent Cross-Site Tracking</b> to{" "}
+          <b>OFF</b> in your iOS Settings
+        </p>
+      </>
+    ),
+  },
 ];
 
 function classNames(...classes) {
