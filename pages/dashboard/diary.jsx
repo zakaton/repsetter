@@ -342,6 +342,7 @@ export default function Diary() {
             (exercise) => exercise.type.id === copiedExercise.type.id
           )
       );
+      // FILL - replace clientId with the current clientId if switched
       const newExercises = uniqueExercises.map((uniqueExercise) => {
         const {
           client,
@@ -361,8 +362,8 @@ export default function Diary() {
 
           date: selectedDate.toDateString(),
 
-          client,
-          client_email,
+          client: selectedClientId,
+          client_email: selectedClient.client_email,
 
           number_of_sets_assigned,
           number_of_reps_assigned,
@@ -370,7 +371,12 @@ export default function Diary() {
           weight_assigned,
         };
 
-        if (coach && coach_email) {
+        if (!amITheClient) {
+          Object.assign(insertedExercise, {
+            coach: user.id,
+            coach_email: user.email,
+          });
+        } else if (coach && coach_email) {
           Object.assign(insertedExercise, { coach, coach_email });
         }
 
