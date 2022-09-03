@@ -106,7 +106,16 @@ export default function ExerciseModal(props) {
       setNumberOfReps([numberOfReps[0]]);
       setIsNumberOfRepsEmptyString([isNumberOfRepsEmptyString[0]]);
     } else {
-      setNumberOfReps(new Array(numberOfSets).fill(numberOfReps[0]));
+      let newNumberOfReps;
+      if (numberOfReps.length > numberOfSets) {
+        newNumberOfReps = numberOfReps.slice(0, numberOfSets);
+      } else {
+        newNumberOfReps = numberOfReps.slice();
+        while (newNumberOfReps.length < numberOfSets) {
+          newNumberOfReps.push(newNumberOfReps[newNumberOfReps.length - 1]);
+        }
+      }
+      setNumberOfReps(newNumberOfReps);
       setIsNumberOfRepsEmptyString(
         new Array(numberOfSets).fill(isNumberOfRepsEmptyString[0])
       );
