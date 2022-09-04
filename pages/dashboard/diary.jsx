@@ -1419,6 +1419,16 @@ export default function Diary() {
                               </dd>
                             </div>
                           )}
+                          {exercise.feedback?.length > 0 && (
+                            <div className="sm:col-span-1">
+                              <dt className="text-sm font-medium text-gray-500">
+                                Feedback
+                              </dt>
+                              <dd className="mt-1 break-words text-sm text-gray-900">
+                                {exercise.feedback}
+                              </dd>
+                            </div>
+                          )}
                           <div className="sm:col-span-1">
                             <button
                               onClick={() => {

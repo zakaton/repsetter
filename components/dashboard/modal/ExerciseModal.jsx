@@ -299,6 +299,7 @@ export default function ExerciseModal(props) {
     setTimePerformed();
 
     setComments("");
+    setFeedback("");
   };
 
   useEffect(() => {
@@ -476,6 +477,9 @@ export default function ExerciseModal(props) {
 
       if (selectedExercise.comments) {
         setComments(selectedExercise.comments);
+      }
+      if (selectedExercise.feedback) {
+        setFeedback(selectedExercise.feedback);
       }
     }
   }, [open, selectedExercise]);
@@ -769,6 +773,9 @@ export default function ExerciseModal(props) {
   const [comments, setComments] = useState("");
   const maxCommentsLength = 200;
 
+  const [feedback, setFeedback] = useState("");
+  const maxFeedbackLength = 200;
+
   return (
     <Modal
       {...props}
@@ -888,7 +895,9 @@ export default function ExerciseModal(props) {
 
               difficulty,
               video,
+
               comments,
+              feedback,
             };
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
@@ -930,6 +939,7 @@ export default function ExerciseModal(props) {
               type: selectedExerciseType.id,
 
               comments,
+              feedback,
 
               number_of_sets_assigned: numberOfSets,
               number_of_reps_assigned: selectedExerciseType.features?.includes(
@@ -1294,6 +1304,14 @@ export default function ExerciseModal(props) {
                 <dt className="text-sm font-medium text-gray-500">Comments</dt>
                 <dd className="mt-1 break-words text-sm text-gray-900">
                   {previousExercise.comments}
+                </dd>
+              </div>
+            )}
+            {previousExercise.feedback?.length > 0 && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Feedback</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.feedback}
                 </dd>
               </div>
             )}
@@ -2852,6 +2870,32 @@ export default function ExerciseModal(props) {
                   ))}
               </React.Fragment>
             ))}
+
+            <div className="relative w-full sm:col-span-3">
+              <label
+                htmlFor="feedback"
+                className="block select-none text-sm font-medium text-gray-700"
+              >
+                Feedback
+              </label>
+              <div className="mt-1">
+                <textarea
+                  placeholder="optional feedback"
+                  value={feedback}
+                  maxLength={maxFeedbackLength}
+                  onInput={(e) => {
+                    const newFeedback = e.target.value;
+                    setFeedback(newFeedback);
+                  }}
+                  name="feedback"
+                  id="feedback"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  {feedback.length}/{maxFeedbackLength}
+                </p>
+              </div>
+            </div>
           </>
         )}
       </form>

@@ -370,6 +370,10 @@ export default function Exercises() {
             title: "comments",
             value: exercise.comments,
           },
+          exercise.feedback?.length > 0 && {
+            title: "feedback",
+            value: exercise.feedback,
+          },
           {
             jsx: (
               <button
