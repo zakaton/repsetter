@@ -297,6 +297,8 @@ export default function ExerciseModal(props) {
 
     setIncludeTimePerformed(false);
     setTimePerformed();
+
+    setComments("");
   };
 
   useEffect(() => {
@@ -470,6 +472,10 @@ export default function ExerciseModal(props) {
           ).fill(0);
         }
         setSpeedPerformed(speedPerformed);
+      }
+
+      if (selectedExercise.comments) {
+        setComments(selectedExercise.comments);
       }
     }
   }, [open, selectedExercise]);
@@ -760,6 +766,9 @@ export default function ExerciseModal(props) {
     }
   }, [previousExercise]);
 
+  const [comments, setComments] = useState("");
+  const maxCommentsLength = 200;
+
   return (
     <Modal
       {...props}
@@ -879,6 +888,7 @@ export default function ExerciseModal(props) {
 
               difficulty,
               video,
+              comments,
             };
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
@@ -918,6 +928,8 @@ export default function ExerciseModal(props) {
               time: includeTimePerformed ? timePerformed : null,
 
               type: selectedExerciseType.id,
+
+              comments,
 
               number_of_sets_assigned: numberOfSets,
               number_of_reps_assigned: selectedExerciseType.features?.includes(
@@ -1275,6 +1287,15 @@ export default function ExerciseModal(props) {
                     </div>
                   </React.Fragment>
                 )
+            )}
+
+            {previousExercise.comments?.length > 0 && (
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Comments</dt>
+                <dd className="mt-1 break-words text-sm text-gray-900">
+                  {previousExercise.comments}
+                </dd>
+              </div>
             )}
           </>
         )}
@@ -2042,6 +2063,32 @@ export default function ExerciseModal(props) {
                   ))}
               </>
             )}
+
+            <div className="relative w-full sm:col-span-3">
+              <label
+                htmlFor="comments"
+                className="block select-none text-sm font-medium text-gray-700"
+              >
+                Comments
+              </label>
+              <div className="mt-1">
+                <textarea
+                  placeholder="optional comments"
+                  value={comments}
+                  maxLength={maxCommentsLength}
+                  onInput={(e) => {
+                    const newComments = e.target.value;
+                    setComments(newComments);
+                  }}
+                  name="comments"
+                  id="comments"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  {comments.length}/{maxCommentsLength}
+                </p>
+              </div>
+            </div>
           </>
         )}
 

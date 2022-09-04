@@ -366,6 +366,10 @@ export default function Exercises() {
                 ),
               }
           ) || []),
+          exercise.comments?.length > 0 && {
+            title: "comments",
+            value: exercise.comments,
+          },
           {
             jsx: (
               <button
