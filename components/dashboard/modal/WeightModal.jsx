@@ -31,6 +31,25 @@ export default function WeightModal(props) {
   const { selectedDate } = useClient();
   const { user } = useUser();
 
+  const [isAddingWeight, setIsAddingWeight] = useState(false);
+  const [didAddWeight, setDidAddWeight] = useState(false);
+
+  const [isUpdatingWeight, setIsUpdatingWeight] = useState(false);
+  const [didUpdateWeight, setDidUpdateWeight] = useState(false);
+
+  const [includeTime, setIncludeTime] = useState(false);
+
+  const [weight, setWeight] = useState(0);
+  const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
+  const [bodyfatPercentage, setBodyfatPercentage] = useState(null);
+  const [isBodyfatPercentageEmptyString, setIsBodyfatPercentageEmptyString] =
+    useState(true);
+  const [time, setTime] = useState();
+  const [weightEvent, setWeightEvent] = useState();
+  const [isUsingKilograms, setIsUsingKilograms] = useState(false);
+  const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
+    useState(null);
+
   useEffect(() => {
     if (!open) {
       setDidAddWeight(false);
@@ -39,6 +58,9 @@ export default function WeightModal(props) {
       setIsAddingWeight(false);
       setIsUpdatingWeight(false);
       setPreviousIsUsingKilograms(null);
+
+      setBodyfatPercentage(null);
+      setIsBodyfatPercentageEmptyString(true);
     }
   }, [open]);
 
@@ -48,6 +70,10 @@ export default function WeightModal(props) {
       if (selectedWeight) {
         setWeight(selectedWeight.weight);
         setIsWeightEmptyString(false);
+        if (selectedWeight.bodyfat_percentage !== null) {
+          setBodyfatPercentage(selectedWeight.bodyfat_percentage);
+          setIsBodyfatPercentageEmptyString(false);
+        }
         setIsUsingKilograms(selectedWeight.is_weight_in_kilograms);
         if (selectedWeight.time !== null) {
           setTime(selectedWeight.time);
@@ -57,13 +83,20 @@ export default function WeightModal(props) {
       } else {
         if (existingWeights?.length > 0) {
           const latestWeightToday = existingWeights[existingWeights.length - 1];
-          console.log("latestWeightToday", latestWeightToday);
           setWeight(latestWeightToday.weight);
           setIsUsingKilograms(latestWeightToday.is_weight_in_kilograms);
           setIsWeightEmptyString(false);
         } else if (lastWeightBeforeToday) {
-          setIsUsingKilograms(lastWeightBeforeToday.is_weight_in_kilograms);
           setWeight(lastWeightBeforeToday.weight);
+          if (
+            lastWeightBeforeToday.is_weight_in_kilograms != isUsingKilograms
+          ) {
+            setIsUsingKilograms(lastWeightBeforeToday.is_weight_in_kilograms);
+          } else {
+            setPreviousIsUsingKilograms(
+              lastWeightBeforeToday.is_weight_in_kilograms
+            );
+          }
           setIsWeightEmptyString(false);
         } else {
           setWeight(0);
@@ -75,21 +108,6 @@ export default function WeightModal(props) {
     }
   }, [open, selectedWeight]);
 
-  const [isAddingWeight, setIsAddingWeight] = useState(false);
-  const [didAddWeight, setDidAddWeight] = useState(false);
-
-  const [isUpdatingWeight, setIsUpdatingWeight] = useState(false);
-  const [didUpdateWeight, setDidUpdateWeight] = useState(false);
-
-  const [includeTime, setIncludeTime] = useState(false);
-
-  const [weight, setWeight] = useState(0);
-  const [time, setTime] = useState();
-  const [weightEvent, setWeightEvent] = useState();
-  const [isWeightEmptyString, setIsWeightEmptyString] = useState(true);
-  const [isUsingKilograms, setIsUsingKilograms] = useState(false);
-  const [previousIsUsingKilograms, setPreviousIsUsingKilograms] =
-    useState(null);
   useEffect(() => {
     if (!open) {
       return;
@@ -114,7 +132,11 @@ export default function WeightModal(props) {
   if (lastWeightBeforeToday) {
     lastWeightBeforeTodayString += ` (Last weight was ${
       lastWeightBeforeToday.weight
-    } ${lastWeightBeforeToday.is_weight_in_kilograms ? "kg" : "lbs"}`;
+    } ${lastWeightBeforeToday.is_weight_in_kilograms ? "kg" : "lbs"}${
+      lastWeightBeforeToday.bodyfat_percentage !== null
+        ? ` with ${lastWeightBeforeToday.bodyfat_percentage}% bodyfat`
+        : ""
+    }`;
     const date = dateFromDateAndTime(
       lastWeightBeforeToday.date,
       lastWeightBeforeToday.time
@@ -165,7 +187,7 @@ export default function WeightModal(props) {
       }
     >
       <form
-        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+        className="my-5 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3"
         id="weightForm"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -175,6 +197,7 @@ export default function WeightModal(props) {
             const updateWeightData = {
               weight,
               is_weight_in_kilograms: isUsingKilograms,
+              bodyfat_percentage: bodyfatPercentage,
             };
             if (includeTime) {
               updateWeightData.time = time;
@@ -213,6 +236,7 @@ export default function WeightModal(props) {
               is_weight_in_kilograms: isUsingKilograms,
               client: user.id,
               client_email: user.email,
+              bodyfat_percentage: bodyfatPercentage,
             };
             if (includeTime) {
               addWeightData.time = time;
@@ -278,6 +302,34 @@ export default function WeightModal(props) {
                 <option>kg</option>
               </select>
             </div>
+          </div>
+        </div>
+        <div className="col-span-1">
+          <label
+            htmlFor="bodyfatPercentage"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Bodyfat Percentage
+          </label>
+          <div className="relative mt-1 rounded-md shadow-sm">
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              max="100"
+              placeholder="0"
+              name="bodyfatPercentage"
+              id="bodyfatPercentage"
+              step="0.1"
+              className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              value={isBodyfatPercentageEmptyString ? "" : bodyfatPercentage}
+              onInput={(e) => {
+                setIsBodyfatPercentageEmptyString(e.target.value === "");
+                const newBodyfatPercentage =
+                  e.target.value === "" ? null : Number(e.target.value);
+                setBodyfatPercentage(newBodyfatPercentage);
+              }}
+            />
           </div>
         </div>
         <div className="flex self-center">

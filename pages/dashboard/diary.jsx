@@ -1601,6 +1601,7 @@ export default function Diary() {
                           previousWeight = weights[index - 1];
                         }
                         let weightDifference;
+                        let bodyfatDifference = null;
                         if (previousWeight) {
                           let previousWeightValue = previousWeight.weight;
                           if (
@@ -1610,6 +1611,14 @@ export default function Diary() {
                             previousWeightValue = weight.is_weight_in_kilograms
                               ? poundsToKilograms(previousWeightValue)
                               : kilogramsToPounds(previousWeightValue);
+                          }
+                          if (
+                            weight.bodyfat_percentage !== null &&
+                            previousWeight.bodyfat_percentage !== null
+                          ) {
+                            bodyfatDifference =
+                              weight.bodyfat_percentage -
+                              previousWeight.bodyfat_percentage;
                           }
                           weightDifference =
                             weight.weight - previousWeightValue;
@@ -1661,6 +1670,28 @@ export default function Diary() {
                                   )}
                                 </dd>
                               </div>
+                              {weight.bodyfat_percentage !== null && (
+                                <div className="sm:col-span-1">
+                                  <dt className="text-sm font-medium text-gray-500">
+                                    Bodyfat Percentage
+                                  </dt>
+                                  <dd className="mt-1 break-words text-sm text-gray-900">
+                                    {weight.bodyfat_percentage}%
+                                    {bodyfatDifference && (
+                                      <span
+                                        className={
+                                          bodyfatDifference < 0
+                                            ? "text-red-500"
+                                            : "text-green-500"
+                                        }
+                                      >
+                                        ({bodyfatDifference < 0 ? "" : "+"}
+                                        {bodyfatDifference.toFixed(1)})
+                                      </span>
+                                    )}
+                                  </dd>
+                                </div>
+                              )}
                               {weight.time !== null && (
                                 <div className="sm:col-span-1">
                                   <dt className="text-sm font-medium text-gray-500">

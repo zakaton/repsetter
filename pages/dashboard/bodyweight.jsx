@@ -165,6 +165,10 @@ export default function Bodyweight() {
                 weight.is_weight_in_kilograms ? "kg" : "lbs"
               })`,
             },
+            weight.bodyfat_percentage !== null && {
+              title: "bodyfat percentage",
+              value: `${weight.bodyfat_percentage}%`,
+            },
             ...pictureItems,
             weight.event && {
               title: "event",

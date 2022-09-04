@@ -290,6 +290,9 @@ export default function Photos() {
                     <p className="pointer-events-none block text-center text-sm font-medium text-gray-500">
                       {weight.weight}{" "}
                       {weight.is_weight_in_kilograms ? "kg" : "lbs"}
+                      {weight.bodyfat_percentage !== null
+                        ? `, ${weight.bodyfat_percentage}% bodyfat`
+                        : ""}
                     </p>
                   )}
                   <img
