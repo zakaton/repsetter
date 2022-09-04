@@ -593,8 +593,8 @@ const graphTypes = {
   "bodyfat percentage": {
     label: "Bodyfat Percentage",
     type: "line",
-    borderColor: "rgb(0, 204, 21)",
-    backgroundColor: "rgba(0, 204, 21, 0.5)",
+    borderColor: "rgb(209, 97, 31)",
+    backgroundColor: "rgba(209, 97, 31, 0.5)",
     getData: ({ weights, filters }) => {
       const data = [];
       weights
