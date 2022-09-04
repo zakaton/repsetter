@@ -771,10 +771,10 @@ export default function ExerciseModal(props) {
   }, [previousExercise]);
 
   const [notes, setNotes] = useState("");
-  const maxNotesLength = 200;
+  const maxNotesLength = 500;
 
   const [feedback, setFeedback] = useState("");
-  const maxFeedbackLength = 200;
+  const maxFeedbackLength = 500;
 
   return (
     <Modal
