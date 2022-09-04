@@ -48,6 +48,7 @@ const defaultDateRange = "past month";
 const graphTypeOrder = [
   "weight",
   "bodyweight",
+  "bodyfat percentage",
   "number of sets",
   "number of reps",
   "difficulty",
@@ -153,6 +154,10 @@ const filterTypes = [
       {
         value: "bodyweight",
         label: "Bodyweight",
+      },
+      {
+        value: "bodyfat percentage",
+        label: "Bodyfat percentage",
       },
     ],
   },
@@ -585,6 +590,73 @@ const graphTypes = {
     */
     yAxisID: "y4",
   },
+  "bodyfat percentage": {
+    label: "Bodyfat Percentage",
+    type: "line",
+    borderColor: "rgb(0, 204, 21)",
+    backgroundColor: "rgba(0, 204, 21, 0.5)",
+    getData: ({ weights, filters }) => {
+      const data = [];
+      weights
+        ?.filter((weight) => weight.bodyfat_percentage !== null)
+        .forEach((weight) => {
+          const bodyfatPercentage = weight.bodyfat_percentage;
+          const weightValue = bodyfatPercentage;
+          const showIndividualWeights =
+            false && filters["date-range"] == "past week";
+          const date = dateFromDateAndTime(weight.date, weight.time);
+          let datum = data.find((_data) => _data._date === weight.date);
+          if (datum && !showIndividualWeights) {
+            datum.sum += weightValue;
+            datum.numberOfWeights += 1;
+            datum.y = datum.sum / datum.numberOfWeights;
+            if (weightValue > datum.max) {
+              datum.max = weightValue;
+              datum.maxTime = date.toLocaleTimeString([], {
+                timeStyle: "short",
+              });
+            }
+            if (weightValue < datum.min) {
+              datum.min = weightValue;
+              datum.minTime = date.toLocaleTimeString([], {
+                timeStyle: "short",
+              });
+            }
+          } else {
+            datum = {
+              x: date,
+              y: weightValue,
+              sum: weightValue,
+              numberOfWeights: 1,
+              _date: weight.date,
+              toFixed: 1,
+              max: weightValue,
+              maxTime: date.toLocaleTimeString([], { timeStyle: "short" }),
+              min: weightValue,
+              minTime: date.toLocaleTimeString([], { timeStyle: "short" }),
+              includeTime: showIndividualWeights,
+              event: showIndividualWeights ? weight.event : null,
+            };
+            data.push(datum);
+          }
+        });
+
+      return data;
+    },
+    segment: {
+      borderColor: (context) => {
+        const event = context?.p1?.raw?.event;
+        return weightEventColors[event || "none"];
+      },
+    },
+    /*
+    pointBackgroundColor: (context) => {
+      const event = context?.raw?.event;
+      return weightEventColors[event || "none"];
+    },
+    */
+    yAxisID: "y11",
+  },
 };
 
 const getTopWeightIndex = (exercise) => {
@@ -762,7 +834,10 @@ export default function Progress() {
         setExercises();
       }
 
-      if (containsFilters?.type?.includes("bodyweight")) {
+      if (
+        containsFilters?.type?.includes("bodyweight") ||
+        containsFilters?.type?.includes("bodyfat")
+      ) {
         getWeights(didDateRangeExpand);
       } else if (didDateRangeExpand) {
         setWeights();
@@ -1001,6 +1076,20 @@ export default function Progress() {
           title: {
             display: true,
             text: `Distance`,
+          },
+        },
+        y11: {
+          type: "linear",
+          display: typesToDisplay.includes("bodyfat percentage"),
+          min: 0,
+          max: 100,
+          position: getPosition("bodyfat percentage"),
+          grid: {
+            drawOnChartArea: getGridDrawOnChartArea("bodyfat percentage"),
+          },
+          title: {
+            display: true,
+            text: `Bodyfat Percentage`,
           },
         },
       },
