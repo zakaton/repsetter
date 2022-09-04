@@ -366,9 +366,9 @@ export default function Exercises() {
                 ),
               }
           ) || []),
-          exercise.comments?.length > 0 && {
-            title: "comments",
-            value: exercise.comments,
+          exercise.notes?.length > 0 && {
+            title: "notes",
+            value: exercise.notes,
           },
           exercise.feedback?.length > 0 && {
             title: "feedback",

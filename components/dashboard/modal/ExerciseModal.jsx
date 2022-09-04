@@ -298,7 +298,7 @@ export default function ExerciseModal(props) {
     setIncludeTimePerformed(false);
     setTimePerformed();
 
-    setComments("");
+    setNotes("");
     setFeedback("");
   };
 
@@ -475,8 +475,8 @@ export default function ExerciseModal(props) {
         setSpeedPerformed(speedPerformed);
       }
 
-      if (selectedExercise.comments) {
-        setComments(selectedExercise.comments);
+      if (selectedExercise.notes) {
+        setNotes(selectedExercise.notes);
       }
       if (selectedExercise.feedback) {
         setFeedback(selectedExercise.feedback);
@@ -770,8 +770,8 @@ export default function ExerciseModal(props) {
     }
   }, [previousExercise]);
 
-  const [comments, setComments] = useState("");
-  const maxCommentsLength = 200;
+  const [notes, setNotes] = useState("");
+  const maxNotesLength = 200;
 
   const [feedback, setFeedback] = useState("");
   const maxFeedbackLength = 200;
@@ -896,7 +896,7 @@ export default function ExerciseModal(props) {
               difficulty,
               video,
 
-              comments,
+              notes,
               feedback,
             };
             console.log("updateExerciseData", updateExerciseData);
@@ -938,7 +938,7 @@ export default function ExerciseModal(props) {
 
               type: selectedExerciseType.id,
 
-              comments,
+              notes,
               feedback,
 
               number_of_sets_assigned: numberOfSets,
@@ -1299,11 +1299,11 @@ export default function ExerciseModal(props) {
                 )
             )}
 
-            {previousExercise.comments?.length > 0 && (
+            {previousExercise.notes?.length > 0 && (
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Comments</dt>
+                <dt className="text-sm font-medium text-gray-500">Notes</dt>
                 <dd className="mt-1 break-words text-sm text-gray-900">
-                  {previousExercise.comments}
+                  {previousExercise.notes}
                 </dd>
               </div>
             )}
@@ -2084,26 +2084,26 @@ export default function ExerciseModal(props) {
 
             <div className="relative w-full sm:col-span-3">
               <label
-                htmlFor="comments"
+                htmlFor="notes"
                 className="block select-none text-sm font-medium text-gray-700"
               >
-                Comments
+                Notes
               </label>
               <div className="mt-1">
                 <textarea
-                  placeholder="optional comments"
-                  value={comments}
-                  maxLength={maxCommentsLength}
+                  placeholder="optional notes"
+                  value={notes}
+                  maxLength={maxNotesLength}
                   onInput={(e) => {
-                    const newComments = e.target.value;
-                    setComments(newComments);
+                    const newNotes = e.target.value;
+                    setNotes(newNotes);
                   }}
-                  name="comments"
-                  id="comments"
+                  name="notes"
+                  id="notes"
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
                 <p className="mt-2 text-sm text-gray-500">
-                  {comments.length}/{maxCommentsLength}
+                  {notes.length}/{maxNotesLength}
                 </p>
               </div>
             </div>
@@ -2870,6 +2870,20 @@ export default function ExerciseModal(props) {
                   ))}
               </React.Fragment>
             ))}
+
+            <div className="relative w-full sm:col-span-3">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center">
+                <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-gray-700 shadow-sm">
+                  <span className="select-none">Feedback</span>
+                </div>
+              </div>
+            </div>
 
             <div className="relative w-full sm:col-span-3">
               <label
