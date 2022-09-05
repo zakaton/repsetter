@@ -27,13 +27,17 @@ export default async function handler(req, res) {
   }
 
   let authCode = req.query.code || null;
+  const updatedProfile = {};
   if (authCode == "null") {
-    authCode = null;
+    updatedProfile.withings_auth_code = null;
+    updatedProfile.withings_access_token = null;
+    updatedProfile.withings_refresh_token = null;
+    updatedProfile.withings_token_expiration = null;
+    updatedProfile.withings_userid = null;
+  } else {
+    updatedProfile.withings_auth_code = authCode;
   }
-  await supabase
-    .from("profile")
-    .update({ withings_auth_code: authCode })
-    .eq("id", profile.id);
+  await supabase.from("profile").update(updatedProfile).eq("id", profile.id);
 
   res.status(200).json({
     status: {
