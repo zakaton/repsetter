@@ -38,10 +38,15 @@ export default function AccountGeneral() {
   useEffect(() => {
     if (user) {
       setWithingsAuthURL(getWithingsAuthURL(user.id));
+      if (didGrantAccessToWithings !== null) {
+        setDidGrantAccessToWithings(user.withings_auth_code);
+      }
     }
   }, [user]);
 
   const router = useRouter();
+  const [didGrantAccessToWithings, setDidGrantAccessToWithings] =
+    useState(null);
   useEffect(() => {
     if (router.isReady) {
       if ((router.query.code || router.query.error) && router.query.state) {
@@ -65,6 +70,8 @@ export default function AccountGeneral() {
   }, [router.isReady]);
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
+    setDidGrantAccessToWithings(withingsAuthCode === "null");
+
     const response = await fetchWithAccessToken(
       `/api/account/set-withings-auth-code?code=${withingsAuthCode}`
     );
