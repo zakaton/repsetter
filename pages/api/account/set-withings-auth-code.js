@@ -1,5 +1,9 @@
 /* eslint-disable consistent-return */
-import { getSupabaseService, getUserProfile } from "../../../utils/supabase";
+import {
+  getSupabaseService,
+  getUserProfile,
+  getUserByAccessToken,
+} from "../../../utils/supabase";
 
 export default async function handler(req, res) {
   const supabase = getSupabaseService();
@@ -12,7 +16,7 @@ export default async function handler(req, res) {
       },
     });
 
-  const { user } = await supabase.auth.api.getUser(req.query.access_token);
+  const { user } = await getUserByAccessToken(supabase, req);
   if (!user) {
     return sendError({ message: "you are not signed in" });
   }
