@@ -35,6 +35,7 @@ export default async function handler(req, res) {
     return sendError({ message: json.error });
   }
   const { access_token, refresh_token, expires_in, userid } = json.body;
+  console.log(access_token, refresh_token, expires_in, userid);
   await supabase
     .from("profile")
     .update({

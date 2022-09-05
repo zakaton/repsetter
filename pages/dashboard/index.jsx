@@ -18,6 +18,8 @@ export default function AccountGeneral() {
   const { user, isLoading, stripeLinks, fetchWithAccessToken } = useUser();
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
+  //window.fetchWithAccessToken = fetchWithAccessToken;
+
   const { coachPictures, getCoachPicture } = useCoachPictures();
 
   const [showCoachPictureModal, setShowCoachPictureModal] = useState(false);
@@ -88,10 +90,11 @@ export default function AccountGeneral() {
       );
       if (getWithingsAccessTokenJSON.status === "succeeded") {
         console.log("got access token!");
-
+        /*
         subscribeToAllWithingsNotifications(
           getWithingsAccessTokenJSON.data.access_token
         );
+        */
       }
     }
   };
