@@ -18,7 +18,7 @@ export default function AccountGeneral() {
   const { user, isLoading, stripeLinks, fetchWithAccessToken } = useUser();
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
-  //window.fetchWithAccessToken = fetchWithAccessToken;
+  window.fetchWithAccessToken = fetchWithAccessToken;
 
   const { coachPictures, getCoachPicture } = useCoachPictures();
 
@@ -75,12 +75,13 @@ export default function AccountGeneral() {
   }, [router.isReady]);
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
+    console.log("setWithingsAuthCode", withingsAuthCode);
     setDidGrantAccessToWithings(withingsAuthCode !== "null");
-
     const response = await fetchWithAccessToken(
       `/api/account/set-withings-auth-code?code=${withingsAuthCode}`
     );
     const setWithingsAuthCodeJSON = await response.json();
+    console.log("setWithingsAuthCodeJSON", setWithingsAuthCodeJSON);
     if (
       setWithingsAuthCodeJSON.status === "succeeded" &&
       setWithingsAuthCodeJSON.withings_auth_code
@@ -88,6 +89,7 @@ export default function AccountGeneral() {
       const getWithingsAccessTokenJSON = await fetchWithAccessToken(
         "/api/account/get-withings-access-token"
       );
+      console.log("getWithingsAccessTokenJSON", getWithingsAccessTokenJSON);
       if (getWithingsAccessTokenJSON.status === "succeeded") {
         console.log("got access token!");
         /*
