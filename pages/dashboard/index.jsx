@@ -70,7 +70,7 @@ export default function AccountGeneral() {
   }, [router.isReady]);
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
-    setDidGrantAccessToWithings(withingsAuthCode === "null");
+    setDidGrantAccessToWithings(withingsAuthCode !== "null");
 
     const response = await fetchWithAccessToken(
       `/api/account/set-withings-auth-code?code=${withingsAuthCode}`
