@@ -8,7 +8,10 @@ import MyLink from "../../components/MyLink";
 import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import Notification from "../../components/Notification";
 import { useCoachPictures } from "../../context/coach-picture-context";
-import { getWithingsAuthURL } from "../../utils/withings";
+import {
+  getWithingsAuthURL,
+  subscribeToAllWithingsNotifications,
+} from "../../utils/withings";
 import { useRouter } from "next/router";
 
 export default function AccountGeneral() {
@@ -85,6 +88,10 @@ export default function AccountGeneral() {
       );
       if (getWithingsAccessTokenJSON.status === "succeeded") {
         console.log("got access token!");
+
+        subscribeToAllWithingsNotifications(
+          getWithingsAccessTokenJSON.data.access_token
+        );
       }
     }
   };

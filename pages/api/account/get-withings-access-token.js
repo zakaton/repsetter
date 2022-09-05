@@ -49,6 +49,6 @@ export default async function handler(req, res) {
       type: "succeeded",
       title: "Successfully Received Withings access token",
     },
-    json,
+    data: json.body,
   });
 }

@@ -64,6 +64,40 @@ export async function refreshWithingsAccessToken(refreshToken) {
   return json;
 }
 
+export async function subscribeToWithingsNotifications(accessToken, appli) {
+  const params = new URLSearchParams();
+  params.append("action", "subscribe");
+  params.append(
+    "callbackurl",
+    process.env.NEXT_PUBLIC_URL +
+      process.env.NEXT_PUBLIC_WITHINGS_NOTIFICATIONS_URI
+  );
+  params.append("appli", appli);
+
+  const response = await fetch(
+    `${process.env.WITHINGS_TARGET_ENDPOINT}/notify`,
+    {
+      method: "POST",
+      body: params,
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+  const json = await response.json();
+  console.log("withings subscribe json", json);
+  return json;
+}
+const withingsAppliList = [1, 6]; // weight (kg) and Fat Ratio (%)
+export async function subscribeToAllWithingsNotifications(accessToken) {
+  const jsonResponses = await Promise.all(
+    withingsAppliList.map((appli) =>
+      subscribeToWithingsNotifications(accessToken, appli)
+    )
+  );
+  return jsonResponses;
+}
+
 export async function getNonce() {
   const params = new URLSearchParams();
 
@@ -94,5 +128,3 @@ export async function getNonce() {
   console.log("nonce json", json);
   return json;
 }
-
-// curl --data "action=getnonce&client_id=client_id&timestamp=timestamp&signature=signature" 'https://wbsapi.withings.net/v2/signature'
