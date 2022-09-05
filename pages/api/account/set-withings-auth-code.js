@@ -26,7 +26,10 @@ export default async function handler(req, res) {
     return sendError({ message: "user profile not found" });
   }
 
-  const authCode = req.query.code || null;
+  let authCode = req.query.code || null;
+  if (authCode == "null") {
+    authCode = null;
+  }
   await supabase
     .from("profile")
     .update({ withings_auth_code: authCode })

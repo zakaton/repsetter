@@ -44,13 +44,18 @@ export default function AccountGeneral() {
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
-      if (router.query.code && router.query.state) {
+      if ((router.query.code || router.query.error) && router.query.state) {
         if (router.query.state === user.id) {
-          setWithingsAuthCode(router.query.code);
+          if (router.query.code) {
+            setWithingsAuthCode(router.query.code);
+          } else if (router.query.error === "access_denied") {
+            setWithingsAuthCode("null");
+          }
         }
 
         delete router.query.code;
         delete router.query.state;
+        delete router.query.error;
 
         router.replace({ query: { ...router.query } }, undefined, {
           shallow: true,
