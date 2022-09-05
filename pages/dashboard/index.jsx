@@ -8,9 +8,11 @@ import MyLink from "../../components/MyLink";
 import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import Notification from "../../components/Notification";
 import { useCoachPictures } from "../../context/coach-picture-context";
+import { getWithingsAuthURL } from "../../utils/withings";
+import { useRouter } from "next/router";
 
 export default function AccountGeneral() {
-  const { user, isLoading, stripeLinks } = useUser();
+  const { user, isLoading, stripeLinks, fetchWithAccessToken } = useUser();
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   const { coachPictures, getCoachPicture } = useCoachPictures();
@@ -31,6 +33,40 @@ export default function AccountGeneral() {
       getCoachPicture(user.id, true);
     }
   }, [coachPictureStatus]);
+
+  const [withingsAuthURL, setWithingsAuthURL] = useState("");
+  useEffect(() => {
+    if (user) {
+      setWithingsAuthURL(getWithingsAuthURL(user.id));
+    }
+  }, [user]);
+
+  const router = useRouter();
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query.code && router.query.state) {
+        if (router.query.state === user.id) {
+          withingsAuthCode = router.query.code;
+          setWithingsAuthCode(withingsAuthCode);
+        }
+
+        delete router.query.code;
+        delete router.query.state;
+
+        router.replace({ query: { ...router.query } }, undefined, {
+          shallow: true,
+        });
+      }
+    }
+  }, [router.isReady]);
+
+  const setWithingsAuthCode = async (withingsAuthCode) => {
+    const response = await fetchWithAccessToken(
+      `/api/account/set-withings-auth-code?code=${withingsAuthCode}`
+    );
+    const json = await response.json();
+    console.log(json);
+  };
 
   return (
     <>
@@ -108,6 +144,23 @@ export default function AccountGeneral() {
                       in order to coach.
                     </>
                   )}
+                </dd>
+              </div>
+              <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
+                <dt className="text-sm font-medium text-gray-500">Withings</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  <MyLink
+                    href={withingsAuthURL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <button
+                      type="button"
+                      className="inline-flex items-center rounded-md border border-transparent bg-blue-100 px-2 py-1 text-sm font-medium leading-4 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      Update Access
+                    </button>
+                  </MyLink>
                 </dd>
               </div>
               {user.can_coach && (
