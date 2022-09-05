@@ -46,8 +46,7 @@ export default function AccountGeneral() {
     if (router.isReady) {
       if (router.query.code && router.query.state) {
         if (router.query.state === user.id) {
-          withingsAuthCode = router.query.code;
-          setWithingsAuthCode(withingsAuthCode);
+          setWithingsAuthCode(router.query.code);
         }
 
         delete router.query.code;
