@@ -41,8 +41,8 @@ export default function AccountGeneral() {
   useEffect(() => {
     if (user) {
       setWithingsAuthURL(getWithingsAuthURL(user.id));
-      if (didGrantAccessToWithings !== null) {
-        setDidGrantAccessToWithings(user.withings_auth_code);
+      if (didGrantAccessToWithings === null) {
+        setDidGrantAccessToWithings(Boolean(user.withings_auth_code));
       }
     }
   }, [user]);
