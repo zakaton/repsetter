@@ -64,6 +64,7 @@ export async function refreshWithingsAccessToken(refreshToken) {
   return json;
 }
 
+const withingsAppliList = [1]; // user.metrics
 export async function subscribeToWithingsNotifications(accessToken, appli) {
   const params = new URLSearchParams();
   params.append("action", "subscribe");
@@ -85,14 +86,45 @@ export async function subscribeToWithingsNotifications(accessToken, appli) {
     }
   );
   const json = await response.json();
-  console.log("withings subscribe json", json);
+  console.log("withings subscribe json", json, appli);
   return json;
 }
-const withingsAppliList = [1, 6]; // weight (kg) and Fat Ratio (%)
 export async function subscribeToAllWithingsNotifications(accessToken) {
   const jsonResponses = await Promise.all(
     withingsAppliList.map((appli) =>
       subscribeToWithingsNotifications(accessToken, appli)
+    )
+  );
+  return jsonResponses;
+}
+export async function revokeWithingsNotifications(accessToken, appli) {
+  const params = new URLSearchParams();
+  params.append("action", "revoke");
+  params.append(
+    "callbackurl",
+    process.env.NEXT_PUBLIC_URL +
+      process.env.NEXT_PUBLIC_WITHINGS_NOTIFICATIONS_URI
+  );
+  params.append("appli", appli);
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/notify`,
+    {
+      method: "POST",
+      body: params,
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+  const json = await response.json();
+  console.log("withings subscribe json", json, appli);
+  return json;
+}
+export async function revokeAllWithingsNotifications(accessToken) {
+  const jsonResponses = await Promise.all(
+    withingsAppliList.map((appli) =>
+      revokeWithingsNotifications(accessToken, appli)
     )
   );
   return jsonResponses;
