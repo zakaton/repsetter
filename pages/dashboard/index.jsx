@@ -68,8 +68,18 @@ export default function AccountGeneral() {
     const response = await fetchWithAccessToken(
       `/api/account/set-withings-auth-code?code=${withingsAuthCode}`
     );
-    const json = await response.json();
-    console.log(json);
+    const setWithingsAuthCodeJSON = await response.json();
+    if (
+      setWithingsAuthCodeJSON.status === "succeeded" &&
+      setWithingsAuthCodeJSON.withings_auth_code
+    ) {
+      const getWithingsAccessTokenJSON = await fetchWithAccessToken(
+        "/api/account/get-withings-access-token"
+      );
+      if (getWithingsAccessTokenJSON.status === "succeeded") {
+        console.log("got access token!");
+      }
+    }
   };
 
   return (
@@ -107,6 +117,28 @@ export default function AccountGeneral() {
                 <dt className="text-sm font-medium text-gray-500">Email</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                   {user.email}
+                </dd>
+              </div>
+
+              <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
+                <dt className="text-sm font-medium text-gray-500">Withings</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  {user.withings_auth_code
+                    ? "Has given Access"
+                    : "Hasn't given Access"}
+                  .{" "}
+                  <MyLink
+                    href={withingsAuthURL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <button
+                      type="button"
+                      className="inline-flex items-center rounded-md border border-transparent bg-blue-100 px-2 py-1 text-sm font-medium leading-4 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      Update Access
+                    </button>
+                  </MyLink>
                 </dd>
               </div>
               <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
@@ -148,27 +180,6 @@ export default function AccountGeneral() {
                       in order to coach.
                     </>
                   )}
-                </dd>
-              </div>
-              <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                <dt className="text-sm font-medium text-gray-500">Withings</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                  {user.withings_auth_code
-                    ? "Given Access"
-                    : "Hasn't given Access"}
-                  .{" "}
-                  <MyLink
-                    href={withingsAuthURL}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <button
-                      type="button"
-                      className="inline-flex items-center rounded-md border border-transparent bg-blue-100 px-2 py-1 text-sm font-medium leading-4 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                      Update Access
-                    </button>
-                  </MyLink>
                 </dd>
               </div>
               {user.can_coach && (

@@ -4,6 +4,7 @@ import {
   getUserProfile,
   getUserByAccessToken,
 } from "../../../utils/supabase";
+import { refreshWithingsAccessToken } from "../../../utils/withings";
 
 export default async function handler(req, res) {
   const supabase = getSupabaseService();
@@ -11,7 +12,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       status: {
         type: "failed",
-        title: "Failed to update Withings auth code",
+        title: "Failed to refresh Withings access token",
         ...error,
       },
     });
@@ -25,21 +26,29 @@ export default async function handler(req, res) {
   if (!profile) {
     return sendError({ message: "user profile not found" });
   }
-
-  let authCode = req.query.code || null;
-  if (authCode == "null") {
-    authCode = null;
+  if (!profile.withings_auth_code) {
+    return sendError({ message: "no withings authorization code found" });
   }
+
+  const json = await refreshWithingsAccessToken(profile.withings_refresh_token);
+  if (json.status != 0) {
+    return sendError({ message: json.error });
+  }
+  const { access_token, refresh_token, expires_in } = json.body;
   await supabase
     .from("profile")
-    .update({ withings_auth_code: authCode })
+    .update({
+      withings_access_token: access_token,
+      withings_refresh_token: refresh_token,
+      withings_token_expiration: expires_in,
+    })
     .eq("id", profile.id);
 
   res.status(200).json({
     status: {
       type: "succeeded",
-      title: "successfully updated Withings auth code",
+      title: "successfully refreshed Withings access token",
     },
-    withings_auth_code: authCode,
+    json,
   });
 }
