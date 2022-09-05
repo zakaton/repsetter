@@ -118,7 +118,7 @@ export async function revokeWithingsNotifications(accessToken, appli) {
     }
   );
   const json = await response.json();
-  console.log("withings subscribe json", json, appli);
+  console.log("withings revoke json", json, appli);
   return json;
 }
 export async function revokeAllWithingsNotifications(accessToken) {
@@ -128,6 +128,27 @@ export async function revokeAllWithingsNotifications(accessToken) {
     )
   );
   return jsonResponses;
+}
+
+export async function getWithingsMeasure(accessToken) {
+  const params = new URLSearchParams();
+  params.append("action", "getmeas");
+  params.append("meastypes", "1,6");
+  params.append("category", "1");
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/measure`,
+    {
+      method: "POST",
+      body: params,
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+  const json = await response.json();
+  console.log("withings getGetmeas json", json);
+  return json;
 }
 
 export async function getNonce() {

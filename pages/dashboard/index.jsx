@@ -11,6 +11,7 @@ import { useCoachPictures } from "../../context/coach-picture-context";
 import {
   getWithingsAuthURL,
   subscribeToAllWithingsNotifications,
+  getWithingsMeasure,
 } from "../../utils/withings";
 import { useRouter } from "next/router";
 
@@ -72,9 +73,14 @@ export default function AccountGeneral() {
     }
   }, [router.isReady]);
 
+  /*
   window.subscribeToAllWithingsNotifications = () => {
     subscribeToAllWithingsNotifications(user.withings_access_token);
   };
+  window.getWithingsMeasure = () => {
+    getWithingsMeasure(user.withings_access_token);
+  };
+  */
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
     console.log("setWithingsAuthCode", withingsAuthCode);
