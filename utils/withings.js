@@ -31,7 +31,7 @@ export async function getWithingsAccessToken(code) {
   );
 
   const response = await fetch(
-    `${process.env.WITHINGS_TARGET_ENDPOINT}/v2/oauth2`,
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/v2/oauth2`,
     {
       method: "POST",
       body: params,
@@ -53,7 +53,7 @@ export async function refreshWithingsAccessToken(refreshToken) {
     process.env.NEXT_PUBLIC_URL + process.env.NEXT_PUBLIC_WITHINGS_REDIRECT_URI
   );
   const response = await fetch(
-    `${process.env.WITHINGS_TARGET_ENDPOINT}/v2/oauth2`,
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/v2/oauth2`,
     {
       method: "POST",
       body: params,
@@ -75,7 +75,7 @@ export async function subscribeToWithingsNotifications(accessToken, appli) {
   params.append("appli", appli);
 
   const response = await fetch(
-    `${process.env.WITHINGS_TARGET_ENDPOINT}/notify`,
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/notify`,
     {
       method: "POST",
       body: params,
@@ -121,7 +121,7 @@ export async function getNonce() {
   params.append("signature", signature);
 
   const response = await fetch(
-    `${process.env.WITHINGS_TARGET_ENDPOINT}/v2/signature`,
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/v2/signature`,
     { method: "POST", body: params }
   );
   const json = await response.json();

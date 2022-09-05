@@ -72,6 +72,10 @@ export default function AccountGeneral() {
     }
   }, [router.isReady]);
 
+  window.subscribeToAllWithingsNotifications = () => {
+    subscribeToAllWithingsNotifications(user.withings_access_token);
+  };
+
   const setWithingsAuthCode = async (withingsAuthCode) => {
     console.log("setWithingsAuthCode", withingsAuthCode);
     setDidGrantAccessToWithings(withingsAuthCode !== "null");
