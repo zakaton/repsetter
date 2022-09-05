@@ -34,13 +34,14 @@ export default async function handler(req, res) {
   if (json.status != 0) {
     return sendError({ message: json.error });
   }
-  const { access_token, refresh_token, expires_in } = json.body;
+  const { access_token, refresh_token, expires_in, userid } = json.body;
   await supabase
     .from("profile")
     .update({
       withings_access_token: access_token,
       withings_refresh_token: refresh_token,
       withings_token_expiration: expires_in,
+      withings_userid: userid,
     })
     .eq("id", profile.id);
 
