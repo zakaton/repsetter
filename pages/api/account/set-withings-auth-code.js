@@ -29,6 +29,6 @@ export default async function handler(req, res) {
     .eq("id", profile.id);
 
   res.status(200).json({
-    message: "successfully updated withings auth code",
+    message: "successfully updated Withings auth code",
   });
 }
