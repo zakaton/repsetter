@@ -90,7 +90,8 @@ export default function AccountGeneral() {
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
     console.log("setWithingsAuthCode", withingsAuthCode);
-    setDidGrantAccessToWithings(withingsAuthCode !== "null");
+    const newDidGrantAccess = withingsAuthCode !== "null";
+    setDidGrantAccessToWithings(newDidGrantAccess);
     const response = await fetchWithAccessToken(
       `/api/account/set-withings-auth-code?code=${withingsAuthCode}`
     );
@@ -100,11 +101,15 @@ export default function AccountGeneral() {
       setWithingsAuthCodeJSON.status.type === "succeeded" &&
       setWithingsAuthCodeJSON.withings_auth_code
     ) {
-      const getWithingsAccessTokenJSON = await fetchWithAccessToken(
+      const getWithingsAccessTokenResponse = await fetchWithAccessToken(
         "/api/account/get-withings-access-token"
       );
+      const getWithingsAccessTokenJSON = getWithingsAccessTokenResponse.json();
       console.log("getWithingsAccessTokenJSON", getWithingsAccessTokenJSON);
-      if (getWithingsAccessTokenJSON.status.type === "succeeded") {
+      if (
+        getWithingsAccessTokenJSON.status.type === "succeeded" &&
+        newDidGrantAccess
+      ) {
         console.log("got access token!");
         subscribeToAllWithingsNotifications(
           getWithingsAccessTokenJSON.data.access_token
