@@ -104,7 +104,8 @@ export default function AccountGeneral() {
       const getWithingsAccessTokenResponse = await fetchWithAccessToken(
         "/api/account/get-withings-access-token"
       );
-      const getWithingsAccessTokenJSON = getWithingsAccessTokenResponse.json();
+      const getWithingsAccessTokenJSON =
+        await getWithingsAccessTokenResponse.json();
       console.log("getWithingsAccessTokenJSON", getWithingsAccessTokenJSON);
       if (
         getWithingsAccessTokenJSON.status.type === "succeeded" &&
