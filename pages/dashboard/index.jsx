@@ -12,6 +12,8 @@ import {
   getWithingsAuthURL,
   subscribeToAllWithingsNotifications,
   getWithingsMeasure,
+  listWithingsNotifications,
+  revokeAllWithingsNotifications,
 } from "../../utils/withings";
 import { useRouter } from "next/router";
 
@@ -73,14 +75,18 @@ export default function AccountGeneral() {
     }
   }, [router.isReady]);
 
-  /*
   window.subscribeToAllWithingsNotifications = () => {
     subscribeToAllWithingsNotifications(user.withings_access_token);
   };
   window.getWithingsMeasure = () => {
     getWithingsMeasure(user.withings_access_token);
   };
-  */
+  window.listWithingsNotifications = () => {
+    listWithingsNotifications(user.withings_access_token);
+  };
+  window.revokeAllWithingsNotifications = () => {
+    revokeAllWithingsNotifications(user.withings_access_token);
+  };
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
     console.log("setWithingsAuthCode", withingsAuthCode);

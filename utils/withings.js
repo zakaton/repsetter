@@ -151,6 +151,29 @@ export async function getWithingsMeasure(accessToken) {
   return json;
 }
 
+export async function listWithingsNotifications(
+  accessToken,
+  appli = withingsAppliList[0]
+) {
+  const params = new URLSearchParams();
+  params.append("action", "list");
+  params.append("appli", appli);
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/notify`,
+    {
+      method: "POST",
+      body: params,
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+  const json = await response.json();
+  console.log("withings list notifications json", json, appli);
+  return json;
+}
+
 export async function getNonce() {
   const params = new URLSearchParams();
 

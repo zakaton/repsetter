@@ -8,6 +8,10 @@ import {
   storagePaginationSize,
 } from "../../../utils/supabase";
 import Stripe from "stripe";
+import {
+  revokeAllWithingsNotifications,
+  refreshWithingsAccessToken,
+} from "../../../utils/withings";
 
 export default async function handler(req, res) {
   const supabase = getSupabaseService();
@@ -172,6 +176,29 @@ export default async function handler(req, res) {
     await stripe.accounts.del(profile.stripe_account);
   } catch (error) {
     console.error("error deleting stripe account", error);
+  }
+
+  if (profile.withings_refresh_token) {
+    const refreshResponseJSON = await refreshWithingsAccessToken(
+      profile.withings_refresh_token
+    );
+    if (refreshResponseJSON.status == 0) {
+      const { access_token } = refreshResponseJSON.body;
+      const revokeResponseJSON = await revokeAllWithingsNotifications(
+        access_token
+      );
+      if (revokeResponseJSON.status != 0) {
+        console.error(
+          "unable to revoke withings notifications",
+          revokeResponseJSON.error
+        );
+      }
+    } else {
+      console.error(
+        "unable to refresh withings access token",
+        refreshResponseJSON.error
+      );
+    }
   }
 
   const deleteProfileResult = await supabase
