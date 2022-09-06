@@ -47,6 +47,18 @@ export default function Privacy() {
             Stripe account information, so you can receive payments from your
             clients
           </li>
+          <li>
+            Withings account information (optional), so we can update your
+            bodyweight information when you log new weights from your{" "}
+            <a
+              href="https://www.withings.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Withings
+            </a>{" "}
+            devices
+          </li>
         </ul>
 
         <p>

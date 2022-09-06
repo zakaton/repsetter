@@ -1676,7 +1676,7 @@ export default function Diary() {
                                     Bodyfat Percentage
                                   </dt>
                                   <dd className="mt-1 break-words text-sm text-gray-900">
-                                    {weight.bodyfat_percentage}%
+                                    {weight.bodyfat_percentage}%{" "}
                                     {bodyfatDifference && (
                                       <span
                                         className={

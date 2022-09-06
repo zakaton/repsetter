@@ -87,6 +87,13 @@ export default function AccountGeneral() {
   window.revokeAllWithingsNotifications = () => {
     revokeAllWithingsNotifications(user.withings_access_token);
   };
+  window.refreshWithingsAccessToken = async () => {
+    const response = await fetchWithAccessToken(
+      "/api/account/refresh-withings-access-token"
+    );
+    const json = await response.json();
+    console.log(json);
+  };
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
     console.log("setWithingsAuthCode", withingsAuthCode);
@@ -176,6 +183,8 @@ export default function AccountGeneral() {
                       Update Access
                     </button>
                   </MyLink>
+                  (for automatically logging weight/bodyfat from your Withings
+                  devices)
                 </dd>
               </div>
               <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">

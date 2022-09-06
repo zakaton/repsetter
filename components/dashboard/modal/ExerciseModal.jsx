@@ -2096,7 +2096,7 @@ export default function ExerciseModal(props) {
                   maxLength={maxNotesLength}
                   onInput={(e) => {
                     const newNotes = e.target.value;
-                    setNotes(newNotes);
+                    setNotes(newNotes.slice(0, maxNotesLength));
                   }}
                   name="notes"
                   id="notes"
@@ -2899,7 +2899,7 @@ export default function ExerciseModal(props) {
                   maxLength={maxFeedbackLength}
                   onInput={(e) => {
                     const newFeedback = e.target.value;
-                    setFeedback(newFeedback);
+                    setFeedback(newFeedback.slice(0, maxFeedbackLength));
                   }}
                   name="feedback"
                   id="feedback"
