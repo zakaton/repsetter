@@ -30,7 +30,11 @@ export default async function handler(req, res) {
         console.log("date", date);
         const newWeightDatum = {
           date: dateToString(date),
-          time: date.toLocaleTimeString("en-US", { timeZone: timezone }),
+          time: date.toLocaleTimeString("en-US", {
+            timeZone: timezone,
+            hour12: false,
+            timeStyle: "short",
+          }),
           client: profile.id,
           client_email: profile.email,
         };
