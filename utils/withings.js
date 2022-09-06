@@ -130,11 +130,18 @@ export async function revokeAllWithingsNotifications(accessToken) {
   return jsonResponses;
 }
 
-export async function getWithingsMeasure(accessToken) {
+export async function getWithingsMeasure(accessToken, startdate, enddate) {
   const params = new URLSearchParams();
   params.append("action", "getmeas");
   params.append("meastypes", "1,6");
   params.append("category", "1");
+
+  if (startdate) {
+    params.append("startdate", startdate);
+  }
+  if (enddate) {
+    params.append("enddate", enddate);
+  }
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_WITHINGS_TARGET_ENDPOINT}/measure`,
