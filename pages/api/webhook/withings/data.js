@@ -28,12 +28,10 @@ export default async function handler(req, res) {
         measuregrp.measures.forEach((measure) => {
           switch (measure.type) {
             case 1:
-              // weight (kg)
               const weightInKilograms = measure.value / 1000;
               console.log("weightInKilograms", weightInKilograms);
               break;
             case 6:
-              // bodyfat (%)
               const bodyfatPercentage = measure.value / 1000;
               console.log("bodyfatPercentage", bodyfatPercentage);
               break;
