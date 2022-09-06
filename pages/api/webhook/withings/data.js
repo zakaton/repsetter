@@ -21,8 +21,10 @@ export default async function handler(req, res) {
       enddate
     );
     if (measureJSON.status === 0) {
-      measureJSON.measuregrps.forEach((measuregrp) => {
+      measureJSON.body.measuregrps.forEach((measuregrp) => {
         const date = new Date(measuregrp.date * 1000);
+        console.log("date", date);
+        // FILL - update profile by adding exercises
         measuregrp.measures.forEach((measure) => {
           switch (measure.type) {
             case 1:
