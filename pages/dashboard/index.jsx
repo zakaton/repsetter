@@ -182,7 +182,7 @@ export default function AccountGeneral() {
                     >
                       Update Access
                     </button>
-                  </MyLink>
+                  </MyLink>{" "}
                   (for automatically logging weight/bodyfat from your Withings
                   devices)
                 </dd>
