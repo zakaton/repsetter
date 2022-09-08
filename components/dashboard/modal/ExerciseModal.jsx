@@ -1070,7 +1070,7 @@ export default function ExerciseModal(props) {
             </p>
           )}
 
-          {selectedExerciseType && (
+          {selectedExerciseType?.group?.length > 0 && (
             <div className="mt-3">
               <ExerciseTypesSelect
                 selectedExerciseType={selectedExerciseType}
