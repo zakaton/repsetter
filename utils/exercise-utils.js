@@ -13,6 +13,7 @@ export const muscleGroupsObject = {
   "lower body": ["core", "obliques", "back", "abs"],
   legs: ["quads", "glutes", "hamstrings", "adductors", "abductors", "calves"],
 };
+export const exerciseTypeGroups = ["pull"]; // FILL
 export const muscleGroups = Object.keys(muscleGroupsObject);
 export const muscles = muscleGroups.reduce((muscles, muscleGroupName) => {
   return muscleGroupsObject[muscleGroupName].reduce(

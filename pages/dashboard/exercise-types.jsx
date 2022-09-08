@@ -6,12 +6,33 @@ import ExerciseTypeModal from "../../components/dashboard/modal/ExerciseTypeModa
 import DeleteExerciseTypeModal from "../../components/dashboard/modal/DeleteExerciseTypeModal";
 import Table from "../../components/Table";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
-import { muscles, muscleGroups } from "../../utils/exercise-utils";
+import {
+  muscles,
+  muscleGroups,
+  exerciseTypeGroups,
+} from "../../utils/exercise-utils";
 import MyLink from "../../components/MyLink";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import { useSelectedExerciseType } from "../../context/selected-exercise-context";
 import { useClient } from "../../context/client-context";
 
+const exerciseGroupTypes = {
+  name: "Exercise Group",
+  query: "group",
+  column: "group",
+  radios: [
+    {
+      value: null,
+      label: "any",
+      defaultChecked: true,
+    },
+    ...exerciseTypeGroups.map((group) => ({
+      value: group,
+      label: group,
+      defaultChecked: false,
+    })),
+  ],
+};
 const filterTypes = [
   ...muscleGroups.map((muscleGroup) => ({
     name: `Muscles (${muscleGroup})`,
@@ -25,6 +46,7 @@ const filterTypes = [
         defaultChecked: false,
       })),
   })),
+  exerciseGroupTypes,
 ];
 
 const orderTypes = [
@@ -124,7 +146,7 @@ export default function ExerciseTypes() {
         title="Exercise Types"
         subtitle="View all Exercise Types"
         className={
-          "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8"
+          "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-9"
         }
         CreateResultModal={isAdmin && ExerciseTypeModal}
         DeleteResultModal={isAdmin && DeleteExerciseTypeModal}
@@ -148,6 +170,10 @@ export default function ExerciseTypes() {
           result.features?.length > 0 && {
             title: "features",
             value: result.features.join(", "),
+          },
+          result.group && {
+            title: "group",
+            value: result.group,
           },
           isAdmin && {
             jsx: (

@@ -17,6 +17,7 @@ export default function ExerciseTypesSelect({
   existingExercises = [],
   selectedExercise,
   open = true,
+  groupOnly = false,
   selectedExerciseTypeName,
   setSelectedExerciseTypeName,
 }) {
@@ -97,6 +98,12 @@ export default function ExerciseTypesSelect({
               existingExercise.type.id === filteredExerciseType.id
           )
       );
+      if (selectedExerciseType && groupOnly) {
+        filteredExerciseTypes = filteredExerciseTypes.filter(
+          (filteredExerciseType) =>
+            filteredExerciseType.group === selectedExerciseType.group
+        );
+      }
       setFilteredExerciseTypes(filteredExerciseTypes);
     }
   }, [exerciseTypes, query]);
@@ -108,7 +115,7 @@ export default function ExerciseTypesSelect({
       onChange={setSelectedExerciseType}
     >
       <Combobox.Label className="block text-sm font-medium text-gray-700">
-        Exercise Type
+        {groupOnly ? "Alternate Exercise Types" : "Exercise Type"}
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input

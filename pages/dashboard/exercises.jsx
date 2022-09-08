@@ -7,7 +7,11 @@ import DeleteExerciseModal from "../../components/dashboard/modal/DeleteExercise
 import Table from "../../components/Table";
 import ExerciseTypesSelect from "../../components/dashboard/modal/ExerciseTypesSelect";
 import { useClient } from "../../context/client-context";
-import { muscles, muscleGroups } from "../../utils/exercise-utils";
+import {
+  muscles,
+  muscleGroups,
+  exerciseTypeGroups,
+} from "../../utils/exercise-utils";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import YouTube from "react-youtube";
@@ -28,6 +32,23 @@ const muscleFilterTypes = muscleGroups.map((muscleGroup) => ({
       defaultChecked: false,
     })),
 }));
+const exerciseGroupTypes = {
+  name: "Exercise Group",
+  query: "group",
+  column: "type.group",
+  radios: [
+    {
+      value: null,
+      label: "any",
+      defaultChecked: true,
+    },
+    ...exerciseTypeGroups.map((group) => ({
+      value: group,
+      label: group,
+      defaultChecked: false,
+    })),
+  ],
+};
 const baseFilterTypes = [];
 
 const orderTypes = [
@@ -170,7 +191,7 @@ export default function Exercises() {
         filterTypes={
           selectedExerciseType
             ? baseFilterTypes
-            : [...baseFilterTypes, ...muscleFilterTypes]
+            : [...baseFilterTypes, ...muscleFilterTypes, exerciseGroupTypes]
         }
         orderTypes={orderTypes}
         tableName="exercise"

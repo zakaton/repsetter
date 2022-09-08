@@ -1069,6 +1069,19 @@ export default function ExerciseModal(props) {
               </MyLink>
             </p>
           )}
+
+          {selectedExerciseType && (
+            <div className="mt-3">
+              <ExerciseTypesSelect
+                selectedExerciseType={selectedExerciseType}
+                groupOnly
+                setSelectedExerciseType={setSelectedExerciseType}
+                open={open}
+                existingExercises={existingExercises}
+                selectedExercise={selectedExercise}
+              />
+            </div>
+          )}
         </div>
 
         {previousExercise && (

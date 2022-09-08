@@ -6,6 +6,7 @@ import {
   muscles,
   muscleGroups,
   exerciseFeatures,
+  exerciseTypeGroups,
 } from "../../../utils/exercise-utils";
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
@@ -79,9 +80,13 @@ export default function ExerciseTypeModal(props) {
   const [selectedMuscles, setSelectedMuscles] = useState([]);
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
+  const [group, setGroup] = useState("");
+  const maxGroupLength = 30;
+
   useEffect(() => {
     if (selectedExerciseType) {
       setExerciseTypeName(selectedExerciseType.name);
+      setGroup(selectedExerciseType.group || "");
       setSelectedMuscles(
         muscles.filter((muscle) =>
           selectedExerciseType?.muscles?.includes(muscle.name)
@@ -190,6 +195,7 @@ export default function ExerciseTypeModal(props) {
             let updateExerciseError, replaceVideoError, replaceImageError;
             if (
               exerciseTypeName !== selectedExerciseType.name ||
+              group !== selectedExerciseType.group ||
               !areArraysTheSame(
                 selectedExerciseType.muscles,
                 flattenedSelectedMuscles
@@ -203,6 +209,7 @@ export default function ExerciseTypeModal(props) {
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
                   features: selectedFeatures,
+                  group,
                 })
                 .match({ id: selectedExerciseType.id });
               updateExerciseError = error;
@@ -274,6 +281,7 @@ export default function ExerciseTypeModal(props) {
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
                   features: selectedFeatures,
+                  group,
                 },
               ]);
             if (createdExerciseError) {
@@ -362,6 +370,7 @@ export default function ExerciseTypeModal(props) {
             {exerciseTypeName.length}/{maxExerciseTypeLength}
           </p>
         </div>
+
         <div className="my-4">
           <label
             htmlFor="muscles"
@@ -500,6 +509,29 @@ export default function ExerciseTypeModal(props) {
               </span>
             ))}
           </div>
+        </div>
+
+        <div className="my-4">
+          <label
+            htmlFor="group"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Muscles
+          </label>
+          <select
+            id="group"
+            name="group"
+            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+            value={group}
+            onInput={(e) => {
+              setGroup(e.target.value);
+            }}
+          >
+            <option value="">No Group Selected</option>
+            {exerciseTypeGroups.map((exerciseGroup) => (
+              <option key={exerciseGroup}>{exerciseGroup}</option>
+            ))}
+          </select>
         </div>
 
         <div>
