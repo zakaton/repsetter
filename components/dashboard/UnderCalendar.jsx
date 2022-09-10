@@ -18,6 +18,9 @@ const getDates = (dateRangeToCopy, selectedDate) => {
   let fromDate = new Date(selectedDate);
   let toDate = new Date(selectedDate);
   switch (dateRangeToCopy) {
+    case "day":
+      toDate.setDate(toDate.getDate() + 1);
+      break;
     case "week":
       fromDate.setDate(fromDate.getDate() - fromDate.getDay());
       toDate.setDate(toDate.getDate() + (6 - toDate.getDay()));
@@ -47,10 +50,28 @@ export default function UnderCalendar({
   refreshExercises,
   setShowDeleteExerciseModal,
   setSelectedExercises,
+  setDatesToHighlight,
 }) {
   const { selectedClient, selectedDate, amITheClient, selectedClientId } =
     useClient();
   const { user } = useUser();
+
+  const [copyActiveOption, setCopyActiveOption] = useState();
+  const [deleteActiveOption, setDeleteActiveOption] = useState();
+  const highlightDates = (dateRangeToCopy, type) => {
+    if (dateRangeToCopy) {
+      const { fromDate, toDate } = getDates(dateRangeToCopy, selectedDate);
+      setDatesToHighlight?.({ fromDate, toDate, type });
+    } else {
+      setDatesToHighlight?.();
+    }
+  };
+  useEffect(() => {
+    highlightDates(copyActiveOption, "copy");
+  }, [copyActiveOption]);
+  useEffect(() => {
+    highlightDates(deleteActiveOption, "delete");
+  }, [deleteActiveOption]);
 
   const [copiedExercises, setCopiedExercises] = useState();
   const [copiedExercisesFromDate, setCopiedExercisesFromDate] = useState();
@@ -157,7 +178,7 @@ export default function UnderCalendar({
       } = copiedExercise;
 
       const originalCopiedDate = stringToDate(date);
-      const daysSinceOriginalDate = Math.round(
+      const daysSinceOriginalDate = Math.floor(
         (originalCopiedDate - copiedExercisesFromDate) / (1000 * 60 * 60 * 24)
       );
       const newDate = new Date(fromDate);
@@ -252,6 +273,8 @@ export default function UnderCalendar({
   return (
     <div className="mt-3 sm:mt-3 sm:grid sm:grid-flow-row-dense sm:grid-cols-3 sm:gap-3">
       <MultiDateSelect
+        activeOption={copyActiveOption}
+        setActiveOption={setCopyActiveOption}
         title="Copy Exercises"
         className="col-span-2 w-full"
         setDateRange={setDateRangeToCopy}
@@ -268,10 +291,18 @@ export default function UnderCalendar({
             : "bg-blue-400"
         )}
         onClick={() => pasteExercises()}
+        onMouseEnter={() => {
+          highlightDates(copiedExercisesForDateRange, "paste");
+        }}
+        onMouseLeave={() => {
+          highlightDates();
+        }}
       >
         Paste
       </button>
       <MultiDateSelect
+        activeOption={deleteActiveOption}
+        setActiveOption={setDeleteActiveOption}
         title="Delete Exercises"
         className="col-span-3 w-full"
         setDateRange={setDateRangeToDelete}

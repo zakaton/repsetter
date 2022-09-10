@@ -19,6 +19,12 @@ const months = [
   "December",
 ];
 
+const highlightColors = {
+  copy: "bg-blue-50",
+  paste: "bg-blue-50",
+  delete: "bg-red-50",
+};
+
 const capitalizeFirstLetter = (string) =>
   string[0].toUpperCase() + string.slice(1).toLowerCase();
 
@@ -40,6 +46,7 @@ export default function DashboardCalendarLayout({
   yearsRange = [2021, 2022],
   setCalendar: setCalendarParent,
   datesDots = {},
+  datesToHighlight,
 }) {
   resultName = resultName || tableName;
   resultNamePlural = resultNamePlural || resultName + "s";
@@ -249,6 +256,20 @@ export default function DashboardCalendarLayout({
                         dots: datesDots[dateString] || [],
                         dateString,
                       };
+                      if (datesToHighlight) {
+                        console.log(
+                          date,
+                          date >= datesToHighlight.fromDate,
+                          date <= datesToHighlight.toDate
+                        );
+                        day.shouldHighlight =
+                          date >= datesToHighlight.fromDate &&
+                          date < datesToHighlight.toDate;
+                        if (day.shouldHighlight) {
+                          day.highlightColor =
+                            highlightColors[datesToHighlight.type];
+                        }
+                      }
                       return (
                         <button
                           key={day.date}
@@ -269,6 +290,7 @@ export default function DashboardCalendarLayout({
                               !day.isCurrentMonth &&
                               !day.isToday &&
                               "text-gray-500",
+                            day.shouldHighlight && day.highlightColor,
                             "flex h-14 flex-col py-2 px-3 hover:bg-gray-100 focus:z-10"
                           )}
                         >

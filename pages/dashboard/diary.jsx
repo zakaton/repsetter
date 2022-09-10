@@ -874,6 +874,8 @@ export default function Diary() {
   const [showWeights, setShowWeights] = useState(true);
   const [showPictures, setShowPictures] = useState(true);
 
+  const [datesToHighlight, setDatesToHighlight] = useState();
+
   return (
     <>
       <ExerciseModal
@@ -981,12 +983,14 @@ export default function Diary() {
       />
 
       <DashboardCalendarLayout
+        datesToHighlight={datesToHighlight}
         underCalendar={
           <UnderCalendar
             refreshExercises={() => {
               getExerciseDates();
               getExercises(true);
             }}
+            setDatesToHighlight={setDatesToHighlight}
             setSelectedExercises={setSelectedExercises}
             setShowDeleteExerciseModal={setShowDeleteExerciseModal}
           />

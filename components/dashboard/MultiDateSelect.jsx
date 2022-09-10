@@ -57,6 +57,8 @@ export default function MultiDateSelect({
   setDateRange,
   color,
   onClick,
+  activeOption,
+  setActiveOption,
 }) {
   const colorPallete = colorPalletes[color] || colorPalletes.default;
 
@@ -65,6 +67,12 @@ export default function MultiDateSelect({
       <button
         type="button"
         onClick={onClick}
+        onMouseEnter={() => setActiveOption("day")}
+        onMouseLeave={() => {
+          if (activeOption === "day") {
+            setActiveOption();
+          }
+        }}
         className={classNames(
           "relative inline-flex w-full items-center rounded-l-md border px-4 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-1",
           colorPallete["bg"],
@@ -79,6 +87,10 @@ export default function MultiDateSelect({
       </button>
       <Menu as="div" className="relative -ml-px block">
         <Menu.Button
+          onMouseEnter={(e) => {
+            setActiveOption("");
+          }}
+          onMouseLeave={(e) => {}}
           className={classNames(
             "relative inline-flex items-center rounded-r-md border px-2 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-1",
             colorPallete["border"],
@@ -111,19 +123,27 @@ export default function MultiDateSelect({
             <div className="py-1">
               {items.map((item) => (
                 <Menu.Item key={item.value}>
-                  {({ active }) => (
-                    <button
-                      className={classNames(
-                        active
-                          ? colorPallete["active"]
-                          : colorPallete["inactive"],
-                        "block w-full px-4 py-2 text-left text-sm"
-                      )}
-                      onClick={() => setDateRange(item.value)}
-                    >
-                      {item.label}
-                    </button>
-                  )}
+                  {({ active }) => {
+                    return (
+                      <button
+                        onMouseEnter={() => setActiveOption(item.value)}
+                        onMouseLeave={() => {
+                          if (activeOption === item.value) {
+                            setActiveOption();
+                          }
+                        }}
+                        className={classNames(
+                          active
+                            ? colorPallete["active"]
+                            : colorPallete["inactive"],
+                          "block w-full px-4 py-2 text-left text-sm"
+                        )}
+                        onClick={() => setDateRange(item.value)}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  }}
                 </Menu.Item>
               ))}
             </div>
