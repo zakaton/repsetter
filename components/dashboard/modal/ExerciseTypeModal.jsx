@@ -11,6 +11,7 @@ import {
 import { supabase } from "../../../utils/supabase";
 import { useExerciseVideos } from "../../../context/exercise-videos-context";
 import { compressAccurately } from "image-conversion";
+import ExerciseTypesSelect from "./ExerciseTypesSelect";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -81,7 +82,6 @@ export default function ExerciseTypeModal(props) {
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
   const [group, setGroup] = useState("");
-  const maxGroupLength = 30;
 
   useEffect(() => {
     if (selectedExerciseType) {
@@ -516,7 +516,7 @@ export default function ExerciseTypeModal(props) {
             htmlFor="group"
             className="block text-sm font-medium text-gray-700"
           >
-            Muscles
+            Group
           </label>
           <select
             id="group"
@@ -533,6 +533,19 @@ export default function ExerciseTypeModal(props) {
             ))}
           </select>
         </div>
+
+        {group && (
+          <div className="mb-3">
+            <ExerciseTypesSelect
+              groupOnly
+              muscles={selectedMuscles}
+              group={group}
+              open={true}
+              setSelectedExerciseType={() => {}}
+              required={false}
+            />
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700">

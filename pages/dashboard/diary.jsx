@@ -8,6 +8,7 @@ import DeleteWeightModal from "../../components/dashboard/modal/DeleteWeightModa
 import PictureModal from "../../components/dashboard/modal/PictureModal";
 import DeletePictureModal from "../../components/dashboard/modal/DeletePictureModal";
 import Notification from "../../components/Notification";
+import UnderCalendar from "../../components/dashboard/UnderCalendar";
 import {
   supabase,
   dateFromDateAndTime,
@@ -980,7 +981,16 @@ export default function Diary() {
       />
 
       <DashboardCalendarLayout
-        /* FILL - buttons and stuff */
+        underCalendar={
+          <UnderCalendar
+            refreshExercises={() => {
+              getExerciseDates();
+              getExercises(true);
+            }}
+            setSelectedExercises={setSelectedExercises}
+            setShowDeleteExerciseModal={setShowDeleteExerciseModal}
+          />
+        }
         setCalendar={setCalendar}
         tableName="diary"
         resultNamePlural="diary"

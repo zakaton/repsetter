@@ -1073,6 +1073,7 @@ export default function ExerciseModal(props) {
           {selectedExerciseType?.group?.length > 0 && (
             <div className="mt-3">
               <ExerciseTypesSelect
+                required={false}
                 selectedExerciseType={selectedExerciseType}
                 groupOnly
                 setSelectedExerciseType={setSelectedExerciseType}

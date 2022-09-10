@@ -18,8 +18,11 @@ export default function ExerciseTypesSelect({
   selectedExercise,
   open = true,
   groupOnly = false,
+  group,
   selectedExerciseTypeName,
   setSelectedExerciseTypeName,
+  required = true,
+  muscles,
 }) {
   const { exerciseTypes, getExerciseTypes } = useExerciseTypes();
   const { getExerciseVideo } = useExerciseVideos();
@@ -98,15 +101,33 @@ export default function ExerciseTypesSelect({
               existingExercise.type.id === filteredExerciseType.id
           )
       );
-      if (selectedExerciseType && groupOnly) {
+      if (groupOnly) {
+        const groupToFilter = group || selectedExerciseType?.group;
         filteredExerciseTypes = filteredExerciseTypes.filter(
-          (filteredExerciseType) =>
-            filteredExerciseType.group === selectedExerciseType.group
+          (filteredExerciseType) => filteredExerciseType.group === groupToFilter
         );
+        const musclesToFilter = muscles || selectedExerciseType?.muscles;
+        const flattenedSelectedMuscles = musclesToFilter.map(
+          (selectedMuscle) => selectedMuscle.name
+        );
+        filteredExerciseTypes.forEach((exerciseType) => {
+          exerciseType._numberOfSimilarMuscles = 0;
+          exerciseType.muscles.forEach((muscle) => {
+            if (flattenedSelectedMuscles.includes(muscle)) {
+              exerciseType._numberOfSimilarMuscles++;
+            }
+          });
+        });
+        filteredExerciseTypes.sort((a, b) => {
+          if (b._numberOfSimilarMuscles == a._numberOfSimilarMuscles) {
+            return a.muscles.length - b.muscles.length;
+          }
+          return b._numberOfSimilarMuscles - a._numberOfSimilarMuscles;
+        });
       }
       setFilteredExerciseTypes(filteredExerciseTypes);
     }
-  }, [exerciseTypes, query]);
+  }, [exerciseTypes, query, group, muscles]);
 
   return (
     <Combobox
@@ -119,7 +140,7 @@ export default function ExerciseTypesSelect({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
-          required
+          required={required}
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
           onChange={(event) => {
             debouncedQueryUpdate(event.target.value);

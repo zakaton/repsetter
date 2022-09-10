@@ -64,8 +64,6 @@ export function UserContextProvider(props) {
       async (event, session) => {
         console.log(event, session);
 
-        // FILL - refresh if session is
-
         setSession(session);
         switch (event) {
           case "SIGNED_IN":

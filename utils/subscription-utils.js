@@ -50,6 +50,4 @@ export async function updateNumberOfUnredeemedSubscriptions(
 
 export async function deleteClientSubscriptions(client, supabase) {}
 export async function deleteCoachingSubscriptions(coach, supabase) {}
-export async function deleteSubscription(subscriptionId, supabase) {
-  // FILL
-}
+export async function deleteSubscription(subscriptionId, supabase) {}

@@ -4,6 +4,8 @@ import { getWithingsMeasure } from "../../../../utils/withings";
 import { dateToString } from "../../../../utils/supabase";
 
 export default async function handler(req, res) {
+  res.status(200).send("OK");
+
   const supabase = getSupabaseService();
 
   const { userid, startdate, enddate, appli } = req.body;
@@ -77,6 +79,4 @@ export default async function handler(req, res) {
       }
     }
   }
-
-  res.status(200).json({ hello: "world" });
 }
