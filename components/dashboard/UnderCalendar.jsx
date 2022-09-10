@@ -61,7 +61,7 @@ export default function UnderCalendar({
   const highlightDates = (dateRangeToCopy, type) => {
     if (dateRangeToCopy) {
       const { fromDate, toDate } = getDates(dateRangeToCopy, selectedDate);
-      setDatesToHighlight?.({ fromDate, toDate, type });
+      setDatesToHighlight?.({ fromDate, toDate, type, dateRangeToCopy });
     } else {
       setDatesToHighlight?.();
     }

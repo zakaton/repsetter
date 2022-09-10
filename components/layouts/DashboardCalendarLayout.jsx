@@ -257,14 +257,14 @@ export default function DashboardCalendarLayout({
                         dateString,
                       };
                       if (datesToHighlight) {
-                        console.log(
-                          date,
-                          date >= datesToHighlight.fromDate,
-                          date <= datesToHighlight.toDate
-                        );
-                        day.shouldHighlight =
-                          date >= datesToHighlight.fromDate &&
-                          date < datesToHighlight.toDate;
+                        day.shouldHighlight = date >= datesToHighlight.fromDate;
+                        if (datesToHighlight.dateRangeToCopy === "day") {
+                          day.shouldHighlight &&=
+                            date < datesToHighlight.toDate;
+                        } else {
+                          day.shouldHighlight &&=
+                            date <= datesToHighlight.toDate;
+                        }
                         if (day.shouldHighlight) {
                           day.highlightColor =
                             highlightColors[datesToHighlight.type];
