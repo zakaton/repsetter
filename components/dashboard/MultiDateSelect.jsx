@@ -6,7 +6,7 @@ const items = [
   { label: "Current Day", value: "day" },
   { label: "Current Week", value: "week" },
   { label: "Current Month", value: "month" },
-  { label: "First 4 Weeks", value: "block" },
+  { label: "4 Weeks (Inc Current)", value: "block" },
 ];
 const colorPalletes = {
   default: {

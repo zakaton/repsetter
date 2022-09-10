@@ -32,8 +32,7 @@ const getDates = (dateRangeToCopy, selectedDate) => {
       toDate.setDate(numberOfDaysInMonth);
       break;
     case "block":
-      fromDate.setDate(1);
-      fromDate.setDate(1 - fromDate.getDay());
+      fromDate.setDate(fromDate.getDate() - fromDate.getDay());
       toDate = new Date(fromDate);
       toDate.setDate(toDate.getDate() + 7 * 4 - 1);
       break;
