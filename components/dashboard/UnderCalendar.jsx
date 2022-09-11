@@ -302,6 +302,12 @@ export default function UnderCalendar({
           if (!isDesktop) return;
           highlightDates();
         }}
+        onTouchStart={() => {
+          highlightDates(copiedExercisesForDateRange, "paste");
+        }}
+        onTouchEnd={() => {
+          highlightDates();
+        }}
       >
         Paste
       </button>

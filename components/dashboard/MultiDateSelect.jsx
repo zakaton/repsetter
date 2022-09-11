@@ -78,6 +78,14 @@ export default function MultiDateSelect({
             setActiveOption();
           }
         }}
+        onTouchStart={() => {
+          setActiveOption("day");
+        }}
+        onTouchEnd={() => {
+          if (activeOption === "day") {
+            setActiveOption();
+          }
+        }}
         className={classNames(
           "relative inline-flex w-full items-center rounded-l-md border px-4 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-1",
           colorPallete["bg"],
@@ -133,6 +141,14 @@ export default function MultiDateSelect({
                         }}
                         onMouseLeave={() => {
                           if (!isDesktop) return;
+                          if (activeOption === item.value) {
+                            setActiveOption();
+                          }
+                        }}
+                        onTouchStart={() => {
+                          setActiveOption(item.value);
+                        }}
+                        onTouchEnd={() => {
                           if (activeOption === item.value) {
                             setActiveOption();
                           }
