@@ -271,7 +271,7 @@ export default function UnderCalendar({
   };
 
   return (
-    <div className="mt-3 sm:mt-3 sm:grid sm:grid-flow-row-dense sm:grid-cols-3 sm:gap-3">
+    <div className="mt-3 space-y-2 sm:mt-3 sm:grid sm:grid-flow-row-dense sm:grid-cols-3 sm:gap-3 sm:space-y-0">
       <MultiDateSelect
         activeOption={copyActiveOption}
         setActiveOption={setCopyActiveOption}
@@ -285,7 +285,7 @@ export default function UnderCalendar({
         type="button"
         disabled={!(copiedExercises?.length > 0)}
         className={classNames(
-          "col-span-1 mt-3 inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm sm:mt-0 sm:text-sm",
+          "col-span-1 inline-flex w-full justify-center self-center rounded-md border border-transparent px-4 py-1 text-base font-medium text-white shadow-sm sm:mt-0 sm:py-2 sm:text-sm",
           copiedExercises?.length > 0
             ? "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             : "bg-blue-400"

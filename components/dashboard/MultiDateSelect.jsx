@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
+import { isMobile, isDesktop } from "react-device-detect";
 
 const items = [
   { label: "Current Day", value: "day" },
@@ -67,7 +68,9 @@ export default function MultiDateSelect({
       <button
         type="button"
         onClick={onClick}
-        onMouseEnter={() => setActiveOption("day")}
+        onMouseEnter={() => {
+          setActiveOption("day");
+        }}
         onMouseLeave={() => {
           if (activeOption === "day") {
             setActiveOption();
