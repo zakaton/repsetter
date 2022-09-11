@@ -30,7 +30,18 @@ export default async function handler(req, res) {
       profile.withings_refresh_token
     );
     if (refreshResponseJSON.status == 0) {
-      const { access_token } = refreshResponseJSON.body;
+      const { access_token, refresh_token, expires_in } =
+        refreshResponseJSON.body;
+
+      await supabase
+        .from("profile")
+        .update({
+          withings_access_token: access_token,
+          withings_refresh_token: refresh_token,
+          withings_token_expiration: expires_in,
+        })
+        .eq("id", profile.id);
+
       const measureJSON = await getWithingsMeasure(
         access_token,
         startdate,
