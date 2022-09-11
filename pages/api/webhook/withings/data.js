@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     typeof req.body === "string" ? JSON.parse(req.body) : req.body;
   console.log(req.body, typeof req.body);
 
+  console.log("going to fetch profile...", userid);
   const { data: profile, error: getProfileError } = await supabase
     .from("profile")
     .select("*")
