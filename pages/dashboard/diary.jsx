@@ -364,7 +364,9 @@ export default function Diary() {
           date: selectedDate.toDateString(),
 
           client: selectedClientId,
-          client_email: selectedClient.client_email,
+          client_email: amITheClient
+            ? user.email
+            : selectedClient?.client_email,
 
           number_of_sets_assigned,
           number_of_reps_assigned,

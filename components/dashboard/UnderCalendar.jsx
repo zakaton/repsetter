@@ -158,6 +158,8 @@ export default function UnderCalendar({
     const { exercises: existingExercises, error } =
       await getExercisesWithinRange(copiedExercisesForDateRange);
 
+    console.log("existingExercises", existingExercises);
+
     const { fromDate, toDate } = getDates(
       copiedExercisesForDateRange,
       selectedDate
@@ -196,7 +198,7 @@ export default function UnderCalendar({
         date: newDate.toDateString(),
 
         client: selectedClientId,
-        client_email: selectedClient.client_email,
+        client_email: amITheClient ? user.email : selectedClient?.client_email,
 
         number_of_sets_assigned,
         number_of_reps_assigned,
@@ -286,7 +288,7 @@ export default function UnderCalendar({
         type="button"
         disabled={!(copiedExercises?.length > 0)}
         className={classNames(
-          "col-span-1 inline-flex w-full justify-center self-center rounded-md border border-transparent px-4 py-1 text-base font-medium text-white shadow-sm sm:mt-0 sm:py-2 sm:text-sm",
+          "col-span-1 inline-flex w-full justify-center self-center rounded-md border border-transparent px-4 py-1 text-sm font-medium text-white shadow-sm sm:mt-0 sm:py-2 sm:text-sm",
           copiedExercises?.length > 0
             ? "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             : "bg-blue-400"
