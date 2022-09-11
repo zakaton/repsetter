@@ -131,6 +131,7 @@ export async function revokeAllWithingsNotifications(accessToken) {
 }
 
 export async function getWithingsMeasure(accessToken, startdate, enddate) {
+  console.log("getWithingsMeasure", accessToken, startdate, enddate);
   const params = new URLSearchParams();
   params.append("action", "getmeas");
   params.append("meastypes", "1,6");
