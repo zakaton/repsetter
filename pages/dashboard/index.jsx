@@ -75,6 +75,7 @@ export default function AccountGeneral() {
     }
   }, [router.isReady]);
 
+  /*
   window.subscribeToAllWithingsNotifications = () => {
     subscribeToAllWithingsNotifications(user.withings_access_token);
   };
@@ -94,6 +95,7 @@ export default function AccountGeneral() {
     const json = await response.json();
     console.log(json);
   };
+  */
 
   const setWithingsAuthCode = async (withingsAuthCode) => {
     console.log("setWithingsAuthCode", withingsAuthCode);

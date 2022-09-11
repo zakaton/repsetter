@@ -7,8 +7,6 @@ import {
 import { dateToString } from "../../../../utils/supabase";
 
 export default async function handler(req, res) {
-  res.status(200).send("OK");
-
   const supabase = getSupabaseService();
 
   const { userid, startdate, enddate, appli } =
@@ -104,4 +102,6 @@ export default async function handler(req, res) {
       }
     }
   }
+  console.log("Sending OK");
+  res.status(200).send("OK");
 }
