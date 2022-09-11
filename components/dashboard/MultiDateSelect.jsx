@@ -69,9 +69,11 @@ export default function MultiDateSelect({
         type="button"
         onClick={onClick}
         onMouseEnter={() => {
+          if (!isDesktop) return;
           setActiveOption("day");
         }}
         onMouseLeave={() => {
+          if (!isDesktop) return;
           if (activeOption === "day") {
             setActiveOption();
           }
@@ -90,10 +92,6 @@ export default function MultiDateSelect({
       </button>
       <Menu as="div" className="relative -ml-px block">
         <Menu.Button
-          onMouseEnter={(e) => {
-            setActiveOption("");
-          }}
-          onMouseLeave={(e) => {}}
           className={classNames(
             "relative inline-flex items-center rounded-r-md border px-2 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-1",
             colorPallete["border"],
@@ -129,8 +127,12 @@ export default function MultiDateSelect({
                   {({ active }) => {
                     return (
                       <button
-                        onMouseEnter={() => setActiveOption(item.value)}
+                        onMouseEnter={() => {
+                          if (!isDesktop) return;
+                          setActiveOption(item.value);
+                        }}
                         onMouseLeave={() => {
+                          if (!isDesktop) return;
                           if (activeOption === item.value) {
                             setActiveOption();
                           }

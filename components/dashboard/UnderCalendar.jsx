@@ -9,6 +9,7 @@ import {
   dateToString,
   stringToDate,
 } from "../../utils/supabase";
+import { isDesktop } from "react-device-detect";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -292,9 +293,11 @@ export default function UnderCalendar({
         )}
         onClick={() => pasteExercises()}
         onMouseEnter={() => {
+          if (!isDesktop) return;
           highlightDates(copiedExercisesForDateRange, "paste");
         }}
         onMouseLeave={() => {
+          if (!isDesktop) return;
           highlightDates();
         }}
       >
