@@ -77,6 +77,7 @@ export default function Photos() {
     console.log("getting pictures list");
     let { data: picturesList, error: listPicturesError } =
       await supabase.storage.from("picture").list(selectedClientId, {
+        limit: 1000,
         sortBy: {
           column: order[0],
           order: order[1].ascending ? "asc" : "desc",
