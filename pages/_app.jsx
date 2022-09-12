@@ -8,6 +8,7 @@ import { ProgressContextProvider } from "../context/progress-context";
 import { CoachPicturesContextProvider } from "../context/coach-picture-context";
 import { PicturesContextProvider } from "../context/picture-context";
 import { ExerciseTypesContextProvider } from "../context/exercise-types-context";
+import { WiiBalanceBoardContextProvider } from "../context/wii-balance-board-context";
 import Layout from "../components/layouts/Layout";
 import { useEffect } from "react";
 import { isIOS } from "react-device-detect";
@@ -34,7 +35,11 @@ function MyApp({ Component, pageProps }) {
                 <ProgressContextProvider>
                   <CoachPicturesContextProvider>
                     <PicturesContextProvider>
-                      <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+                      <WiiBalanceBoardContextProvider>
+                        <Layout>
+                          {getLayout(<Component {...pageProps} />)}
+                        </Layout>
+                      </WiiBalanceBoardContextProvider>
                     </PicturesContextProvider>
                   </CoachPicturesContextProvider>
                 </ProgressContextProvider>

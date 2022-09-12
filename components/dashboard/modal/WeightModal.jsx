@@ -14,6 +14,7 @@ import {
   poundsToKilograms,
 } from "../../../utils/exercise-utils";
 import { weightEvents } from "../../../utils/weight-utils";
+import { useWiiBalanceBoard } from "../../../context/wii-balance-board-context";
 
 export default function WeightModal(props) {
   const {
@@ -30,6 +31,80 @@ export default function WeightModal(props) {
 
   const { selectedDate } = useClient();
   const { user } = useUser();
+
+  // WII BALANCE BOARD START
+  const {
+    wiiBalanceBoard,
+    canConnectToWiiBalanceBoard,
+    connectToWiiBalanceBoard,
+    addWiiBalanceBoardEventListener,
+    removeWiiBalanceBoardEventListener,
+    openWiiBalanceBoardData,
+    closeWiiBalanceBoardData,
+  } = useWiiBalanceBoard();
+  const [includeWiiBalanceBoard, setIncludeWiiBalanceBoard] = useState(false);
+  const [wiiBalanceBoardWeight, setWiiBalanceBoardWeight] = useState();
+  useEffect(() => {
+    if (includeWiiBalanceBoard) {
+      openWiiBalanceBoardData();
+    } else {
+      closeWiiBalanceBoardData();
+    }
+  }, [includeWiiBalanceBoard, wiiBalanceBoard]);
+
+  const onWiiBalanceBoardWeightData = (weights) => {
+    const { total } = weights;
+    setWiiBalanceBoardWeight(total);
+  };
+  useEffect(() => {
+    if (wiiBalanceBoard) {
+      addWiiBalanceBoardEventListener("weights", onWiiBalanceBoardWeightData);
+      return () => {
+        removeWiiBalanceBoardEventListener(
+          "weights",
+          onWiiBalanceBoardWeightData
+        );
+      };
+    }
+  }, [wiiBalanceBoard]);
+
+  const [
+    isCapturingWiiBalanceBoardWeight,
+    setIsCapturingWiiBalanceBoardWeight,
+  ] = useState(false);
+  const [
+    startCapturingWiiBalanceBoardWeightTime,
+    setStartCapturingWiiBalanceBoardWeightTime,
+  ] = useState();
+  const [
+    captureWiiBalanceBoardWeightTimeoutId,
+    setCaptureWiiBalanceBoardWeightTimeoutId,
+  ] = useState();
+  const captureWiiBalanceBoardSeconds = 3;
+  const captureWiiBalanceBoardWeight = () => {
+    clearTimeout(captureWiiBalanceBoardWeightTimeoutId);
+    const newCaptureWiiBalanceBoardWeightTimeoutId = setTimeout(() => {
+      const newWeight = (
+        isUsingKilograms
+          ? wiiBalanceBoardWeight
+          : kilogramsToPounds(wiiBalanceBoardWeight)
+      ).toFixed(2);
+      setWeight(newWeight);
+      setIsCapturingWiiBalanceBoardWeight(false);
+    }, captureWiiBalanceBoardSeconds * 1000);
+    setCaptureWiiBalanceBoardWeightTimeoutId(
+      newCaptureWiiBalanceBoardWeightTimeoutId
+    );
+    setStartCapturingWiiBalanceBoardWeightTime(Date.now());
+    setIsCapturingWiiBalanceBoardWeight(true);
+  };
+  let timeSinceStartCapturingWiiBalanceBoardWeight = 0;
+  if (isCapturingWiiBalanceBoardWeight) {
+    timeSinceStartCapturingWiiBalanceBoardWeight = Math.floor(
+      (Date.now() - startCapturingWiiBalanceBoardWeightTime) / 1000
+    );
+  }
+  // WII BALANCE BOARD END
 
   const [isAddingWeight, setIsAddingWeight] = useState(false);
   const [didAddWeight, setDidAddWeight] = useState(false);
@@ -61,6 +136,10 @@ export default function WeightModal(props) {
 
       setBodyfatPercentage(null);
       setIsBodyfatPercentageEmptyString(true);
+
+      setIncludeWiiBalanceBoard(false);
+      setWiiBalanceBoardWeight();
+      closeWiiBalanceBoardData();
     }
   }, [open]);
 
@@ -170,7 +249,7 @@ export default function WeightModal(props) {
         <button
           type="submit"
           form="weightForm"
-          className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+          className="inline-flex h-fit w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
         >
           {selectedWeight
             ? isUpdatingWeight
@@ -398,6 +477,99 @@ export default function WeightModal(props) {
               ))}
             </select>
           </div>
+        )}
+
+        {canConnectToWiiBalanceBoard && (
+          <div className="flex self-center">
+            <div className="flex h-5 items-center">
+              <input
+                id="includeWiiBalanceBoard"
+                name="includeWiiBalanceBoard"
+                type="checkbox"
+                checked={includeWiiBalanceBoard}
+                onChange={(e) => {
+                  setIncludeWiiBalanceBoard(e.target.checked);
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label
+                htmlFor="includeWiiBalanceBoard"
+                className="font-medium text-gray-700"
+              >
+                Use Wii Balance Board
+              </label>
+            </div>
+          </div>
+        )}
+        {includeWiiBalanceBoard &&
+          canConnectToWiiBalanceBoard &&
+          !wiiBalanceBoard && (
+            <button
+              type="button"
+              onClick={() => connectToWiiBalanceBoard()}
+              className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Connect to Wii Balance Board
+            </button>
+          )}
+        {includeWiiBalanceBoard && wiiBalanceBoard && (
+          <div className="col-span-1">
+            <label
+              htmlFor="weight"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Wii Balance Board Weight
+            </label>
+            <div className="relative mt-1 rounded-md shadow-sm">
+              <input
+                readOnly
+                type="number"
+                inputMode="decimal"
+                min="0"
+                placeholder="0"
+                name="weight"
+                id="weight"
+                className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                value={
+                  wiiBalanceBoardWeight
+                    ? (isUsingKilograms
+                        ? wiiBalanceBoardWeight
+                        : kilogramsToPounds(wiiBalanceBoardWeight)
+                      ).toFixed(2)
+                    : ""
+                }
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <label htmlFor="weight-type-wii" className="sr-only">
+                  weight type
+                </label>
+                <select
+                  id="weight-type-wii"
+                  name="weight-type-wii"
+                  className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  onChange={(e) => setIsUsingKilograms(e.target.value === "kg")}
+                  value={isUsingKilograms ? "kg" : "lbs"}
+                >
+                  <option>lbs</option>
+                  <option>kg</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+        {includeWiiBalanceBoard && wiiBalanceBoard && (
+          <button
+            type="button"
+            onClick={() => captureWiiBalanceBoardWeight()}
+            className="inline-flex h-fit w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            {isCapturingWiiBalanceBoardWeight
+              ? captureWiiBalanceBoardSeconds -
+                timeSinceStartCapturingWiiBalanceBoardWeight
+              : "Capture Wii Balance Board Weight"}
+          </button>
         )}
       </form>
     </Modal>

@@ -130,6 +130,12 @@ export default class Wiimote {
       this.LedEncoder(...this.ledStatus),
     ]);
   }
+  setLed(id, value) {
+    this.ledStatus[id] = value;
+    return this.sendReport(ReportMode.PLAYER_LED, [
+      this.LedEncoder(...this.ledStatus),
+    ]);
+  }
 
   // Write the the Wiimote register
   writeRegister(type, offset, data) {
