@@ -20,9 +20,9 @@ const months = [
 ];
 
 const highlightColors = {
-  copy: "bg-blue-50",
-  paste: "bg-blue-50",
-  delete: "bg-red-50",
+  copy: "bg-blue-100",
+  paste: "bg-blue-100",
+  delete: "bg-red-100",
 };
 
 const capitalizeFirstLetter = (string) =>
@@ -278,7 +278,8 @@ export default function DashboardCalendarLayout({
                             setSelectedDate(day.date);
                           }}
                           className={classNames(
-                            day.isCurrentMonth ? "bg-white" : "bg-gray-50",
+                            !day.shouldHighlight &&
+                              (day.isCurrentMonth ? "bg-white" : "bg-gray-50"),
                             (day.isSelected || day.isToday) && "font-semibold",
                             day.isSelected && "text-white",
                             !day.isSelected && day.isToday && "text-blue-600",

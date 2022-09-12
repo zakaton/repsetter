@@ -32,11 +32,16 @@ export default function ClientsSelect() {
           }}
         >
           <option value={user.email}>Me</option>
-          {clients?.map((client) => (
-            <option key={client.client_email} value={client.client_email}>
-              {client.client_email}
-            </option>
-          ))}
+          <optgroup label="My Clients">
+            {clients?.map((client) => (
+              <option key={client.client_email} value={client.client_email}>
+                {client.client_email}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="My Blocks">
+            <option>create new...</option>
+          </optgroup>
         </select>
       </div>
     )

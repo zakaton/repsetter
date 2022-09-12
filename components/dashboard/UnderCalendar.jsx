@@ -43,6 +43,7 @@ const getDates = (dateRangeToCopy, selectedDate) => {
     default:
       break;
   }
+  ("");
   //console.log("getDates", fromDate, toDate);
   return { fromDate, toDate };
 };
