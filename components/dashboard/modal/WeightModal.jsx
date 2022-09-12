@@ -95,6 +95,7 @@ export default function WeightModal(props) {
   const captureWiiBalanceBoardWeight = () => {
     clearTimeout(captureWiiBalanceBoardWeightTimeoutId);
     const newCaptureWiiBalanceBoardWeightTimeoutId = setTimeout(() => {
+      const wiiBalanceBoardWeight = wiiBalanceBoard.weights.total;
       const newWeight = (
         isUsingKilograms
           ? wiiBalanceBoardWeight
