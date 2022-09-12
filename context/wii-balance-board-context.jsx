@@ -62,7 +62,7 @@ export function WiiBalanceBoardContextProvider(props) {
   };
 
   const [wiiBalanceBoardEventListeners, setWiiBalanceBoardEventListeners] =
-    useState({ button: [], buttonDown: [], buttonUp: [], weights: [] });
+    useState({ button: [], buttondown: [], buttonup: [], weights: [] });
 
   const addWiiBalanceBoardEventListener = (type, callback) => {
     if (

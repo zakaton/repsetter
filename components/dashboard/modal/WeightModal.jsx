@@ -56,13 +56,24 @@ export default function WeightModal(props) {
     const { total } = weights;
     setWiiBalanceBoardWeight(total);
   };
+  const onWiiBalanceBoardButtonDown = () => {
+    captureWiiBalanceBoardWeight();
+  };
   useEffect(() => {
     if (wiiBalanceBoard) {
       addWiiBalanceBoardEventListener("weights", onWiiBalanceBoardWeightData);
+      addWiiBalanceBoardEventListener(
+        "buttondown",
+        onWiiBalanceBoardButtonDown
+      );
       return () => {
         removeWiiBalanceBoardEventListener(
           "weights",
           onWiiBalanceBoardWeightData
+        );
+        removeWiiBalanceBoardEventListener(
+          "buttondown",
+          onWiiBalanceBoardButtonDown
         );
       };
     }
