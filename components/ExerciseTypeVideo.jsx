@@ -69,6 +69,12 @@ export default function ExerciseTypeVideo(
           setShowVideo(false);
         }
       }}
+      onTouchStart={() => {
+        setShowVideo(true);
+      }}
+      onTouchEnd={() => {
+        setShowVideo(false);
+      }}
       onClick={(e) => {
         const { current: video } = videoRef;
         if (video && isMobile) {
