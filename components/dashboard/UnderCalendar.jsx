@@ -310,7 +310,8 @@ export default function UnderCalendar({
           highlightDates();
         }}
       >
-        Paste
+        <span className="lg:hidden">Paste Exercises</span>
+        <span className="hidden lg:inline">Paste</span>
       </button>
       <MultiDateSelect
         activeOption={deleteActiveOption}
