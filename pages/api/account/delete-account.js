@@ -129,10 +129,28 @@ export default async function handler(req, res) {
     .match({ client: profile.id });
   console.log("deleteExercisesError", deleteExercisesError);
 
+  const { data: blocks, error: getBlocksError } = await supabase
+    .from("block")
+    .select("*")
+    .eq("user", profile.id);
+  console.log("getBlocksError", getBlocksError);
+  console.log("blocks", blocks);
+  if (blocks) {
+    const { error: updateExercisesError } = await supabase
+      .from("exercise")
+      .update({ block: null })
+      .match({ is_block_template: false })
+      .in(
+        "block",
+        blocks.map((block) => block.id)
+      );
+    console.log("updateExercisesError", updateExercisesError);
+  }
+
   const { error: deleteBlocksError } = await supabase
     .from("block")
     .delete()
-    .match({ created_by: profile.id });
+    .match({ user: profile.id });
   console.log("deleteBlocksError", deleteBlocksError);
 
   const { error: deleteWeightError } = await supabase

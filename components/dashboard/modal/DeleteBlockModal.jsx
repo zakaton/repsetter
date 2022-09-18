@@ -57,6 +57,19 @@ export default function DeleteBlockModal(props) {
                 error = deleteExercisesError;
               }
 
+              const {
+                data: updateExercisesResult,
+                error: updateExercisesError,
+              } = await supabase
+                .from("exercise")
+                .update({ block: null })
+                .match({ block: selectedBlock.id, is_block_template: false });
+              console.log("updateExercisesResult", updateExercisesResult);
+              if (updateExercisesError) {
+                console.error(updateExercisesError);
+                error = updateExercisesError;
+              }
+
               const { data: deleteBlockResult, error: deleteBlockError } =
                 await supabase
                   .from("block")
@@ -83,6 +96,23 @@ export default function DeleteBlockModal(props) {
               if (deleteExercisesError) {
                 console.error(deleteExercisesError);
                 error = deleteExercisesError;
+              }
+
+              const {
+                data: updateExercisesResult,
+                error: updateExercisesError,
+              } = await supabase
+                .from("exercise")
+                .update({ block: null })
+                .match({ is_block_template: false })
+                .in(
+                  "block",
+                  selectedBlocks.map((block) => block.id)
+                );
+              console.log("updateExercisesResult", updateExercisesResult);
+              if (updateExercisesError) {
+                console.error(updateExercisesError);
+                error = updateExercisesError;
               }
 
               const { data: deleteBlocksResult, error: deleteBlocksError } =
