@@ -231,6 +231,11 @@ export default function UnderCalendar({
         weight_assigned,
       };
 
+      if (selectedBlock) {
+        insertedExercise.client = user.id;
+        insertedExercise.client_email = user.email;
+      }
+
       if (!amITheClient) {
         Object.assign(insertedExercise, {
           coach: user.id,

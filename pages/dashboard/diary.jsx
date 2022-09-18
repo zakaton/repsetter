@@ -147,6 +147,7 @@ export default function Diary() {
       matchFilters.block = selectedBlock.id;
       matchFilters.is_block_template;
       matchFilters.date = selectedBlockDate.toDateString();
+      matchFilters.client = user.id;
     }
     console.log("getting exercises for date", matchFilters.date);
     console.log("matchFilters", matchFilters);
@@ -429,6 +430,10 @@ export default function Diary() {
           is_weight_in_kilograms,
           weight_assigned,
         };
+        if (selectedBlock) {
+          insertedExercise.client = user.id;
+          insertedExercise.client_email = user.email;
+        }
 
         if (!amITheClient) {
           Object.assign(insertedExercise, {
