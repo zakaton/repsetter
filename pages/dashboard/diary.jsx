@@ -9,6 +9,8 @@ import PictureModal from "../../components/dashboard/modal/PictureModal";
 import DeletePictureModal from "../../components/dashboard/modal/DeletePictureModal";
 import Notification from "../../components/Notification";
 import UnderCalendar from "../../components/dashboard/UnderCalendar";
+import BlockModal from "../../components/dashboard/modal/BlockModal";
+import DeleteBlockModal from "../../components/dashboard/modal/DeleteBlockModal";
 import {
   supabase,
   dateFromDateAndTime,
@@ -17,7 +19,10 @@ import {
 } from "../../utils/supabase";
 import { useUser } from "../../context/user-context";
 import { usePictures } from "../../context/picture-context";
-import { useClient } from "../../context/client-context";
+import {
+  useClient,
+  firstDayOfBlockTemplate,
+} from "../../context/client-context";
 import { useExerciseVideos } from "../../context/exercise-videos-context";
 import ExerciseTypeVideo from "../../components/ExerciseTypeVideo";
 import YouTube from "react-youtube";
@@ -78,11 +83,23 @@ export default function Diary() {
     selectedClientId,
     getSelectedDate,
     isSelectedDateAfterToday,
+    selectedBlock,
+    setSelectedBlock,
+    checkedQuery,
+    getBlocks,
+
+    selectedBlockDate,
+    getSelectedBlockDate,
   } = useClient();
 
   useEffect(() => {
     if (!selectedDate) {
       getSelectedDate();
+    }
+  }, []);
+  useEffect(() => {
+    if (!selectedBlockDate) {
+      getSelectedBlockDate();
     }
   }, []);
 
@@ -118,7 +135,6 @@ export default function Diary() {
     if (isGettingExercises && !refresh) {
       return;
     }
-    console.log("getting exercises for date", selectedDate.toDateString());
     setIsGettingExercises(true);
     const matchFilters = {
       client: selectedClientId,
@@ -127,36 +143,46 @@ export default function Diary() {
     if (!amITheClient) {
       //matchFilters.coach = user.id;
     }
+    if (selectedBlock) {
+      matchFilters.block = selectedBlock.id;
+      matchFilters.is_block_template;
+      matchFilters.date = selectedBlockDate.toDateString();
+    }
+    console.log("getting exercises for date", matchFilters.date);
     console.log("matchFilters", matchFilters);
     const { data: exercises, error } = await supabase
       .from("exercise")
-      .select("*, type(*)")
+      .select("*, type(*), block(*)")
+      .match(matchFilters)
       .order("time", { ascending: true })
-      .order("created_at", { ascending: true })
-      .match(matchFilters);
+      .order("created_at", { ascending: true });
     if (error) {
       console.error(error);
     } else {
-      console.log(
-        "got exercises for date",
-        selectedDate.toDateString(),
-        exercises
-      );
+      console.log("got exercises for date", matchFilters.date, exercises);
       setVideo({});
       setVideoPlayer({});
       setExercises(exercises);
       setGotExerciseForUserId(selectedClientId);
-      setGotExerciseForDate(selectedDate);
+      setGotExerciseForDate(selectedBlock ? selectedBlockDate : selectedDate);
     }
     setIsGettingExercises(false);
   };
 
   useEffect(() => {
+    if (!checkedQuery.block) {
+      return;
+    }
+
     if (!selectedDate) {
       return;
     }
 
     if (!selectedClientId) {
+      return;
+    }
+
+    if (selectedBlock) {
       return;
     }
 
@@ -171,13 +197,26 @@ export default function Diary() {
         getExerciseDates();
       }
     }
-  }, [exercises, selectedClientId, selectedClient, selectedDate]);
+  }, [
+    exercises,
+    selectedClientId,
+    selectedClient,
+    selectedDate,
+    selectedBlock,
+    checkedQuery,
+  ]);
 
   useEffect(() => {
     if (exercises) {
+      let fromString = ``;
+      if (selectedBlock) {
+        fromString = `exercise:block=eq.${selectedBlock.id}`;
+      } else {
+        fromString = `exercise:client=eq.${selectedClientId}`;
+      }
       console.log(`subscribing to exercise updates`);
       const subscription = supabase
-        .from(`exercise:client=eq.${selectedClientId}`)
+        .from(fromString)
         .on("INSERT", (payload) => {
           console.log(`new exercise`, payload);
           getExercises(true);
@@ -264,6 +303,11 @@ export default function Diary() {
   const [lastSelectedDate, setLastSelectedDate] = useState();
   const [exerciseDates, setExerciseDates] = useState();
   const getExerciseDates = async () => {
+    if (selectedBlock) {
+      await getExerciseDatesForBlock();
+      return;
+    }
+
     console.log(
       "getting exercise dates for the month",
       calendar[0].toDateString(),
@@ -288,6 +332,7 @@ export default function Diary() {
       setExerciseDates(exerciseDates);
     }
   };
+
   const [weightDates, setWeightDates] = useState();
   const getWeightDates = async () => {
     console.log(
@@ -310,9 +355,12 @@ export default function Diary() {
   };
   useEffect(() => {
     if (
+      checkedQuery.block &&
+      !selectedBlock &&
       selectedClientId &&
       calendar &&
       selectedDate &&
+      calendar[0].getFullYear() != firstDayOfBlockTemplate.getFullYear() &&
       (!lastSelectedDate ||
         lastSelectedDate.getFullYear() !== selectedDate.getFullYear() ||
         lastSelectedDate.getMonth() !== selectedDate.getMonth())
@@ -322,7 +370,7 @@ export default function Diary() {
       getWeightDates();
       getPictureDates();
     }
-  }, [calendar, selectedClientId]);
+  }, [calendar, selectedClientId, selectedBlock, checkedQuery]);
 
   const [copiedExercises, setCopiedExercises] = useState();
   const copyExercises = () => {
@@ -352,6 +400,8 @@ export default function Diary() {
           coach,
           coach_email,
 
+          block,
+
           number_of_sets_assigned,
           number_of_reps_assigned,
           is_weight_in_kilograms,
@@ -361,7 +411,13 @@ export default function Diary() {
         const insertedExercise = {
           type: uniqueExercise.type.id,
 
-          date: selectedDate.toDateString(),
+          date: (selectedBlock
+            ? selectedBlockDate
+            : selectedDate
+          ).toDateString(),
+
+          block: selectedBlock ? selectedBlock.id : block,
+          is_block_template: selectedBlock ? true : false,
 
           client: selectedClientId,
           client_email: amITheClient
@@ -505,11 +561,19 @@ export default function Diary() {
   };
 
   useEffect(() => {
+    if (!checkedQuery.block) {
+      return;
+    }
+
     if (!selectedDate) {
       return;
     }
 
     if (!selectedClientId) {
+      return;
+    }
+
+    if (selectedBlock) {
       return;
     }
 
@@ -524,7 +588,14 @@ export default function Diary() {
         getWeightDates();
       }
     }
-  }, [weights, selectedClientId, selectedClient, selectedDate]);
+  }, [
+    weights,
+    selectedClientId,
+    selectedClient,
+    selectedDate,
+    selectedBlock,
+    checkedQuery,
+  ]);
 
   useEffect(() => {
     if (weights) {
@@ -580,37 +651,6 @@ export default function Diary() {
   const [showDeletePictureNotification, setShowDeletePictureNotification] =
     useState(false);
   const [deletePictureStatus, setDeletePictureStatus] = useState();
-
-  const clearNotifications = () => {
-    setShowAddExerciseNotification(false);
-    setShowDeleteExerciseNotification(false);
-    setShowEditExerciseNotification(false);
-    setShowWeightNotification(false);
-    setShowDeleteWeightNotification(false);
-    setShowPictureNotification(false);
-    setShowDeletePictureNotification(false);
-  };
-  useEffect(() => {
-    if (
-      showAddExerciseModal ||
-      showDeleteExerciseModal ||
-      showEditExerciseModal ||
-      showWeightModal ||
-      showDeleteWeightModal ||
-      showPictureModal ||
-      showDeletePictureModal
-    ) {
-      clearNotifications();
-    }
-  }, [
-    showAddExerciseModal,
-    showDeleteExerciseModal,
-    showEditExerciseModal,
-    showWeightModal,
-    showDeleteWeightModal,
-    showPictureModal,
-    showDeletePictureModal,
-  ]);
 
   const [weightChartOptions, setWeightChartOptions] = useState();
   const [weightChartData, setWeightChartData] = useState();
@@ -762,11 +802,19 @@ export default function Diary() {
   const [selectedPictureTypes, setSelectedPictureTypes] = useState();
   const [pictureType, setPictureType] = useState(pictureTypes[0]);
   useEffect(() => {
+    if (!checkedQuery.block) {
+      return;
+    }
+
     if (!selectedDate) {
       return;
     }
 
     if (!selectedClientId) {
+      return;
+    }
+
+    if (selectedBlock) {
       return;
     }
 
@@ -778,7 +826,7 @@ export default function Diary() {
     ) {
       getPictureDates();
     }
-  }, [selectedClientId, selectedDate]);
+  }, [selectedClientId, selectedDate, selectedBlock, checkedQuery]);
 
   useEffect(() => {
     if (pictureStatus?.type === "succeeded") {
@@ -850,7 +898,12 @@ export default function Diary() {
   const [datesDots, setDatesDots] = useState({});
   useEffect(() => {
     if (exerciseDates || weightDates || pictureDates) {
-      console.log("updating date dots");
+      console.log(
+        "updating date dots",
+        exerciseDates,
+        weightDates,
+        pictureDates
+      );
       const newDatesDots = {};
       exerciseDates?.forEach((exerciseDate) => {
         const dots = newDatesDots[exerciseDate.date] || [];
@@ -877,6 +930,97 @@ export default function Diary() {
   const [showPictures, setShowPictures] = useState(true);
 
   const [datesToHighlight, setDatesToHighlight] = useState();
+
+  const getExerciseDatesForBlock = async () => {
+    console.log("getting exercise dates for block", selectedBlock);
+    const { data: exerciseDates, error } = await supabase.rpc(
+      "get_block_exercise_dates",
+      {
+        block_id: selectedBlock.id,
+      }
+    );
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("exerciseDates", exerciseDates);
+      setExerciseDates(exerciseDates);
+    }
+  };
+  useEffect(() => {
+    if (selectedBlock) {
+      setWeightDates();
+      setPictureDates();
+      getExerciseDates();
+      getExercises();
+      setLastSelectedDate();
+    }
+  }, [selectedBlock]);
+
+  useEffect(() => {
+    if (selectedBlock) {
+      if (selectedBlockDate != gotExerciseForDate) {
+        getExercises(true);
+      }
+    }
+  }, [selectedBlockDate]);
+
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showBlockNotification, setShowBlockNotification] = useState(false);
+  const [blockStatus, setBlockStatus] = useState();
+
+  const [showDeleteBlockModal, setShowDeleteBlockModal] = useState(false);
+  const [showDeleteBlockNotification, setShowDeleteBlockNotification] =
+    useState(false);
+  const [deleteBlockStatus, setDeleteBlockStatus] = useState();
+
+  const clearNotifications = () => {
+    setShowAddExerciseNotification(false);
+    setShowDeleteExerciseNotification(false);
+    setShowEditExerciseNotification(false);
+    setShowWeightNotification(false);
+    setShowDeleteWeightNotification(false);
+    setShowPictureNotification(false);
+    setShowDeletePictureNotification(false);
+    setShowBlockNotification(false);
+    setShowDeleteBlockNotification(false);
+  };
+  useEffect(() => {
+    if (
+      showAddExerciseModal ||
+      showDeleteExerciseModal ||
+      showEditExerciseModal ||
+      showWeightModal ||
+      showDeleteWeightModal ||
+      showPictureModal ||
+      showDeletePictureModal ||
+      showBlockModal ||
+      showDeleteBlockModal
+    ) {
+      clearNotifications();
+    }
+  }, [
+    showAddExerciseModal,
+    showDeleteExerciseModal,
+    showEditExerciseModal,
+    showWeightModal,
+    showDeleteWeightModal,
+    showPictureModal,
+    showDeletePictureModal,
+    showBlockModal,
+    showDeleteBlockModal,
+  ]);
+
+  useEffect(() => {
+    if (blockStatus?.type === "succeeded") {
+      console.log("GET BLOKS!");
+      getBlocks(true);
+    }
+  }, [blockStatus]);
+  useEffect(() => {
+    if (deleteBlockStatus?.type === "succeeded") {
+      setSelectedBlock();
+    }
+  }, [deleteBlockStatus]);
 
   return (
     <>
@@ -984,7 +1128,67 @@ export default function Diary() {
         status={deletePictureStatus}
       />
 
+      <BlockModal
+        open={showBlockModal}
+        setOpen={setShowBlockModal}
+        selectedResult={selectedBlock}
+        setResultStatus={setBlockStatus}
+        setShowBlockNotification={setShowBlockNotification}
+      ></BlockModal>
+      <Notification
+        open={showBlockNotification}
+        setOpen={setShowBlockNotification}
+        status={blockStatus}
+      ></Notification>
+
+      <DeleteBlockModal
+        open={showDeleteBlockModal}
+        setOpen={setShowDeleteBlockModal}
+        selectedResult={selectedBlock}
+        setDeleteResultStatus={setDeleteBlockStatus}
+        setShowDeleteResultNotification={setShowDeleteBlockNotification}
+      ></DeleteBlockModal>
+      <Notification
+        open={showDeleteBlockNotification}
+        setOpen={setShowDeleteBlockNotification}
+        status={deleteBlockStatus}
+      ></Notification>
+
       <DashboardCalendarLayout
+        aboveCalendar={
+          selectedBlock && (
+            <>
+              <div className="mb-3 space-y-2 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3 sm:space-y-0">
+                <button
+                  type="button"
+                  className={classNames(
+                    "col-span-1 inline-flex w-full justify-center self-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm sm:mt-0 sm:py-2 sm:text-sm",
+                    "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  )}
+                  onClick={() => {
+                    setShowBlockModal(true);
+                  }}
+                >
+                  Block Details
+                </button>
+                <button
+                  type="button"
+                  className={classNames(
+                    "col-span-1 inline-flex w-full justify-center self-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm sm:mt-0 sm:py-2 sm:text-sm",
+                    "bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  )}
+                  onClick={() => {
+                    setShowDeleteBlockModal(true);
+                  }}
+                >
+                  Delete Block
+                </button>
+              </div>
+            </>
+          )
+        }
+        showCalendarControls={!selectedBlock}
+        includeClientSelect={{ showBlocks: true }}
         datesToHighlight={datesToHighlight}
         underCalendar={
           <UnderCalendar
@@ -1000,7 +1204,13 @@ export default function Diary() {
         setCalendar={setCalendar}
         tableName="diary"
         resultNamePlural="diary"
-        subtitle="View and edit your weight, pictures, and exercises"
+        subtitle={`View and edit ${
+          selectedClient ? `${selectedClient.client_email}'s` : "your"
+        } ${
+          selectedBlock
+            ? `"${selectedBlock.name}" block`
+            : "weight, pictures, and exercises"
+        }`}
         datesDots={datesDots}
       >
         <div className="relative min-h-[3rem]">
@@ -1131,6 +1341,16 @@ export default function Diary() {
                               {exercise.type.name}
                             </dd>
                           </div>
+                          {exercise.block && (
+                            <div className="sm:col-span-1">
+                              <dt className="text-sm font-medium text-gray-500">
+                                Block
+                              </dt>
+                              <dd className="mt-1 break-words text-sm text-gray-900">
+                                {exercise.block.name}
+                              </dd>
+                            </div>
+                          )}
                           {exercise.time && (
                             <div className="sm:col-span-1">
                               <dt className="text-sm font-medium text-gray-500">
@@ -1152,6 +1372,14 @@ export default function Diary() {
                             </dt>
                             <dd className="mt-1 break-words text-sm text-gray-900">
                               {exercise.type.muscles.join(", ")}
+                            </dd>
+                          </div>
+                          <div className="sm:col-span-1">
+                            <dt className="text-sm font-medium text-gray-500">
+                              Muscle Group
+                            </dt>
+                            <dd className="mt-1 break-words text-sm text-gray-900">
+                              {exercise.type.group}
                             </dd>
                           </div>
                           {exercise.coach_email && (
@@ -1490,447 +1718,463 @@ export default function Diary() {
           </>
         )}
 
-        <div className="relative min-h-[3rem]">
-          <div
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <div className="relative z-10 flex justify-start">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowWeights(!showWeights);
-                }}
-                className="flex bg-white pr-2 text-base text-yellow-600"
+        {!selectedBlock && (
+          <>
+            <div className="relative min-h-[3rem]">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
               >
-                {showWeights ? (
-                  <ChevronDownIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <ChevronRightIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                )}
-                <span className="pl-0.5">Bodyweight</span>
-              </button>
-            </div>
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div
-            className={classNames(
-              "relative flex justify-end sm:justify-center",
-              showWeights ? "" : "invisible"
-            )}
-          >
-            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {!isSelectedDateAfterToday && (
-                <>
-                  {amITheClient &&
-                    !weights?.some((weight) => weight.time == null) && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedWeight();
-                          setShowWeightModal(true);
-                        }}
-                        className={classNames(
-                          "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                          "rounded-l-md"
-                        )}
-                      >
-                        <span className="sr-only">Add Weight</span>
-                        <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                      </button>
-                    )}
+                <div className="relative z-10 flex justify-start">
                   <button
                     type="button"
-                    onClick={() => setIsUsingKilograms(!isUsingKilograms)}
-                    className={classNames(
-                      "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                      amITheClient &&
-                        !weights?.some((weight) => weight.time == null)
-                        ? ""
-                        : amITheClient
-                        ? "rounded-l-md"
-                        : "rounded-md"
-                    )}
+                    onClick={() => {
+                      setShowWeights(!showWeights);
+                    }}
+                    className="flex bg-white pr-2 text-base text-yellow-600"
                   >
-                    <span className="sr-only">Toggle Weight</span>
-                    {isUsingKilograms ? "kg" : "lbs"}
-                  </button>
-                  {amITheClient && (
-                    <button
-                      type="button"
-                      disabled={!(weights?.length > 0)}
-                      onClick={() => {
-                        setSelectedWeights(weights);
-                        setShowDeleteWeightModal(true);
-                      }}
-                      className={classNames(
-                        "relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
-                        weights?.length > 0
-                          ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          : "bg-gray-100"
-                      )}
-                    >
-                      <span className="sr-only">Delete Weights</span>
-                      <TrashIcon className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  )}
-                </>
-              )}
-            </span>
-          </div>
-        </div>
-        {showWeights && (
-          <>
-            {!isGettingWeights && weights && (
-              <>
-                {weights.length > 0 && (
-                  <>
-                    {weightChartData && weightChartOptions && (
-                      <Line
-                        options={weightChartOptions}
-                        data={weightChartData}
+                    {showWeights ? (
+                      <ChevronDownIcon
+                        className="m-auto inline h-4 w-4"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <ChevronRightIcon
+                        className="m-auto inline h-4 w-4"
+                        aria-hidden="true"
                       />
                     )}
-                    {weights
-                      .slice()
-                      .sort((a, b) => {
-                        const [aHour, aMinute, aCreated_at] = a.time.split(":");
-                        const [bHour, bMinute, bCreated_at] = b.time.split(":");
-                        if (aHour != bHour) {
-                          return aHour - bHour;
-                        } else if (aMinute != bMinute) {
-                          return aMinute - bMinute;
-                        } else {
-                          return aCreated_at - bCreated_at;
-                        }
-                      })
-                      .map((weight, index, weights) => {
-                        let previousWeight;
-                        if (index === 0) {
-                          previousWeight = lastWeightBeforeToday;
-                        } else {
-                          previousWeight = weights[index - 1];
-                        }
-                        let weightDifference;
-                        let bodyfatDifference = null;
-                        if (previousWeight) {
-                          let previousWeightValue = previousWeight.weight;
-                          if (
-                            weight.is_weight_in_kilograms !==
-                            previousWeight.is_weight_in_kilograms
-                          ) {
-                            previousWeightValue = weight.is_weight_in_kilograms
-                              ? poundsToKilograms(previousWeightValue)
-                              : kilogramsToPounds(previousWeightValue);
-                          }
-                          if (
-                            weight.bodyfat_percentage !== null &&
-                            previousWeight.bodyfat_percentage !== null
-                          ) {
-                            bodyfatDifference =
-                              weight.bodyfat_percentage -
-                              previousWeight.bodyfat_percentage;
-                          }
-                          weightDifference =
-                            weight.weight - previousWeightValue;
-                        }
-                        return (
-                          <div
-                            key={weight.id}
+                    <span className="pl-0.5">Bodyweight</span>
+                  </button>
+                </div>
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div
+                className={classNames(
+                  "relative flex justify-end sm:justify-center",
+                  showWeights ? "" : "invisible"
+                )}
+              >
+                <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+                  {!isSelectedDateAfterToday && (
+                    <>
+                      {amITheClient &&
+                        !weights?.some((weight) => weight.time == null) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedWeight();
+                              setShowWeightModal(true);
+                            }}
                             className={classNames(
-                              "py-5",
-                              index === 0 ? "" : "border-gray-20 border-t"
+                              "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                              "rounded-l-md"
                             )}
                           >
-                            <dl
-                              className={
-                                "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
+                            <span className="sr-only">Add Weight</span>
+                            <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                          </button>
+                        )}
+                      <button
+                        type="button"
+                        onClick={() => setIsUsingKilograms(!isUsingKilograms)}
+                        className={classNames(
+                          "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                          amITheClient &&
+                            !weights?.some((weight) => weight.time == null)
+                            ? ""
+                            : amITheClient
+                            ? "rounded-l-md"
+                            : "rounded-md"
+                        )}
+                      >
+                        <span className="sr-only">Toggle Weight</span>
+                        {isUsingKilograms ? "kg" : "lbs"}
+                      </button>
+                      {amITheClient && (
+                        <button
+                          type="button"
+                          disabled={!(weights?.length > 0)}
+                          onClick={() => {
+                            setSelectedWeights(weights);
+                            setShowDeleteWeightModal(true);
+                          }}
+                          className={classNames(
+                            "relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400",
+                            weights?.length > 0
+                              ? "hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              : "bg-gray-100"
+                          )}
+                        >
+                          <span className="sr-only">Delete Weights</span>
+                          <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
+            {showWeights && (
+              <>
+                {!isGettingWeights && weights && (
+                  <>
+                    {weights.length > 0 && (
+                      <>
+                        {weightChartData && weightChartOptions && (
+                          <Line
+                            options={weightChartOptions}
+                            data={weightChartData}
+                          />
+                        )}
+                        {weights
+                          .slice()
+                          .sort((a, b) => {
+                            const [aHour, aMinute, aCreated_at] =
+                              a.time.split(":");
+                            const [bHour, bMinute, bCreated_at] =
+                              b.time.split(":");
+                            if (aHour != bHour) {
+                              return aHour - bHour;
+                            } else if (aMinute != bMinute) {
+                              return aMinute - bMinute;
+                            } else {
+                              return aCreated_at - bCreated_at;
+                            }
+                          })
+                          .map((weight, index, weights) => {
+                            let previousWeight;
+                            if (index === 0) {
+                              previousWeight = lastWeightBeforeToday;
+                            } else {
+                              previousWeight = weights[index - 1];
+                            }
+                            let weightDifference;
+                            let bodyfatDifference = null;
+                            if (previousWeight) {
+                              let previousWeightValue = previousWeight.weight;
+                              if (
+                                weight.is_weight_in_kilograms !==
+                                previousWeight.is_weight_in_kilograms
+                              ) {
+                                previousWeightValue =
+                                  weight.is_weight_in_kilograms
+                                    ? poundsToKilograms(previousWeightValue)
+                                    : kilogramsToPounds(previousWeightValue);
                               }
-                            >
-                              <div className="sm:col-span-1">
-                                <dt className="text-sm font-medium text-gray-500">
-                                  Weight
-                                </dt>
-                                <dd className="mt-1 break-words text-sm text-gray-900">
-                                  {weight.is_weight_in_kilograms ==
-                                  isUsingKilograms
-                                    ? weight.weight
-                                    : (isUsingKilograms
-                                        ? poundsToKilograms(weight.weight)
-                                        : kilogramsToPounds(weight.weight)
-                                      ).toFixed(1)}{" "}
-                                  {isUsingKilograms ? "kg" : "lbs"}{" "}
-                                  {previousWeight && (
-                                    <span
-                                      className={
-                                        weightDifference < 0
-                                          ? "text-red-500"
-                                          : "text-green-500"
-                                      }
-                                    >
-                                      ({weightDifference < 0 ? "" : "+"}
-                                      {(weight.is_weight_in_kilograms ==
+                              if (
+                                weight.bodyfat_percentage !== null &&
+                                previousWeight.bodyfat_percentage !== null
+                              ) {
+                                bodyfatDifference =
+                                  weight.bodyfat_percentage -
+                                  previousWeight.bodyfat_percentage;
+                              }
+                              weightDifference =
+                                weight.weight - previousWeightValue;
+                            }
+                            return (
+                              <div
+                                key={weight.id}
+                                className={classNames(
+                                  "py-5",
+                                  index === 0 ? "" : "border-gray-20 border-t"
+                                )}
+                              >
+                                <dl
+                                  className={
+                                    "grid grid-cols-3 gap-x-4 gap-y-6 xs:grid-cols-4 sm:grid-cols-5"
+                                  }
+                                >
+                                  <div className="sm:col-span-1">
+                                    <dt className="text-sm font-medium text-gray-500">
+                                      Weight
+                                    </dt>
+                                    <dd className="mt-1 break-words text-sm text-gray-900">
+                                      {weight.is_weight_in_kilograms ==
                                       isUsingKilograms
-                                        ? weightDifference
-                                        : isUsingKilograms
-                                        ? poundsToKilograms(weightDifference)
-                                        : kilogramsToPounds(weightDifference)
-                                      ).toFixed(1)}
-                                      )
-                                    </span>
+                                        ? weight.weight
+                                        : (isUsingKilograms
+                                            ? poundsToKilograms(weight.weight)
+                                            : kilogramsToPounds(weight.weight)
+                                          ).toFixed(1)}{" "}
+                                      {isUsingKilograms ? "kg" : "lbs"}{" "}
+                                      {previousWeight && (
+                                        <span
+                                          className={
+                                            weightDifference < 0
+                                              ? "text-red-500"
+                                              : "text-green-500"
+                                          }
+                                        >
+                                          ({weightDifference < 0 ? "" : "+"}
+                                          {(weight.is_weight_in_kilograms ==
+                                          isUsingKilograms
+                                            ? weightDifference
+                                            : isUsingKilograms
+                                            ? poundsToKilograms(
+                                                weightDifference
+                                              )
+                                            : kilogramsToPounds(
+                                                weightDifference
+                                              )
+                                          ).toFixed(1)}
+                                          )
+                                        </span>
+                                      )}
+                                    </dd>
+                                  </div>
+                                  {weight.bodyfat_percentage !== null && (
+                                    <div className="sm:col-span-1">
+                                      <dt className="text-sm font-medium text-gray-500">
+                                        Bodyfat Percentage
+                                      </dt>
+                                      <dd className="mt-1 break-words text-sm text-gray-900">
+                                        {weight.bodyfat_percentage}%{" "}
+                                        {bodyfatDifference && (
+                                          <span
+                                            className={
+                                              bodyfatDifference < 0
+                                                ? "text-red-500"
+                                                : "text-green-500"
+                                            }
+                                          >
+                                            ({bodyfatDifference < 0 ? "" : "+"}
+                                            {bodyfatDifference.toFixed(1)})
+                                          </span>
+                                        )}
+                                      </dd>
+                                    </div>
                                   )}
-                                </dd>
-                              </div>
-                              {weight.bodyfat_percentage !== null && (
-                                <div className="sm:col-span-1">
-                                  <dt className="text-sm font-medium text-gray-500">
-                                    Bodyfat Percentage
-                                  </dt>
-                                  <dd className="mt-1 break-words text-sm text-gray-900">
-                                    {weight.bodyfat_percentage}%{" "}
-                                    {bodyfatDifference && (
-                                      <span
-                                        className={
-                                          bodyfatDifference < 0
-                                            ? "text-red-500"
-                                            : "text-green-500"
-                                        }
+                                  {weight.time !== null && (
+                                    <div className="sm:col-span-1">
+                                      <dt className="text-sm font-medium text-gray-500">
+                                        Time
+                                      </dt>
+                                      <dd className="mt-1 break-words text-sm text-gray-900">
+                                        {timeToDate(
+                                          weight.time
+                                        ).toLocaleTimeString([], {
+                                          timeStyle: "short",
+                                        })}
+                                      </dd>
+                                    </div>
+                                  )}
+                                  {weight.time !== null &&
+                                    weight.event !== null && (
+                                      <div className="sm:col-span-1">
+                                        <dt className="text-sm font-medium text-gray-500">
+                                          Event
+                                        </dt>
+                                        <dd className="mt-1 break-words text-sm text-gray-900">
+                                          {weight.event}
+                                        </dd>
+                                      </div>
+                                    )}
+                                  {amITheClient && (
+                                    <div className="sm:col-span-1">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedWeight(weight);
+                                          setShowWeightModal(true);
+                                        }}
+                                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
                                       >
-                                        ({bodyfatDifference < 0 ? "" : "+"}
-                                        {bodyfatDifference.toFixed(1)})
-                                      </span>
-                                    )}
-                                  </dd>
-                                </div>
-                              )}
-                              {weight.time !== null && (
-                                <div className="sm:col-span-1">
-                                  <dt className="text-sm font-medium text-gray-500">
-                                    Time
-                                  </dt>
-                                  <dd className="mt-1 break-words text-sm text-gray-900">
-                                    {timeToDate(weight.time).toLocaleTimeString(
-                                      [],
-                                      {
-                                        timeStyle: "short",
-                                      }
-                                    )}
-                                  </dd>
-                                </div>
-                              )}
-                              {weight.time !== null && weight.event !== null && (
-                                <div className="sm:col-span-1">
-                                  <dt className="text-sm font-medium text-gray-500">
-                                    Event
-                                  </dt>
-                                  <dd className="mt-1 break-words text-sm text-gray-900">
-                                    {weight.event}
-                                  </dd>
-                                </div>
-                              )}
-                              {amITheClient && (
-                                <div className="sm:col-span-1">
-                                  <button
-                                    onClick={() => {
-                                      setSelectedWeight(weight);
-                                      setShowWeightModal(true);
-                                    }}
-                                    className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                                  >
-                                    Edit<span className="sr-only"> weight</span>
-                                  </button>
-                                </div>
-                              )}
-                              {amITheClient && (
-                                <div className="sm:col-span-1">
-                                  <button
-                                    onClick={() => {
-                                      setSelectedWeight(weight);
-                                      setShowDeleteWeightModal(true);
-                                    }}
-                                    type="button"
-                                    className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                                  >
-                                    Delete
-                                    <span className="sr-only"> weight</span>
-                                  </button>
-                                </div>
-                              )}
-                            </dl>
-                          </div>
-                        );
-                      })}
+                                        Edit
+                                        <span className="sr-only"> weight</span>
+                                      </button>
+                                    </div>
+                                  )}
+                                  {amITheClient && (
+                                    <div className="sm:col-span-1">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedWeight(weight);
+                                          setShowDeleteWeightModal(true);
+                                        }}
+                                        type="button"
+                                        className="inline-flex justify-center rounded-md border border-transparent bg-red-600 py-1.5 px-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                      >
+                                        Delete
+                                        <span className="sr-only"> weight</span>
+                                      </button>
+                                    </div>
+                                  )}
+                                </dl>
+                              </div>
+                            );
+                          })}
+                      </>
+                    )}
+                    {weights.length === 0 && (
+                      <div className="text-sm font-medium text-gray-500">
+                        No bodyweight found.
+                      </div>
+                    )}
                   </>
                 )}
-                {weights.length === 0 && (
+                {isGettingWeights && (
                   <div className="text-sm font-medium text-gray-500">
-                    No bodyweight found.
+                    Getting bodyweight...
                   </div>
                 )}
               </>
-            )}
-            {isGettingWeights && (
-              <div className="text-sm font-medium text-gray-500">
-                Getting bodyweight...
-              </div>
             )}
           </>
         )}
 
-        <div className="relative min-h-[3rem]">
-          <div
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <div className="relative z-10 flex justify-start">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPictures(!showPictures);
-                }}
-                className="flex bg-white pr-2 text-base text-green-600"
-              >
-                {showPictures ? (
-                  <ChevronDownIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <ChevronRightIcon
-                    className="m-auto inline h-4 w-4"
-                    aria-hidden="true"
-                  />
-                )}
-                <span className="pl-0.5">Pictures</span>
-              </button>
-            </div>
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div
-            className={classNames(
-              "relative flex justify-end sm:justify-center",
-              showPictures ? "" : "invisible"
-            )}
-          >
-            <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
-              {amITheClient && !isSelectedDateAfterToday && userPictures && (
-                <>
-                  {numberOfUserPictures < pictureTypes.length && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const existingTypes = userPictureTypes;
-                        const newPictureType = pictureTypes.find(
-                          (type) => !existingTypes.includes(type)
-                        );
-                        setPictureType(newPictureType);
-                        setShowPictureModal(true);
-                      }}
-                      className={classNames(
-                        "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                        numberOfUserPictures === 0
-                          ? "rounded-md"
-                          : "rounded-l-md"
-                      )}
-                    >
-                      <span className="sr-only">Add Picture</span>
-                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  )}
-                  {numberOfUserPictures > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedPictureTypes(
-                          pictureTypes.filter((pictureType) =>
-                            userPictureTypes.includes(pictureType)
-                          )
-                        );
-                        setShowDeletePictureModal(true);
-                      }}
-                      className={classNames(
-                        "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
-                        numberOfUserPictures === pictureTypes.length
-                          ? "rounded-md"
-                          : "rounded-r-md"
-                      )}
-                    >
-                      <span className="sr-only">Delete Pictures</span>
-                      <TrashIcon className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  )}
-                </>
-              )}
-            </span>
-          </div>
-        </div>
-        {showPictures && (
+        {!selectedBlock && (
           <>
-            {!isGettingPictures && (
-              <>
-                {numberOfUserPictures > 0 && (
-                  <ul
-                    role="list"
-                    className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+            <div className="relative min-h-[3rem]">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
+                <div className="relative z-10 flex justify-start">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPictures(!showPictures);
+                    }}
+                    className="flex bg-white pr-2 text-base text-green-600"
                   >
-                    {pictureTypes
-                      .filter((type) => type in userPictures)
-                      .map((type) => (
-                        <li className="relative flex flex-col" key={type}>
-                          <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
-                            {capitalizeFirstLetter(type)}
-                          </p>
-                          <img
-                            loading="lazy"
-                            src={userPictures[type]}
-                            alt={`${type} progress picture`}
-                            className="rounded-lg"
-                          ></img>
-                          {amITheClient && (
-                            <div className="mt-3 space-y-2 xs:mt-2 xs:grid xs:grid-flow-row-dense xs:grid-cols-2 xs:gap-2 xs:space-y-0">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setPictureType(type);
-                                  setShowPictureModal(true);
-                                }}
-                                className="w-full justify-center rounded-md border border-transparent bg-blue-600 px-2 py-1 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedPictureTypes([type]);
-                                  setShowDeletePictureModal(true);
-                                }}
-                                className="w-full justify-center rounded-md border border-transparent bg-red-600 px-2 py-1 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                  </ul>
+                    {showPictures ? (
+                      <ChevronDownIcon
+                        className="m-auto inline h-4 w-4"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <ChevronRightIcon
+                        className="m-auto inline h-4 w-4"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className="pl-0.5">Pictures</span>
+                  </button>
+                </div>
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div
+                className={classNames(
+                  "relative flex justify-end sm:justify-center",
+                  showPictures ? "" : "invisible"
                 )}
-                {numberOfUserPictures === 0 && (
+              >
+                <span className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
+                  {amITheClient && !isSelectedDateAfterToday && userPictures && (
+                    <>
+                      {numberOfUserPictures < pictureTypes.length && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const existingTypes = userPictureTypes;
+                            const newPictureType = pictureTypes.find(
+                              (type) => !existingTypes.includes(type)
+                            );
+                            setPictureType(newPictureType);
+                            setShowPictureModal(true);
+                          }}
+                          className={classNames(
+                            "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                            numberOfUserPictures === 0
+                              ? "rounded-md"
+                              : "rounded-l-md"
+                          )}
+                        >
+                          <span className="sr-only">Add Picture</span>
+                          <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                      )}
+                      {numberOfUserPictures > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedPictureTypes(
+                              pictureTypes.filter((pictureType) =>
+                                userPictureTypes.includes(pictureType)
+                              )
+                            );
+                            setShowDeletePictureModal(true);
+                          }}
+                          className={classNames(
+                            "relative inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 hover:bg-gray-50 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+                            numberOfUserPictures === pictureTypes.length
+                              ? "rounded-md"
+                              : "rounded-r-md"
+                          )}
+                        >
+                          <span className="sr-only">Delete Pictures</span>
+                          <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
+            {showPictures && (
+              <>
+                {!isGettingPictures && (
+                  <>
+                    {numberOfUserPictures > 0 && (
+                      <ul
+                        role="list"
+                        className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8"
+                      >
+                        {pictureTypes
+                          .filter((type) => type in userPictures)
+                          .map((type) => (
+                            <li className="relative flex flex-col" key={type}>
+                              <p className="pointer-events-none mt-2 block truncate text-center text-base font-medium text-gray-900">
+                                {capitalizeFirstLetter(type)}
+                              </p>
+                              <img
+                                loading="lazy"
+                                src={userPictures[type]}
+                                alt={`${type} progress picture`}
+                                className="rounded-lg"
+                              ></img>
+                              {amITheClient && (
+                                <div className="mt-3 space-y-2 xs:mt-2 xs:grid xs:grid-flow-row-dense xs:grid-cols-2 xs:gap-2 xs:space-y-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setPictureType(type);
+                                      setShowPictureModal(true);
+                                    }}
+                                    className="w-full justify-center rounded-md border border-transparent bg-blue-600 px-2 py-1 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-sm"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedPictureTypes([type]);
+                                      setShowDeletePictureModal(true);
+                                    }}
+                                    className="w-full justify-center rounded-md border border-transparent bg-red-600 px-2 py-1 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    )}
+                    {numberOfUserPictures === 0 && (
+                      <div className="text-sm font-medium text-gray-500">
+                        No pictures found.
+                      </div>
+                    )}
+                  </>
+                )}
+                {isGettingPictures && (
                   <div className="text-sm font-medium text-gray-500">
-                    No pictures found.
+                    Getting Pictures...
                   </div>
                 )}
               </>
-            )}
-            {isGettingPictures && (
-              <div className="text-sm font-medium text-gray-500">
-                Getting Pictures...
-              </div>
             )}
           </>
         )}

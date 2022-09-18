@@ -1,47 +1,100 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { useClient } from "../../context/client-context";
 import { useUser } from "../../context/user-context";
 import { useEffect } from "react";
 
-export default function ClientsSelect() {
-  const { user } = useUser();
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
-  const { clients, getClients, selectedClient, setSelectedClient } =
-    useClient();
+export default function ClientsSelect({
+  showBlocks = false,
+  showClients = true,
+  name,
+  className,
+}) {
+  const { user, isAdmin } = useUser();
+
+  const {
+    clients,
+    getClients,
+    selectedClient,
+    setSelectedClient,
+    blocks,
+    selectedClientId,
+    selectedBlock,
+    setSelectedBlock,
+    getBlocks,
+  } = useClient();
   useEffect(() => {
     if (!clients) {
       getClients();
     }
   }, [clients]);
 
+  useEffect(() => {
+    if (showBlocks && selectedClientId) {
+      getBlocks();
+    }
+  }, [selectedClientId]);
+
+  console.log();
+
   return (
     clients?.length > 0 && (
-      <div className="w-50 ml-3 inline-block">
+      <div className={classNames("w-50 ml-3 inline-block", className)}>
         <select
-          id="clientEmail"
+          name={name}
           className="mt-1 w-full rounded-md border-gray-300 py-1 pl-2 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-          value={selectedClient?.client_email || user.email}
+          value={
+            selectedBlock && showBlocks
+              ? selectedBlock.id
+              : selectedClient?.client_email || user.email
+          }
           onInput={(e) => {
-            setSelectedClient(
-              e.target.value === user.email
-                ? null
-                : clients.find(
-                    (client) => client.client_email === e.target.value
-                  )
-            );
+            const isBlock = e.target.selectedOptions[0].dataset.block;
+            if (isBlock) {
+              setSelectedBlock(
+                blocks.find((block) => block.id === e.target.value)
+              );
+            } else {
+              setSelectedBlock();
+              setSelectedClient(
+                e.target.value === user.email
+                  ? null
+                  : clients.find(
+                      (client) => client.client_email === e.target.value
+                    )
+              );
+            }
           }}
         >
-          <option value={user.email}>Me</option>
-          <optgroup label="My Clients">
-            {clients?.map((client) => (
-              <option key={client.client_email} value={client.client_email}>
-                {client.client_email}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="My Blocks">
-            <option>create new...</option>
-          </optgroup>
+          {showClients && (
+            <>
+              <option value={user.email}>Me</option>
+              <optgroup label="My Clients">
+                {clients?.map((client) => (
+                  <option key={client.client_email} value={client.client_email}>
+                    {client.client_email}
+                  </option>
+                ))}
+              </optgroup>
+            </>
+          )}
+          {showBlocks && blocks?.length > 0 && (
+            <optgroup
+              label={
+                isAdmin && selectedClient && selectedClient.id !== user.id
+                  ? `${selectedClient?.client_email}'s Blocks`
+                  : "My Blocks"
+              }
+            >
+              {blocks?.map((block) => (
+                <option key={block.id} value={block.id} data-block="true">
+                  {block.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
       </div>
     )

@@ -1,7 +1,10 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
 import { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
-import { useClient } from "../../context/client-context";
+import {
+  useClient,
+  firstDayOfBlockTemplate,
+} from "../../context/client-context";
 import ClientsSelect from "../dashboard/ClientsSelect";
 
 const months = [
@@ -47,6 +50,9 @@ export default function DashboardCalendarLayout({
   setCalendar: setCalendarParent,
   datesDots = {},
   datesToHighlight,
+  includeClientSelect,
+  showCalendarControls = true,
+  aboveCalendar,
 }) {
   resultName = resultName || tableName;
   resultNamePlural = resultNamePlural || resultName + "s";
@@ -56,7 +62,15 @@ export default function DashboardCalendarLayout({
 
   title = title || ResultNamePlural;
 
-  const { selectedClient, selectedDate, setSelectedDate } = useClient();
+  const {
+    selectedClient,
+    selectedDate,
+    setSelectedDate,
+    selectedBlock,
+    selectedBlockDate,
+    checkedQuery,
+    setSelectedBlockDate,
+  } = useClient();
 
   const years = [];
   for (let year = yearsRange[0]; year <= yearsRange[1]; year++) {
@@ -68,7 +82,10 @@ export default function DashboardCalendarLayout({
 
   const [calendar, setCalendar] = useState();
   const populateCalendar = () => {
-    console.log("populating calendar");
+    if (selectedBlock) {
+      populateCalendarWithBlock();
+      return;
+    }
 
     const newCalendar = [];
     newCalendar.push(selectedDate);
@@ -107,11 +124,43 @@ export default function DashboardCalendarLayout({
     setCalendar(newCalendar);
   };
 
+  const populateCalendarWithBlock = () => {
+    const newCalendar = [];
+    newCalendar.push(new Date(firstDayOfBlockTemplate));
+
+    const nextDay = new Date(newCalendar[0]);
+    const addNextDate = () => {
+      nextDay.setDate(nextDay.getDate() + 1);
+      newCalendar.push(new Date(nextDay));
+    };
+    while (newCalendar.length < selectedBlock.number_of_weeks * 7) {
+      addNextDate();
+    }
+
+    if (
+      !newCalendar.some(
+        (date) => date.toDateString() == selectedBlockDate.toDateString()
+      )
+    ) {
+      setSelectedBlockDate(newCalendar[newCalendar.length - 1]);
+    }
+
+    setPreviouslySelectedDate();
+    setCalendar(newCalendar);
+  };
+
   useEffect(() => {
     setCalendarParent?.(calendar);
   }, [calendar]);
 
   useLayoutEffect(() => {
+    if (!checkedQuery.block) {
+      return;
+    }
+    if (selectedBlock) {
+      return;
+    }
+
     if (
       selectedDate &&
       previouslySelectedDate &&
@@ -126,7 +175,20 @@ export default function DashboardCalendarLayout({
       populateCalendar();
       setPreviouslySelectedDate(selectedDate);
     }
-  }, [selectedDate, calendar]);
+  }, [selectedDate, calendar, checkedQuery, selectedBlock]);
+
+  useLayoutEffect(() => {
+    if (!checkedQuery.block) {
+      return;
+    }
+    if (!selectedBlock) {
+      return;
+    }
+
+    if (selectedBlockDate) {
+      populateCalendarWithBlock();
+    }
+  }, [selectedBlock, checkedQuery]);
 
   return (
     <>
@@ -139,7 +201,11 @@ export default function DashboardCalendarLayout({
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
-            <ClientsSelect />
+            <ClientsSelect
+              {...(typeof includeClientSelect == "object"
+                ? includeClientSelect
+                : {})}
+            />
             <p className="mt-2 text-sm text-gray-500">
               {subtitle ||
                 `View and edit ${
@@ -150,65 +216,69 @@ export default function DashboardCalendarLayout({
             </p>
           </div>
           <div className="mt-6 text-center lg:col-start-9 lg:col-end-13 lg:row-span-2 lg:row-start-1 lg:mt-0">
-            <div className="flex items-center text-gray-900">
-              <button
-                type="button"
-                className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
-                onClick={() => {
-                  const newSelectedDate = new Date(selectedDate);
-                  newSelectedDate.setMonth(newSelectedDate.getMonth() - 1);
-                  setSelectedDate(newSelectedDate);
-                }}
-              >
-                <span className="sr-only">Previous month</span>
-                <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <div className="flex-auto">
-                <select
-                  id="month"
-                  className="mt-1 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                  value={selectedDate?.getMonth() || 0}
-                  onInput={(e) => {
+            {showCalendarControls && (
+              <div className="flex items-center text-gray-900">
+                <button
+                  type="button"
+                  className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
+                  onClick={() => {
                     const newSelectedDate = new Date(selectedDate);
-                    newSelectedDate.setMonth(e.target.selectedIndex);
+                    newSelectedDate.setMonth(newSelectedDate.getMonth() - 1);
                     setSelectedDate(newSelectedDate);
                   }}
                 >
-                  {months.map((month, index) => (
-                    <option key={month} value={index}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
+                  <span className="sr-only">Previous month</span>
+                  <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
+                <div className="flex-auto">
+                  <select
+                    id="month"
+                    className="mt-1 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    value={selectedDate?.getMonth() || 0}
+                    onInput={(e) => {
+                      const newSelectedDate = new Date(selectedDate);
+                      newSelectedDate.setMonth(e.target.selectedIndex);
+                      setSelectedDate(newSelectedDate);
+                    }}
+                  >
+                    {months.map((month, index) => (
+                      <option key={month} value={index}>
+                        {month}
+                      </option>
+                    ))}
+                  </select>
 
-                <select
-                  id="year"
-                  className="mt-1 ml-4 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                  value={selectedDate?.getFullYear()}
-                  onInput={(e) => {
+                  <select
+                    id="year"
+                    className="mt-1 ml-4 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    value={selectedDate?.getFullYear()}
+                    onInput={(e) => {
+                      const newSelectedDate = new Date(selectedDate);
+                      newSelectedDate.setFullYear(e.target.value);
+                      setSelectedDate(newSelectedDate);
+                    }}
+                  >
+                    {years.map((year) => (
+                      <option key={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
+                  onClick={() => {
                     const newSelectedDate = new Date(selectedDate);
-                    newSelectedDate.setFullYear(e.target.value);
+                    newSelectedDate.setMonth(newSelectedDate.getMonth() + 1);
                     setSelectedDate(newSelectedDate);
                   }}
                 >
-                  {years.map((year) => (
-                    <option key={year}>{year}</option>
-                  ))}
-                </select>
+                  <span className="sr-only">Next month</span>
+                  <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+                </button>
               </div>
-              <button
-                type="button"
-                className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
-                onClick={() => {
-                  const newSelectedDate = new Date(selectedDate);
-                  newSelectedDate.setMonth(newSelectedDate.getMonth() + 1);
-                  setSelectedDate(newSelectedDate);
-                }}
-              >
-                <span className="sr-only">Next month</span>
-                <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
+            )}
+
+            {aboveCalendar}
 
             <div className="mt-2 overflow-hidden rounded-md shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
               <div className="grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs font-semibold leading-6 text-gray-700 lg:flex-none">
@@ -248,9 +318,14 @@ export default function DashboardCalendarLayout({
                       const day = {
                         date,
                         isCurrentMonth:
+                          selectedBlock ||
                           date.getMonth() === selectedDate.getMonth(),
                         isSelected:
-                          date.toDateString() === selectedDate.toDateString(),
+                          date.toDateString() ===
+                          (selectedBlock
+                            ? selectedBlockDate
+                            : selectedDate
+                          ).toDateString(),
                         isToday:
                           date.toDateString() === currentDate.toDateString(),
                         dots: datesDots[dateString] || [],
@@ -275,7 +350,11 @@ export default function DashboardCalendarLayout({
                           key={day.date}
                           type="button"
                           onClick={() => {
-                            setSelectedDate(day.date);
+                            if (selectedBlock) {
+                              setSelectedBlockDate(day.date);
+                            } else {
+                              setSelectedDate(day.date);
+                            }
                           }}
                           className={classNames(
                             !day.shouldHighlight &&
@@ -305,7 +384,7 @@ export default function DashboardCalendarLayout({
                               "ml-auto"
                             )}
                           >
-                            {day.date.getDate()}
+                            {selectedBlock ? dayIdx + 1 : day.date.getDate()}
                           </time>
                           {day.dots.length > 0 && (
                             <span className="-mx-0.5 mt-auto flex flex-wrap-reverse">

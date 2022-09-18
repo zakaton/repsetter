@@ -2,12 +2,14 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { isMobile, isDesktop } from "react-device-detect";
+import { useClient } from "../../context/client-context";
 
 const items = [
   { label: "Current Day", value: "day" },
   { label: "Current Week", value: "week" },
-  { label: "Current Month", value: "month" },
-  { label: "4 Weeks (Inc Current)", value: "block" },
+  { label: "Current Month", value: "month", blockOnly: false },
+  { label: "4 Weeks (Inc Current)", value: "block", blockOnly: false },
+  { label: "Whole Block", value: "block", blockOnly: true },
 ];
 const colorPalletes = {
   default: {
@@ -58,10 +60,12 @@ export default function MultiDateSelect({
   setDateRange,
   color,
   onClick,
+  onOptionClick,
   activeOption,
   setActiveOption,
 }) {
   const colorPallete = colorPalletes[color] || colorPalletes.default;
+  const { selectedBlock } = useClient();
 
   return (
     <div className={classNames("inline-flex rounded-md shadow-sm", className)}>
@@ -130,43 +134,54 @@ export default function MultiDateSelect({
             )}
           >
             <div className="py-1">
-              {items.map((item) => (
-                <Menu.Item key={item.value}>
-                  {({ active }) => {
-                    return (
-                      <button
-                        onMouseEnter={() => {
-                          if (!isDesktop) return;
-                          setActiveOption(item.value);
-                        }}
-                        onMouseLeave={() => {
-                          if (!isDesktop) return;
-                          if (activeOption === item.value) {
-                            setActiveOption();
-                          }
-                        }}
-                        onTouchStart={() => {
-                          setActiveOption(item.value);
-                        }}
-                        onTouchEnd={() => {
-                          if (activeOption === item.value) {
-                            setActiveOption();
-                          }
-                        }}
-                        className={classNames(
-                          active
-                            ? colorPallete["active"]
-                            : colorPallete["inactive"],
-                          "block w-full px-4 py-2 text-left text-sm"
-                        )}
-                        onClick={() => setDateRange(item.value)}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  }}
-                </Menu.Item>
-              ))}
+              {items
+                .filter((item) => {
+                  if ("blockOnly" in item) {
+                    return item.blockOnly ? selectedBlock : !selectedBlock;
+                  } else {
+                    return true;
+                  }
+                })
+                .map((item) => (
+                  <Menu.Item key={item.value}>
+                    {({ active }) => {
+                      return (
+                        <button
+                          onMouseEnter={() => {
+                            if (!isDesktop) return;
+                            setActiveOption(item.value);
+                          }}
+                          onMouseLeave={() => {
+                            if (!isDesktop) return;
+                            if (activeOption === item.value) {
+                              setActiveOption();
+                            }
+                          }}
+                          onTouchStart={() => {
+                            setActiveOption(item.value);
+                          }}
+                          onTouchEnd={() => {
+                            if (activeOption === item.value) {
+                              setActiveOption();
+                            }
+                          }}
+                          className={classNames(
+                            active
+                              ? colorPallete["active"]
+                              : colorPallete["inactive"],
+                            "block w-full px-4 py-2 text-left text-sm"
+                          )}
+                          onClick={() => {
+                            setDateRange(item.value);
+                            onOptionClick?.(item.value);
+                          }}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    }}
+                  </Menu.Item>
+                ))}
             </div>
           </Menu.Items>
         </Transition>

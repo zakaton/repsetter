@@ -58,6 +58,7 @@ export default function ExerciseTypeModal(props) {
     setSelectedExerciseType?.();
     setVideoDuration(0);
     setVideoThumbnailTime(null);
+    setGroup("");
   };
   useEffect(() => {
     if (!open) {
@@ -363,7 +364,7 @@ export default function ExerciseTypeModal(props) {
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Type an Exercise Name"
             value={exerciseTypeName}
-            max={maxExerciseTypeLength}
+            maxLength={maxExerciseTypeLength}
             onInput={(e) => setExerciseTypeName(e.target.value)}
           />
           <p className="my-0 mt-1 p-0 text-sm italic text-gray-400">

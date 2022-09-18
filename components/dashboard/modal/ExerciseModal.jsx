@@ -13,7 +13,10 @@ import {
   kilogramsToPounds,
   distanceUnits,
 } from "../../../utils/exercise-utils";
-import { useClient } from "../../../context/client-context";
+import {
+  useClient,
+  firstDayOfBlockTemplate,
+} from "../../../context/client-context";
 import ExerciseTypesSelect from "./ExerciseTypesSelect";
 import { useUser } from "../../../context/user-context";
 import YouTube from "react-youtube";
@@ -35,6 +38,9 @@ export default function ExerciseModal(props) {
     setSelectedResult: setSelectedExercise,
     setEditResultStatus: setEditExerciseStatus,
     setShowEditResultNotification: setShowEditExerciseNotification,
+
+    setResultStatus: setExerciseStatus,
+    setShowResultNotification: setShowExerciseNotification,
   } = props;
 
   const {
@@ -43,6 +49,9 @@ export default function ExerciseModal(props) {
     amITheClient,
     setSelectedDate,
     selectedClientId,
+    selectedBlock,
+    selectedBlockDate,
+    setSelectedBlockDate,
   } = useClient();
   const { user } = useUser();
 
@@ -59,6 +68,7 @@ export default function ExerciseModal(props) {
     if (open && didAddExercise) {
       setShowAddExerciseNotification(false);
       setShowEditExerciseNotification(false);
+      setShowExerciseNotification(false);
     }
   }, [open]);
 
@@ -504,12 +514,18 @@ export default function ExerciseModal(props) {
     if (!isGettingPreviousExercise) {
       setIsGettingPreviousExercise(true);
       console.log("getting previous exercise...");
+      const matchFilters = { client: selectedClientId };
+      if (selectedBlock) {
+        matchFilters.is_block_template;
+        matchFilters.block = selectedBlock.id;
+      }
+      const date = selectedBlock ? selectedBlockDate : selectedDate;
       const { data: previousExercises, error } = await supabase
         .from("exercise")
         .select("*")
-        .match({ client: selectedClientId })
+        .match(matchFilters)
         .eq("type", selectedExerciseType.id)
-        .lt("date", selectedDate.toDateString())
+        .lt("date", date.toDateString())
         .order("date", { ascending: false })
         .limit(1);
       console.log("previousExercises", previousExercises);
@@ -533,8 +549,9 @@ export default function ExerciseModal(props) {
 
   let daysSincePreviousExercise = 0;
   if (previousExercise) {
+    const _selectedDate = selectedBlock ? selectedBlockDate : selectedDate;
     daysSincePreviousExercise = Math.floor(
-      (selectedDate - new Date(previousExercise.date)) / (1000 * 60 * 60 * 24)
+      (_selectedDate - new Date(previousExercise.date)) / (1000 * 60 * 60 * 24)
     );
   }
 
@@ -776,6 +793,12 @@ export default function ExerciseModal(props) {
   const [feedback, setFeedback] = useState("");
   const maxFeedbackLength = 500;
 
+  let blockDayIndex = 0;
+  if (selectedBlock) {
+    blockDayIndex =
+      (selectedBlockDate - firstDayOfBlockTemplate) / (1000 * 60 * 60 * 24);
+  }
+
   return (
     <Modal
       {...props}
@@ -783,11 +806,15 @@ export default function ExerciseModal(props) {
       message={
         <>
           {selectedExercise ? "Update" : "Add an"} exercise to{" "}
-          <span className="font-semibold">
+          <span className={selectedClient ? "font-semibold" : ""}>
             {selectedClient ? `${selectedClient.client_email}'s` : "your"}
           </span>{" "}
-          workout for{" "}
-          <span className="font-semibold">{selectedDate?.toDateString()}</span>
+          {selectedBlock ? `block "${selectedBlock.name}"` : "workout"} for{" "}
+          <span className="font-semibold">
+            {selectedBlock
+              ? `day ${blockDayIndex + 1}`
+              : selectedDate?.toDateString()}
+          </span>
         </>
       }
       Icon={ClipboardCheckIcon}
@@ -899,6 +926,21 @@ export default function ExerciseModal(props) {
               notes,
               feedback,
             };
+            if (selectedBlock) {
+              Object.assign(updateExerciseData, {
+                difficulty: null,
+                video: null,
+                feedback: null,
+                time: null,
+                number_of_sets_performed: null,
+                number_of_reps_performed: null,
+                weight_performed: null,
+                set_duration_performed: null,
+                speed_performed: null,
+                level_performed: null,
+                distance_performed: null,
+              });
+            }
             console.log("updateExerciseData", updateExerciseData);
             const { data: updatedExercise, error: updatedExerciseError } =
               await supabase
@@ -922,8 +964,9 @@ export default function ExerciseModal(props) {
             }
             setIsUpdatingExercise(false);
             setDidUpdateExercise(true);
-            setEditExerciseStatus(status);
-            setShowEditExerciseNotification(true);
+
+            setEditExerciseStatus?.(status);
+            setShowEditExerciseNotification?.(true);
           } else {
             setIsAddingExercise(true);
             const createExerciseData = {
@@ -933,7 +976,11 @@ export default function ExerciseModal(props) {
                 : selectedClient.client_email,
 
               //date: selectedDate,
-              date: dateToString(selectedDate),
+              date: dateToString(
+                selectedBlock ? selectedBlockDate : selectedDate
+              ),
+              block: selectedBlock ? selectedBlock.id : null,
+              is_block_template: selectedBlock ? true : false,
               time: includeTimePerformed ? timePerformed : null,
 
               type: selectedExerciseType.id,
@@ -1009,9 +1056,13 @@ export default function ExerciseModal(props) {
             }
             setIsAddingExercise(false);
             setDidAddExercise(true);
-            setAddExerciseStatus(status);
-            setShowAddExerciseNotification(true);
+
+            setAddExerciseStatus?.(status);
+            setShowAddExerciseNotification?.(true);
           }
+
+          setExerciseStatus?.(status);
+          setShowExerciseNotification?.(true);
 
           setOpen(false);
           if (status.type === "succeeded") {
@@ -1045,8 +1096,8 @@ export default function ExerciseModal(props) {
           {previousExercise && (
             <p className="mt-2 text-sm text-gray-500">
               This exercise was done {daysSincePreviousExercise} day
-              {daysSincePreviousExercise > 1 && "s"} ago on{" "}
-              {previousExercise.date}
+              {daysSincePreviousExercise > 1 && "s"} ago{" "}
+              {!selectedBlock && `on ${previousExercise.date}`}
               {previousExercise.time
                 ? ` at ${timeToDate(previousExercise.time).toLocaleTimeString(
                     [],
@@ -1055,9 +1106,11 @@ export default function ExerciseModal(props) {
                 : ""}{" "}
               <MyLink
                 onClick={() => {
+                  return;
                   setSelectedDate(stringToDate(previousExercise.date));
                   setOpen(false);
                 }}
+                target="_blank"
                 href={`/dashboard/diary?date=${stringToDate(
                   previousExercise.date
                 ).toDateString()}${
@@ -2124,7 +2177,7 @@ export default function ExerciseModal(props) {
           </>
         )}
 
-        {selectedExercise && (
+        {selectedExercise && !selectedBlock && (
           <>
             <div className="relative w-full sm:col-span-3">
               <div

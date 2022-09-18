@@ -1,6 +1,9 @@
 import MultiDateSelect from "./MultiDateSelect";
 import { useState, useEffect } from "react";
-import { useClient } from "../../context/client-context";
+import {
+  useClient,
+  firstDayOfBlockTemplate,
+} from "../../context/client-context";
 import { useUser } from "../../context/user-context";
 import {
   supabase,
@@ -15,54 +18,71 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const getDates = (dateRangeToCopy, selectedDate) => {
-  let fromDate = new Date(selectedDate);
-  let toDate = new Date(selectedDate);
-  switch (dateRangeToCopy) {
-    case "day":
-      toDate.setDate(toDate.getDate() + 1);
-      break;
-    case "week":
-      fromDate.setDate(fromDate.getDate() - fromDate.getDay());
-      toDate.setDate(toDate.getDate() + (6 - toDate.getDay()));
-      break;
-    case "month":
-      fromDate.setDate(1);
-      const numberOfDaysInMonth = new Date(
-        fromDate.getFullYear(),
-        fromDate.getMonth() + 1,
-        0
-      ).getDate();
-      toDate.setDate(numberOfDaysInMonth);
-      break;
-    case "block":
-      fromDate.setDate(fromDate.getDate() - fromDate.getDay());
-      toDate = new Date(fromDate);
-      toDate.setDate(toDate.getDate() + 7 * 4 - 1);
-      break;
-    default:
-      break;
-  }
-  ("");
-  //console.log("getDates", fromDate, toDate);
-  return { fromDate, toDate };
-};
-
 export default function UnderCalendar({
   refreshExercises,
   setShowDeleteExerciseModal,
   setSelectedExercises,
   setDatesToHighlight,
 }) {
-  const { selectedClient, selectedDate, amITheClient, selectedClientId } =
-    useClient();
+  const {
+    selectedClient,
+    selectedDate,
+    amITheClient,
+    selectedClientId,
+    selectedBlockDate,
+    selectedBlock,
+  } = useClient();
   const { user } = useUser();
+
+  const getDates = (dateRangeToCopy) => {
+    const selectedDateForGettingDates = selectedBlock
+      ? selectedBlockDate
+      : selectedDate;
+
+    let fromDate = new Date(selectedDateForGettingDates);
+    let toDate = new Date(selectedDateForGettingDates);
+    switch (dateRangeToCopy) {
+      case "day":
+        toDate.setDate(toDate.getDate() + 1);
+        break;
+      case "week":
+        fromDate.setDate(fromDate.getDate() - fromDate.getDay());
+        toDate.setDate(toDate.getDate() + (6 - toDate.getDay()));
+        break;
+      case "month":
+        fromDate.setDate(1);
+        const numberOfDaysInMonth = new Date(
+          fromDate.getFullYear(),
+          fromDate.getMonth() + 1,
+          0
+        ).getDate();
+        toDate.setDate(numberOfDaysInMonth);
+        break;
+      case "block":
+        if (selectedBlock) {
+          fromDate = new Date(firstDayOfBlockTemplate);
+          toDate = new Date(fromDate);
+          toDate.setDate(
+            toDate.getDate() + 7 * selectedBlock.number_of_weeks - 1
+          );
+        } else {
+          fromDate.setDate(fromDate.getDate() - fromDate.getDay());
+          toDate = new Date(fromDate);
+          toDate.setDate(toDate.getDate() + 7 * 4 - 1);
+        }
+        break;
+      default:
+        break;
+    }
+    //console.log("getDates", fromDate, toDate);
+    return { fromDate, toDate };
+  };
 
   const [copyActiveOption, setCopyActiveOption] = useState();
   const [deleteActiveOption, setDeleteActiveOption] = useState();
   const highlightDates = (dateRangeToCopy, type) => {
     if (dateRangeToCopy) {
-      const { fromDate, toDate } = getDates(dateRangeToCopy, selectedDate);
+      const { fromDate, toDate } = getDates(dateRangeToCopy);
       setDatesToHighlight?.({ fromDate, toDate, type, dateRangeToCopy });
     } else {
       setDatesToHighlight?.();
@@ -87,12 +107,14 @@ export default function UnderCalendar({
       client: selectedClientId,
     };
     if (dateRangeToCopy === "day") {
-      matchFilters.date = selectedDate.toDateString();
+      matchFilters.date = (
+        selectedBlock ? selectedBlockDate : selectedDate
+      ).toDateString();
     }
     console.log("matchFilters", matchFilters);
     let query = supabase.from("exercise").select("*").match(matchFilters);
     if (dateRangeToCopy !== "day") {
-      const { fromDate, toDate } = getDates(dateRangeToCopy, selectedDate);
+      const { fromDate, toDate } = getDates(dateRangeToCopy);
       console.log("getting exercises from-to", fromDate, toDate);
       query = query
         .gte("date", fromDate.toDateString())
@@ -119,7 +141,7 @@ export default function UnderCalendar({
     console.log("getting exercises for dateRangeToCopy", dateRangeToCopy);
     setIsGettingExercises(true);
     const { exercises, error } = await getExercisesWithinRange(dateRangeToCopy);
-    const { fromDate } = getDates(dateRangeToCopy, selectedDate);
+    const { fromDate } = getDates(dateRangeToCopy);
     if (error) {
       console.error(error);
     } else {
@@ -161,10 +183,7 @@ export default function UnderCalendar({
 
     console.log("existingExercises", existingExercises);
 
-    const { fromDate, toDate } = getDates(
-      copiedExercisesForDateRange,
-      selectedDate
-    );
+    const { fromDate, toDate } = getDates(copiedExercisesForDateRange);
     const shiftedCopiedExercises = copiedExercises.map((copiedExercise) => {
       const {
         client,
@@ -174,6 +193,8 @@ export default function UnderCalendar({
 
         coach,
         coach_email,
+
+        block,
 
         number_of_sets_assigned,
         number_of_reps_assigned,
@@ -195,6 +216,9 @@ export default function UnderCalendar({
 
       const insertedExercise = {
         type: copiedExercise.type,
+
+        block: selectedBlock ? selectedBlock.id : block,
+        is_block_template: selectedBlock ? true : false,
 
         date: newDate.toDateString(),
 
@@ -320,7 +344,13 @@ export default function UnderCalendar({
         className="col-span-3 w-full"
         setDateRange={setDateRangeToDelete}
         color="red"
-        onClick={() => setDateRangeToDelete("day")}
+        onClick={() => {
+          setDateRangeToDelete("day");
+          setDatesToHighlight();
+        }}
+        onOptionClick={() => {
+          setDatesToHighlight();
+        }}
       />
     </div>
   );

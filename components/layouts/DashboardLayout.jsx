@@ -13,6 +13,9 @@ import {
   HeartIcon,
   ScaleIcon,
   ClipboardCopyIcon,
+  TableIcon,
+  TemplateIcon,
+  ViewGridIcon,
 } from "@heroicons/react/outline";
 import MyLink from "../MyLink";
 import { useUser } from "../../context/user-context";
@@ -54,6 +57,11 @@ const navigation = [
     name: "Exercises",
     href: "/dashboard/exercises",
     icon: ClipboardCheckIcon,
+  },
+  {
+    name: "Blocks",
+    href: "/dashboard/blocks",
+    icon: TemplateIcon,
   },
   {
     name: "Progress",

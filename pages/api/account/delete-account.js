@@ -129,6 +129,12 @@ export default async function handler(req, res) {
     .match({ client: profile.id });
   console.log("deleteExercisesError", deleteExercisesError);
 
+  const { error: deleteBlocksError } = await supabase
+    .from("block")
+    .delete()
+    .match({ created_by: profile.id });
+  console.log("deleteBlocksError", deleteBlocksError);
+
   const { error: deleteWeightError } = await supabase
     .from("weight")
     .delete()

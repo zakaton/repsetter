@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
-import Notification from "../../components/Notification";
 import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import WeightModal from "../../components/dashboard/modal/WeightModal";
 import DeleteWeightModal from "../../components/dashboard/modal/DeleteWeightModal";
@@ -54,13 +53,6 @@ export default function Bodyweight() {
   const { selectedClient, setSelectedDate, selectedClientId, amITheClient } =
     useClient();
 
-  const [showEditWeightModal, setShowEditWeightModal] = useState(false);
-  const [editWeightStatus, setEditWeightStatus] = useState(false);
-  const [showEditWeightNotification, setShowEditWeightNotification] =
-    useState(false);
-
-  const [selectedWeight, setSelectedWeight] = useState();
-
   const [weights, setWeights] = useState();
   const [baseFilter, setBaseFilter] = useState();
   useEffect(() => {
@@ -86,32 +78,10 @@ export default function Bodyweight() {
     }
   }, [weights, selectedClientId]);
 
-  const [refreshResults, setRefreshResults] = useState(false);
-
-  useEffect(() => {
-    if (editWeightStatus?.type === "succeeded") {
-      setRefreshResults(true);
-    }
-  }, [editWeightStatus]);
-
   return (
     <>
-      <WeightModal
-        open={showEditWeightModal}
-        setOpen={setShowEditWeightModal}
-        selectedResult={selectedWeight}
-        setSelectedResult={setSelectedWeight}
-        setResultStatus={setEditWeightStatus}
-        setShowResultNotification={setShowEditWeightNotification}
-      />
-      <Notification
-        open={showEditWeightNotification}
-        setOpen={setShowEditWeightNotification}
-        status={editWeightStatus}
-      />
       <Table
-        refreshResults={refreshResults}
-        setRefreshResults={setRefreshResults}
+        EditResultModal={WeightModal}
         className={
           "grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7"
         }
@@ -173,19 +143,6 @@ export default function Bodyweight() {
             weight.event && {
               title: "event",
               value: weight.event,
-            },
-            {
-              jsx: (
-                <button
-                  onClick={() => {
-                    setSelectedWeight(weight);
-                    setShowEditWeightModal(true);
-                  }}
-                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                >
-                  Edit
-                </button>
-              ),
             },
             {
               jsx: (

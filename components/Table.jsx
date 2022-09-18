@@ -26,6 +26,8 @@ export default function Table({
   DeleteResultModal,
   resultMap,
   deleteTitle,
+  EditResultModal,
+  editTitle,
   HeaderButton,
   baseFilter,
   resultsListener,
@@ -38,6 +40,7 @@ export default function Table({
   setRefreshResults,
   clearNotifications,
   setClearNotifications,
+  showFilters = true,
 }) {
   const { isLoading, user } = useUser();
   const { selectedClient } = useClient();
@@ -87,6 +90,7 @@ export default function Table({
       }
     }
     const { count: numberOfResults } = await query;
+    console.log("number of results", numberOfResults);
     setPageIndex(0);
     setNumberOfResults(numberOfResults);
     setIsGettingNumberOfResults(false);
@@ -170,7 +174,7 @@ export default function Table({
 
   useEffect(() => {
     if (!isLoading && user && numberOfResults !== null) {
-      getResults();
+      getResults(true);
     }
   }, [isLoading, numberOfResults]);
 
@@ -212,10 +216,16 @@ export default function Table({
     }
   }, [results]);
 
-  const [showDeleteResultModal, setShowDeleteResultModal] = useState(false);
   const [selectedResult, setSelectedResult] = useState(null);
+
+  const [showDeleteResultModal, setShowDeleteResultModal] = useState(false);
   const [deleteResultStatus, setDeleteResultStatus] = useState();
   const [showDeleteResultNotification, setShowDeleteResultNotification] =
+    useState(false);
+
+  const [showEditResultModal, setShowEditResultModal] = useState(false);
+  const [editResultStatus, setEditResultStatus] = useState();
+  const [showEditResultNotification, setShowEditResultNotification] =
     useState(false);
 
   const [showCreateResultModal, setShowCreateResultModal] = useState(false);
@@ -225,28 +235,31 @@ export default function Table({
 
   const removeNotifications = () => {
     setShowDeleteResultNotification(false);
+    setShowEditResultNotification(false);
   };
   useEffect(() => {
     removeNotifications();
   }, []);
 
   useEffect(() => {
-    if (showDeleteResultModal || showCreateResultModal) {
+    if (showDeleteResultModal || showCreateResultModal || showEditResultModal) {
       removeNotifications();
     }
-  }, [showDeleteResultModal, showCreateResultModal]);
+  }, [showDeleteResultModal, showCreateResultModal, showEditResultModal]);
 
   useEffect(() => {
     if (modalListener) {
-      const areEitherModalOpen = showDeleteResultModal || showCreateResultModal;
+      const areEitherModalOpen =
+        showDeleteResultModal || showCreateResultModal || showEditResultModal;
       modalListener(areEitherModalOpen);
     }
-  }, [showDeleteResultModal, showCreateResultModal]);
+  }, [showDeleteResultModal, showCreateResultModal, showEditResultModal]);
 
   useEffect(() => {
     if (clearNotifications) {
       setShowCreateResultNotification(false);
       setShowDeleteResultNotification(false);
+      setShowEditResultNotification(false);
       setClearNotifications(false);
     }
   }, [clearNotifications]);
@@ -256,6 +269,11 @@ export default function Table({
       getNumberOfResults();
     }
   }, [deleteResultStatus]);
+  useEffect(() => {
+    if (editResultStatus?.type === "succeeded") {
+      getResults(true);
+    }
+  }, [editResultStatus]);
   useEffect(() => {
     if (createResultStatus?.type === "succeeded") {
       getNumberOfResults();
@@ -280,6 +298,7 @@ export default function Table({
       <Head>
         <title>{title} - Repsetter</title>
       </Head>
+
       {CreateResultModal && (
         <CreateResultModal
           open={showCreateResultModal}
@@ -293,6 +312,7 @@ export default function Table({
         setOpen={setShowCreateResultNotification}
         status={createResultStatus}
       />
+
       {DeleteResultModal && (
         <DeleteResultModal
           open={showDeleteResultModal}
@@ -307,13 +327,35 @@ export default function Table({
         setOpen={setShowDeleteResultNotification}
         status={deleteResultStatus}
       />
+
+      {EditResultModal && (
+        <EditResultModal
+          open={showEditResultModal}
+          setOpen={setShowEditResultModal}
+          selectedResult={selectedResult}
+          setResultStatus={setEditResultStatus}
+          setShowResultNotification={setShowEditResultNotification}
+        />
+      )}
+      <Notification
+        open={showEditResultNotification}
+        setOpen={setShowEditResultNotification}
+        status={editResultStatus}
+      />
+
       <div className="bg-white px-4 pt-4 sm:px-6">
         <div className="flex items-center pb-4">
           <div className="flex-auto lg:col-span-8 lg:col-start-1 lg:row-start-1">
             <h3 className="inline text-lg font-medium leading-6 text-gray-900">
               {title}
             </h3>
-            {includeClientSelect && <ClientsSelect />}
+            {includeClientSelect && (
+              <ClientsSelect
+                {...(typeof includeClientSelect == "object"
+                  ? includeClientSelect
+                  : {})}
+              />
+            )}
             <p className="mt-2 text-sm text-gray-500">
               {subtitle ||
                 `View and edit ${
@@ -339,19 +381,21 @@ export default function Table({
           </div>
         </div>
 
-        <Filters
-          filters={filters}
-          setFilters={setFilters}
-          containsFilters={containsFilters}
-          setContainsFilters={setContainsFilters}
-          order={order}
-          setOrder={setOrder}
-          filterTypes={filterTypes}
-          orderTypes={orderTypes}
-          clearFiltersListener={clearFiltersListener}
-        >
-          {filterChildren}
-        </Filters>
+        {showFilters && (
+          <Filters
+            filters={filters}
+            setFilters={setFilters}
+            containsFilters={containsFilters}
+            setContainsFilters={setContainsFilters}
+            order={order}
+            setOrder={setOrder}
+            filterTypes={filterTypes}
+            orderTypes={orderTypes}
+            clearFiltersListener={clearFiltersListener}
+          >
+            {filterChildren}
+          </Filters>
+        )}
 
         {results?.length > 0 &&
           // eslint-disable-next-line no-shadow
@@ -384,6 +428,21 @@ export default function Table({
                   }
                 >
                   {resultContent}
+                  {EditResultModal && (
+                    <div className="sm:col-span-1">
+                      <button
+                        onClick={() => {
+                          setSelectedResult(result);
+                          setShowEditResultModal(true);
+                        }}
+                        type="button"
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        {editTitle || "Edit"}
+                        <span className="sr-only"> {resultName}</span>
+                      </button>
+                    </div>
+                  )}
                   {DeleteResultModal && (
                     <div className="sm:col-span-1">
                       <button

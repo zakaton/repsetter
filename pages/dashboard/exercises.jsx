@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user-context";
-import Notification from "../../components/Notification";
 import { getDashboardLayout } from "../../components/layouts/DashboardLayout";
 import ExerciseModal from "../../components/dashboard/modal/ExerciseModal";
 import DeleteExerciseModal from "../../components/dashboard/modal/DeleteExerciseModal";
@@ -36,7 +35,8 @@ const exerciseGroupTypes = {
   name: "Exercise Group",
   query: "group",
   column: "type.group",
-  radios: [
+  defaultValue: null,
+  options: [
     {
       value: null,
       label: "any",
@@ -49,7 +49,25 @@ const exerciseGroupTypes = {
     })),
   ],
 };
-const baseFilterTypes = [];
+const baseFilterTypes = [
+  {
+    name: "Is Block Template?",
+    query: "is_block_template",
+    column: "is_block_template",
+    radios: [
+      {
+        value: false,
+        label: "no",
+        defaultChecked: true,
+      },
+      {
+        value: true,
+        label: "yes",
+        defaultChecked: false,
+      },
+    ],
+  },
+];
 
 const orderTypes = [
   {
@@ -79,15 +97,48 @@ export default function Exercises() {
 
   const { exerciseVideos, getExerciseVideo } = useExerciseVideos();
 
-  const { selectedClientId, selectedClient, setSelectedDate, amITheClient } =
-    useClient();
+  const {
+    selectedClientId,
+    selectedClient,
+    setSelectedDate,
+    amITheClient,
+    blocks,
+    getBlocks,
+    selectedBlock,
+    setSelectedBlock,
+  } = useClient();
 
-  const [showEditExerciseModal, setShowEditExerciseModal] = useState(false);
-  const [editExerciseStatus, setEditExerciseStatus] = useState(false);
-  const [showEditExerciseNotification, setShowEditExerciseNotification] =
-    useState(false);
+  useEffect(() => {
+    if (selectedClientId) {
+      getBlocks();
+    }
+  }, [selectedClientId]);
 
-  const [selectedExercise, setSelectedExercise] = useState();
+  const [blockFilterTypes, setBlockFilterTypes] = useState([]);
+  useEffect(() => {
+    if (blocks) {
+      setBlockFilterTypes([
+        {
+          name: "Block",
+          query: "block-filter",
+          column: "block",
+          options: [
+            {
+              value: null,
+              label: "any",
+              defaultChecked: true,
+            },
+            ...blocks.map((block) => ({
+              value: block.id,
+              label: block.name,
+              defaultChecked: false,
+            })),
+          ],
+        },
+      ]);
+    }
+  }, [blocks]);
+
   const {
     selectedExerciseType,
     setSelectedExerciseType,
@@ -114,6 +165,7 @@ export default function Exercises() {
 
   const clearFiltersListener = () => {
     setSelectedExerciseType();
+    setSelectedBlock();
   };
 
   useEffect(() => {
@@ -144,8 +196,6 @@ export default function Exercises() {
       for (let id in videoPlayer) {
         videoPlayer[id].forEach((player) => player?.pauseVideo());
       }
-      setShowEditExerciseModal(false);
-      clearNotifications();
     } else {
       for (let id in videoPlayer) {
         videoPlayer[id].forEach((player) => player?.playVideo());
@@ -153,36 +203,9 @@ export default function Exercises() {
     }
   };
 
-  const clearNotifications = () => {
-    setShowEditExerciseNotification(false);
-  };
-
-  const [refreshResults, setRefreshResults] = useState(false);
-
-  useEffect(() => {
-    if (editExerciseStatus?.type === "succeeded") {
-      setRefreshResults(true);
-    }
-  }, [editExerciseStatus]);
-
   return (
     <>
-      <ExerciseModal
-        open={showEditExerciseModal}
-        setOpen={setShowEditExerciseModal}
-        selectedResult={selectedExercise}
-        setSelectedResult={setSelectedExercise}
-        setEditResultStatus={setEditExerciseStatus}
-        setShowEditResultNotification={setShowEditExerciseNotification}
-      />
-      <Notification
-        open={showEditExerciseNotification}
-        setOpen={setShowEditExerciseNotification}
-        status={editExerciseStatus}
-      />
       <Table
-        refreshResults={refreshResults}
-        setRefreshResults={setRefreshResults}
         clearFiltersListener={clearFiltersListener}
         includeClientSelect={true}
         baseFilter={baseFilter}
@@ -191,12 +214,17 @@ export default function Exercises() {
         filterTypes={
           selectedExerciseType
             ? baseFilterTypes
-            : [...baseFilterTypes, ...muscleFilterTypes, exerciseGroupTypes]
+            : [
+                ...muscleFilterTypes,
+                exerciseGroupTypes,
+                ...blockFilterTypes,
+                ...baseFilterTypes,
+              ]
         }
         orderTypes={orderTypes}
         tableName="exercise"
         resultName="exercise"
-        selectString="*, type!inner(*)"
+        selectString="*, type!inner(*), block(*)"
         title="Exercises"
         subtitle={`View ${
           selectedClient ? `${selectedClient.client_email}'s` : "your"
@@ -206,11 +234,8 @@ export default function Exercises() {
             : "exercises"
         }`}
         DeleteResultModal={amITheClient && DeleteExerciseModal}
+        EditResultModal={ExerciseModal}
         resultMap={(exercise, index) => [
-          {
-            title: "name",
-            value: exercise.type.name,
-          },
           !selectedExerciseType &&
             exercise.type.id in exerciseVideos && {
               jsx: (
@@ -220,6 +245,18 @@ export default function Exercises() {
                 ></ExerciseTypeVideo>
               ),
             },
+          {
+            title: "name",
+            value: exercise.type.name,
+          },
+          exercise.block && {
+            title: "block",
+            value: exercise.block.name,
+          },
+          exercise.block && {
+            title: "is template?",
+            value: exercise.is_block_template.toString(),
+          },
           {
             title: "date",
             value: stringToDate(exercise.date).toDateString(),
@@ -233,6 +270,10 @@ export default function Exercises() {
           {
             title: "muscles",
             value: exercise.type.muscles.join(", "),
+          },
+          {
+            title: "muscle group",
+            value: exercise.type.group,
           },
           {
             title: "sets",
@@ -394,19 +435,6 @@ export default function Exercises() {
           exercise.feedback?.length > 0 && {
             title: "feedback",
             value: exercise.feedback,
-          },
-          {
-            jsx: (
-              <button
-                onClick={() => {
-                  setSelectedExercise(exercise);
-                  setShowEditExerciseModal(true);
-                }}
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Edit
-              </button>
-            ),
           },
           {
             jsx: (

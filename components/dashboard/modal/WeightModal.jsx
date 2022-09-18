@@ -172,13 +172,14 @@ export default function WeightModal(props) {
           setIncludeTime(true);
         }
       } else {
-        if (existingWeights?.length > 0) {
+        if (false && existingWeights?.length > 0) {
           const latestWeightToday = existingWeights[existingWeights.length - 1];
-          setWeight(latestWeightToday.weight);
           setIsUsingKilograms(latestWeightToday.is_weight_in_kilograms);
+          setWeight(latestWeightToday.weight);
           setIsWeightEmptyString(false);
-        } else if (lastWeightBeforeToday) {
+        } else if (false && lastWeightBeforeToday) {
           setWeight(lastWeightBeforeToday.weight);
+          setIsWeightEmptyString(false);
           if (
             lastWeightBeforeToday.is_weight_in_kilograms != isUsingKilograms
           ) {
@@ -188,7 +189,6 @@ export default function WeightModal(props) {
               lastWeightBeforeToday.is_weight_in_kilograms
             );
           }
-          setIsWeightEmptyString(false);
         } else {
           setWeight(0);
           setIsWeightEmptyString(true);

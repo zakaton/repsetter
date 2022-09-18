@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 
 export const ClientContext = createContext();
 
+export const firstDayOfBlockTemplate = new Date("Sun Oct 01 2000 00:00:00");
+
 const pathnamesForQuery = [
   "diary",
   "exercise-types",
@@ -13,6 +15,7 @@ const pathnamesForQuery = [
   "exercises",
   "all-users",
   "bodyweight",
+  "blocks",
 ].map((pathname) => "/dashboard/" + pathname);
 
 export function ClientContextProvider(props) {
@@ -113,35 +116,69 @@ export function ClientContextProvider(props) {
     }
   }, [initialClientEmail, overrideInitialClientEmail]);
 
-  const [checkedQuery, setCheckedQuery] = useState(false);
+  const [checkedQuery, setCheckedQuery] = useState({
+    block: false,
+    client: false,
+  });
+  const [initialBlockId, setInitialBlockId] = useState();
   useEffect(() => {
     if (router.isReady) {
       console.log("CHECK QUERY", router.query);
+      let newCheckedQuery = { ...checkedQuery };
+      if ("block" in router.query) {
+        setInitialBlockId(router.query.block);
+      } else {
+        newCheckedQuery.block = true;
+      }
+
       if ("client" in router.query) {
         setInitialClientEmail(router.query.client);
       } else {
-        setCheckedQuery(true);
+        newCheckedQuery.client = true;
+      }
+
+      if (newCheckedQuery.block || newCheckedQuery.client) {
+        setCheckedQuery(newCheckedQuery);
       }
     }
   }, [router.isReady]);
 
   useEffect(() => {
-    if (clients && initialClientEmail && !checkedQuery) {
+    if (clients && initialClientEmail && !checkedQuery.client) {
       const selectedClient = clients.find(
         (client) => client.client_email === initialClientEmail
       );
+
       if (selectedClient) {
         console.log("initialClient", selectedClient, initialClientEmail);
         setSelectedClient(selectedClient);
-        setCheckedQuery(true);
+        setCheckedQuery({ ...checkedQuery, client: true });
       } else if (isAdmin) {
         console.log("getting user outside of clients", initialClientEmail);
         getUserProfile();
       } else {
-        setCheckedQuery(true);
+        setCheckedQuery({ ...checkedQuery, client: true });
       }
     }
   }, [clients, initialClientEmail, checkedQuery]);
+
+  const [selectedBlock, setSelectedBlock] = useState();
+  const [selectedBlockDate, setSelectedBlockDate] = useState();
+
+  const getSelectedBlockDate = () => {
+    if ("block-date" in router.query) {
+      const daysSinceFirstDayOfBlockTemplate =
+        Number(router.query["block-date"]) || 0;
+      const selectedBlockDate = new Date(firstDayOfBlockTemplate);
+      selectedBlockDate.setDate(
+        firstDayOfBlockTemplate.getDate() + daysSinceFirstDayOfBlockTemplate
+      );
+      console.log("query selected block date", selectedBlockDate);
+      setSelectedBlockDate(selectedBlockDate);
+    } else {
+      setSelectedBlockDate(new Date(firstDayOfBlockTemplate));
+    }
+  };
 
   useEffect(() => {
     if (!router.isReady) {
@@ -162,24 +199,40 @@ export function ClientContextProvider(props) {
     if (selectedDate) {
       query["date"] = selectedDate.toDateString();
     }
+    if (selectedBlockDate) {
+      query["block-date"] =
+        (selectedBlockDate - firstDayOfBlockTemplate) / (1000 * 60 * 60 * 24);
+    }
+
+    if (selectedBlock) {
+      query["block"] = selectedBlock.id;
+    } else {
+      delete router.query.block;
+    }
 
     console.log("final client query", query);
     router.replace({ query: { ...router.query, ...query } }, undefined, {
       shallow: true,
     });
-  }, [router.isReady, selectedClient, selectedDate, router.pathname]);
+  }, [
+    router.isReady,
+    selectedClient,
+    selectedDate,
+    selectedBlock,
+    selectedBlockDate,
+    router.pathname,
+  ]);
 
   const [amITheClient, setAmITheClient] = useState(false);
   useEffect(() => {
-    if (checkedQuery) {
+    if (checkedQuery.client) {
       setAmITheClient(!selectedClient);
     }
   }, [selectedClient, checkedQuery]);
 
   const [selectedClientId, setSelectedClientId] = useState();
   useEffect(() => {
-    console.log("LOL", selectedClient, user, isLoading, checkedQuery);
-    if (!isLoading && user && checkedQuery) {
+    if (!isLoading && user && checkedQuery.client) {
       setSelectedClientId(selectedClient ? selectedClient.client : user.id);
     }
   }, [selectedClient, user, isLoading, checkedQuery]);
@@ -209,6 +262,64 @@ export function ClientContextProvider(props) {
     setIsSelectedDateAfterToday(selectedDate.getTime() > currentDate.getTime());
   }, [selectedDate]);
 
+  const [blocks, setBlocks] = useState();
+  const [gotBlocksForClientId, setGotBlocksForClientId] = useState();
+  const [isGettingBlocks, setIsGettingBlocks] = useState(false);
+  const getBlocks = async (refresh) => {
+    console.log(isGettingBlocks, blocks, refresh, selectedClientId);
+    if (isGettingBlocks) {
+      return;
+    }
+    if (blocks && !refresh) {
+      return;
+    }
+    if (!selectedClientId) {
+      return;
+    }
+    if (!isAdmin && selectedClientId !== user.id) {
+      return;
+    }
+    setIsGettingBlocks(true);
+    console.log("getting blocks...", selectedClientId);
+    const { data: blocks, error: getBlocksError } = await supabase
+      .from("block")
+      .select("*")
+      .eq("user", selectedClientId);
+    console.log("blocks results", blocks);
+    if (getBlocksError) {
+      console.error(getBlocksError);
+    } else {
+      setBlocks(blocks);
+    }
+    setGotBlocksForClientId(selectedClientId);
+    if (selectedBlock) {
+      setSelectedBlock(blocks.find((block) => block.id === selectedBlock.id));
+    }
+    setIsGettingBlocks(false);
+  };
+  useEffect(() => {
+    if (selectedClientId != gotBlocksForClientId) {
+      setSelectedBlock();
+      if (blocks) {
+        getBlocks(true);
+      } else {
+        setBlocks();
+      }
+    }
+  }, [selectedClientId]);
+
+  useEffect(() => {
+    if (blocks && initialBlockId && !checkedQuery.block) {
+      const selectedBlock = blocks.find((block) => block.id === initialBlockId);
+      if (selectedBlock) {
+        console.log("initialBlock", selectedBlock, initialBlockId);
+        setSelectedBlock(selectedBlock);
+      }
+      setCheckedQuery({ ...checkedQuery, block: true });
+      setInitialBlockId();
+    }
+  }, [blocks, initialBlockId, checkedQuery]);
+
   const value = {
     getClients,
     isGettingClients,
@@ -227,6 +338,18 @@ export function ClientContextProvider(props) {
 
     setInitialClientEmail,
     setOverrideInitialClientEmail,
+
+    blocks,
+    isGettingBlocks,
+    getBlocks,
+
+    selectedBlock,
+    setSelectedBlock,
+    selectedBlockDate,
+    getSelectedBlockDate,
+    setSelectedBlockDate,
+
+    checkedQuery,
   };
 
   return <ClientContext.Provider value={value} {...props} />;
