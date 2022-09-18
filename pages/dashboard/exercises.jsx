@@ -54,6 +54,7 @@ const baseFilterTypes = [
     name: "Is Block Template?",
     query: "is_block_template",
     column: "is_block_template",
+    defaultValue: false,
     radios: [
       {
         value: false,
