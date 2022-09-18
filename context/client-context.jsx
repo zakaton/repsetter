@@ -276,15 +276,18 @@ export function ClientContextProvider(props) {
     if (!selectedClientId) {
       return;
     }
+    /*
     if (!isAdmin && selectedClientId !== user.id) {
       return;
     }
+    */
     setIsGettingBlocks(true);
     console.log("getting blocks...", selectedClientId);
     const { data: blocks, error: getBlocksError } = await supabase
       .from("block")
       .select("*")
-      .eq("user", selectedClientId);
+      //.eq("user", selectedClientId);
+      .eq("user", user.id);
     console.log("blocks results", blocks);
     if (getBlocksError) {
       console.error(getBlocksError);

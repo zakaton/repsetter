@@ -83,7 +83,10 @@ export default function ClientsSelect({
           {showBlocks && blocks?.length > 0 && (
             <optgroup
               label={
-                isAdmin && selectedClient && selectedClient.id !== user.id
+                false &&
+                isAdmin &&
+                selectedClient &&
+                selectedClient.id !== user.id
                   ? `${selectedClient?.client_email}'s Blocks`
                   : "My Blocks"
               }
