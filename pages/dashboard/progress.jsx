@@ -1082,7 +1082,7 @@ export default function Progress() {
           type: "linear",
           display: typesToDisplay.includes("bodyfat percentage"),
           min: 0,
-          max: 100,
+          max: 50,
           position: getPosition("bodyfat percentage"),
           grid: {
             drawOnChartArea: getGridDrawOnChartArea("bodyfat percentage"),
