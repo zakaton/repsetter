@@ -104,7 +104,7 @@ export default function UnderCalendar({
     dateRangeToCopy = copiedExercisesForDateRange
   ) => {
     const matchFilters = {
-      client: selectedClientId,
+      client: selectedBlock ? user.id : selectedClientId,
     };
     if (dateRangeToCopy === "day") {
       matchFilters.date = (

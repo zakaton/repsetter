@@ -417,7 +417,7 @@ export default function Diary() {
             : selectedDate
           ).toDateString(),
 
-          block: selectedBlock ? selectedBlock.id : block,
+          block: selectedBlock ? selectedBlock.id : block?.id,
           is_block_template: selectedBlock ? true : false,
 
           client: selectedClientId,
@@ -1210,7 +1210,9 @@ export default function Diary() {
         tableName="diary"
         resultNamePlural="diary"
         subtitle={`View and edit ${
-          selectedClient ? `${selectedClient.client_email}'s` : "your"
+          selectedClient && !selectedBlock
+            ? `${selectedClient.client_email}'s`
+            : "your"
         } ${
           selectedBlock
             ? `"${selectedBlock.name}" block`
