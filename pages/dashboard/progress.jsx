@@ -1248,12 +1248,14 @@ export default function Progress() {
             setSelectedExerciseTypeName("");
           }}
         >
-          <ExerciseTypesSelect
-            selectedExerciseType={selectedExerciseType}
-            setSelectedExerciseType={setSelectedExerciseType}
-            selectedExerciseTypeName={selectedExerciseTypeName}
-            setSelectedExerciseTypeName={setSelectedExerciseTypeName}
-          />
+          <div className="col-span-2">
+            <ExerciseTypesSelect
+              selectedExerciseType={selectedExerciseType}
+              setSelectedExerciseType={setSelectedExerciseType}
+              selectedExerciseTypeName={selectedExerciseTypeName}
+              setSelectedExerciseTypeName={setSelectedExerciseTypeName}
+            />
+          </div>
         </Filters>
 
         <div className="border-t border-gray-200 pt-2">
