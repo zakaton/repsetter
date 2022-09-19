@@ -51,7 +51,7 @@ export default function Blocks() {
     }
 
     const newBaseFilter = {
-      user: isAdmin ? selectedClientId : user.id,
+      user: false && isAdmin ? selectedClientId : user.id,
     };
 
     setBaseFilter(newBaseFilter);
@@ -63,14 +63,14 @@ export default function Blocks() {
         baseFilter={baseFilter}
         filterTypes={filterTypes}
         orderTypes={orderTypes}
-        includeClientSelect={isAdmin}
+        includeClientSelect={false && isAdmin}
         tableName="block"
         resultName="block"
         //createTitle="Add Block"
         selectString="*"
         title="Blocks"
         subtitle={`View ${
-          isAdmin && selectedClient
+          false && isAdmin && selectedClient
             ? `${selectedClient.client_email}'s`
             : "your"
         } blocks`}
@@ -78,10 +78,11 @@ export default function Blocks() {
         DeleteResultModal={DeleteBlockModal}
         EditResultModal={BlockModal}
         resultMap={(result) => [
-          !amITheClient && {
-            title: "created by",
-            value: result.user_email,
-          },
+          false &&
+            !amITheClient && {
+              title: "created by",
+              value: result.user_email,
+            },
           {
             title: "name",
             value: result.name,
