@@ -31,7 +31,7 @@ export default function ExerciseTypeVideo(
     }
   }, [exerciseTypeId]);
 
-  const [showVideo, setShowVideo] = useState(isMobile);
+  const [showVideo, setShowVideo] = useState(false);
 
   const videoRef = useRef(null);
   useEffect(() => {
@@ -54,8 +54,8 @@ export default function ExerciseTypeVideo(
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   useEffect(() => {
-    setShouldShowVideo(hasPlayed && (showVideo || isMobile));
-  }, [showVideo, isMobile, hasPlayed]);
+    setShouldShowVideo(hasPlayed && showVideo);
+  }, [showVideo, hasPlayed]);
 
   return (
     <div
@@ -71,7 +71,7 @@ export default function ExerciseTypeVideo(
       }}
       onClick={(e) => {
         const { current: video } = videoRef;
-        if (video && isMobile) {
+        if (video) {
           const video = videoRef.current;
           if (video.readyState <= 3) {
             video.play();
