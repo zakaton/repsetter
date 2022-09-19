@@ -22,11 +22,19 @@ const LazyImage = React.forwardRef((props = {}, ref) => {
     document.lazyLoadInstance?.update();
   }, []);
 
+  const [latestSrc, setLatestSrc] = useState(src);
+  const [overrideSrc, setOverrideSrc] = useState();
+  if (latestSrc && latestSrc !== src) {
+    setLatestSrc(src);
+    setOverrideSrc(src);
+  }
+
   return (
     <img
       {...propsSubset}
       ref={ref}
       className={classNames(className || "", "lazy")}
+      src={overrideSrc || ""}
       data-src={src}
       data-srcset={srcset}
       data-sizes={sizes}

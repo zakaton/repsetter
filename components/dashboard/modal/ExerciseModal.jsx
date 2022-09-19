@@ -1086,7 +1086,6 @@ export default function ExerciseModal(props) {
               <ExerciseTypeVideo
                 exerciseTypeId={selectedExerciseType.id}
                 fetchVideo={false}
-                play={true}
                 className="min-h-[150px] min-w-[150px]"
                 width={150}
                 height={150}
