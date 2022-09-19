@@ -71,12 +71,16 @@ export default function ExerciseTypeVideo(
       }}
       onClick={(e) => {
         const { current: video } = videoRef;
-        if (video && isMobile) {
-          const video = videoRef.current;
-          if (video.readyState <= 3) {
-            video.play();
-          } else {
-            setShowVideo(!showVideo);
+        if (isMobile) {
+          console.log("VIDEO TOGGLE", video, video.readyState);
+          if (video) {
+            if (video.readyState === 0) {
+              setShowVideo(true);
+            } else if (video.readyState <= 3) {
+              video.play();
+            } else {
+              setShowVideo(!showVideo);
+            }
           }
         }
       }}

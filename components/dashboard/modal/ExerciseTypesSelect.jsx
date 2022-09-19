@@ -168,7 +168,7 @@ export default function ExerciseTypesSelect({
                   <div className="flex items-center gap-4">
                     <ExerciseTypeVideo
                       className="w-min-[100px] shrink-0"
-                      play={active}
+                      play={active && open}
                       exerciseTypeId={exerciseType.id}
                       fetchVideo={false}
                     ></ExerciseTypeVideo>
