@@ -71,7 +71,7 @@ export default function ExerciseTypeVideo(
       }}
       onClick={(e) => {
         const { current: video } = videoRef;
-        if (video) {
+        if (video && isMobile) {
           const video = videoRef.current;
           if (video.readyState <= 3) {
             video.play();
