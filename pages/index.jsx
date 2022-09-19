@@ -13,8 +13,10 @@ import {
   CameraIcon,
   BookOpenIcon,
   CalendarIcon,
+  PencilAltIcon,
+  DeviceTabletIcon,
 } from "@heroicons/react/outline";
-import { UserGroupIcon } from "@heroicons/react/solid";
+import { TemplateIcon, UserGroupIcon } from "@heroicons/react/solid";
 
 import Image from "next/image";
 import screenshot_1 from "../public/features/screenshot_1.png";
@@ -46,7 +48,7 @@ const features = [
         icon: BookOpenIcon,
       },
       {
-        title: "Color-coded logging Dots",
+        title: "See what you've Logged",
         description:
           "See which days you've logged exercises, bodyweight, and pictures",
         icon: CalendarIcon,
@@ -80,6 +82,12 @@ const features = [
           "Search exercises by name or muscles used, accompanied by images and videos of each exercise",
         icon: SearchIcon,
       },
+      {
+        title: "Block Programming",
+        description:
+          "Plan entire Blocks of Programming you can reuse for you and your clients",
+        icon: TemplateIcon,
+      },
     ],
   },
   {
@@ -101,6 +109,12 @@ const features = [
         title: "Add Videos",
         description: "Embed YouTube or Google Drive videos of your sets",
         icon: VideoCameraIcon,
+      },
+      {
+        title: "Notes and Feedback",
+        description:
+          "Add details for before and after your exercises to note for next time you perform that exercise",
+        icon: PencilAltIcon,
       },
     ],
   },
@@ -124,6 +138,12 @@ const features = [
         description:
           "View your bodyweight fluctuate throughout the day as you eat, drink, and use the restroom, as well as decline over time from exhaling Carbon Dioxide",
         icon: TrendingDownIcon,
+      },
+      {
+        title: "Withings Scale Integration",
+        description:
+          "Connect your Withings account to automatically log weight and bodyfat",
+        icon: DeviceTabletIcon,
       },
     ],
   },
@@ -163,7 +183,7 @@ const features = [
         icon: ChartBarIcon,
       },
       {
-        title: "View Bodyweight",
+        title: "View Bodyweight Progress",
         description:
           "View your Bodyweight over time and correlate it with performance",
         icon: ScaleIcon,
