@@ -1383,7 +1383,7 @@ export default function Diary() {
                           </div>
                           <div className="sm:col-span-1">
                             <dt className="text-sm font-medium text-gray-500">
-                              Muscle Group
+                              Exercise Group
                             </dt>
                             <dd className="mt-1 break-words text-sm text-gray-900">
                               {exercise.type.group}
