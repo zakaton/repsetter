@@ -12,9 +12,10 @@ const keysToDelete = [
   "src",
   "onPlay",
   "onPause",
+  "poster",
 ];
 const LazyVideo = React.forwardRef((props = {}, ref) => {
-  const { className, src, srcset, sizes, onPlay, onPause } = props;
+  const { className, src, srcset, sizes, onPlay, onPause, poster } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
   useEffect(() => {
@@ -51,6 +52,7 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
       data-src={src}
       data-srcset={srcset}
       data-sizes={sizes}
+      data-poster={poster}
     />
   );
 });
