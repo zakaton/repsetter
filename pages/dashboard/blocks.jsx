@@ -44,8 +44,9 @@ export default function Blocks() {
     setSelectedBlock,
   } = useClient();
 
-  const [baseFilter, setBaseFilter] = useState();
+  const [baseFilter, setBaseFilter] = useState({ user: user.id });
   useEffect(() => {
+    return;
     if (!selectedClientId) {
       return;
     }
@@ -76,10 +77,11 @@ export default function Blocks() {
         DeleteResultModal={DeleteBlockModal}
         EditResultModal={BlockModal}
         resultMap={(result) => [
-          !amITheClient && {
-            title: "created by",
-            value: result.user_email,
-          },
+          false &&
+            !amITheClient && {
+              title: "created by",
+              value: result.user_email,
+            },
           {
             title: "name",
             value: result.name,
