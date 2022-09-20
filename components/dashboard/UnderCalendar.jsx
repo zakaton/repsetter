@@ -326,6 +326,16 @@ export default function UnderCalendar({
     setIsGettingExercisesToDelete(false);
   };
 
+  useEffect(() => {
+    const eventListener = () => {
+      highlightDates();
+    };
+    return () => {
+      document.removeEventListener("mouseup", eventListener);
+      document.removeEventListener("touchend", eventListener);
+    };
+  }, []);
+
   return (
     <div className="mt-3 space-y-2 sm:mt-3 sm:grid sm:grid-flow-row-dense sm:grid-cols-3 sm:gap-2 sm:space-y-0">
       <MultiDateSelect
