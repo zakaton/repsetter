@@ -185,6 +185,7 @@ export default function UnderCalendar({
       console.log("dateRangeToCopy", dateRangeToCopy);
       getExercisesToCopy(dateRangeToCopy);
       setDateRangeToCopy();
+      highlightDates();
     }
   }, [dateRangeToCopy]);
 
