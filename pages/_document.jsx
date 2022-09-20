@@ -14,7 +14,10 @@ class MyDocument extends Document {
             href="/images/apple-touch-icon.png"
           />
           <meta name="theme-color" content="#fff" />
-          <meta name="description" content="Repsetter - online coaching" />
+          <meta
+            name="description"
+            content="Repsetter - Your New Favorite Workout Diary"
+          />
           <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
         </Head>
         <body>
