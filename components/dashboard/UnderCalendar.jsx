@@ -18,6 +18,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+const defaultBlockSize = 4;
+
 export default function UnderCalendar({
   refreshExercises,
   setShowDeleteExerciseModal,
@@ -34,7 +36,10 @@ export default function UnderCalendar({
   } = useClient();
   const { user } = useUser();
 
-  const getDates = (dateRangeToCopy) => {
+  const [copiedNumberOfWeeksForBlock, setCopiedNumberOfWeeksForBlock] =
+    useState(defaultBlockSize);
+
+  const getDates = (dateRangeToCopy, type) => {
     const selectedDateForGettingDates = selectedBlock
       ? selectedBlockDate
       : selectedDate;
@@ -68,7 +73,14 @@ export default function UnderCalendar({
         } else {
           fromDate.setDate(fromDate.getDate() - fromDate.getDay());
           toDate = new Date(fromDate);
-          toDate.setDate(toDate.getDate() + 7 * 4 - 1);
+          toDate.setDate(
+            toDate.getDate() +
+              7 *
+                (type === "paste"
+                  ? copiedNumberOfWeeksForBlock
+                  : defaultBlockSize) -
+              1
+          );
         }
         break;
       default:
@@ -82,7 +94,7 @@ export default function UnderCalendar({
   const [deleteActiveOption, setDeleteActiveOption] = useState();
   const highlightDates = (dateRangeToCopy, type) => {
     if (dateRangeToCopy) {
-      const { fromDate, toDate } = getDates(dateRangeToCopy);
+      const { fromDate, toDate } = getDates(dateRangeToCopy, type);
       setDatesToHighlight?.({ fromDate, toDate, type, dateRangeToCopy });
     } else {
       setDatesToHighlight?.();
@@ -153,6 +165,11 @@ export default function UnderCalendar({
       setCopiedExercisesFromDate(fromDate);
       setCopiedExercisesForDateRange(dateRangeToCopy);
       setCopiedExercises(exercises);
+      if (dateRangeToCopy == "block" && selectedBlock) {
+        setCopiedNumberOfWeeksForBlock(selectedBlock.number_of_weeks);
+      } else {
+        setCopiedNumberOfWeeksForBlock(defaultBlockSize);
+      }
     }
     setIsGettingExercises(false);
   };
