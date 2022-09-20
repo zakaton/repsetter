@@ -91,7 +91,7 @@ export default function MultiDateSelect({
           }
         }}
         className={classNames(
-          "relative inline-flex w-full items-center rounded-l-md border px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-1",
+          "relative inline-flex w-full items-center whitespace-pre rounded-l-md border px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-1",
           colorPallete["bg"],
           colorPallete["border"],
           colorPallete["text"],
