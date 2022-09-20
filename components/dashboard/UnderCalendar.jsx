@@ -18,14 +18,6 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function getIsTouchDevice() {
-  return (
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
-  );
-}
-
 export default function UnderCalendar({
   refreshExercises,
   setShowDeleteExerciseModal,
@@ -41,8 +33,6 @@ export default function UnderCalendar({
     selectedBlock,
   } = useClient();
   const { user } = useUser();
-
-  const isTouchDevice = getIsTouchDevice();
 
   const getDates = (dateRangeToCopy) => {
     const selectedDateForGettingDates = selectedBlock
@@ -335,11 +325,11 @@ export default function UnderCalendar({
         )}
         onClick={() => pasteExercises()}
         onMouseEnter={() => {
-          if (isTouchDevice) return;
+          if (!isDesktop) return;
           highlightDates(copiedExercisesForDateRange, "paste");
         }}
         onMouseLeave={() => {
-          if (isTouchDevice) return;
+          if (!isDesktop) return;
           highlightDates();
         }}
         onTouchStart={() => {
