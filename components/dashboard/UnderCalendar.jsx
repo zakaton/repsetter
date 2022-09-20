@@ -304,7 +304,7 @@ export default function UnderCalendar({
   };
 
   return (
-    <div className="mt-3 space-y-2 sm:mt-3 sm:grid sm:grid-flow-row-dense sm:grid-cols-3 sm:gap-3 sm:space-y-0">
+    <div className="mt-3 space-y-2 sm:mt-3 sm:grid sm:grid-flow-row-dense sm:grid-cols-3 sm:gap-2 sm:space-y-0">
       <MultiDateSelect
         activeOption={copyActiveOption}
         setActiveOption={setCopyActiveOption}

@@ -230,10 +230,10 @@ export default function DashboardCalendarLayout({
                   <span className="sr-only">Previous month</span>
                   <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
-                <div className="flex-auto">
+                <div className="flex w-full justify-center space-x-2">
                   <select
                     id="month"
-                    className="mt-1 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    className="rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                     value={selectedDate?.getMonth() || 0}
                     onInput={(e) => {
                       const newSelectedDate = new Date(selectedDate);
@@ -250,7 +250,7 @@ export default function DashboardCalendarLayout({
 
                   <select
                     id="year"
-                    className="mt-1 ml-4 rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    className="rounded-md border-gray-300 py-1 pl-2 pr-8 font-semibold focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                     value={selectedDate?.getFullYear()}
                     onInput={(e) => {
                       const newSelectedDate = new Date(selectedDate);
