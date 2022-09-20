@@ -328,9 +328,13 @@ export default function UnderCalendar({
 
   useEffect(() => {
     const eventListener = () => {
+      console.log("EVENTLISTNEER");
       highlightDates();
     };
+    document.addEventListener("mouseup", eventListener);
+    document.addEventListener("touchend", eventListener);
     return () => {
+      console.log("REMOVING EVENTLISTENER!");
       document.removeEventListener("mouseup", eventListener);
       document.removeEventListener("touchend", eventListener);
     };
