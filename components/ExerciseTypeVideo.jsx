@@ -53,6 +53,7 @@ export default function ExerciseTypeVideo(
 
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [hasLoadedData, setHasLoadedData] = useState(false);
   useEffect(() => {
     setShouldShowVideo(hasPlayed && showVideo);
   }, [showVideo, hasPlayed]);
@@ -99,7 +100,11 @@ export default function ExerciseTypeVideo(
           );
         }}
         onPlay={() => {
+          console.log("onPlay");
           setHasPlayed(true);
+        }}
+        onLoadedData={(e) => {
+          setHasLoadedData(true);
         }}
         onPause={() => {
           setHasPlayed(false);
