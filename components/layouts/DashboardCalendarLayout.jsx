@@ -371,7 +371,7 @@ export default function DashboardCalendarLayout({
                               !day.isToday &&
                               "text-gray-500",
                             day.shouldHighlight && day.highlightColor,
-                            "flex h-14 flex-col py-2 px-3 hover:bg-gray-100 focus:z-10"
+                            "flex h-16 flex-col py-2 px-3 hover:bg-gray-100 focus:z-10"
                           )}
                         >
                           <time
