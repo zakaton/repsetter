@@ -68,7 +68,12 @@ export default function UnderCalendar({
           fromDate = new Date(firstDayOfBlockTemplate);
           toDate = new Date(fromDate);
           toDate.setDate(
-            toDate.getDate() + 7 * selectedBlock.number_of_weeks - 1
+            toDate.getDate() +
+              7 *
+                (type === "paste"
+                  ? copiedNumberOfWeeksForBlock
+                  : selectedBlock.number_of_weeks) -
+              1
           );
         } else {
           fromDate.setDate(fromDate.getDate() - fromDate.getDay());
