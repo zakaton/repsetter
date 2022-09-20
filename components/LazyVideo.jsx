@@ -46,6 +46,7 @@ const LazyVideo = React.forwardRef((props = {}, ref) => {
         setHasPlayed(true);
         onPlay();
       }}
+      poster={poster}
       {...propsSubset}
       ref={ref}
       className={classNames(className || "", "lazy")}

@@ -104,6 +104,7 @@ export default function ExerciseTypeVideo(
           setHasPlayed(true);
         }}
         onLoadedData={(e) => {
+          console.log("setHasLoadedData");
           setHasLoadedData(true);
         }}
         onPause={() => {
