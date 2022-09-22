@@ -18,6 +18,11 @@ class MyDocument extends Document {
             name="description"
             content="Repsetter - Your New Favorite Workout Diary"
           />
+          <meta
+            property="og:title"
+            content="Repsetter - Your New Favorite Workout Diary"
+          />
+          <meta property="og:image" content="/images/icon-512x512.png" />
           <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
         </Head>
         <body>
