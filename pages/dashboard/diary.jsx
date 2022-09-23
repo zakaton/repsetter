@@ -135,10 +135,13 @@ export default function Diary() {
     if (isGettingExercises && !refresh) {
       return;
     }
+    if (!selectedDate && !selectedBlockDate) {
+      return;
+    }
     setIsGettingExercises(true);
     const matchFilters = {
       client: selectedClientId,
-      date: selectedDate.toDateString(),
+      date: selectedDate?.toDateString(),
     };
     if (!amITheClient) {
       //matchFilters.coach = user.id;
