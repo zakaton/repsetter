@@ -24,6 +24,8 @@ export default function DeleteBlockModal(props) {
     }
   }, [open]);
 
+  window.s = supabase;
+
   const resultName = `Block${selectedBlocks?.length > 1 ? "s" : ""}`;
 
   return (
@@ -65,7 +67,10 @@ export default function DeleteBlockModal(props) {
                 .update({ block: null })
                 .match({ block: selectedBlock.id, is_block_template: false });
               console.log("updateExercisesResult", updateExercisesResult);
-              if (updateExercisesError) {
+              if (
+                updateExercisesError &&
+                !Array.isArray(updateExercisesError)
+              ) {
                 console.error(updateExercisesError);
                 error = updateExercisesError;
               }
@@ -110,7 +115,10 @@ export default function DeleteBlockModal(props) {
                   selectedBlocks.map((block) => block.id)
                 );
               console.log("updateExercisesResult", updateExercisesResult);
-              if (updateExercisesError) {
+              if (
+                updateExercisesError &&
+                !Array.isArray(updateExercisesError)
+              ) {
                 console.error(updateExercisesError);
                 error = updateExercisesError;
               }
