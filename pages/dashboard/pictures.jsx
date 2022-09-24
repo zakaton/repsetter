@@ -108,6 +108,7 @@ export default function Photos() {
 
   const [pictures, setPictures] = useState();
   const [isGettingPictures, setIsGettingPictures] = useState(false);
+  const [filteredPicturesList, setFilteredPicturesList] = useState([]);
   const getPictures = async () => {
     if (isGettingPictures) {
       return;
@@ -119,6 +120,7 @@ export default function Photos() {
             containsFilters.type.includes(picture.type)
           )
         : picturesList;
+    setFilteredPicturesList(filteredPicturesList);
 
     if (filteredPicturesList?.length == 0) {
       setPictures([]);
@@ -310,7 +312,7 @@ export default function Photos() {
         {pictures && (
           <Pagination
             name={"picture"}
-            numberOfResults={picturesList.length}
+            numberOfResults={filteredPicturesList.length}
             numberOfResultsPerPage={numberOfPicturesPerPage}
             pageIndex={pageIndex}
             setPageIndex={setPageIndex}
