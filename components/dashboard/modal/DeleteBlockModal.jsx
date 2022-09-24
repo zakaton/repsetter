@@ -24,8 +24,6 @@ export default function DeleteBlockModal(props) {
     }
   }, [open]);
 
-  window.s = supabase;
-
   const resultName = `Block${selectedBlocks?.length > 1 ? "s" : ""}`;
 
   return (
