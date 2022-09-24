@@ -9,6 +9,7 @@ function classNames(...classes) {
 
 export default function Filters({
   filters,
+  queryFilters,
   setFilters,
   containsFilters,
   setContainsFilters,
@@ -94,6 +95,17 @@ export default function Filters({
         query[filter.query] = filters[column];
       }
     });
+
+    if (queryFilters) {
+      Object.keys(queryFilters).forEach((key) => {
+        const value = queryFilters[key];
+        if (value) {
+          query[key] = queryFilters[key];
+        } else {
+          delete query[key];
+        }
+      });
+    }
 
     Object.keys(containsFilters).forEach((column) => {
       const filter = filterTypes.find((filter) => filter.column === column);

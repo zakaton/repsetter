@@ -88,79 +88,80 @@ const dateRangeFilterType = {
   ],
 };
 const dateRanges = dateRangeFilterType.options.map(({ value }) => value);
+const graphFilterTypes = {
+  name: "Graph Types",
+  query: "type",
+  column: "type",
+  requiresExercise: true,
+  checkboxes: [
+    {
+      value: "weight",
+      label: "Top Set",
+      feature: "weight",
+      requiresExercise: true,
+    },
+    {
+      value: "number of sets",
+      label: "Number of Sets",
+      requiresExercise: true,
+    },
+    {
+      value: "number of reps",
+      label: "Number of Reps",
+      requiresExercise: true,
+      feature: "reps",
+    },
+    {
+      value: "difficulty",
+      label: "Difficulty",
+      requiresExercise: true,
+    },
+    {
+      value: "duration",
+      label: "Set Duration",
+      requiresExercise: true,
+      feature: "duration",
+    },
+    {
+      value: "rest duration",
+      label: "Rest Duration",
+      requiresExercise: true,
+    },
+    {
+      value: "speed",
+      label: "Speed",
+      feature: "speed",
+      requiresExercise: true,
+    },
+    {
+      value: "distance",
+      label: "Distance",
+      feature: "distance",
+      requiresExercise: true,
+    },
+    {
+      value: "level",
+      label: "Level",
+      feature: "level",
+      requiresExercise: true,
+    },
+    {
+      value: "exercise time",
+      label: "Exercise Time",
+      requiresExercise: true,
+    },
+    {
+      value: "bodyweight",
+      label: "Bodyweight",
+    },
+    {
+      value: "bodyfat percentage",
+      label: "Bodyfat percentage",
+    },
+  ],
+};
 const filterTypes = [
-  {
-    name: "Graph Types",
-    query: "type",
-    column: "type",
-    requiresExercise: true,
-    checkboxes: [
-      {
-        value: "weight",
-        label: "Top Set",
-        feature: "weight",
-        requiresExercise: true,
-      },
-      {
-        value: "number of sets",
-        label: "Number of Sets",
-        requiresExercise: true,
-      },
-      {
-        value: "number of reps",
-        label: "Number of Reps",
-        requiresExercise: true,
-        feature: "reps",
-      },
-      {
-        value: "difficulty",
-        label: "Difficulty",
-        requiresExercise: true,
-      },
-      {
-        value: "duration",
-        label: "Set Duration",
-        requiresExercise: true,
-        feature: "duration",
-      },
-      {
-        value: "rest duration",
-        label: "Rest Duration",
-        requiresExercise: true,
-      },
-      {
-        value: "speed",
-        label: "Speed",
-        feature: "speed",
-        requiresExercise: true,
-      },
-      {
-        value: "distance",
-        label: "Distance",
-        feature: "distance",
-        requiresExercise: true,
-      },
-      {
-        value: "level",
-        label: "Level",
-        feature: "level",
-        requiresExercise: true,
-      },
-      {
-        value: "exercise time",
-        label: "Exercise Time",
-        requiresExercise: true,
-      },
-      {
-        value: "bodyweight",
-        label: "Bodyweight",
-      },
-      {
-        value: "bodyfat percentage",
-        label: "Bodyfat percentage",
-      },
-    ],
-  },
+  graphFilterTypes,
   {
     name: "Weight Unit",
     query: "weight-unit",
@@ -718,9 +719,16 @@ export default function Progress() {
     ) {
       const newContainsFilters = { ...containsFilters };
       console.log("type", containsFilters.type);
-      newContainsFilters.type = newContainsFilters.type.filter((type) =>
-        selectedExerciseType.features.includes(type)
-      );
+      newContainsFilters.type = newContainsFilters.type.filter((type) => {
+        const requiresExercise = graphFilterTypes.checkboxes.find(
+          (checkbox) => checkbox.value === type
+        )?.requiresExercise;
+        if (requiresExercise) {
+          return selectedExerciseType.features.includes(type);
+        } else {
+          return true;
+        }
+      });
       setContainsFilters(newContainsFilters);
     }
   }, [selectedExerciseType]);
@@ -1184,6 +1192,17 @@ export default function Progress() {
     router.push("/dashboard/diary");
   };
 
+  const [queryFilters, setQueryFilters] = useState({});
+  useEffect(() => {
+    const newQueryFilters = { ...queryFilters };
+    if (selectedExerciseType) {
+      newQueryFilters["exercise-type"] = selectedExerciseType.name;
+    } else {
+      delete newQueryFilters["exercise-type"];
+    }
+    setQueryFilters(newQueryFilters);
+  }, [selectedExerciseType]);
+
   return (
     <>
       <div className="bg-white px-4 pb-2 pt-4 sm:px-6">
@@ -1200,6 +1219,7 @@ export default function Progress() {
         </div>
 
         <Filters
+          queryFilters={queryFilters}
           filters={filters}
           setFilters={setFilters}
           containsFilters={containsFilters}
