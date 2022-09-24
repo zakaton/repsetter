@@ -26,14 +26,12 @@ const navigation = [
     href: "/dashboard",
     icon: UserCircleIcon,
   },
-  /*
   {
     name: "All Users",
     href: "/dashboard/all-users",
     icon: UserGroupIcon,
     isAdmin: true,
   },
-  */
   {
     name: "My Coaches",
     href: "/dashboard/my-coaches",
