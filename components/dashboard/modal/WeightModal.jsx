@@ -101,7 +101,9 @@ export default function WeightModal(props) {
           ? wiiBalanceBoardWeight
           : kilogramsToPounds(wiiBalanceBoardWeight)
       ).toFixed(2);
+      console.log("newWeight", newWeight);
       setWeight(newWeight);
+      setIsWeightEmptyString(false);
       setIsCapturingWiiBalanceBoardWeight(false);
     }, captureWiiBalanceBoardSeconds * 1000);
     setCaptureWiiBalanceBoardWeightTimeoutId(
