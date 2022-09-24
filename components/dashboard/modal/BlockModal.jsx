@@ -174,7 +174,7 @@ export default function BlockModal(props) {
             id="blockName"
             name="blockName"
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="Type an Exercise Name"
+            placeholder="Type a Block Name"
             value={blockName}
             maxLength={maxBlockNameLength}
             onInput={(e) => setBlockName(e.target.value)}
