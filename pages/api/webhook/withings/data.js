@@ -53,7 +53,8 @@ export default async function handler(req, res) {
           const date = new Date(measuregrp.date * 1000);
           console.log("date", date);
           const newWeightDatum = {
-            date: dateToString(date),
+            //date: dateToString(date),
+            date: date.toLocaleDateString("en-US", { timeZone: timezone }),
             time: date.toLocaleTimeString("en-US", {
               timeZone: timezone,
               hour12: false,
