@@ -100,7 +100,7 @@ export default function WeightModal(props) {
         isUsingKilograms
           ? wiiBalanceBoardWeight
           : kilogramsToPounds(wiiBalanceBoardWeight)
-      ).toFixed(2);
+      ).toFixed(1);
       console.log("newWeight", newWeight);
       setWeight(newWeight);
       setIsWeightEmptyString(false);
