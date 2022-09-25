@@ -46,7 +46,7 @@ export default function DashboardCalendarLayout({
   resultName,
   resultNamePlural,
   underCalendar,
-  yearsRange = [2021, 2022],
+  yearsRange = [2022, 2022],
   setCalendar: setCalendarParent,
   datesDots = {},
   datesToHighlight,
