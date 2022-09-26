@@ -103,11 +103,13 @@ export function ClientContextProvider(props) {
         const newClients = [...(clients?.length > 0 ? clients : []), newClient];
         setClients(newClients);
         setSelectedClient(newClient);
+        setSelectedClientId(newClient.id);
       } else {
         setSelectedClient();
+        setSelectedClientId();
       }
     }
-    setCheckedQuery(true);
+    setCheckedQuery({ ...checkedQuery, client: true });
   };
   useEffect(() => {
     if (initialClientEmail && overrideInitialClientEmail) {
@@ -137,7 +139,10 @@ export function ClientContextProvider(props) {
         newCheckedQuery.client = true;
       }
 
+      console.log("newCheckedQuery", newCheckedQuery);
+
       if (newCheckedQuery.block || newCheckedQuery.client) {
+        console.log("update newCheckedQuery", newCheckedQuery);
         setCheckedQuery(newCheckedQuery);
       }
     }
