@@ -24,6 +24,8 @@ export default function ExerciseTypeVideo(
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
 
+  const sizeClassname = `w-[${width}px] h-[${height}px]`;
+
   const { getExerciseVideo, exerciseVideos } = useExerciseVideos();
   useEffect(() => {
     if (exerciseTypeId && fetchVideo) {
@@ -86,7 +88,7 @@ export default function ExerciseTypeVideo(
           }
         }
       }}
-      className="min-h-[100px] min-w-[100px]"
+      className={sizeClassname}
     >
       <LazyVideo
         onSuspend={(e) => {
@@ -124,21 +126,16 @@ export default function ExerciseTypeVideo(
         muted={true}
         loop={true}
         className={classNames(
-          "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
+          "absolute z-10 overflow-hidden rounded-lg",
           className,
+          sizeClassname,
           shouldShowVideo ? "" : "hidden"
         )}
         playsInline={true}
         controls={false}
         ref={videoRef}
       ></LazyVideo>
-      <div
-        className={classNames(
-          "h-[100px] w-[100px]",
-          className,
-          shouldShowVideo ? "hidden" : ""
-        )}
-      >
+      <div className={classNames(sizeClassname, className)}>
         {exerciseVideos?.[exerciseTypeId]?.thumbnailUrl && (
           <LazyImage
             width={width}
