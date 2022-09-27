@@ -19,7 +19,7 @@ export default function ExerciseTypeVideo(
     width = 100,
     height = 100,
     fetchVideo,
-    className = "",
+    className = "min-h-[100px] min-w-[100px]",
   } = props;
   const propsSubset = Object.assign({}, props);
   keysToDelete.forEach((key) => delete propsSubset[key]);
