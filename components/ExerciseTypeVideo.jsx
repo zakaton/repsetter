@@ -103,10 +103,12 @@ export default function ExerciseTypeVideo(
           console.log("onPlay");
           setHasPlayed(true);
         }}
-        onCanPlay={(e) => {
-          console.log("setHasLoadedData");
-          setHasLoadedData(true);
-          e.target.play();
+        onCanPlayThrough={(e) => {
+          if (!hasLoadedData) {
+            console.log("setHasLoadedData", e.target);
+            e.target.play();
+            setHasLoadedData(true);
+          }
         }}
         onPause={() => {
           setHasPlayed(false);
