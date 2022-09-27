@@ -103,9 +103,10 @@ export default function ExerciseTypeVideo(
           console.log("onPlay");
           setHasPlayed(true);
         }}
-        onLoadedData={(e) => {
+        onCanPlay={(e) => {
           console.log("setHasLoadedData");
           setHasLoadedData(true);
+          e.target.play();
         }}
         onPause={() => {
           setHasPlayed(false);
@@ -114,7 +115,7 @@ export default function ExerciseTypeVideo(
         height={height}
         src={exerciseVideos?.[exerciseTypeId]?.url}
         poster={exerciseVideos?.[exerciseTypeId]?.thumbnailUrl}
-        autoPlay={true}
+        autoPlay={false}
         muted={true}
         loop={true}
         className={classNames(
