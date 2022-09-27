@@ -521,10 +521,9 @@ export default function ExerciseModal(props) {
       if (selectedBlock) {
         matchFilters.is_block_template = true;
         matchFilters.block = selectedBlock.id;
-        matchFilters.client = user.id
+        matchFilters.client = user.id;
       }
       const date = selectedBlock ? selectedBlockDate : selectedDate;
-      console.log("FUCK", selectedBlock, date, matchFilters);
       const { data: previousExercises, error } = await supabase
         .from("exercise")
         .select("*")
@@ -1100,7 +1099,8 @@ export default function ExerciseModal(props) {
           )}
           {previousExercise && (
             <p className="mt-2 text-sm text-gray-500">
-              This exercise was {selectedBlock? "programmed":"done"} {daysSincePreviousExercise} day
+              This exercise was {selectedBlock ? "programmed" : "done"}{" "}
+              {daysSincePreviousExercise} day
               {daysSincePreviousExercise > 1 && "s"} ago{" "}
               {!selectedBlock && `on ${previousExercise.date}`}
               {previousExercise.time

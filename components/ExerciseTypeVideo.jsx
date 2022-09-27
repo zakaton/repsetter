@@ -123,7 +123,7 @@ export default function ExerciseTypeVideo(
         className={classNames(
           "min-h-[100px] min-w-[100px] overflow-hidden rounded-lg",
           className,
-          shouldShowVideo ? "" : "hidden"
+          shouldShowVideo && hasPlayed ? "" : "hidden"
         )}
         playsInline={true}
         controls={false}
@@ -133,7 +133,7 @@ export default function ExerciseTypeVideo(
         className={classNames(
           "h-[100px] w-[100px]",
           className,
-          shouldShowVideo ? "hidden" : ""
+          shouldShowVideo && hasPlayed ? "hidden" : ""
         )}
       >
         {exerciseVideos?.[exerciseTypeId]?.thumbnailUrl && (
