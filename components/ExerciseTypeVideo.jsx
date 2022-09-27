@@ -54,9 +54,10 @@ export default function ExerciseTypeVideo(
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [hasLoadedData, setHasLoadedData] = useState(false);
+  const [isSuspended, setIsSuspended] = useState(false);
   useEffect(() => {
-    setShouldShowVideo(hasPlayed && showVideo);
-  }, [showVideo, hasPlayed]);
+    setShouldShowVideo(hasPlayed && showVideo && !isSuspended);
+  }, [showVideo, hasPlayed, isSuspended]);
 
   return (
     <div
@@ -89,6 +90,7 @@ export default function ExerciseTypeVideo(
     >
       <LazyVideo
         onSuspend={(e) => {
+          setIsSuspended(true);
           document.addEventListener(
             "click",
             async () => {
@@ -102,6 +104,7 @@ export default function ExerciseTypeVideo(
         onPlay={() => {
           console.log("onPlay");
           setHasPlayed(true);
+          setIsSuspended(false);
         }}
         onCanPlayThrough={(e) => {
           if (!hasLoadedData) {
