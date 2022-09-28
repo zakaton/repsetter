@@ -37,10 +37,8 @@ export default function ClientsSelect({
     }
   }, [selectedClientId]);
 
-  console.log();
-
   return (
-    clients?.length > 0 && (
+    (clients?.length > 0 || blocks?.length > 0) && (
       <div className={classNames("w-50 ml-3 inline-block", className)}>
         <select
           name={name}
@@ -71,13 +69,18 @@ export default function ClientsSelect({
           {showClients && (
             <>
               <option value={user.email}>Me</option>
-              <optgroup label="My Clients">
-                {clients?.map((client) => (
-                  <option key={client.client_email} value={client.client_email}>
-                    {client.client_email}
-                  </option>
-                ))}
-              </optgroup>
+              {clients?.length > 0 && (
+                <optgroup label="My Clients">
+                  {clients?.map((client) => (
+                    <option
+                      key={client.client_email}
+                      value={client.client_email}
+                    >
+                      {client.client_email}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </>
           )}
           {showBlocks && blocks?.length > 0 && (
