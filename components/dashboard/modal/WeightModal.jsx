@@ -564,8 +564,12 @@ export default function WeightModal(props) {
           >
             <optgroup label="Select a Scale Type">
               <option value="">None</option>
-              <option value="wiiBalanceBoard">Wii Balance Board</option>
-              <option value="miSmartScale2">Mi Smart Scale 2</option>
+              {canConnectToWiiBalanceBoard && (
+                <option value="wiiBalanceBoard">Wii Balance Board</option>
+              )}
+              {miSmartScale2 && (
+                <option value="miSmartScale2">Mi Smart Scale 2</option>
+              )}
             </optgroup>
           </select>
         </div>
