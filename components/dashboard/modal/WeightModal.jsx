@@ -548,21 +548,21 @@ export default function WeightModal(props) {
           </div>
         )}
 
-        <div>
-          <label
-            htmlFor="scale-type"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Scale Type
-          </label>
-          <select
-            onInput={(e) => setScaleType(e.target.value)}
-            id="scale-type"
-            name="scale-type"
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-            defaultValue=""
-          >
-            {(canConnectToWiiBalanceBoard || miSmartScale2) && (
+        {(canConnectToWiiBalanceBoard || miSmartScale2) && (
+          <div>
+            <label
+              htmlFor="scale-type"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Scale Type
+            </label>
+            <select
+              onInput={(e) => setScaleType(e.target.value)}
+              id="scale-type"
+              name="scale-type"
+              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              defaultValue=""
+            >
               <optgroup label="Select a Scale Type">
                 <option value="">None</option>
                 {canConnectToWiiBalanceBoard && (
@@ -572,9 +572,9 @@ export default function WeightModal(props) {
                   <option value="miSmartScale2">Mi Smart Scale 2</option>
                 )}
               </optgroup>
-            )}
-          </select>
-        </div>
+            </select>
+          </div>
+        )}
 
         {scaleType === "wiiBalanceBoard" &&
           canConnectToWiiBalanceBoard &&
