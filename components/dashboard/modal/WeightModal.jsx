@@ -15,6 +15,7 @@ import {
 } from "../../../utils/exercise-utils";
 import { weightEvents } from "../../../utils/weight-utils";
 import { useWiiBalanceBoard } from "../../../context/wii-balance-board-context";
+import MiSmartScale2 from "../../../utils/MiSmartScale2";
 
 export default function WeightModal(props) {
   const {
@@ -32,6 +33,8 @@ export default function WeightModal(props) {
   const { selectedDate } = useClient();
   const { user } = useUser();
 
+  const [scaleType, setScaleType] = useState();
+
   // WII BALANCE BOARD START
   const {
     wiiBalanceBoard,
@@ -42,15 +45,14 @@ export default function WeightModal(props) {
     openWiiBalanceBoardData,
     closeWiiBalanceBoardData,
   } = useWiiBalanceBoard();
-  const [includeWiiBalanceBoard, setIncludeWiiBalanceBoard] = useState(false);
   const [wiiBalanceBoardWeight, setWiiBalanceBoardWeight] = useState();
   useEffect(() => {
-    if (includeWiiBalanceBoard) {
+    if (scaleType === "wiiBalanceBoard") {
       openWiiBalanceBoardData();
     } else {
       closeWiiBalanceBoardData();
     }
-  }, [includeWiiBalanceBoard, wiiBalanceBoard]);
+  }, [scaleType, wiiBalanceBoard]);
 
   const onWiiBalanceBoardWeightData = (weights) => {
     const { total } = weights;
@@ -100,7 +102,7 @@ export default function WeightModal(props) {
         isUsingKilograms
           ? wiiBalanceBoardWeight
           : kilogramsToPounds(wiiBalanceBoardWeight)
-      ).toFixed(1);
+      ).toFixed(2);
       console.log("newWeight", newWeight);
       setWeight(newWeight);
       setIsWeightEmptyString(false);
@@ -119,6 +121,58 @@ export default function WeightModal(props) {
     );
   }
   // WII BALANCE BOARD END
+
+  // MI SMART SCALE 2 START
+  const [miSmartScale2, setMiSmartScale2] = useState();
+  const [miSmartScale2Weight, setMiSmartScale2Weight] = useState(0);
+  const [isConnectedToMiSmartScale2, setIsConnectedToMiSmartScale2] =
+    useState(false);
+  useEffect(() => {
+    if (navigator?.bluetooth) {
+      const miSmartScale2 = new MiSmartScale2();
+      setMiSmartScale2(miSmartScale2);
+      window.miSmartScale2 = miSmartScale2;
+
+      miSmartScale2.addEventListener("connected", (event) => {
+        setIsConnectedToMiSmartScale2(true);
+      });
+      miSmartScale2.addEventListener("disconnected", (event) => {
+        setIsConnectedToMiSmartScale2(false);
+      });
+
+      miSmartScale2.addEventListener("weight", (event) => {
+        const { weight, isUsingKilograms, stabilized } = event.message;
+        setMiSmartScale2Weight(weight);
+        setIsUsingKilograms(isUsingKilograms);
+        if (stabilized) {
+          setWeight(weight.toFixed(2));
+          setIsWeightEmptyString(false);
+        }
+      });
+
+      return () => {
+        miSmartScale2._listeners = {};
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!miSmartScale2) return;
+
+    if (scaleType === "miSmartScale2") {
+      miSmartScale2.open();
+    } else {
+      miSmartScale2.close();
+    }
+  }, [scaleType, miSmartScale2]);
+
+  useEffect(() => {
+    if (miSmartScale2) {
+      miSmartScale2.disconnect();
+    }
+  }, [open]);
+
+  // MI SMART SCALE 2 END
 
   const [isAddingWeight, setIsAddingWeight] = useState(false);
   const [didAddWeight, setDidAddWeight] = useState(false);
@@ -151,9 +205,10 @@ export default function WeightModal(props) {
       setBodyfatPercentage(null);
       setIsBodyfatPercentageEmptyString(true);
 
-      setIncludeWiiBalanceBoard(false);
       setWiiBalanceBoardWeight();
       closeWiiBalanceBoardData();
+
+      setScaleType();
     }
   }, [open]);
 
@@ -216,7 +271,7 @@ export default function WeightModal(props) {
       const newWeight = isUsingKilograms
         ? poundsToKilograms(weight)
         : kilogramsToPounds(weight);
-      setWeight(newWeight.toFixed(1));
+      setWeight(newWeight.toFixed(2));
       setPreviousIsUsingKilograms(isUsingKilograms);
     }
   }, [isUsingKilograms]);
@@ -372,7 +427,7 @@ export default function WeightModal(props) {
               placeholder="0"
               name="weight"
               id="weight"
-              step="0.1"
+              step="0.01"
               className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               value={isWeightEmptyString ? "" : weight}
               onInput={(e) => {
@@ -493,31 +548,29 @@ export default function WeightModal(props) {
           </div>
         )}
 
-        {canConnectToWiiBalanceBoard && (
-          <div className="flex self-center">
-            <div className="flex h-5 items-center">
-              <input
-                id="includeWiiBalanceBoard"
-                name="includeWiiBalanceBoard"
-                type="checkbox"
-                checked={includeWiiBalanceBoard}
-                onChange={(e) => {
-                  setIncludeWiiBalanceBoard(e.target.checked);
-                }}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-            </div>
-            <div className="ml-3 text-sm">
-              <label
-                htmlFor="includeWiiBalanceBoard"
-                className="font-medium text-gray-700"
-              >
-                Use Wii Balance Board
-              </label>
-            </div>
-          </div>
-        )}
-        {includeWiiBalanceBoard &&
+        <div>
+          <label
+            htmlFor="scale-type"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Scale Type
+          </label>
+          <select
+            onInput={(e) => setScaleType(e.target.value)}
+            id="scale-type"
+            name="scale-type"
+            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+            defaultValue=""
+          >
+            <optgroup label="Select a Scale Type">
+              <option value="">None</option>
+              <option value="wiiBalanceBoard">Wii Balance Board</option>
+              <option value="miSmartScale2">Mi Smart Scale 2</option>
+            </optgroup>
+          </select>
+        </div>
+
+        {scaleType === "wiiBalanceBoard" &&
           canConnectToWiiBalanceBoard &&
           !wiiBalanceBoard && (
             <button
@@ -528,10 +581,10 @@ export default function WeightModal(props) {
               Connect to Wii Balance Board
             </button>
           )}
-        {includeWiiBalanceBoard && wiiBalanceBoard && (
+        {scaleType === "wiiBalanceBoard" && wiiBalanceBoard && (
           <div className="col-span-1">
             <label
-              htmlFor="weight"
+              htmlFor="wii-weight"
               className="block text-sm font-medium text-gray-700"
             >
               Wii Balance Board Weight
@@ -543,8 +596,8 @@ export default function WeightModal(props) {
                 inputMode="decimal"
                 min="0"
                 placeholder="0"
-                name="weight"
-                id="weight"
+                name="wii-weight"
+                id="wii-weight"
                 className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 value={
                   wiiBalanceBoardWeight
@@ -573,7 +626,7 @@ export default function WeightModal(props) {
             </div>
           </div>
         )}
-        {includeWiiBalanceBoard && wiiBalanceBoard && (
+        {scaleType === "wiiBalanceBoard" && wiiBalanceBoard && (
           <button
             type="button"
             onClick={() => captureWiiBalanceBoardWeight()}
@@ -585,6 +638,70 @@ export default function WeightModal(props) {
               : "Capture Wii Balance Board Weight"}
           </button>
         )}
+
+        {scaleType === "miSmartScale2" &&
+          miSmartScale2 &&
+          !isConnectedToMiSmartScale2 && (
+            <button
+              type="button"
+              onClick={() => miSmartScale2.connect()}
+              className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Connect to Mi Smart Scale 2
+            </button>
+          )}
+        {scaleType === "miSmartScale2" &&
+          miSmartScale2 &&
+          miSmartScale2.isConnected && (
+            <div className="col-span-1">
+              <label
+                htmlFor="mi-smart-scale-2-weight"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Mi Smart Scale 2 Weight
+              </label>
+              <div className="relative mt-1 rounded-md shadow-sm">
+                <input
+                  readOnly
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  placeholder="0"
+                  name="mi-smart-scale-2-weight"
+                  id="mi-smart-scale-2-weight"
+                  className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  value={
+                    miSmartScale2Weight
+                      ? (isUsingKilograms
+                          ? miSmartScale2Weight
+                          : kilogramsToPounds(miSmartScale2Weight)
+                        ).toFixed(2)
+                      : ""
+                  }
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <label
+                    htmlFor="weight-type-mi-smart-scale-2"
+                    className="sr-only"
+                  >
+                    weight type
+                  </label>
+                  <select
+                    id="weight-type-mi-smart-scale-2"
+                    name="weight-type-mi-smart-scale-2"
+                    className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    onChange={(e) =>
+                      setIsUsingKilograms(e.target.value === "kg")
+                    }
+                    value={isUsingKilograms ? "kg" : "lbs"}
+                  >
+                    <option>lbs</option>
+                    <option>kg</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
       </form>
     </Modal>
   );
