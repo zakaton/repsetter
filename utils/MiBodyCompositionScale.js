@@ -1,10 +1,12 @@
-// https://github.com/oliexdev/openScale/wiki/Xiaomi-Bluetooth-Mi-Scale
+// https://github.com/wiecosystem/Bluetooth/blob/master/doc/devices/huami.health.scale2.md
+// https://dev.to/henrylim96/reading-xiaomi-mi-scale-data-with-web-bluetooth-scanning-api-1mb9
 
 import { EventDispatcher } from "./EventDispatcher";
+import Metrics from "./MIBCSMetrics";
 
-export default class MiSmartScale2 extends EventDispatcher {
-  serviceUUID = "0000181d-0000-1000-8000-00805f9b34fb";
-  characteristicUUID = "00002a9d-0000-1000-8000-00805f9b34fb";
+export default class MiBodyCompositionScale extends EventDispatcher {
+  serviceUUID = "0000181b-0000-1000-8000-00805f9b34fb";
+  characteristicUUID = "00002a9c-0000-1000-8000-00805f9b34fb";
 
   get isConnected() {
     return this.server?.connected;
@@ -59,23 +61,24 @@ export default class MiSmartScale2 extends EventDispatcher {
 
   onCharacteristicValueChanged(event) {
     const dataView = event.target.value;
-    const controlByte = dataView.getUint8(0);
+    const controlByte = dataView.getUint8(1);
     const stabilized = Boolean(controlByte & (1 << 5));
-    let weight = dataView.getUint16(1, true);
+    let weight = dataView.getUint16(11, true);
     let isUsingKilograms = true;
-    if (Boolean(controlByte & (1 << 0))) {
-      // lbs
-      isUsingKilograms = false;
-    } else if (Boolean(controlByte & (1 << 4))) {
-      // jin
-      isUsingKilograms = false;
-      weight *= 1.1023113109244;
-    }
-
     if (isUsingKilograms) {
       weight /= 200;
     } else {
       weight /= 100;
+    }
+
+    const impedance = dataView.getUint16(9, true);
+    if (stabilized && impedance > 0 && impedance < 3000) {
+      const metrics = new Metrics(weight, impedance, 180, 28, "male");
+      const result = metrics.getResult();
+      const bodyfatPercentage = result.find(
+        (result) => result.name === "Fat"
+      ).value;
+      // not gonna use bodyfat percentage - complete garbage data
     }
 
     this.dispatchEvent({

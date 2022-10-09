@@ -16,6 +16,7 @@ import {
 import { weightEvents } from "../../../utils/weight-utils";
 import { useWiiBalanceBoard } from "../../../context/wii-balance-board-context";
 import MiSmartScale2 from "../../../utils/MiSmartScale2";
+import MiBodyCompositionScale from "../../../utils/MiBodyCompositionScale";
 
 export default function WeightModal(props) {
   const {
@@ -173,6 +174,62 @@ export default function WeightModal(props) {
   }, [open]);
 
   // MI SMART SCALE 2 END
+
+  // Mi Body Composition Scale START
+  const [miBodyCompositionScale, setMiBodyCompositionScale] = useState();
+  const [miBodyCompositionScaleWeight, setMiBodyCompositionScaleWeight] =
+    useState(0);
+  const [
+    isConnectedToMiBodyCompositionScale,
+    setIsConnectedToMiBodyCompositionScale,
+  ] = useState(false);
+  useEffect(() => {
+    if (navigator?.bluetooth) {
+      const miBodyCompositionScale = new MiBodyCompositionScale();
+      setMiBodyCompositionScale(miBodyCompositionScale);
+      window.miBodyCompositionScale = miBodyCompositionScale;
+
+      miBodyCompositionScale.addEventListener("connected", (event) => {
+        setIsConnectedToMiBodyCompositionScale(true);
+      });
+      miBodyCompositionScale.addEventListener("disconnected", (event) => {
+        setIsConnectedToMiBodyCompositionScale(false);
+      });
+
+      miBodyCompositionScale.addEventListener("weight", (event) => {
+        // FIX
+        const { weight, isUsingKilograms, stabilized } = event.message;
+        setMiBodyCompositionScaleWeight(weight);
+        setIsUsingKilograms(isUsingKilograms);
+        if (stabilized) {
+          setWeight(weight.toFixed(2));
+          setIsWeightEmptyString(false);
+        }
+      });
+
+      return () => {
+        miBodyCompositionScale._listeners = {};
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!miBodyCompositionScale) return;
+
+    if (scaleType === "miBodyCompositionScale") {
+      miBodyCompositionScale.open();
+    } else {
+      miBodyCompositionScale.close();
+    }
+  }, [scaleType, miBodyCompositionScale]);
+
+  useEffect(() => {
+    if (miBodyCompositionScale) {
+      miBodyCompositionScale.disconnect();
+    }
+  }, [open]);
+
+  // Mi Body Composition Scale END
 
   const [isAddingWeight, setIsAddingWeight] = useState(false);
   const [didAddWeight, setDidAddWeight] = useState(false);
@@ -571,6 +628,11 @@ export default function WeightModal(props) {
                 {miSmartScale2 && (
                   <option value="miSmartScale2">Mi Smart Scale 2</option>
                 )}
+                {miBodyCompositionScale && (
+                  <option value="miBodyCompositionScale">
+                    Mi Body Composition Scale
+                  </option>
+                )}
               </optgroup>
             </select>
           </div>
@@ -681,6 +743,70 @@ export default function WeightModal(props) {
                       ? (isUsingKilograms
                           ? miSmartScale2Weight
                           : kilogramsToPounds(miSmartScale2Weight)
+                        ).toFixed(2)
+                      : ""
+                  }
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <label
+                    htmlFor="weight-type-mi-smart-scale-2"
+                    className="sr-only"
+                  >
+                    weight type
+                  </label>
+                  <select
+                    id="weight-type-mi-smart-scale-2"
+                    name="weight-type-mi-smart-scale-2"
+                    className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    onChange={(e) =>
+                      setIsUsingKilograms(e.target.value === "kg")
+                    }
+                    value={isUsingKilograms ? "kg" : "lbs"}
+                  >
+                    <option>lbs</option>
+                    <option>kg</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+        {scaleType === "miBodyCompositionScale" &&
+          miBodyCompositionScale &&
+          !isConnectedToMiBodyCompositionScale && (
+            <button
+              type="button"
+              onClick={() => miBodyCompositionScale.connect()}
+              className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Connect to Mi Body Composition Scale
+            </button>
+          )}
+        {scaleType === "miBodyCompositionScale" &&
+          miBodyCompositionScale &&
+          miBodyCompositionScale.isConnected && (
+            <div className="col-span-1">
+              <label
+                htmlFor="mi-smart-scale-2-weight"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Mi Body Composition Scale Weight
+              </label>
+              <div className="relative mt-1 rounded-md shadow-sm">
+                <input
+                  readOnly
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  placeholder="0"
+                  name="mi-smart-scale-2-weight"
+                  id="mi-smart-scale-2-weight"
+                  className="hide-arrows block w-full rounded-md border-gray-300 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  value={
+                    miBodyCompositionScaleWeight
+                      ? (isUsingKilograms
+                          ? miBodyCompositionScaleWeight
+                          : kilogramsToPounds(miBodyCompositionScaleWeight)
                         ).toFixed(2)
                       : ""
                   }
