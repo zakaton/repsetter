@@ -168,6 +168,20 @@ export default async function handler(req, res) {
               }
             }
 
+            if (event.type === "customer.subscription.deleted") {
+              console.log("de-activating subscription...");
+              await supabase
+                .from("subscription")
+                .update({
+                  is_active: false,
+                })
+                .eq("id", subscription.id);
+
+              if (client.coaches?.includes(subscription.coach.id)) {
+                coaches.splice(coaches.indexOf(subscription.coach.id), 1);
+              }
+            }
+
             console.log("coaches", coaches);
             const updateClientResponse = await supabase
               .from("profile")
