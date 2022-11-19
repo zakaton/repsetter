@@ -169,6 +169,10 @@ export default async function handler(req, res) {
             }
 
             if (event.type === "customer.subscription.deleted") {
+              if (client.coaches?.includes(subscription.coach.id)) {
+                coaches.splice(coaches.indexOf(subscription.coach.id), 1);
+              }
+
               console.log("deleting subscription...");
               const deleteSubscriptionResult = await supabase
                 .from("subscription")
@@ -178,10 +182,6 @@ export default async function handler(req, res) {
                 "delete subscription result",
                 deleteSubscriptionResult
               );
-
-              if (client.coaches?.includes(subscription.coach.id)) {
-                coaches.splice(coaches.indexOf(subscription.coach.id), 1);
-              }
             }
 
             console.log("coaches", coaches);
