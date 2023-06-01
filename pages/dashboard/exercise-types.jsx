@@ -171,6 +171,10 @@ export default function ExerciseTypes() {
             title: "features",
             value: result.features.join(", "),
           },
+          result.styles?.length > 0 && {
+            title: "styles",
+            value: result.styles.join(", "),
+          },
           result.group && {
             title: "group",
             value: result.group,

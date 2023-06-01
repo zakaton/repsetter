@@ -79,6 +79,7 @@ export default function ExerciseModal(props) {
   const [didUpdateExercise, setDidUpdateExercise] = useState(false);
 
   const [selectedExerciseType, setSelectedExerciseType] = useState(null);
+  const [style, setStyle] = useState(null);
   const [numberOfSets, setNumberOfSets] = useState(initialNumberOfSets);
   const [isNumberOfSetsEmptyString, setIsNumberOfSetsEmptyString] =
     useState(false);
@@ -99,6 +100,14 @@ export default function ExerciseModal(props) {
     isNumberOfRepsPerformedEmptyString,
     setIsNumberOfRepsPerformedEmptyString,
   ] = useState([]);
+
+  useEffect(() => {
+    if (open && selectedExerciseType) {
+      if (selectedExerciseType.styles?.length > 0 && style == null) {
+        setStyle(selectedExerciseType.styles[0]);
+      }
+    }
+  }, [open, selectedExerciseType]);
 
   /*
   console.log({
@@ -267,6 +276,8 @@ export default function ExerciseModal(props) {
     setDidAddExercise(false);
     setSelectedExerciseType(null);
 
+    setStyle(null);
+
     setNumberOfSets(3);
     setIsNumberOfSetsEmptyString(false);
 
@@ -317,6 +328,10 @@ export default function ExerciseModal(props) {
       setNumberOfSets(selectedExercise.number_of_sets_assigned);
       if (selectedExercise.number_of_reps_assigned) {
         setNumberOfReps(selectedExercise.number_of_reps_assigned);
+      }
+
+      if (selectedExercise.style) {
+        setStyle(selectedExercise.style);
       }
 
       if (selectedExercise.is_weight_in_kilograms !== null) {
@@ -774,6 +789,10 @@ export default function ExerciseModal(props) {
         );
       }
 
+      if (previousExercise.style) {
+        setStyle(previousExercise.style);
+      }
+
       if (previousExercise.weight_assigned) {
         setWeight(
           previousExercise.weight_assigned,
@@ -856,6 +875,12 @@ export default function ExerciseModal(props) {
 
               number_of_sets_assigned: numberOfSets,
               number_of_sets_performed: numberOfSetsPerformed,
+
+              ...(selectedExerciseType.styles?.length > 0
+                ? {
+                    style,
+                  }
+                : {}),
 
               ...(selectedExerciseType.features?.includes("reps")
                 ? {
@@ -1005,6 +1030,12 @@ export default function ExerciseModal(props) {
                     weight_assigned: isUsingKilograms
                       ? weightKilograms
                       : weightPounds,
+                  }
+                : {}),
+
+              ...(selectedExerciseType.styles?.length > 0
+                ? {
+                    style,
                   }
                 : {}),
 
@@ -1405,6 +1436,40 @@ export default function ExerciseModal(props) {
                 </div>
               </div>
             </div>
+
+            {selectedExerciseType.styles?.length > 0 && (
+              <div>
+                <label
+                  htmlFor="style"
+                  className="block select-none text-sm font-medium text-gray-700"
+                >
+                  Style
+                </label>
+                <div className="mt-1">
+                  <select
+                    className="mt-1 block w-fit rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    value={style || ""}
+                    onInput={(e) => {
+                      const newStyle = e.target.value;
+                      setStyle(newStyle);
+                    }}
+                  >
+                    {selectedExerciseType.styles.map((style, index) => {
+                      const id = `${style}-${index}`;
+                      return (
+                        <option
+                          key={id}
+                          value={style}
+                          className="flex items-center text-base sm:text-sm"
+                        >
+                          {style}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+            )}
 
             <div>
               <label

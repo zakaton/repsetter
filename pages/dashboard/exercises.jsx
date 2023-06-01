@@ -248,7 +248,9 @@ export default function Exercises() {
             },
           {
             title: "name",
-            value: exercise.type.name,
+            value: `${exercise.type.name}${
+              exercise.style ? ` (${exercise.style})` : ""
+            }`,
           },
           exercise.block && {
             title: "block",

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import { PencilAltIcon } from "@heroicons/react/outline";
+import { PlusCircleIcon } from "@heroicons/react/solid";
 import {
   muscles,
   muscleGroups,
@@ -53,12 +54,14 @@ export default function ExerciseTypeModal(props) {
     setExerciseTypeName("");
     setSelectedMuscles([]);
     setSelectedFeatures([]);
+    setSelectedStyles([]);
     setVideoUrl("");
     setVideoFile("");
     setSelectedExerciseType?.();
     setVideoDuration(0);
     setVideoThumbnailTime(null);
     setGroup("");
+    setExerciseStyleName("");
   };
   useEffect(() => {
     if (!open) {
@@ -75,12 +78,16 @@ export default function ExerciseTypeModal(props) {
   const [exerciseTypeName, setExerciseTypeName] = useState("");
   const maxExerciseTypeLength = 30;
 
+  const [exerciseStyleName, setExerciseStyleName] = useState("");
+  const maxExerciseStyleLength = 30;
+
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [videoUrl, setVideoUrl] = useState();
   const [videoFile, setVideoFile] = useState();
 
   const [selectedMuscles, setSelectedMuscles] = useState([]);
   const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [selectedStyles, setSelectedStyles] = useState([]);
 
   const [group, setGroup] = useState("");
 
@@ -98,6 +105,7 @@ export default function ExerciseTypeModal(props) {
           selectedExerciseType?.features?.includes(feature)
         )
       );
+      setSelectedStyles(selectedExerciseType.styles || []);
       getExerciseVideo(selectedExerciseType.id);
     }
   }, [selectedExerciseType]);
@@ -192,7 +200,12 @@ export default function ExerciseTypeModal(props) {
 
           if (selectedExerciseType) {
             setIsUpdatingExerciseType(true);
-            console.log(exerciseTypeName, flattenedSelectedMuscles, videoFile);
+            console.log(
+              exerciseTypeName,
+              flattenedSelectedMuscles,
+              videoFile,
+              selectedStyles
+            );
             let updateExerciseError, replaceVideoError, replaceImageError;
             if (
               exerciseTypeName !== selectedExerciseType.name ||
@@ -201,7 +214,11 @@ export default function ExerciseTypeModal(props) {
                 selectedExerciseType.muscles,
                 flattenedSelectedMuscles
               ) ||
-              !areArraysTheSame(selectedExerciseType.features, selectedFeatures)
+              !areArraysTheSame(
+                selectedExerciseType.features,
+                selectedFeatures
+              ) ||
+              !areArraysTheSame(selectedExerciseType.styles, selectedStyles)
             ) {
               console.log("updating exercise row");
               const { data: updateExerciseType, error } = await supabase
@@ -210,6 +227,7 @@ export default function ExerciseTypeModal(props) {
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
                   features: selectedFeatures,
+                  styles: selectedStyles,
                   group,
                 })
                 .match({ id: selectedExerciseType.id });
@@ -282,6 +300,7 @@ export default function ExerciseTypeModal(props) {
                   name: exerciseTypeName,
                   muscles: flattenedSelectedMuscles,
                   features: selectedFeatures,
+                  styles: selectedStyles,
                   group,
                 },
               ]);
@@ -494,6 +513,87 @@ export default function ExerciseTypeModal(props) {
                   className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
                 >
                   <span className="sr-only">Remove filter for {feature}</span>
+                  <svg
+                    className="h-2 w-2"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 8 8"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeWidth="1.5"
+                      d="M1 1l6 6m0-6L1 7"
+                    />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="my-4">
+          <label
+            htmlFor="styles"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Styles
+          </label>
+          {/* STYLE */}
+          <div className="mt-2 flex rounded-md shadow-sm">
+            <div className="relative flex flex-grow items-stretch focus-within:z-10">
+              <input
+                type="text"
+                autoComplete="off"
+                id="exerciseStyleName"
+                name="exerciseStyleName"
+                className="block w-full rounded-none rounded-l-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                placeholder="Type an Exercise Style"
+                value={exerciseStyleName}
+                maxLength={maxExerciseStyleLength}
+                onInput={(e) => setExerciseStyleName(e.target.value)}
+              />
+            </div>
+            <button
+              type="button"
+              className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              onClick={(e) => {
+                if (
+                  exerciseStyleName &&
+                  !selectedStyles.includes(exerciseStyleName)
+                ) {
+                  setSelectedStyles(selectedStyles.concat(exerciseStyleName));
+                  setExerciseStyleName("");
+                }
+              }}
+            >
+              <PlusCircleIcon
+                className="-ml-0.5 h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              Add
+            </button>
+          </div>
+
+          <p className="my-0 mt-1 p-0 text-sm italic text-gray-400">
+            {exerciseStyleName.length}/{maxExerciseStyleLength}
+          </p>
+          <div className="mt-2">
+            {selectedStyles.map((style) => (
+              <span
+                key={style}
+                className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
+              >
+                <span>{style}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedStyles(
+                      selectedStyles.filter((_style) => _style !== style)
+                    );
+                  }}
+                  className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
+                >
+                  <span className="sr-only">Remove style for {style}</span>
                   <svg
                     className="h-2 w-2"
                     stroke="currentColor"

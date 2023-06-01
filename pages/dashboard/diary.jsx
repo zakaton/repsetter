@@ -1348,7 +1348,9 @@ export default function Diary() {
                               Name
                             </dt>
                             <dd className="mt-1 break-words text-sm text-gray-900">
-                              {exercise.type.name}
+                              {`${exercise.type.name}${
+                                exercise.style ? ` (${exercise.style})` : ""
+                              }`}
                             </dd>
                           </div>
                           {exercise.block && (
